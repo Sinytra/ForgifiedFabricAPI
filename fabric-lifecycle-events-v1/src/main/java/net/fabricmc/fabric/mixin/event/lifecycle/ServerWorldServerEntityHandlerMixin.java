@@ -31,17 +31,17 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 abstract class ServerWorldServerEntityHandlerMixin {
 	// final synthetic Lnet/minecraft/server/level/ServerLevel; f_143351_
 	@SuppressWarnings("ShadowTarget")
-	@Shadow
+	@Shadow(aliases = "f_143351_")
 	@Final
-	private ServerLevel f_143351_;
+	private ServerLevel this$0;
 
 	@Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
 	private void invokeEntityLoadEvent(Entity entity, CallbackInfo ci) {
-		ServerEntityEvents.ENTITY_LOAD.invoker().onLoad(entity, this.f_143351_);
+		ServerEntityEvents.ENTITY_LOAD.invoker().onLoad(entity, this.this$0);
 	}
 
 	@Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
 	private void invokeEntityUnloadEvent(Entity entity, CallbackInfo info) {
-		ServerEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.f_143351_);
+		ServerEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.this$0);
 	}
 }

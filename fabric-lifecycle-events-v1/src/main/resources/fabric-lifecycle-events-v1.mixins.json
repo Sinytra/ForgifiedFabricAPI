@@ -5,7 +5,6 @@
   "mixins": [
     "MinecraftServerMixin",
     "ServerWorldServerEntityHandlerMixin",
-    "ServerWorldMixin",
     "WorldMixin"
   ],
   "server": [

@@ -69,3 +69,9 @@ Fabric API Lookup API (v1) Test Mod
     versionRange="[0, )"
     ordering="NONE"
     side="BOTH"
+[[dependencies.fabric_api_lookup_api_v1_testmod]]
+    modId="fabric_object_builder_api_v1"
+    mandatory=true
+    versionRange="[0, )"
+    ordering="NONE"
+    side="BOTH"

@@ -8,5 +8,5 @@ mixin {
 }
 
 dependencies { 
-    implementation(project(":fabric-api-base"))
+    api(project(":fabric-api-base"))
 }

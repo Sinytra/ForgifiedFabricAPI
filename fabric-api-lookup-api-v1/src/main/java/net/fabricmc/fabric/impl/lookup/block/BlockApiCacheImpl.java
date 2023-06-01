@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.impl.lookup.block;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -128,11 +129,11 @@ public final class BlockApiCacheImpl<A, C> implements BlockApiCache<A, C> {
 
 	static {
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
-			((ServerWorldCache) world).fabric_invalidateCache(blockEntity.getPos());
+			((ServerWorldCache) world).fabric_invalidateCache(blockEntity.getBlockPos());
 		});
 
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
-			((ServerWorldCache) world).fabric_invalidateCache(blockEntity.getPos());
+			((ServerWorldCache) world).fabric_invalidateCache(blockEntity.getBlockPos());
 		});
 	}
 }

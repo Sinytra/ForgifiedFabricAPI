@@ -16,116 +16,127 @@
 
 package net.fabricmc.fabric.test.lookup;
 
-import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.material.Material;
-import org.jetbrains.annotations.NotNull;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.test.lookup.api.ItemApis;
 import net.fabricmc.fabric.test.lookup.api.ItemInsertable;
+import net.fabricmc.fabric.test.lookup.client.entity.FabricEntityApiLookupTestClient;
 import net.fabricmc.fabric.test.lookup.compat.InventoryExtractableProvider;
 import net.fabricmc.fabric.test.lookup.compat.InventoryInsertableProvider;
 import net.fabricmc.fabric.test.lookup.entity.FabricEntityApiLookupTest;
 import net.fabricmc.fabric.test.lookup.item.FabricItemApiLookupTest;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Material;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
 
-public class FabricApiLookupTest implements ModInitializer {
-	public static final String MOD_ID = "fabric-lookup-api-v1-testmod";
-	// Chute - Block without model that transfers item from the container above to the container below.
-	// It's meant to work with unsided containers: chests, dispensers, droppers and hoppers.
-	public static final ChuteBlock CHUTE_BLOCK = new ChuteBlock(FabricBlockSettings.of(Material.METAL));
-	public static final BlockItem CHUTE_ITEM = new BlockItem(CHUTE_BLOCK, new Item.Properties());
-	public static BlockEntityType<ChuteBlockEntity> CHUTE_BLOCK_ENTITY_TYPE;
-	// Cobble gen - Block without model that can generate infinite cobblestone when placed above a chute.
-	// It's meant to test BlockApiLookup#registerSelf.
-	public static final CobbleGenBlock COBBLE_GEN_BLOCK = new CobbleGenBlock(FabricBlockSettings.of(Material.METAL));
-	public static final BlockItem COBBLE_GEN_ITEM = new BlockItem(COBBLE_GEN_BLOCK, new Item.Properties());
-	public static BlockEntityType<CobbleGenBlockEntity> COBBLE_GEN_BLOCK_ENTITY_TYPE;
-	// Testing for item api lookups is done in the `item` package.
+@Mod("fabric_api_lookup_api_v1_testmod")
+public class FabricApiLookupTest {
+    public static final String MOD_ID = "fabric-lookup-api-v1-testmod";
 
-	public static final InspectorBlock INSPECTOR_BLOCK = new InspectorBlock(FabricBlockSettings.of(Material.METAL));
-	public static final BlockItem INSPECTOR_ITEM = new BlockItem(INSPECTOR_BLOCK, new Item.Properties());
+    public static final DeferredRegister<Block> BLOCK_REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_REGISTER = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MOD_ID);
+    public static final DeferredRegister<Item> ITEM_REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPE_REGISTER = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MOD_ID);
 
-	@Override
-	public void onInitialize() {
-		ResourceLocation chute = new ResourceLocation(MOD_ID, "chute");
-		Registry.register(BuiltInRegistries.BLOCK, chute, CHUTE_BLOCK);
-		Registry.register(BuiltInRegistries.ITEM, chute, CHUTE_ITEM);
-		CHUTE_BLOCK_ENTITY_TYPE = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, chute, FabricBlockEntityTypeBuilder.create(ChuteBlockEntity::new, CHUTE_BLOCK).build());
+    // Chute - Block without model that transfers item from the container above to the container below.
+    // It's meant to work with unsided containers: chests, dispensers, droppers and hoppers.
+    public static final RegistryObject<ChuteBlock> CHUTE_BLOCK = BLOCK_REGISTER.register("chute", () -> new ChuteBlock(FabricBlockSettings.of(Material.METAL)));
+    public static final RegistryObject<BlockItem> CHUTE_ITEM = ITEM_REGISTER.register("chute", () -> new BlockItem(CHUTE_BLOCK.get(), new Item.Properties()));
+    public static final RegistryObject<BlockEntityType<ChuteBlockEntity>> CHUTE_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_REGISTER.register("chute", () -> FabricBlockEntityTypeBuilder.create(ChuteBlockEntity::new, CHUTE_BLOCK.get()).build());
+    // Cobble gen - Block without model that can generate infinite cobblestone when placed above a chute.
+    // It's meant to test BlockApiLookup#registerSelf.
+    public static final RegistryObject<CobbleGenBlock> COBBLE_GEN_BLOCK = BLOCK_REGISTER.register("cobble_gen", () -> new CobbleGenBlock(FabricBlockSettings.of(Material.METAL)));
+    public static final RegistryObject<BlockItem> COBBLE_GEN_ITEM = ITEM_REGISTER.register("cobble_gen", () -> new BlockItem(COBBLE_GEN_BLOCK.get(), new Item.Properties()));
+    public static final RegistryObject<BlockEntityType<CobbleGenBlockEntity>> COBBLE_GEN_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_REGISTER.register("cobble_gen", () -> FabricBlockEntityTypeBuilder.create(CobbleGenBlockEntity::new, COBBLE_GEN_BLOCK.get()).build());
+    // Testing for item api lookups is done in the `item` package.
 
-		ResourceLocation cobbleGen = new ResourceLocation(MOD_ID, "cobble_gen");
-		Registry.register(BuiltInRegistries.BLOCK, cobbleGen, COBBLE_GEN_BLOCK);
-		Registry.register(BuiltInRegistries.ITEM, cobbleGen, COBBLE_GEN_ITEM);
-		COBBLE_GEN_BLOCK_ENTITY_TYPE = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, cobbleGen, FabricBlockEntityTypeBuilder.create(CobbleGenBlockEntity::new, COBBLE_GEN_BLOCK).build());
+    public static final RegistryObject<InspectorBlock> INSPECTOR_BLOCK = BLOCK_REGISTER.register("inspector", () -> new InspectorBlock(FabricBlockSettings.of(Material.METAL)));
+    public static final RegistryObject<BlockItem> INSPECTOR_ITEM = ITEM_REGISTER.register("inspector", () -> new BlockItem(INSPECTOR_BLOCK.get(), new Item.Properties()));
 
-		InventoryExtractableProvider extractableProvider = new InventoryExtractableProvider();
-		InventoryInsertableProvider insertableProvider = new InventoryInsertableProvider();
+    public FabricApiLookupTest() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        bus.addListener(this::onCommonSetup);
+        bus.addListener(FabricEntityApiLookupTest::onAttributesCreate);
+        bus.addListener(FabricEntityApiLookupTestClient::onInitializeClient);
 
-		ItemApis.INSERTABLE.registerForBlockEntities(insertableProvider, BlockEntityType.CHEST, BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.HOPPER);
-		ItemApis.EXTRACTABLE.registerForBlockEntities(extractableProvider, BlockEntityType.CHEST, BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.HOPPER);
-		ItemApis.EXTRACTABLE.registerSelf(COBBLE_GEN_BLOCK_ENTITY_TYPE);
+        BLOCK_REGISTER.register(bus);
+        ITEM_REGISTER.register(bus);
+        BLOCK_ENTITY_REGISTER.register(bus);
+        ENTITY_TYPE_REGISTER.register(bus);
 
-		testLookupRegistry();
-		testSelfRegistration();
+        FabricItemApiLookupTest.onInitialize();
+        FabricEntityApiLookupTest.onInitialize();
+    }
 
-		ResourceLocation inspector = new ResourceLocation(FabricApiLookupTest.MOD_ID, "inspector");
-		Registry.register(BuiltInRegistries.BLOCK, inspector, INSPECTOR_BLOCK);
-		Registry.register(BuiltInRegistries.ITEM, inspector, INSPECTOR_ITEM);
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        InventoryExtractableProvider extractableProvider = new InventoryExtractableProvider();
+        InventoryInsertableProvider insertableProvider = new InventoryInsertableProvider();
 
-		FabricItemApiLookupTest.onInitialize();
-		FabricEntityApiLookupTest.onInitialize();
-	}
+        ItemApis.INSERTABLE.registerForBlockEntities(insertableProvider, BlockEntityType.CHEST, BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.HOPPER);
+        ItemApis.EXTRACTABLE.registerForBlockEntities(extractableProvider, BlockEntityType.CHEST, BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.HOPPER);
+        ItemApis.EXTRACTABLE.registerSelf(COBBLE_GEN_BLOCK_ENTITY_TYPE.get());
 
-	private static void testLookupRegistry() {
-		BlockApiLookup<ItemInsertable, @NotNull Direction> insertable2 = BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), ItemInsertable.class, Direction.class);
+        testLookupRegistry();
+        testSelfRegistration();
 
-		if (insertable2 != ItemApis.INSERTABLE) {
-			throw new AssertionError("The registry should have returned the same instance.");
-		}
+        FabricItemApiLookupTest.runTests();
+        FabricEntityApiLookupTest.runTests();
+    }
 
-		ensureException(() -> {
-			BlockApiLookup<Void, Void> wrongInsertable = BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), Void.class, Void.class);
-			wrongInsertable.registerFallback((world, pos, state, be, nocontext) -> null);
-		}, "The registry should have prevented creation of another instance with different classes, but same id.");
+    private static void testLookupRegistry() {
+        BlockApiLookup<ItemInsertable, @NotNull Direction> insertable2 = BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), ItemInsertable.class, Direction.class);
 
-		if (!insertable2.getId().equals(new ResourceLocation("testmod:item_insertable"))) {
-			throw new AssertionError("Incorrect identifier was returned.");
-		}
+        if (insertable2 != ItemApis.INSERTABLE) {
+            throw new AssertionError("The registry should have returned the same instance.");
+        }
 
-		if (insertable2.apiClass() != ItemInsertable.class) {
-			throw new AssertionError("Incorrect API class was returned.");
-		}
+        ensureException(() -> {
+            BlockApiLookup<Void, Void> wrongInsertable = BlockApiLookup.get(new ResourceLocation("testmod:item_insertable"), Void.class, Void.class);
+            wrongInsertable.registerFallback((world, pos, state, be, nocontext) -> null);
+        }, "The registry should have prevented creation of another instance with different classes, but same id.");
 
-		if (insertable2.contextClass() != Direction.class) {
-			throw new AssertionError("Incorrect context class was returned.");
-		}
-	}
+        if (!insertable2.getId().equals(new ResourceLocation("testmod:item_insertable"))) {
+            throw new AssertionError("Incorrect identifier was returned.");
+        }
 
-	private static void testSelfRegistration() {
-		ensureException(() -> {
-			ItemApis.INSERTABLE.registerSelf(COBBLE_GEN_BLOCK_ENTITY_TYPE);
-		}, "The BlockApiLookup should have prevented self-registration of incompatible block entity types.");
-	}
+        if (insertable2.apiClass() != ItemInsertable.class) {
+            throw new AssertionError("Incorrect API class was returned.");
+        }
 
-	public static void ensureException(Runnable runnable, String message) {
-		boolean failed = false;
+        if (insertable2.contextClass() != Direction.class) {
+            throw new AssertionError("Incorrect context class was returned.");
+        }
+    }
 
-		try {
-			runnable.run();
-		} catch (Throwable t) {
-			failed = true;
-		}
+    private static void testSelfRegistration() {
+        ensureException(() -> ItemApis.INSERTABLE.registerSelf(COBBLE_GEN_BLOCK_ENTITY_TYPE.get()), "The BlockApiLookup should have prevented self-registration of incompatible block entity types.");
+    }
 
-		if (!failed) {
-			throw new AssertionError(message);
-		}
-	}
+    public static void ensureException(Runnable runnable, String message) {
+        boolean failed = false;
+
+        try {
+            runnable.run();
+        } catch (Throwable t) {
+            failed = true;
+        }
+
+        if (!failed) {
+            throw new AssertionError(message);
+        }
+    }
 }

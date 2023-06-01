@@ -29,3 +29,4 @@ rootProject.name = "ForgifiedFabricAPI"
 include("fabric-api-base")
 include("fabric-api-lookup-api-v1")
 include("fabric-lifecycle-events-v1")
+include("fabric-object-builder-api-v1")

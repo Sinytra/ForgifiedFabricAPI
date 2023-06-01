@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 
 public class CobbleGenBlockEntity extends BlockEntity implements ItemExtractable {
 	public CobbleGenBlockEntity(BlockPos pos, BlockState state) {
-		super(FabricApiLookupTest.COBBLE_GEN_BLOCK_ENTITY_TYPE, pos, state);
+		super(FabricApiLookupTest.COBBLE_GEN_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	@Override

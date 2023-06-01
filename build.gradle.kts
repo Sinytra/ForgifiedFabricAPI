@@ -2,7 +2,7 @@ import net.minecraftforge.gradle.common.util.RunConfig
 import java.time.LocalDateTime
 
 plugins {
-    java
+    `java-library`
     `maven-publish`
     id("net.minecraftforge.gradle") version "[6.0,6.2)"
     id("org.parchmentmc.librarian.forgegradle") version "1.+"
@@ -95,6 +95,7 @@ tasks {
 }
 
 subprojects {
+    apply(plugin = "java-library")
     apply(plugin = "net.minecraftforge.gradle")
     apply(plugin = "org.parchmentmc.librarian.forgegradle")
     apply(plugin = "org.spongepowered.mixin")
@@ -113,30 +114,17 @@ subprojects {
         }
     }
 
-    val runConfigurator = Action<RunConfig> {
-        property("forge.logging.console.level", "debug")
-        property("forge.logging.markers", "REGISTRIES,SCAN,FMLHANDSHAKE")
-        property("mixin.debug", "true")
-        workingDirectory = project.file("run").canonicalPath
-
-        mods {
-            create(project.name) {
-                sources(sourceSets.main.get())
-            }
-        }
-    }
-
     fun applyTestMod() {
         val testMod: SourceSet by sourceSets.creating
         configurations.named(testMod.implementationConfigurationName) {
             extendsFrom(configurations.implementation.get())
         }
         dependencies.add(testMod.implementationConfigurationName, sourceSets.main.get().output)
-        minecraft.runs.create("testClient") {
-            runConfigurator(this)
+        minecraft.runs.create("clientTest") {
+            parent(minecraft.runs["client"])
             workingDirectory = project.file("run_test").canonicalPath
             mods {
-                create("${project.name}-test") {
+                create("${project.name}_test") {
                     sources(testMod)
                 }
             }
@@ -158,6 +146,19 @@ subprojects {
         if (atFile.exists()) accessTransformer(atFile)
 
         runs {
+            val runConfigurator = Action<RunConfig> {
+                property("forge.logging.console.level", "debug")
+                property("forge.logging.markers", "REGISTRIES,SCAN,FMLHANDSHAKE")
+                property("mixin.debug", "true")
+                workingDirectory = project.file("run").canonicalPath
+
+                mods {
+                    create(project.name) {
+                        sources(sourceSets.main.get())
+                    }
+                }
+            }
+
             create("client", runConfigurator)
             create("server", runConfigurator)
         }
@@ -174,5 +175,6 @@ subprojects {
         minecraft(group = "net.minecraftforge", name = "forge", version = "$versionMc-45.0.66")
 
         implementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.19")
+        annotationProcessor(group = "org.spongepowered", name = "mixin", version = "0.8.5", classifier = "processor")
     }
 }

@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.impl.lookup;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.impl.lookup.entity.EntityApiLookupImpl;
 import net.minecraftforge.fml.common.Mod;
 

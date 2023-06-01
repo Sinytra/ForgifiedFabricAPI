@@ -25,6 +25,6 @@ import java.util.Set;
 
 @Mixin(BlockEntityType.class)
 public interface BlockEntityTypeAccessor {
-	@Accessor("blocks")
-	Set<Block> getBlocks();
+	@Accessor("validBlocks")
+	Set<Block> getValidBlocks();
 }
