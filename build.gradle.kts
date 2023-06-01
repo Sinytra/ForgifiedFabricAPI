@@ -1,19 +1,17 @@
-import java.time.LocalDateTime
-import net.minecraftforge.gradle.common.util.MavenArtifactDownloader
 import net.minecraftforge.gradle.common.util.RunConfig
-import net.minecraftforge.gradle.mcp.tasks.GenerateSRG
+import java.time.LocalDateTime
 
 plugins {
     java
     `maven-publish`
-    id("net.minecraftforge.gradle") version "5.1.+"
-    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
-    id("org.spongepowered.mixin") version "0.7.+"
-    id("dev.su5ed.yarndeobf") version "0.1.+"
+    id("net.minecraftforge.gradle") version "[6.0,6.2)"
+    id("org.parchmentmc.librarian.forgegradle") version "1.+"
+    id("org.spongepowered.mixin") version "0.7.+" apply false
+    id("dev.su5ed.yarndeobf") version "0.1.+" apply false
 }
 
-version = "1.0"
 group = "dev.su5ed.sinytra.fabric-api"
+version = "1.0"
 
 val versionMc: String by project
 
@@ -24,7 +22,7 @@ java {
 
 println("Java: ${System.getProperty("java.version")}, JVM: ${System.getProperty("java.vm.version")} (${System.getProperty("java.vendor")}), Arch: ${System.getProperty("os.arch")}")
 minecraft {
-    mappings("official", versionMc)
+    mappings("parchment", "1.19.3-2023.03.12-$versionMc")
 
 //     accessTransformer(file("src/mod/resources/META-INF/accesstransformer.cfg"))
 
@@ -34,8 +32,6 @@ minecraft {
             property("forge.logging.markers", "REGISTRIES,SCAN,FMLHANDSHAKE")
             property("mixin.debug", "true")
             workingDirectory = project.file("run").canonicalPath
-            // Don't exit the daemon when the game closes
-            forceExit = false
 
             mods {
                 create("fabric_api") {
@@ -66,12 +62,14 @@ sourceSets.main {
 }
 
 repositories {
-    
+    maven {
+        name = "Fabric"
+        url = uri("https://maven.fabricmc.net")
+    }
 }
 
 dependencies {
     minecraft(group = "net.minecraftforge", name = "forge", version = "$versionMc-45.0.66")
-    yarnMappings(group = "net.fabricmc", name = "yarn", version = "1.19.4+build.2")
 }
 
 tasks {
@@ -80,12 +78,12 @@ tasks {
 
         manifest {
             attributes(
-                "Specification-Title" to "examplemod",
-                "Specification-Vendor" to "examplemodsareus",
-                "Specification-Version" to "1", // We are version 1 of ourselves
+                "Specification-Title" to "fabric-api",
+                "Specification-Vendor" to "FabricMC",
+                "Specification-Version" to "1",
                 "Implementation-Title" to project.name,
                 "Implementation-Version" to project.version,
-                "Implementation-Vendor" to "examplemodsareus",
+                "Implementation-Vendor" to "Sinytra",
                 "Implementation-Timestamp" to LocalDateTime.now()
             )
         }
@@ -93,5 +91,88 @@ tasks {
 
     withType<JavaCompile> {
         options.encoding = "UTF-8"
+    }
+}
+
+subprojects {
+    apply(plugin = "net.minecraftforge.gradle")
+    apply(plugin = "org.parchmentmc.librarian.forgegradle")
+    apply(plugin = "org.spongepowered.mixin")
+
+    group = "dev.su5ed.sinytra.fabric-api"
+    version = "1.0"
+
+    fun applyClientSourceSet() {
+        sourceSets.main {
+            java {
+                srcDir("src/client/java")
+            }
+            resources {
+                srcDir("src/client/resources")
+            }
+        }
+    }
+
+    val runConfigurator = Action<RunConfig> {
+        property("forge.logging.console.level", "debug")
+        property("forge.logging.markers", "REGISTRIES,SCAN,FMLHANDSHAKE")
+        property("mixin.debug", "true")
+        workingDirectory = project.file("run").canonicalPath
+
+        mods {
+            create(project.name) {
+                sources(sourceSets.main.get())
+            }
+        }
+    }
+
+    fun applyTestMod() {
+        val testMod: SourceSet by sourceSets.creating
+        configurations.named(testMod.implementationConfigurationName) {
+            extendsFrom(configurations.implementation.get())
+        }
+        dependencies.add(testMod.implementationConfigurationName, sourceSets.main.get().output)
+        minecraft.runs.create("testClient") {
+            runConfigurator(this)
+            workingDirectory = project.file("run_test").canonicalPath
+            mods {
+                create("${project.name}-test") {
+                    sources(testMod)
+                }
+            }
+        }
+    }
+
+    @Suppress("UNUSED_VARIABLE") val withClientSourceSet: () -> Unit by extra { ::applyClientSourceSet }
+    @Suppress("UNUSED_VARIABLE") val withTestMod: () -> Unit by extra { ::applyTestMod }
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+        withSourcesJar()
+    }
+
+    minecraft {
+        mappings("parchment", "1.19.3-2023.03.12-$versionMc")
+
+        val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
+        if (atFile.exists()) accessTransformer(atFile)
+
+        runs {
+            create("client", runConfigurator)
+            create("server", runConfigurator)
+        }
+    }
+
+    repositories {
+        maven {
+            name = "Fabric"
+            url = uri("https://maven.fabricmc.net")
+        }
+    }
+
+    dependencies {
+        minecraft(group = "net.minecraftforge", name = "forge", version = "$versionMc-45.0.66")
+
+        implementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.19")
     }
 }
