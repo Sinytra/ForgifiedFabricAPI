@@ -8,7 +8,7 @@ Missing -> Added -> Cleaned up -> Tested
 
 | API                                  |   State    |
 |:-------------------------------------|:----------:|
-| fabric-api-base                      |  ❓ Added   |
+| fabric-api-base                      |  ✅ Tested  |
 | fabric-api-lookup-api-v1             |  ✅ Tested  |
 | fabric-biome-api-v1                  | ⚠️ Missing |
 | fabric-block-api-v1                  | ⚠️ Missing |

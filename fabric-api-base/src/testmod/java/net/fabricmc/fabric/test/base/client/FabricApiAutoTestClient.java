@@ -16,14 +16,12 @@
 
 package net.fabricmc.fabric.test.base.client;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
-import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import java.io.IOException;
@@ -44,9 +42,9 @@ import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.waitFo
 import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.waitForScreen;
 import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.waitForWorldTicks;
 
-public class FabricApiAutoTestClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class FabricApiAutoTestClient {
+
+	public static void onInitializeClient() {
 		if (System.getProperty("fabric.autoTest") == null) {
 			return;
 		}
@@ -63,7 +61,7 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 		thread.start();
 	}
 
-	private void runTest() {
+	private static void runTest() {
 		waitForLoadingComplete();
 
 		final boolean onboardAccessibility = submitAndWait(client -> client.options.onboardAccessibility);
@@ -80,7 +78,7 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 			clickScreenButton("menu.singleplayer");
 		}
 
-		if (!isDirEmpty(FabricLoader.getInstance().getGameDir().resolve("saves"))) {
+		if (!isDirEmpty(FMLPaths.GAMEDIR.get().resolve("saves"))) {
 			waitForScreen(SelectWorldScreen.class);
 			takeScreenshot("select_world_screen");
 			clickScreenButton("selectWorld.create");
@@ -96,8 +94,9 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 
 		{
 			// API test mods use experimental features
-			waitForScreen(ConfirmScreen.class);
-			clickScreenButton("gui.yes");
+			// RE: No they don't, so we disable this
+//			waitForScreen(ConfirmScreen.class);
+//			clickScreenButton("gui.yes");
 		}
 
 		{
@@ -132,7 +131,7 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 		}
 	}
 
-	private boolean isDirEmpty(Path path) {
+	private static boolean isDirEmpty(Path path) {
 		try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
 			return !directory.iterator().hasNext();
 		} catch (IOException e) {

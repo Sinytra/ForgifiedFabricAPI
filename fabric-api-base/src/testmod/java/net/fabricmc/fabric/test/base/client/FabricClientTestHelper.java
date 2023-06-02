@@ -18,7 +18,6 @@ package net.fabricmc.fabric.test.base.client;
 
 import net.fabricmc.fabric.test.base.client.mixin.CyclingButtonWidgetAccessor;
 import net.fabricmc.fabric.test.base.client.mixin.ScreenAccessor;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -34,6 +33,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -80,7 +80,7 @@ public final class FabricClientTestHelper {
 		waitFor(Duration.ofSeconds(1));
 
 		submitAndWait(client -> {
-			Screenshot.grab(FabricLoader.getInstance().getGameDir().toFile(), name + ".png", client.getMainRenderTarget(), (message) -> {
+			Screenshot.grab(FMLPaths.GAMEDIR.get().toFile(), name + ".png", client.getMainRenderTarget(), (message) -> {
 			});
 			return null;
 		});

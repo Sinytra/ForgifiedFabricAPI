@@ -19,11 +19,13 @@ package net.fabricmc.fabric.test.base;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 @GameTestHolder(FabricApiBaseTestInit.MODID)
 public class FabricApiBaseGameTest {
-	@GameTest(templateNamespace = "fabric_gametest_api_v1", template = "empty")
+	@GameTest(template = "empty")
+	@PrefixGameTestTemplate(false)
 	public void auditMixins(GameTestHelper context) {
 		MixinEnvironment.getCurrentEnvironment().audit();
 

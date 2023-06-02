@@ -21,11 +21,10 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
-public class FabricApiAutoTestServer implements DedicatedServerModInitializer {
-	private int ticks = 0;
+public class FabricApiAutoTestServer {
+	private static int ticks = 0;
 
-	@Override
-	public void onInitializeServer() {
+	public static void onInitializeServer() {
 		if (System.getProperty("fabric.autoTest") != null) {
 			ServerTickEvents.END_SERVER_TICK.register(server -> {
 				ticks++;
