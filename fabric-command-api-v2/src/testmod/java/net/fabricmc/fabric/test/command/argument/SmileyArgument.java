@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.test.base;
+package net.fabricmc.fabric.test.command.argument;
 
-import org.spongepowered.asm.mixin.MixinEnvironment;
+public enum SmileyArgument {
+	HAPPY(":)"),
+	SAD(":(");
 
-import net.fabricmc.api.DedicatedServerModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+	public final String smiley;
 
-public class FabricApiAutoTestServer implements DedicatedServerModInitializer {
-	private int ticks = 0;
-
-	@Override
-	public void onInitializeServer() {
-		if (System.getProperty("fabric.autoTest") != null) {
-			ServerTickEvents.END_SERVER_TICK.register(server -> {
-				ticks++;
-
-				if (ticks == 50) {
-					MixinEnvironment.getCurrentEnvironment().audit();
-					server.halt(false);
-				}
-			});
-		}
+	SmileyArgument(String smiley) {
+		this.smiley = smiley;
 	}
 }

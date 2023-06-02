@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "description": {
+      "text": "fabric_command_api_v2 resources"
+    },
+    "forge:server_data_pack_format": 12,
+    "pack_format": 13
+  }
+}

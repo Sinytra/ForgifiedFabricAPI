@@ -142,7 +142,7 @@ subprojects {
 
     @Suppress("UNCHECKED_CAST")
     val checkReferenceCompatibility by tasks.registering(CheckJarCompatibility::class) {
-        dependsOn(renameReferenceApi)
+        dependsOn("reobfJar", renameReferenceApi)
 
         tool.set("dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all")
         binaryMode.set(false)
@@ -154,10 +154,6 @@ subprojects {
     }
 
     tasks {
-        jar {
-            finalizedBy("reobfJar")
-        }
-
         check {
             dependsOn(checkReferenceCompatibility)
         }

@@ -22,10 +22,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -82,8 +81,8 @@ public class EventTests {
 	}
 
 	private static void testMultipleDefaultPhases() {
-		Identifier first = new Identifier("fabric", "first");
-		Identifier second = new Identifier("fabric", "second");
+		ResourceLocation first = new ResourceLocation("fabric", "first");
+		ResourceLocation second = new ResourceLocation("fabric", "second");
 		Event<Test> event = EventFactory.createWithPhases(Test.class, INVOKER_FACTORY, first, second, Event.DEFAULT_PHASE);
 
 		event.register(second, ensureOrder(1));
@@ -100,10 +99,10 @@ public class EventTests {
 	private static void testAddedPhases() {
 		Event<Test> event = createEvent();
 
-		Identifier veryEarly = new Identifier("fabric", "very_early");
-		Identifier early = new Identifier("fabric", "early");
-		Identifier late = new Identifier("fabric", "late");
-		Identifier veryLate = new Identifier("fabric", "very_late");
+		ResourceLocation veryEarly = new ResourceLocation("fabric", "very_early");
+		ResourceLocation early = new ResourceLocation("fabric", "early");
+		ResourceLocation late = new ResourceLocation("fabric", "late");
+		ResourceLocation veryLate = new ResourceLocation("fabric", "very_late");
 
 		event.addPhaseOrdering(veryEarly, early);
 		event.addPhaseOrdering(early, Event.DEFAULT_PHASE);
@@ -131,11 +130,11 @@ public class EventTests {
 	private static void testCycle() {
 		Event<Test> event = createEvent();
 
-		Identifier a = new Identifier("fabric", "a");
-		Identifier b1 = new Identifier("fabric", "b1");
-		Identifier b2 = new Identifier("fabric", "b2");
-		Identifier b3 = new Identifier("fabric", "b3");
-		Identifier c = Event.DEFAULT_PHASE;
+		ResourceLocation a = new ResourceLocation("fabric", "a");
+		ResourceLocation b1 = new ResourceLocation("fabric", "b1");
+		ResourceLocation b2 = new ResourceLocation("fabric", "b2");
+		ResourceLocation b3 = new ResourceLocation("fabric", "b3");
+		ResourceLocation c = Event.DEFAULT_PHASE;
 
 		// A always first and C always last.
 		event.register(a, ensureOrder(0));
@@ -184,13 +183,13 @@ public class EventTests {
 	 * We get for the final order: [a, d, e, cycle [b, y, z], f].
 	 */
 	private static void testDeterministicOrdering() {
-		Identifier a = new Identifier("fabric", "a");
-		Identifier b = new Identifier("fabric", "b");
-		Identifier d = new Identifier("fabric", "d");
-		Identifier e = new Identifier("fabric", "e");
-		Identifier f = new Identifier("fabric", "f");
-		Identifier y = new Identifier("fabric", "y");
-		Identifier z = new Identifier("fabric", "z");
+		ResourceLocation a = new ResourceLocation("fabric", "a");
+		ResourceLocation b = new ResourceLocation("fabric", "b");
+		ResourceLocation d = new ResourceLocation("fabric", "d");
+		ResourceLocation e = new ResourceLocation("fabric", "e");
+		ResourceLocation f = new ResourceLocation("fabric", "f");
+		ResourceLocation y = new ResourceLocation("fabric", "y");
+		ResourceLocation z = new ResourceLocation("fabric", "z");
 
 		List<Consumer<Event<Test>>> dependencies = List.of(
 				ev -> ev.addPhaseOrdering(a, z),
@@ -229,11 +228,11 @@ public class EventTests {
 	 * </pre>
 	 */
 	private static void testTwoCycles() {
-		Identifier a = new Identifier("fabric", "a");
-		Identifier b = new Identifier("fabric", "b");
-		Identifier c = new Identifier("fabric", "c");
-		Identifier d = new Identifier("fabric", "d");
-		Identifier e = new Identifier("fabric", "e");
+		ResourceLocation a = new ResourceLocation("fabric", "a");
+		ResourceLocation b = new ResourceLocation("fabric", "b");
+		ResourceLocation c = new ResourceLocation("fabric", "c");
+		ResourceLocation d = new ResourceLocation("fabric", "d");
+		ResourceLocation e = new ResourceLocation("fabric", "e");
 
 		List<Consumer<Event<Test>>> dependencies = List.of(
 				ev -> ev.addPhaseOrdering(e, a),

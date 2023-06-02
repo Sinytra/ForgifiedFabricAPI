@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.test.base;
+package net.fabricmc.fabric.test.base.client.mixin;
 
-import net.minecraft.gametest.framework.GameTest;
-import net.minecraft.gametest.framework.GameTestHelper;
-import org.spongepowered.asm.mixin.MixinEnvironment;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-//import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import java.util.List;
 
-public class FabricApiBaseGameTest {
-//	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void auditMixins(GameTestHelper context) {
-		MixinEnvironment.getCurrentEnvironment().audit();
-
-		context.succeed();
-	}
+@Mixin(Screen.class)
+public interface ScreenAccessor {
+	@Accessor
+	List<Renderable> getRenderables();
 }

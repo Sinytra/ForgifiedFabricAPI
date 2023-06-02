@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.test.base;
+package net.fabricmc.fabric.test.base.client.mixin;
 
-import net.minecraft.gametest.framework.GameTest;
-import net.minecraft.gametest.framework.GameTestHelper;
-import org.spongepowered.asm.mixin.MixinEnvironment;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-//import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-
-public class FabricApiBaseGameTest {
-//	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void auditMixins(GameTestHelper context) {
-		MixinEnvironment.getCurrentEnvironment().audit();
-
-		context.succeed();
-	}
+@Mixin(CycleButton.class)
+public interface CyclingButtonWidgetAccessor {
+	@Accessor
+	Component getName();
 }

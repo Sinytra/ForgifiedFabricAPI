@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.test.command.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "CommandSelectionAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

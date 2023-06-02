@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.command.client",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "ClientCommandSourceMixin",
+    "CommandSourceStackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

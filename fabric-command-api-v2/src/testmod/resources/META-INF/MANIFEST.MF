@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+MixinConfigs: fabric-command-api-v2-testmod.mixins.json
