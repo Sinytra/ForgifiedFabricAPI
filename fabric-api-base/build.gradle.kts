@@ -25,9 +25,3 @@ dependencies {
     "testModImplementation"(project(":fabric-lifecycle-events-v1"))
     "testModImplementation"(project(":fabric-command-api-v2"))
 }
-
-tasks.configureEach {
-    if (name.startsWith("run") && name.contains("Test")) {
-        dependsOn(configurations["testModRuntimeClasspath"])
-    }
-}

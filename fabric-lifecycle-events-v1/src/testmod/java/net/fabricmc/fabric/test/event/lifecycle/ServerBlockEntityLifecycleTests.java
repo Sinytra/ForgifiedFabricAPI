@@ -16,85 +16,81 @@
 
 package net.fabricmc.fabric.test.event.lifecycle;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.registry.Registries;
-import net.minecraft.world.chunk.WorldChunk;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.impl.event.lifecycle.LoadedChunksCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.slf4j.Logger;
 
-public final class ServerBlockEntityLifecycleTests implements ModInitializer {
-	private static final boolean PRINT_SERVER_BLOCKENTITY_MESSAGES = System.getProperty("fabric-lifecycle-events-testmod.printServerBlockEntityMessages") != null;
-	private final List<BlockEntity> serverBlockEntities = new ArrayList<>();
+import java.util.ArrayList;
+import java.util.List;
 
-	@Override
-	public void onInitialize() {
-		final Logger logger = ServerLifecycleTests.LOGGER;
+public final class ServerBlockEntityLifecycleTests {
+    private static final boolean PRINT_SERVER_BLOCKENTITY_MESSAGES = System.getProperty("fabric-lifecycle-events-testmod.printServerBlockEntityMessages") != null;
+    private static final List<BlockEntity> serverBlockEntities = new ArrayList<>();
 
-		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
-			this.serverBlockEntities.add(blockEntity);
+    public static void onInitialize() {
+        final Logger logger = ServerLifecycleTests.LOGGER;
 
-			if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
-				logger.info("[SERVER] LOADED " + Registries.BLOCK_ENTITY_TYPE.getId(blockEntity.getType()).toString() + " - BlockEntities: " + this.serverBlockEntities.size());
-			}
-		});
+        ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
+            serverBlockEntities.add(blockEntity);
 
-		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
-			this.serverBlockEntities.remove(blockEntity);
+            if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
+                logger.info("[SERVER] LOADED " + ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(blockEntity.getType()).toString() + " - BlockEntities: " + serverBlockEntities.size());
+            }
+        });
 
-			if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
-				logger.info("[SERVER] UNLOADED " + Registries.BLOCK_ENTITY_TYPE.getId(blockEntity.getType()).toString() + " - BlockEntities: " + this.serverBlockEntities.size());
-			}
-		});
+        ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
+            serverBlockEntities.remove(blockEntity);
 
-		ServerTickEvents.END_SERVER_TICK.register(minecraftServer -> {
-			if (minecraftServer.getTicks() % 200 == 0) {
-				int entities = 0;
+            if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
+                logger.info("[SERVER] UNLOADED " + ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(blockEntity.getType()).toString() + " - BlockEntities: " + serverBlockEntities.size());
+            }
+        });
 
-				if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
-					logger.info("[SERVER] Tracked BlockEntities:" + this.serverBlockEntities.size() + " Ticked at: " + minecraftServer.getTicks() + "ticks");
-				}
+        ServerTickEvents.END_SERVER_TICK.register(minecraftServer -> {
+            if (minecraftServer.getTickCount() % 200 == 0) {
+                int entities = 0;
 
-				for (ServerWorld world : minecraftServer.getWorlds()) {
-					int worldEntities = 0;
+                if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
+                    logger.info("[SERVER] Tracked BlockEntities:" + serverBlockEntities.size() + " Ticked at: " + minecraftServer.getTickCount() + "ticks");
+                }
 
-					for (WorldChunk chunk : ((LoadedChunksCache) world).fabric_getLoadedChunks()) {
-						worldEntities += chunk.getBlockEntities().size();
-					}
+                for (ServerLevel world : minecraftServer.getAllLevels()) {
+                    int worldEntities = 0;
 
-					if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
-						logger.info("[SERVER] Tracked BlockEntities in " + world.getRegistryKey().toString() + " - " + worldEntities);
-					}
+                    for (LevelChunk chunk : ((LoadedChunksCache) world).fabric_getLoadedChunks()) {
+                        worldEntities += chunk.getBlockEntities().size();
+                    }
 
-					entities += worldEntities;
-				}
+                    if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
+                        logger.info("[SERVER] Tracked BlockEntities in " + world.dimension() + " - " + worldEntities);
+                    }
 
-				if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
-					logger.info("[SERVER] Actual Total BlockEntities: " + entities);
-				}
+                    entities += worldEntities;
+                }
 
-				if (entities != this.serverBlockEntities.size()) {
-					// Always print mismatches
-					logger.error("[SERVER] Mismatch in tracked blockentities and actual blockentities");
-				}
-			}
-		});
+                if (PRINT_SERVER_BLOCKENTITY_MESSAGES) {
+                    logger.info("[SERVER] Actual Total BlockEntities: " + entities);
+                }
 
-		ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
-			logger.info("[SERVER] Disconnected. Tracking: " + this.serverBlockEntities.size() + " blockentities");
+                if (entities != serverBlockEntities.size()) {
+                    // Always print mismatches
+                    logger.error("[SERVER] Mismatch in tracked blockentities and actual blockentities");
+                }
+            }
+        });
 
-			if (this.serverBlockEntities.size() != 0) {
-				logger.error("[SERVER] Mismatch in tracked blockentities, expected 0");
-			}
-		});
-	}
+        ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
+            logger.info("[SERVER] Disconnected. Tracking: " + serverBlockEntities.size() + " blockentities");
+
+            if (serverBlockEntities.size() != 0) {
+                logger.error("[SERVER] Mismatch in tracked blockentities, expected 0");
+            }
+        });
+    }
 }

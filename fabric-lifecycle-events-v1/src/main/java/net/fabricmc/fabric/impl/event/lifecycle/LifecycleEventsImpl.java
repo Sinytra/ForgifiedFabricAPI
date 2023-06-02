@@ -38,7 +38,7 @@ public final class LifecycleEventsImpl {
         MinecraftForge.EVENT_BUS.register(LivingEntityEventHooks.class);
         MinecraftForge.EVENT_BUS.register(ChunkEventHooks.class);
         MinecraftForge.EVENT_BUS.register(PlayerListHooks.class);
-        
+
         if (FMLLoader.getDist() == Dist.CLIENT) {
             ClientLifecycleEventsImpl.onInitializeClient();
         }

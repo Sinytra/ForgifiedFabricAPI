@@ -16,43 +16,40 @@
 
 package net.fabricmc.fabric.test.event.lifecycle;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests related to the lifecycle of a server.
  */
-public final class ServerLifecycleTests implements ModInitializer {
-	public static final Logger LOGGER = LoggerFactory.getLogger("LifecycleEventsTest");
+public final class ServerLifecycleTests {
+    public static final Logger LOGGER = LoggerFactory.getLogger("LifecycleEventsTest");
 
-	@Override
-	public void onInitialize() {
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			LOGGER.info("Started Server!");
-		});
+    public static void onInitialize() {
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            LOGGER.info("Started Server!");
+        });
 
-		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-			LOGGER.info("Stopping Server!");
-		});
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+            LOGGER.info("Stopping Server!");
+        });
 
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			LOGGER.info("Stopped Server!");
-		});
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            LOGGER.info("Stopped Server!");
+        });
 
-		ServerWorldEvents.LOAD.register((server, world) -> {
-			LOGGER.info("Loaded world " + world.getRegistryKey().getValue().toString());
-		});
+        ServerWorldEvents.LOAD.register((server, world) -> {
+            LOGGER.info("Loaded world " + world.dimension().location());
+        });
 
-		ServerWorldEvents.UNLOAD.register((server, world) -> {
-			LOGGER.info("Unloaded world " + world.getRegistryKey().getValue().toString());
-		});
+        ServerWorldEvents.UNLOAD.register((server, world) -> {
+            LOGGER.info("Unloaded world " + world.dimension().location());
+        });
 
-		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
-			LOGGER.info("SyncDataPackContents received for {}", joined ? "join" : "reload");
-		});
-	}
+        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
+            LOGGER.info("SyncDataPackContents received for {}", joined ? "join" : "reload");
+        });
+    }
 }

@@ -1,10 +1,21 @@
 val withClientSourceSet: () -> Unit by extra
+val withTestMod: () -> Unit by extra
 
 withClientSourceSet()
+withTestMod()
 
 mixin {
     config("fabric-lifecycle-events-v1.mixins.json")
     config("fabric-lifecycle-events-v1.client.mixins.json")
+}
+
+minecraft.runs {
+    "clientTest" {
+        property("fabric-lifecycle-events-testmod.printClientBlockEntityMessages", "true")
+        property("fabric-lifecycle-events-testmod.printClientEntityMessages", "true")
+        property("fabric-lifecycle-events-testmod.printServerBlockEntityMessages", "true")
+        property("fabric-lifecycle-events-testmod.printServerEntityMessages", "true")
+    }
 }
 
 dependencies {

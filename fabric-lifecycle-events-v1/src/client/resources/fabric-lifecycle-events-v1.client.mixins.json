@@ -1,16 +1,16 @@
 {
-  "required": true,
-  "package": "net.fabricmc.fabric.mixin.event.lifecycle.client",
-  "compatibilityLevel": "JAVA_16",
-  "client": [
-    "ClientChunkManagerMixin",
-    "ClientPlayNetworkHandlerMixin",
-    "ClientWorldClientEntityHandlerMixin",
-    "MinecraftClientMixin",
-    "WorldChunkMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1,
-    "maxShiftBy": 3
-  }
+    "required": true,
+    "package": "net.fabricmc.fabric.mixin.event.lifecycle.client",
+    "compatibilityLevel": "JAVA_16",
+    "client": [
+        "ClientChunkManagerMixin",
+        "ClientPlayNetworkHandlerMixin",
+        "ClientWorldClientEntityHandlerMixin",
+        "MinecraftClientMixin",
+        "WorldChunkMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1,
+        "maxShiftBy": 3
+    }
 }

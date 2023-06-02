@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.mixin.event.lifecycle.client;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
@@ -25,25 +26,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-
 @Mixin(targets = "net/minecraft/client/multiplayer/ClientLevel$EntityCallbacks")
 abstract class ClientWorldClientEntityHandlerMixin {
-	// final synthetic Lnet/minecraft/client/multiplayer/ClientLevel; f_171692_
-	@SuppressWarnings("ShadowTarget")
-	@Shadow(aliases = "f_171692_")
-	@Final
-	private ClientLevel this$0;
+    // final synthetic Lnet/minecraft/client/multiplayer/ClientLevel; f_171692_
+    @SuppressWarnings("ShadowTarget")
+    @Shadow(aliases = "f_171692_")
+    @Final
+    private ClientLevel this$0;
 
-	// Call our load event after vanilla has loaded the entity
-	@Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
-	private void invokeLoadEntity(Entity entity, CallbackInfo ci) {
-		ClientEntityEvents.ENTITY_LOAD.invoker().onLoad(entity, this.this$0);
-	}
+    // Call our load event after vanilla has loaded the entity
+    @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
+    private void invokeLoadEntity(Entity entity, CallbackInfo ci) {
+        ClientEntityEvents.ENTITY_LOAD.invoker().onLoad(entity, this.this$0);
+    }
 
-	// Call our unload event before vanilla does.
-	@Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
-	private void onTrackingEnd(Entity entity, CallbackInfo ci) {
-		ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.this$0);
-	}
+    // Call our unload event before vanilla does.
+    @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
+    private void onTrackingEnd(Entity entity, CallbackInfo ci) {
+        ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.this$0);
+    }
 }

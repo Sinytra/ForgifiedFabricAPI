@@ -1,7 +1,7 @@
 {
     "pack": {
         "description": {
-            "text": "fabric_lifecycle_events_v1 resources"
+            "text": "fabric_lifecycle_events_v1_testmod resources"
         },
         "forge:server_data_pack_format": 12,
         "pack_format": 13

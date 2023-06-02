@@ -31,7 +31,7 @@ Missing -> Added -> Cleaned up -> Tested
 | fabric-item-group-api-v1             | ⚠️ Missing |
 | fabric-key-binding-api-v1            | ⚠️ Missing |
 | fabric-keybindings-v0                | ⚠️ Missing |
-| fabric-lifecycle-events-v1           |  ❓ Added   |
+| fabric-lifecycle-events-v1           |  ✅ Tested  |
 | fabric-loot-api-v2                   | ⚠️ Missing |
 | fabric-loot-tables-v1                | ⚠️ Missing |
 | fabric-message-api-v1                | ⚠️ Missing |

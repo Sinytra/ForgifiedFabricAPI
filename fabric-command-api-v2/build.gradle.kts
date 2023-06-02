@@ -17,9 +17,3 @@ dependencies {
     api(project(":fabric-api-base"))
     "testModImplementation"(project(":fabric-lifecycle-events-v1"))
 }
-
-tasks.configureEach { 
-    if (name == "runClientTest" || name == "runGameTestServer") {
-        dependsOn(configurations["testModRuntimeClasspath"])
-    }
-}

@@ -23,11 +23,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
 
 public final class ClientLifecycleEventsImpl {
-	
+
     public static void onInitializeClient() {
-		MinecraftForge.EVENT_BUS.register(ClientChunkEventHooks.class);
-		MinecraftForge.EVENT_BUS.register(MinecraftEventHooks.class);
-		
+        MinecraftForge.EVENT_BUS.register(ClientChunkEventHooks.class);
+        MinecraftForge.EVENT_BUS.register(MinecraftEventHooks.class);
+
         // Part of impl for block entity events
         ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
             ((LoadedChunksCache) world).fabric_markLoaded(chunk);

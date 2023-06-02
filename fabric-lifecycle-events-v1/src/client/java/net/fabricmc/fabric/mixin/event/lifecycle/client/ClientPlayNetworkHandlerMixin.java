@@ -34,61 +34,61 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPacketListener.class)
 abstract class ClientPlayNetworkHandlerMixin {
-	@Shadow
-	private ClientLevel level;
+    @Shadow
+    private ClientLevel level;
 
-	@Inject(method = "handleRespawn", at = @At(value = "NEW", target = "net/minecraft/client/multiplayer/ClientLevel"))
-	private void onPlayerRespawn(ClientboundRespawnPacket packet, CallbackInfo ci) {
-		// If a world already exists, we need to unload all (block)entities in the world.
-		if (this.level != null) {
-			for (Entity entity : this.level.entitiesForRendering()) {
-				ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.level);
-			}
+    @Inject(method = "handleRespawn", at = @At(value = "NEW", target = "net/minecraft/client/multiplayer/ClientLevel"))
+    private void onPlayerRespawn(ClientboundRespawnPacket packet, CallbackInfo ci) {
+        // If a world already exists, we need to unload all (block)entities in the world.
+        if (this.level != null) {
+            for (Entity entity : this.level.entitiesForRendering()) {
+                ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.level);
+            }
 
-			for (LevelChunk chunk : ((LoadedChunksCache) this.level).fabric_getLoadedChunks()) {
-				for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-					ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, this.level);
-				}
-			}
-		}
-	}
+            for (LevelChunk chunk : ((LoadedChunksCache) this.level).fabric_getLoadedChunks()) {
+                for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                    ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, this.level);
+                }
+            }
+        }
+    }
 
-	/**
-	 * An explanation why we unload entities during onGameJoin:
-	 * Proxies such as Waterfall may send another Game Join packet if entity meta rewrite is disabled, so we will cover ourselves.
-	 * Velocity by default will send a Game Join packet when the player changes servers, which will create a new client world.
-	 * Also anyone can send another GameJoinPacket at any time, so we need to watch out.
-	 */
-	@Inject(method = "handleLogin", at = @At(value = "NEW", target = "net/minecraft/client/multiplayer/ClientLevel"))
-	private void onGameJoin(ClientboundLoginPacket packet, CallbackInfo ci) {
-		// If a world already exists, we need to unload all (block)entities in the world.
-		if (this.level != null) {
-			for (Entity entity : level.entitiesForRendering()) {
-				ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.level);
-			}
+    /**
+     * An explanation why we unload entities during onGameJoin:
+     * Proxies such as Waterfall may send another Game Join packet if entity meta rewrite is disabled, so we will cover ourselves.
+     * Velocity by default will send a Game Join packet when the player changes servers, which will create a new client world.
+     * Also anyone can send another GameJoinPacket at any time, so we need to watch out.
+     */
+    @Inject(method = "handleLogin", at = @At(value = "NEW", target = "net/minecraft/client/multiplayer/ClientLevel"))
+    private void onGameJoin(ClientboundLoginPacket packet, CallbackInfo ci) {
+        // If a world already exists, we need to unload all (block)entities in the world.
+        if (this.level != null) {
+            for (Entity entity : level.entitiesForRendering()) {
+                ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.level);
+            }
 
-			for (LevelChunk chunk : ((LoadedChunksCache) this.level).fabric_getLoadedChunks()) {
-				for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-					ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, this.level);
-				}
-			}
-		}
-	}
+            for (LevelChunk chunk : ((LoadedChunksCache) this.level).fabric_getLoadedChunks()) {
+                for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                    ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, this.level);
+                }
+            }
+        }
+    }
 
-	// Called when the client disconnects from a server.
-	@Inject(method = "close", at = @At("HEAD"))
-	private void onClearWorld(CallbackInfo ci) {
-		// If a world already exists, we need to unload all (block)entities in the world.
-		if (this.level != null) {
-			for (Entity entity : this.level.entitiesForRendering()) {
-				ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.level);
-			}
+    // Called when the client disconnects from a server.
+    @Inject(method = "close", at = @At("HEAD"))
+    private void onClearWorld(CallbackInfo ci) {
+        // If a world already exists, we need to unload all (block)entities in the world.
+        if (this.level != null) {
+            for (Entity entity : this.level.entitiesForRendering()) {
+                ClientEntityEvents.ENTITY_UNLOAD.invoker().onUnload(entity, this.level);
+            }
 
-			for (LevelChunk chunk : ((LoadedChunksCache) this.level).fabric_getLoadedChunks()) {
-				for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-					ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, this.level);
-				}
-			}
-		}
-	}
+            for (LevelChunk chunk : ((LoadedChunksCache) this.level).fabric_getLoadedChunks()) {
+                for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
+                    ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, this.level);
+                }
+            }
+        }
+    }
 }

@@ -22,38 +22,38 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public final class ServerChunkEvents {
-	private ServerChunkEvents() {
-	}
+    private ServerChunkEvents() {
+    }
 
-	/**
-	 * Called when a chunk is loaded into a ServerWorld.
-	 *
-	 * <p>When this event is called, the chunk is already in the world.
-	 */
-	public static final Event<ServerChunkEvents.Load> CHUNK_LOAD = EventFactory.createArrayBacked(ServerChunkEvents.Load.class, callbacks -> (serverWorld, chunk) -> {
-		for (Load callback : callbacks) {
-			callback.onChunkLoad(serverWorld, chunk);
-		}
-	});
+    /**
+     * Called when a chunk is loaded into a ServerWorld.
+     *
+     * <p>When this event is called, the chunk is already in the world.
+     */
+    public static final Event<ServerChunkEvents.Load> CHUNK_LOAD = EventFactory.createArrayBacked(ServerChunkEvents.Load.class, callbacks -> (serverWorld, chunk) -> {
+        for (Load callback : callbacks) {
+            callback.onChunkLoad(serverWorld, chunk);
+        }
+    });
 
-	/**
-	 * Called when a chunk is unloaded from a ServerWorld.
-	 *
-	 * <p>When this event is called, the chunk is still present in the world.
-	 */
-	public static final Event<ServerChunkEvents.Unload> CHUNK_UNLOAD = EventFactory.createArrayBacked(ServerChunkEvents.Unload.class, callbacks -> (serverWorld, chunk) -> {
-		for (Unload callback : callbacks) {
-			callback.onChunkUnload(serverWorld, chunk);
-		}
-	});
+    /**
+     * Called when a chunk is unloaded from a ServerWorld.
+     *
+     * <p>When this event is called, the chunk is still present in the world.
+     */
+    public static final Event<ServerChunkEvents.Unload> CHUNK_UNLOAD = EventFactory.createArrayBacked(ServerChunkEvents.Unload.class, callbacks -> (serverWorld, chunk) -> {
+        for (Unload callback : callbacks) {
+            callback.onChunkUnload(serverWorld, chunk);
+        }
+    });
 
-	@FunctionalInterface
-	public interface Load {
-		void onChunkLoad(ServerLevel world, LevelChunk chunk);
-	}
+    @FunctionalInterface
+    public interface Load {
+        void onChunkLoad(ServerLevel world, LevelChunk chunk);
+    }
 
-	@FunctionalInterface
-	public interface Unload {
-		void onChunkUnload(ServerLevel world, LevelChunk chunk);
-	}
+    @FunctionalInterface
+    public interface Unload {
+        void onChunkUnload(ServerLevel world, LevelChunk chunk);
+    }
 }

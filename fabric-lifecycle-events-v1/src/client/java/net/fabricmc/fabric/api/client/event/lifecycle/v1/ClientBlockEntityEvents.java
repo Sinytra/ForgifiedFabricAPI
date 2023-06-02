@@ -22,39 +22,39 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public final class ClientBlockEntityEvents {
-	private ClientBlockEntityEvents() {
-	}
+    private ClientBlockEntityEvents() {
+    }
 
-	/**
-	 * Called when a BlockEntity is loaded into a ClientWorld.
-	 *
-	 * <p>When this event is called, the block entity is already in the world.
-	 * However, its data might not be loaded yet, so don't rely on it.
-	 */
-	public static final Event<ClientBlockEntityEvents.Load> BLOCK_ENTITY_LOAD = EventFactory.createArrayBacked(ClientBlockEntityEvents.Load.class, callbacks -> (blockEntity, world) -> {
-		for (Load callback : callbacks) {
-			callback.onLoad(blockEntity, world);
-		}
-	});
+    /**
+     * Called when a BlockEntity is loaded into a ClientWorld.
+     *
+     * <p>When this event is called, the block entity is already in the world.
+     * However, its data might not be loaded yet, so don't rely on it.
+     */
+    public static final Event<ClientBlockEntityEvents.Load> BLOCK_ENTITY_LOAD = EventFactory.createArrayBacked(ClientBlockEntityEvents.Load.class, callbacks -> (blockEntity, world) -> {
+        for (Load callback : callbacks) {
+            callback.onLoad(blockEntity, world);
+        }
+    });
 
-	/**
-	 * Called when a BlockEntity is about to be unloaded from a ClientWorld.
-	 *
-	 * <p>When this event is called, the block entity is still present on the world.
-	 */
-	public static final Event<ClientBlockEntityEvents.Unload> BLOCK_ENTITY_UNLOAD = EventFactory.createArrayBacked(ClientBlockEntityEvents.Unload.class, callbacks -> (blockEntity, world) -> {
-		for (Unload callback : callbacks) {
-			callback.onUnload(blockEntity, world);
-		}
-	});
+    /**
+     * Called when a BlockEntity is about to be unloaded from a ClientWorld.
+     *
+     * <p>When this event is called, the block entity is still present on the world.
+     */
+    public static final Event<ClientBlockEntityEvents.Unload> BLOCK_ENTITY_UNLOAD = EventFactory.createArrayBacked(ClientBlockEntityEvents.Unload.class, callbacks -> (blockEntity, world) -> {
+        for (Unload callback : callbacks) {
+            callback.onUnload(blockEntity, world);
+        }
+    });
 
-	@FunctionalInterface
-	public interface Load {
-		void onLoad(BlockEntity blockEntity, ClientLevel world);
-	}
+    @FunctionalInterface
+    public interface Load {
+        void onLoad(BlockEntity blockEntity, ClientLevel world);
+    }
 
-	@FunctionalInterface
-	public interface Unload {
-		void onUnload(BlockEntity blockEntity, ClientLevel world);
-	}
+    @FunctionalInterface
+    public interface Unload {
+        void onUnload(BlockEntity blockEntity, ClientLevel world);
+    }
 }

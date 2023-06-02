@@ -22,38 +22,38 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 
 public final class ClientEntityEvents {
-	private ClientEntityEvents() {
-	}
+    private ClientEntityEvents() {
+    }
 
-	/**
-	 * Called when an Entity is loaded into a ClientWorld.
-	 *
-	 * <p>When this event is called, the chunk is already in the world.
-	 */
-	public static final Event<ClientEntityEvents.Load> ENTITY_LOAD = EventFactory.createArrayBacked(ClientEntityEvents.Load.class, callbacks -> (entity, world) -> {
-		for (Load callback : callbacks) {
-			callback.onLoad(entity, world);
-		}
-	});
+    /**
+     * Called when an Entity is loaded into a ClientWorld.
+     *
+     * <p>When this event is called, the chunk is already in the world.
+     */
+    public static final Event<ClientEntityEvents.Load> ENTITY_LOAD = EventFactory.createArrayBacked(ClientEntityEvents.Load.class, callbacks -> (entity, world) -> {
+        for (Load callback : callbacks) {
+            callback.onLoad(entity, world);
+        }
+    });
 
-	/**
-	 * Called when an Entity is about to be unloaded from a ClientWorld.
-	 *
-	 * <p>This event is called before the entity is unloaded from the world.
-	 */
-	public static final Event<ClientEntityEvents.Unload> ENTITY_UNLOAD = EventFactory.createArrayBacked(ClientEntityEvents.Unload.class, callbacks -> (entity, world) -> {
-		for (Unload callback : callbacks) {
-			callback.onUnload(entity, world);
-		}
-	});
+    /**
+     * Called when an Entity is about to be unloaded from a ClientWorld.
+     *
+     * <p>This event is called before the entity is unloaded from the world.
+     */
+    public static final Event<ClientEntityEvents.Unload> ENTITY_UNLOAD = EventFactory.createArrayBacked(ClientEntityEvents.Unload.class, callbacks -> (entity, world) -> {
+        for (Unload callback : callbacks) {
+            callback.onUnload(entity, world);
+        }
+    });
 
-	@FunctionalInterface
-	public interface Load {
-		void onLoad(Entity entity, ClientLevel world);
-	}
+    @FunctionalInterface
+    public interface Load {
+        void onLoad(Entity entity, ClientLevel world);
+    }
 
-	@FunctionalInterface
-	public interface Unload {
-		void onUnload(Entity entity, ClientLevel world);
-	}
+    @FunctionalInterface
+    public interface Unload {
+        void onUnload(Entity entity, ClientLevel world);
+    }
 }

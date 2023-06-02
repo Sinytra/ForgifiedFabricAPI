@@ -24,7 +24,7 @@ val minecraftSrg: Configuration by configurations.creating
 
 dependencies {
     yarnMappings(group = "net.fabricmc", name = "yarn", version = "1.19.4+build.2")
-    
+
     minecraftSrg("net.minecraft:joined:1.19.4:srg")
 }
 
@@ -56,7 +56,7 @@ allprojects {
     apply(plugin = "java-library")
     apply(plugin = "net.minecraftforge.gradle")
     apply(plugin = "org.parchmentmc.librarian.forgegradle")
-    
+
     group = "dev.su5ed.sinytra.fabric-api"
 
     java {
@@ -142,7 +142,7 @@ subprojects {
 
     @Suppress("UNCHECKED_CAST")
     val checkReferenceCompatibility by tasks.registering(CheckJarCompatibility::class) {
-        dependsOn("reobfJar", renameReferenceApi)
+        dependsOn(renameReferenceApi)
 
         tool.set("dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all")
         binaryMode.set(false)
@@ -151,11 +151,18 @@ subprojects {
         inputJar.set(devJar.flatMap { it.archiveFile })
         commonLibraries.from(configurations.minecraft.map { c -> c.files.filter { it.name.endsWith(".jar") } })
         args.addAll("--internal-ann-mode", "skip")
+        outputs.upToDateWhen { true }
     }
 
     tasks {
         check {
             dependsOn(checkReferenceCompatibility)
+        }
+
+        configureEach {
+            if (name.startsWith("run") && name.contains("Test")) {
+                dependsOn(configurations["testModRuntimeClasspath"])
+            }
         }
     }
 
@@ -216,7 +223,7 @@ open class ConvertSRGTask : DefaultTask() {
 
     @get:InputFile
     val inputSrgMappings: RegularFileProperty = project.objects.fileProperty()
-    
+
     @get:Optional
     @get:InputFile
     val inputMcpMappings: RegularFileProperty = project.objects.fileProperty()
@@ -237,10 +244,9 @@ open class ConvertSRGTask : DefaultTask() {
             if (inputMcpMappings.isPresent) {
                 val srgToMcp = load(inputMcpMappings.asFile.get())
                 map.chain(srgToMcp)
-            }   
-            else map
+            } else map
         }
-        
+
         intermediaryToSrg.write(outputFile.get().asFile.toPath(), IMappingFile.Format.TSRG2, false)
     }
 }

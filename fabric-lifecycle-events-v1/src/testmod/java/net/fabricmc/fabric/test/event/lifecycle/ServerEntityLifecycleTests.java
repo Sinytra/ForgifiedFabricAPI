@@ -16,85 +16,81 @@
 
 package net.fabricmc.fabric.test.event.lifecycle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.collect.Iterables;
-import org.slf4j.Logger;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests related to the lifecycle of entities.
  */
-public final class ServerEntityLifecycleTests implements ModInitializer {
-	private static final boolean PRINT_SERVER_ENTITY_MESSAGES = System.getProperty("fabric-lifecycle-events-testmod.printServerEntityMessages") != null;
-	private final List<Entity> serverEntities = new ArrayList<>();
-	private int serverTicks = 0;
+public final class ServerEntityLifecycleTests {
+    private static final boolean PRINT_SERVER_ENTITY_MESSAGES = System.getProperty("fabric-lifecycle-events-testmod.printServerEntityMessages") != null;
+    private static final List<Entity> serverEntities = new ArrayList<>();
+    private static int serverTicks = 0;
 
-	@Override
-	public void onInitialize() {
-		final Logger logger = ServerLifecycleTests.LOGGER;
+    public static void onInitialize() {
+        final Logger logger = ServerLifecycleTests.LOGGER;
 
-		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-			this.serverEntities.add(entity);
+        ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+            serverEntities.add(entity);
 
-			if (PRINT_SERVER_ENTITY_MESSAGES) {
-				logger.info("[SERVER] LOADED " + entity.toString() + " - Entities: " + this.serverEntities.size());
-			}
-		});
+            if (PRINT_SERVER_ENTITY_MESSAGES) {
+                logger.info("[SERVER] LOADED " + entity.toString() + " - Entities: " + serverEntities.size());
+            }
+        });
 
-		ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
-			this.serverEntities.remove(entity);
+        ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
+            serverEntities.remove(entity);
 
-			if (PRINT_SERVER_ENTITY_MESSAGES) {
-				logger.info("[SERVER] UNLOADED " + entity.toString() + " - Entities: " + this.serverEntities.size());
-			}
-		});
+            if (PRINT_SERVER_ENTITY_MESSAGES) {
+                logger.info("[SERVER] UNLOADED " + entity.toString() + " - Entities: " + serverEntities.size());
+            }
+        });
 
-		ServerEntityEvents.EQUIPMENT_CHANGE.register((livingEntity, equipmentSlot, previousStack, currentStack) -> {
-			if (PRINT_SERVER_ENTITY_MESSAGES) {
-				logger.info("[SERVER] Entity equipment change: Entity: {}, Slot {}, Previous: {}, Current {} ", livingEntity, equipmentSlot.name(), previousStack, currentStack);
-			}
-		});
+        ServerEntityEvents.EQUIPMENT_CHANGE.register((livingEntity, equipmentSlot, previousStack, currentStack) -> {
+            if (PRINT_SERVER_ENTITY_MESSAGES) {
+                logger.info("[SERVER] Entity equipment change: Entity: {}, Slot {}, Previous: {}, Current {} ", livingEntity, equipmentSlot.name(), previousStack, currentStack);
+            }
+        });
 
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			if (this.serverTicks++ % 200 == 0) {
-				int entities = 0;
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (serverTicks++ % 200 == 0) {
+                int entities = 0;
 
-				for (ServerWorld world : server.getWorlds()) {
-					final int worldEntities = Iterables.size(world.iterateEntities());
+                for (ServerLevel world : server.getAllLevels()) {
+                    final int worldEntities = Iterables.size(world.getAllEntities());
 
-					if (PRINT_SERVER_ENTITY_MESSAGES) {
-						logger.info("[SERVER] Tracked Entities in " + world.getRegistryKey().toString() + " - " + worldEntities);
-					}
+                    if (PRINT_SERVER_ENTITY_MESSAGES) {
+                        logger.info("[SERVER] Tracked Entities in " + world.dimension() + " - " + worldEntities);
+                    }
 
-					entities += worldEntities;
-				}
+                    entities += worldEntities;
+                }
 
-				if (PRINT_SERVER_ENTITY_MESSAGES) {
-					logger.info("[SERVER] Actual Total Entities: " + entities);
-				}
+                if (PRINT_SERVER_ENTITY_MESSAGES) {
+                    logger.info("[SERVER] Actual Total Entities: " + entities);
+                }
 
-				if (entities != this.serverEntities.size()) {
-					// Always print mismatches
-					logger.error("[SERVER] Mismatch in tracked entities and actual entities");
-				}
-			}
-		});
+                if (entities != serverEntities.size()) {
+                    // Always print mismatches
+                    logger.error("[SERVER] Mismatch in tracked entities and actual entities");
+                }
+            }
+        });
 
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			logger.info("[SERVER] Disconnected. Tracking: " + this.serverEntities.size() + " entities");
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            logger.info("[SERVER] Disconnected. Tracking: " + serverEntities.size() + " entities");
 
-			if (this.serverEntities.size() != 0) {
-				logger.error("[SERVER] Mismatch in tracked entities, expected 0");
-			}
-		});
-	}
+            if (serverEntities.size() != 0) {
+                logger.error("[SERVER] Mismatch in tracked entities, expected 0");
+            }
+        });
+    }
 }

@@ -27,21 +27,21 @@ import java.util.Set;
 
 @Mixin(Level.class)
 public abstract class WorldMixin implements LoadedChunksCache {
-	@Unique
-	private final Set<LevelChunk> loadedChunks = new HashSet<>();
+    @Unique
+    private final Set<LevelChunk> loadedChunks = new HashSet<>();
 
-	@Override
-	public Set<LevelChunk> fabric_getLoadedChunks() {
-		return this.loadedChunks;
-	}
+    @Override
+    public Set<LevelChunk> fabric_getLoadedChunks() {
+        return this.loadedChunks;
+    }
 
-	@Override
-	public void fabric_markLoaded(LevelChunk chunk) {
-		this.loadedChunks.add(chunk);
-	}
+    @Override
+    public void fabric_markLoaded(LevelChunk chunk) {
+        this.loadedChunks.add(chunk);
+    }
 
-	@Override
-	public void fabric_markUnloaded(LevelChunk chunk) {
-		this.loadedChunks.remove(chunk);
-	}
+    @Override
+    public void fabric_markUnloaded(LevelChunk chunk) {
+        this.loadedChunks.remove(chunk);
+    }
 }
