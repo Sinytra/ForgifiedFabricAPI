@@ -7,6 +7,8 @@ mixin {
     config("fabric-lifecycle-events-v1.client.mixins.json")
 }
 
-dependencies { 
+dependencies {
+    referenceApi(group = "net.fabricmc.fabric-api", name = project.name, version = "2.2.17+1e9487d2f4")
+
     api(project(":fabric-api-base"))
 }
