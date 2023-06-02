@@ -16,14 +16,17 @@
 
 package net.fabricmc.fabric.test.base;
 
-import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
-import org.spongepowered.asm.mixin.MixinEnvironment;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraftforge.fml.common.Mod;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 
+@Mod(FabricApiBaseTestInit.MODID)
 public class FabricApiBaseTestInit implements ModInitializer {
+	public static final String MODID = "fabric_api_base_testmod";
+	
 	@Override
 	public void onInitialize() {
 		// Command to call audit the mixin environment

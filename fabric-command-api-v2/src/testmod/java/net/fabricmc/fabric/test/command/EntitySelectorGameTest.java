@@ -16,35 +16,48 @@
 
 package net.fabricmc.fabric.test.command;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+import java.util.Locale;
+
+@GameTestHolder("fabric_command_api_v2_testmod")
 public class EntitySelectorGameTest {
-//	private void spawn(TestContext context, float health) {
-//		MobEntity entity = context.spawnMob(EntityType.CREEPER, BlockPos.ORIGIN);
-//		entity.setAiDisabled(true);
-//		entity.setHealth(health);
-//	}
-//
-//	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-//	public void testEntitySelector(TestContext context) {
-//		BlockPos absolute = context.getAbsolutePos(BlockPos.ORIGIN);
-//
-//		spawn(context, 1.0f);
-//		spawn(context, 5.0f);
-//		spawn(context, 10.0f);
-//
-//		String command = String.format(
-//				Locale.ROOT,
-//				"/kill @e[x=%d, y=%d, z=%d, distance=..2, %s=5.0]",
-//				absolute.getX(),
-//				absolute.getY(),
-//				absolute.getZ(),
-//				CommandTest.SELECTOR_ID.toUnderscoreSeparatedString()
-//		);
-//
-//		context.expectEntitiesAround(EntityType.CREEPER, BlockPos.ORIGIN, 3, 2.0);
-//		MinecraftServer server = context.getWorld().getServer();
-//		int result = server.getCommandManager().executeWithPrefix(server.getCommandSource(), command);
-//		context.assertTrue(result == 2, "Expected 2 entities killed, got " + result);
-//		context.expectEntitiesAround(EntityType.CREEPER, BlockPos.ORIGIN, 1, 2.0);
-//		context.complete();
-//	}
+    private void spawn(GameTestHelper context, float health) {
+        Mob entity = context.spawn(EntityType.CREEPER, BlockPos.ZERO);
+        entity.setNoAi(true);
+        entity.setHealth(health);
+    }
+
+    @GameTest(template = "empty")
+    @PrefixGameTestTemplate(false)
+    public void testEntitySelector(GameTestHelper context) {
+        BlockPos absolute = context.absolutePos(BlockPos.ZERO);
+
+        spawn(context, 1.0f);
+        spawn(context, 5.0f);
+        spawn(context, 10.0f);
+
+        String command = String.format(
+            Locale.ROOT,
+            "/kill @e[x=%d, y=%d, z=%d, distance=..2, %s=5.0]",
+            absolute.getX(),
+            absolute.getY(),
+            absolute.getZ(),
+            CommandTest.SELECTOR_ID.toDebugFileName()
+        );
+
+        context.assertEntitiesPresent(EntityType.CREEPER, BlockPos.ZERO, 3, 2.0);
+        MinecraftServer server = context.getLevel().getServer();
+        int result = server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), command);
+        context.assertTrue(result == 2, "Expected 2 entities killed, got " + result);
+        context.assertEntitiesPresent(EntityType.CREEPER, BlockPos.ZERO, 1, 2.0);
+        context.succeed();
+    }
 }

@@ -188,6 +188,19 @@ subprojects {
             }
         }
     } }
+    @Suppress("UNUSED_VARIABLE")
+    val withGameTest: (String) -> Unit by extra { { modid ->
+        minecraft.runs.create("gameTestServer") {
+            parent(minecraft.runs["server"])
+            workingDirectory = project.file("run_test").canonicalPath
+            property("forge.enabledGameTestNamespaces", modid)
+            mods {
+                create("${project.name}_test") {
+                    sources(sourceSets["testMod"])
+                }
+            }
+        }
+    } }
     //@formatter:on
 
     dependencies {

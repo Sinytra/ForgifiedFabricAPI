@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.test.command.mixin.CommandSelectionAccessor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.gametest.framework.GameTestServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -57,7 +58,7 @@ public final class CommandTest {
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			// Verify the commands actually exist in the command dispatcher.
-			final boolean dedicated = server.isDedicatedServer();
+			final boolean dedicated = server.isDedicatedServer() || server instanceof GameTestServer;
 			final RootCommandNode<CommandSourceStack> rootNode = server.getCommands().getDispatcher().getRoot();
 
 			// Now we climb the tree
