@@ -19,7 +19,7 @@ Missing -> Added -> Cleaned up -> Tested
 | fabric-commands-v0                   | ⚠️ Missing |
 | fabric-containers-v0                 | ⚠️ Missing |
 | fabric-content-registries-v0         | ⚠️ Missing |
-| fabric-convention-tags-v1            | ⚠️ Missing |
+| fabric-convention-tags-v1            |  ✅ Tested  |
 | fabric-crash-report-info-v1          | ⚠️ Missing |
 | fabric-data-generation-api-v1        | ⚠️ Missing |
 | fabric-dimensions-v1                 | ⚠️ Missing |
