@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.biome",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "MobSpawnSettingsBuilderAccessor",
+    "BiomeSourceMixin",
+    "ChunkNoiseSamplerMixin",
+    "MultiNoiseUtilMultiNoiseSamplerMixin",
+    "NetherBiomePresetMixin",
+    "NoiseConfigMixin",
+    "TheEndBiomeSourceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "fabric_biome_api_v1_testmod:custom_plains",
+    "fabric_biome_api_v1_testmod:test_end_highlands"
+  ]
+}
