@@ -22,7 +22,7 @@ sourceSets.configureEach {
             // Only apply to default source directory since we also add the generated 
             // sources to the source set.
             header.set(rootProject.file("HEADER"))
-            sourceRoot.set(file("src/$sourceSetName/java"))
+            sourceRoots.from(this@configureEach.java.srcDirs)
             outputDir.set(file("src/generated/$sourceSetName"))
         }
         java.srcDir(task)
@@ -45,8 +45,8 @@ open class GenerateImplPackageInfos : DefaultTask() {
     val header: RegularFileProperty = project.objects.fileProperty()
 
     @SkipWhenEmpty
-    @InputDirectory
-    val sourceRoot: DirectoryProperty = project.objects.directoryProperty()
+    @InputFiles
+    val sourceRoots: ConfigurableFileCollection = project.objects.fileCollection()
 
     @OutputDirectory
     val outputDir: DirectoryProperty = project.objects.directoryProperty()
@@ -56,8 +56,13 @@ open class GenerateImplPackageInfos : DefaultTask() {
         val output: Path = outputDir.get().asFile.toPath()
         project.delete(output)
         val headerText = header.get().asFile.readLines().joinToString("\n") // normalize line endings
-        val root = sourceRoot.get().asFile.toPath()
+        sourceRoots.files
+            .filter(File::isDirectory)
+            .forEach { sourceRoot -> generateForRoot(sourceRoot, output, headerText) }
+    }
 
+    private fun generateForRoot(sourceRoot: File, output: Path, headerText: String) {
+        val root = sourceRoot.toPath()
         for (dir in INTERNAL_DIRS) {
             val implDir = root.resolve("net/fabricmc/fabric/$dir")
             if (implDir.notExists()) {
