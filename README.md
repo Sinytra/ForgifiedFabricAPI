@@ -13,7 +13,7 @@ Missing -> Added -> Cleaned up -> Tested
 | fabric-biome-api-v1                  |  ✅ Tested  |
 | fabric-block-api-v1                  |  ❓ Added   |
 | fabric-blockrenderlayer-v1           |  ❓ Added   |
-| fabric-client-tags-api-v1            | ⚠️ Missing |
+| fabric-client-tags-api-v1            |  ✅ Tested  |
 | fabric-command-api-v1                | ⚠️ Missing |
 | fabric-command-api-v2                |  ✅ Tested  |
 | fabric-commands-v0                   | ⚠️ Missing |
