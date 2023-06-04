@@ -15,19 +15,18 @@ license="Apache License 2.0"
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
 # The modid of the mod
-modId="fabric_convention_tags_v1" #mandatory
+modId="fabric_dimensions_v1_testmod" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
 # ${file.jarVersion} will substitute the value of the Implementation-Version as read from the mod's JAR file metadata
 # see the associated build.gradle script for how to populate this completely automatically during a build
 version="${file.jarVersion}" #mandatory
  # A display name for the mod
-displayName="[Forgified] Fabric Convention Tags" #mandatory
+displayName="[Forgified] Fabric Dimensions (v1) Test Mod" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="assets/fabric_convention_tags_v1/icon.png" #optional
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
@@ -42,10 +41,10 @@ authors="FabricMC, Sinytra" #optional
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Contains common tags used by mods for vanilla things.
+Fabric Dimension API.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.fabric_convention_tags_v1]] #optional
+[[dependencies.fabric_dimensions_v1_testmod]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -57,10 +56,16 @@ Contains common tags used by mods for vanilla things.
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.fabric_convention_tags_v1]]
+[[dependencies.fabric_dimensions_v1_testmod]]
     modId="minecraft"
     mandatory=true
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
     versionRange="[1.19.4,1.20)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.fabric_dimensions_v1_testmod]]
+    modId="fabric_dimensions_v1"
+    mandatory=true
+    versionRange="[0, )"
     ordering="NONE"
     side="BOTH"

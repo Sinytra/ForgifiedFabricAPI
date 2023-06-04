@@ -1,10 +1,8 @@
 # Forgified Fabric API
 
-TODO Use JarCompatibilityChecker to verify API
-
 ### API Support Status
 
-Missing -> Added -> Cleaned up -> Tested
+Missing -> Added -> Tested
 
 | API                                  |   State    |  Lifecycle   |
 |:-------------------------------------|:----------:|:------------:|
@@ -20,9 +18,9 @@ Missing -> Added -> Cleaned up -> Tested
 | fabric-containers-v0                 | ⚠️ Missing |  Deprecated  |
 | fabric-content-registries-v0         |  ✅ Tested  |    Stable    |
 | fabric-convention-tags-v1            |  ✅ Tested  |    Stable    |
-| fabric-crash-report-info-v1          | ⚠️ Missing |              |
-| fabric-data-generation-api-v1        | ⚠️ Missing |              |
-| fabric-dimensions-v1                 | ⚠️ Missing |              |
+| fabric-crash-report-info-v1          | ⚠️ Missing |    Stable    |
+| fabric-data-generation-api-v1        | ⚠️ Missing |    Stable    |
+| fabric-dimensions-v1                 |  ✅ Tested  |    Stable    |
 | fabric-entity-events-v1              | ⚠️ Missing |              |
 | fabric-events-interaction-v0         | ⚠️ Missing |              |
 | fabric-events-lifecycle-v0           | ⚠️ Missing |  Deprecated  |
