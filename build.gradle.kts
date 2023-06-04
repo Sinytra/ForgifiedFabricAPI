@@ -201,7 +201,7 @@ subprojects {
             parent(minecraft.runs["client"])
             workingDirectory = project.file("run_test").canonicalPath
             mods {
-                create("${project.name}_test") {
+                create("${project.name}-test") {
                     sources(testMod)
                 }
             }

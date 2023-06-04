@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.content.registry",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "FarmerVillagerTaskMixin",
+    "HoneycombItemMixin",
+    "LandPathNodeMakerMixin",
+    "FireBlockMixin",
+    "VibrationListenerMixin",
+    "VillagerEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
