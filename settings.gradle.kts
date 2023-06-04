@@ -13,10 +13,6 @@ pluginManagement {
             name = "Sponge Snapshots"
             url = uri("https://repo.spongepowered.org/repository/maven-public/")
         }
-        maven {
-            name = "Su5eD"
-            url = uri("https://maven.su5ed.dev/releases")
-        }
     }
 }
 
@@ -36,5 +32,6 @@ include("fabric-content-registries-v0")
 include("fabric-convention-tags-v1")
 include("fabric-command-api-v2")
 include("fabric-dimensions-v1")
+include("fabric-entity-events-v1")
 include("fabric-lifecycle-events-v1")
 include("fabric-object-builder-api-v1")

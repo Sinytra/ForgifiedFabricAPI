@@ -1,6 +1,6 @@
 # Forgified Fabric API
 
-### API Support Status
+## API Support Status
 
 Missing -> Added -> Tested
 
@@ -21,7 +21,7 @@ Missing -> Added -> Tested
 | fabric-crash-report-info-v1          | ⚠️ Missing |    Stable    |
 | fabric-data-generation-api-v1        | ⚠️ Missing |    Stable    |
 | fabric-dimensions-v1                 |  ✅ Tested  |    Stable    |
-| fabric-entity-events-v1              | ⚠️ Missing |              |
+| fabric-entity-events-v1              |  ✅ Tested  |    Stable    |
 | fabric-events-interaction-v0         | ⚠️ Missing |              |
 | fabric-events-lifecycle-v0           | ⚠️ Missing |  Deprecated  |
 | fabric-game-rule-api-v1              | ⚠️ Missing |              |
