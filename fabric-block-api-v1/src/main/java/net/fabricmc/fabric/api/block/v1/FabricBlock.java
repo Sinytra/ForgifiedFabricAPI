@@ -20,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.extensions.IForgeBlock;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  */
 // Note to maintainers: Functions should only be added to this interface if they are general-purpose enough,
 // to be evaluated on a case-by-case basis. Otherwise, they are better suited for more specialized APIs.
-public interface FabricBlock {
+public interface FabricBlock extends IForgeBlock {
 	/**
 	 * Return the current appearance of the block, i.e. which block state this block reports to look like on a given side.
 	 *
@@ -95,5 +96,7 @@ public interface FabricBlock {
 	 * @param sourcePos   (optional) position of the block that is querying the appearance, or null if unknown
 	 * @return the appearance of the block on the given side; the original {@code state} can be returned if there is no better option
 	 */
-	BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos);
+	default BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
+		return IForgeBlock.super.getAppearance(state, renderView, pos, side, sourceState, sourcePos);
+	}
 }

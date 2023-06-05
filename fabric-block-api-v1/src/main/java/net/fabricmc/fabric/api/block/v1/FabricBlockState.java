@@ -20,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.extensions.IForgeBlockState;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>Note: This interface is automatically implemented on all block states via Mixin and interface injection.
  */
-public interface FabricBlockState {
+public interface FabricBlockState extends IForgeBlockState {
 	/**
 	 * Return the current appearance of the block, i.e. which block state this block reports to look like on a given side.
 	 *
@@ -39,5 +40,7 @@ public interface FabricBlockState {
 	 * @return the appearance of the block on the given side; the original {@code state} can be returned if there is no better option
 	 * @see FabricBlock#getAppearance
 	 */
-	BlockState getAppearance(BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos);
+	default BlockState getAppearance(BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
+		return IForgeBlockState.super.getAppearance(renderView, pos, side, sourceState, sourcePos);
+	}
 }
