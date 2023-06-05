@@ -22,7 +22,7 @@ Missing -> Added -> Tested
 | fabric-data-generation-api-v1        | ⚠️ Missing |    Stable    |
 | fabric-dimensions-v1                 |  ✅ Tested  |    Stable    |
 | fabric-entity-events-v1              |  ✅ Tested  |    Stable    |
-| fabric-events-interaction-v0         | ⚠️ Missing |              |
+| fabric-events-interaction-v0         |  ✅ Tested  |    Stable    |
 | fabric-events-lifecycle-v0           | ⚠️ Missing |  Deprecated  |
 | fabric-game-rule-api-v1              | ⚠️ Missing |              |
 | fabric-item-api-v1                   | ⚠️ Missing |              |

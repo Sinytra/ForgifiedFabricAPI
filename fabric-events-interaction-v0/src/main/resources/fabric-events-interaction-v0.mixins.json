@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.event.interaction",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "ServerPlayerInteractionManagerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,5 +1,5 @@
+import dev.su5ed.gradle.SimpleRenameTask
 import net.minecraftforge.gradle.common.tasks.CheckJarCompatibility
-import net.minecraftforge.gradle.common.tasks.JarExec
 import net.minecraftforge.gradle.common.util.RunConfig
 import net.minecraftforge.srgutils.IMappingFile
 import net.minecraftforge.srgutils.IMappingFile.load
@@ -20,12 +20,9 @@ version = "1.0"
 val versionMc: String by project
 
 val yarnMappings: Configuration by configurations.creating
-val minecraftSrg: Configuration by configurations.creating
 
 dependencies {
     yarnMappings(group = "net.fabricmc", name = "yarn", version = "1.19.4+build.2")
-
-    minecraftSrg("net.minecraft:joined:1.19.4:srg")
 }
 
 tasks {
@@ -121,33 +118,18 @@ subprojects {
         from(sourceSets.main.map { it.output })
         archiveClassifier.set("dev")
     }
-    val renameReferenceApi by tasks.registering(JarExec::class) {
-        val inputFile = provider(referenceApi::getSingleFile)
-        inputs.file(inputFile)
-        val mappings = createIntermediaryToSrg.flatMap(ConvertSRGTask::outputFile)
-        inputs.file(mappings)
-        val output = project.layout.buildDirectory.file("$name/output.jar")
-        outputs.file(output)
-        extra["output"] = output
-
-        tool.set("net.minecraftforge:ForgeAutoRenamingTool:1.0.2:all")
-        args.add("--input")
-        args.add(inputFile.map(File::getAbsolutePath))
-        args.add("--output")
-        args.add(output.map { it.asFile.absolutePath })
-        args.add("--map")
-        args.add(mappings.map { it.asFile.absolutePath })
-        args.add("--disable-abstract-param")
+    val renameReferenceApi by tasks.registering(SimpleRenameTask::class) {
+        inputFile.set(referenceApi::getSingleFile)
+        mappingFile.set(createIntermediaryToSrg.flatMap(ConvertSRGTask::outputFile))
     }
 
-    @Suppress("UNCHECKED_CAST")
     val checkReferenceCompatibility by tasks.registering(CheckJarCompatibility::class) {
         dependsOn(renameReferenceApi)
 
         tool.set("dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all")
         binaryMode.set(false)
         annotationCheckMode.set("warn_added")
-        baseJar.set(renameReferenceApi.flatMap { it.extra["output"] as Provider<RegularFile> })
+        baseJar.set(renameReferenceApi.flatMap { it.outputFile })
         inputJar.set(devJar.flatMap { it.archiveFile })
         commonLibraries.from(configurations.minecraft.map { c -> c.files.filter { it.name.endsWith(".jar") } })
         args.addAll("--internal-ann-mode", "skip")

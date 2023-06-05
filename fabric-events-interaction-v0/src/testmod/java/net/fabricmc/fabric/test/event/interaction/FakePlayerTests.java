@@ -1,0 +1,65 @@
+/*
+ * Copyright (c) 2016, 2017, 2018, 2019 FabricMC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.fabricmc.fabric.test.event.interaction;
+
+import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+@GameTestHolder(EntityInteractionTestsImpl.MODID)
+public class FakePlayerTests {
+    /**
+     * Try placing a sign with a fake player.
+     */
+    @GameTest(templateNamespace = EntityInteractionTestsImpl.MODID, template = "empty")
+    @PrefixGameTestTemplate(false)
+    public void testFakePlayerPlaceSign(GameTestHelper context) {
+        // This is for Fabric internal testing only, if you copy this to your mod you're on your own...
+
+        BlockPos basePos = new BlockPos(0, 1, 0);
+        BlockPos signPos = basePos.above();
+
+        context.setBlock(basePos, Blocks.STONE.defaultBlockState());
+
+        Player fakePlayer = FakePlayer.get(context.getLevel());
+
+        BlockPos fakePlayerPos = context.absolutePos(signPos.offset(2, 0, 2));
+        fakePlayer.setPos(fakePlayerPos.getX(), fakePlayerPos.getY(), fakePlayerPos.getZ());
+        ItemStack signStack = Items.OAK_SIGN.getDefaultInstance();
+        fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, signStack);
+
+        Vec3 hitPos = context.absolutePos(basePos).getCenter().add(0, 0.5, 0);
+        BlockHitResult hitResult = new BlockHitResult(hitPos, Direction.UP, context.absolutePos(basePos), false);
+        signStack.useOn(new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, hitResult));
+
+        context.assertBlockState(signPos, x -> x.is(Blocks.OAK_SIGN), () -> "Sign was not placed");
+        context.assertTrue(signStack.isEmpty(), "Sign stack was not emptied");
+        context.succeed();
+    }
+}
