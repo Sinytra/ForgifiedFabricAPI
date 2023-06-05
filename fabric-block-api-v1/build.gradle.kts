@@ -1,3 +1,9 @@
+val withTestMod: () -> Unit by extra
+val withGameTest: (String) -> Unit by extra
+
+withTestMod()
+withGameTest("fabric_block_api_v1_testmod")
+
 mixin {
     config("fabric-block-api-v1.mixins.json")
 }

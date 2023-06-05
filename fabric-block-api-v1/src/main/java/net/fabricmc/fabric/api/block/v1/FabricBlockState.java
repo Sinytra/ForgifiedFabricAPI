@@ -39,8 +39,5 @@ public interface FabricBlockState {
 	 * @return the appearance of the block on the given side; the original {@code state} can be returned if there is no better option
 	 * @see FabricBlock#getAppearance
 	 */
-	default BlockState getAppearance(BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
-		BlockState self = (BlockState) this;
-		return self.getBlock().getAppearance(self, renderView, pos, side, sourceState, sourcePos);
-	}
+	BlockState getAppearance(BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos);
 }

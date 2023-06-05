@@ -95,7 +95,5 @@ public interface FabricBlock {
 	 * @param sourcePos   (optional) position of the block that is querying the appearance, or null if unknown
 	 * @return the appearance of the block on the given side; the original {@code state} can be returned if there is no better option
 	 */
-	default BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
-		return state;
-	}
+	BlockState getAppearance(BlockState state, BlockAndTintGetter renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos);
 }
