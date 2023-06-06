@@ -125,6 +125,7 @@ subprojects {
 
     val checkReferenceCompatibility by tasks.registering(CheckJarCompatibility::class) {
         dependsOn(renameReferenceApi)
+        group = "verification"
 
         tool.set("dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all")
         binaryMode.set(false)
