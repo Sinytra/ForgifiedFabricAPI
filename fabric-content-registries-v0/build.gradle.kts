@@ -10,4 +10,12 @@ mixin {
 
 dependencies {
     referenceApi(group = "net.fabricmc.fabric-api", name = project.name, version = "3.5.11+ae0966baf4")
+
+    api(project(":fabric-api-base"))
+}
+
+tasks.devJar {
+    from(zipTree(project(":fabric-api-base").tasks.named<Jar>("devJar").flatMap { it.archiveFile })) {
+        include("net/fabricmc/fabric/api/util/**")
+    }
 }

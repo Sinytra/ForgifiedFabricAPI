@@ -25,7 +25,8 @@ Missing -> Added -> Tested
 | fabric-events-interaction-v0         |  ✅ Tested  |    Stable    |
 | fabric-events-lifecycle-v0           | ⚠️ Missing |  Deprecated  |
 | fabric-game-rule-api-v1              |  ✅ Tested  |    Stable    |
-| fabric-item-api-v1                   | ⚠️ Missing |              |
+| fabric-gametest-api-v1               | ⚠️ Missing |    Stable    |
+| fabric-item-api-v1                   |  ✅ Tested  |    Stable    |
 | fabric-item-group-api-v1             | ⚠️ Missing |              |
 | fabric-key-binding-api-v1            | ⚠️ Missing |              |
 | fabric-keybindings-v0                | ⚠️ Missing |  Deprecated  |
