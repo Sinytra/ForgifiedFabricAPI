@@ -1,0 +1,8 @@
+{
+  "key.category.first.test": "First Test Category",
+  "key.category.second.test": "Second Test Category",
+  "key.fabric_keybindings_v1_testmod.test_keybinding_1": "Test 1",
+  "key.fabric_keybindings_v1_testmod.test_keybinding_2": "Test 2",
+  "key.fabric_keybindings_v1_testmod.test_keybinding_sticky": "Sticky Test",
+  "key.fabric_keybindings_v1_testmod.test_keybinding_duplicate": "Duplicate Test"
+}
