@@ -1,0 +1,116 @@
+/*
+ * Copyright (c) 2016, 2017, 2018, 2019 FabricMC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.fabricmc.fabric.test.message;
+
+import net.fabricmc.fabric.api.message.v1.ServerMessageDecoratorEvent;
+import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
+import net.fabricmc.fabric.test.message.client.ChatTestClient;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.util.RandomSource;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
+@Mod("fabric_message_api_v1_testmod")
+public class ChatTest {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ChatTest.class);
+
+	public ChatTest() {
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			ChatTestClient.onInitializeClient();
+		}
+		
+		Executor ioWorkerExecutor = Util.ioPool();
+
+		// Basic content phase testing
+		ServerMessageDecoratorEvent.EVENT.register(ServerMessageDecoratorEvent.CONTENT_PHASE, (sender, message) -> {
+			if (message.getString().contains("tater")) {
+				return CompletableFuture.completedFuture(message.copy().append(" :tiny_potato:"));
+			}
+
+			return CompletableFuture.completedFuture(message);
+		});
+
+		// Content phase testing, with variable info
+		ServerMessageDecoratorEvent.EVENT.register(ServerMessageDecoratorEvent.CONTENT_PHASE, (sender, message) -> {
+			if (message.getString().contains("random")) {
+				return CompletableFuture.completedFuture(Component.nullToEmpty(String.valueOf(RandomSource.create().nextIntBetweenInclusive(0, 100))));
+			}
+
+			return CompletableFuture.completedFuture(message);
+		});
+
+		// Basic styling phase testing
+		ServerMessageDecoratorEvent.EVENT.register(ServerMessageDecoratorEvent.STYLING_PHASE, (sender, message) -> {
+			if (sender != null && sender.getAbilities().instabuild) {
+				return CompletableFuture.completedFuture(message.copy().withStyle(style -> style.withColor(0xFFA500)));
+			}
+
+			return CompletableFuture.completedFuture(message);
+		});
+
+		// Async testing
+		ServerMessageDecoratorEvent.EVENT.register(ServerMessageDecoratorEvent.CONTENT_PHASE, (sender, message) -> {
+			if (message.getString().contains("wait")) {
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						Thread.sleep(RandomSource.create().nextIntBetweenInclusive(500, 2000));
+					} catch (InterruptedException ignored) {
+						// Ignore interruption
+					}
+
+					return message;
+				}, ioWorkerExecutor);
+			}
+
+			return CompletableFuture.completedFuture(message);
+		});
+
+		// ServerMessageEvents
+		ServerMessageEvents.CHAT_MESSAGE.register(
+				(message, sender, params) -> LOGGER.info("ChatTest: {} sent \"{}\"", sender, message)
+		);
+		ServerMessageEvents.GAME_MESSAGE.register(
+				(server, message, overlay) -> LOGGER.info("ChatTest: server sent \"{}\"", message)
+		);
+		ServerMessageEvents.COMMAND_MESSAGE.register(
+				(message, source, params) -> LOGGER.info("ChatTest: command sent \"{}\"", message)
+		);
+
+		// ServerMessageEvents blocking
+		ServerMessageEvents.ALLOW_CHAT_MESSAGE.register(
+				(message, sender, params) -> !message.signedContent().contains("sadtater")
+		);
+		ServerMessageEvents.ALLOW_GAME_MESSAGE.register((server, message, overlay) -> {
+			if (message.getContents() instanceof TranslatableContents translatable) {
+				return !translatable.getKey().startsWith("death.attack.badRespawnPoint.");
+			}
+
+			return true;
+		});
+		ServerMessageEvents.ALLOW_COMMAND_MESSAGE.register(
+				(message, source, params) -> !message.signedContent().contains("sadtater")
+		);
+	}
+}

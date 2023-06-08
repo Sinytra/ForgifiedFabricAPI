@@ -189,6 +189,15 @@ subprojects {
                 }
             }
         }
+        minecraft.runs.create("serverTest") {
+            parent(minecraft.runs["server"])
+            workingDirectory = project.file("run_test").canonicalPath
+            mods {
+                create("${project.name}-test") {
+                    sources(testMod)
+                }
+            }
+        }
     } }
     @Suppress("UNUSED_VARIABLE")
     val withGameTest: (String) -> Unit by extra { { modid ->
