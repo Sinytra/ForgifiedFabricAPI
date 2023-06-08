@@ -34,7 +34,7 @@ Missing -> Added -> Tested
 | fabric-loot-api-v2                   |         ✅ Tested         |    Stable    |
 | fabric-loot-tables-v1                |        ⚠️ Missing        |  Deprecated  |
 | fabric-message-api-v1                |         ✅ Tested         | Experimental |
-| fabric-mining-level-api-v1           |        ⚠️ Missing        |              |
+| fabric-mining-level-api-v1           |         ✅ Tested         |    Stable    |
 | fabric-models-v0                     |        ⚠️ Missing        |              |
 | fabric-networking-api-v1             |        ⚠️ Missing        |              |
 | fabric-networking-v0                 |        ⚠️ Missing        |  Deprecated  |

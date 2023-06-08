@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "fabric_mining_level_api_v1_testmod:needs_netherite_pickaxe",
+    "fabric_mining_level_api_v1_testmod:needs_netherite_sword"
+  ]
+}
