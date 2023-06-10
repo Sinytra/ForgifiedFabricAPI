@@ -1,0 +1,9 @@
+{
+    "pack": {
+        "description": {
+            "text": "fabric_networking_api_v1_testmod resources"
+        },
+        "forge:server_data_pack_format": 12,
+        "pack_format": 13
+    }
+}

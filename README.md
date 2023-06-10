@@ -36,7 +36,7 @@ Missing -> Added -> Tested
 | fabric-message-api-v1                |         ✅ Tested         | Experimental |
 | fabric-mining-level-api-v1           |         ✅ Tested         |    Stable    |
 | fabric-models-v0                     |         ❓ Added          |    Stable    |
-| fabric-networking-api-v1             |        ⚠️ Missing        |              |
+| fabric-networking-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-networking-v0                 |        ⚠️ Missing        |  Deprecated  |
 | fabric-object-builder-api-v1         |         ❓ Added          |    Stable    |
 | fabric-particles-v1                  |        ⚠️ Missing        |              |
