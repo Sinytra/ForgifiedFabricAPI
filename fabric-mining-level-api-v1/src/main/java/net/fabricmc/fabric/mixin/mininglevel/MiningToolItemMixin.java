@@ -31,8 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class MiningToolItemMixin {
     @Inject(
         method = "isCorrectToolForDrops(Lnet/minecraft/world/level/block/state/BlockState;)Z",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/DiggerItem;getTier()Lnet/minecraft/world/item/Tier;"),
-        slice = @Slice(to = @At(value = "INVOKE:FIRST", target = "Lnet/minecraft/world/item/DiggerItem;getTier()Lnet/minecraft/world/item/Tier;")),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/DiggerItem;getTier()Lnet/minecraft/world/item/Tier;", ordinal = 0),
         cancellable = true
     )
     private void fabric$onIsSuitableFor(BlockState state, CallbackInfoReturnable<Boolean> info) {
