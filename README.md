@@ -38,7 +38,7 @@ Missing -> Added -> Tested
 | fabric-models-v0                     |         ❓ Added          |    Stable    |
 | fabric-networking-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-networking-v0                 |        ⚠️ Missing        |  Deprecated  |
-| fabric-object-builder-api-v1         |         ❓ Added          |    Stable    |
+| fabric-object-builder-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-particles-v1                  |        ⚠️ Missing        |              |
 | fabric-recipe-api-v1                 |        ⚠️ Missing        |              |
 | fabric-registry-sync-v0              |        ⚠️ Missing        |              |

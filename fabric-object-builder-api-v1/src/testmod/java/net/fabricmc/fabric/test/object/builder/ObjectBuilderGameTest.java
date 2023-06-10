@@ -16,27 +16,30 @@
 
 package net.fabricmc.fabric.test.object.builder;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.test.GameTest;
-import net.minecraft.test.TestContext;
-import net.minecraft.util.math.BlockPos;
-
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-
+@GameTestHolder(ObjectBuilderTestConstants.MOD_ID)
 public class ObjectBuilderGameTest {
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-	public void testBlockUse(TestContext context) {
-		List<Block> blocks = List.of(BlockEntityTypeBuilderTest.INITIAL_BETRAYAL_BLOCK, BlockEntityTypeBuilderTest.ADDED_BETRAYAL_BLOCK, BlockEntityTypeBuilderTest.FIRST_MULTI_BETRAYAL_BLOCK, BlockEntityTypeBuilderTest.SECOND_MULTI_BETRAYAL_BLOCK);
-		BlockPos.Mutable pos = BlockPos.ORIGIN.mutableCopy();
+	
+	@GameTest(templateNamespace = ObjectBuilderTestConstants.MOD_ID, template = "empty")
+	@PrefixGameTestTemplate(false)
+	public void testBlockUse(GameTestHelper context) {
+		List<Block> blocks = List.of(BlockEntityTypeBuilderTest.INITIAL_BETRAYAL_BLOCK.get(), BlockEntityTypeBuilderTest.ADDED_BETRAYAL_BLOCK.get(), BlockEntityTypeBuilderTest.FIRST_MULTI_BETRAYAL_BLOCK.get(), BlockEntityTypeBuilderTest.SECOND_MULTI_BETRAYAL_BLOCK.get());
+		BlockPos pos = BlockPos.ZERO;
 
 		for (Block block : blocks) {
-			context.setBlockState(pos, block);
+			context.setBlock(pos, block);
 			context.useBlock(pos);
-			pos.up();
+			pos = pos.above();
 		}
 
-		context.complete();
+		context.succeed();
 	}
 }

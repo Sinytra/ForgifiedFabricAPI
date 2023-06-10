@@ -16,101 +16,93 @@
 
 package net.fabricmc.fabric.test.object.builder;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
-public class BlockEntityTypeBuilderTest implements ModInitializer {
-	private static final Identifier INITIAL_BETRAYAL_BLOCK_ID = ObjectBuilderTestConstants.id("initial_betrayal_block");
-	static final Block INITIAL_BETRAYAL_BLOCK = new BetrayalBlock(MapColor.BLUE);
+import java.util.function.Supplier;
 
-	private static final Identifier ADDED_BETRAYAL_BLOCK_ID = ObjectBuilderTestConstants.id("added_betrayal_block");
-	static final Block ADDED_BETRAYAL_BLOCK = new BetrayalBlock(MapColor.GREEN);
+public class BlockEntityTypeBuilderTest {
+    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ObjectBuilderTestConstants.MOD_ID);
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ObjectBuilderTestConstants.MOD_ID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ObjectBuilderTestConstants.MOD_ID);
 
-	private static final Identifier FIRST_MULTI_BETRAYAL_BLOCK_ID = ObjectBuilderTestConstants.id("first_multi_betrayal_block");
-	static final Block FIRST_MULTI_BETRAYAL_BLOCK = new BetrayalBlock(MapColor.RED);
+    static final RegistryObject<Block> INITIAL_BETRAYAL_BLOCK = registerBlock("initial_betrayal_block", () -> new BetrayalBlock(MaterialColor.COLOR_BLUE));
+    static final RegistryObject<Block> ADDED_BETRAYAL_BLOCK = registerBlock("added_betrayal_block", () -> new BetrayalBlock(MaterialColor.COLOR_GREEN));
+    static final RegistryObject<Block> FIRST_MULTI_BETRAYAL_BLOCK = registerBlock("first_multi_betrayal_block", () -> new BetrayalBlock(MaterialColor.COLOR_RED));
+    static final RegistryObject<Block> SECOND_MULTI_BETRAYAL_BLOCK = registerBlock("second_multi_betrayal_block", () -> new BetrayalBlock(MaterialColor.COLOR_YELLOW));
+    public static final RegistryObject<BlockEntityType<?>> BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register("betrayal_block", () -> FabricBlockEntityTypeBuilder.create(BetrayalBlockEntity::new, INITIAL_BETRAYAL_BLOCK.get())
+        .addBlock(ADDED_BETRAYAL_BLOCK.get())
+        .addBlocks(FIRST_MULTI_BETRAYAL_BLOCK.get(), SECOND_MULTI_BETRAYAL_BLOCK.get())
+        .build());
 
-	private static final Identifier SECOND_MULTI_BETRAYAL_BLOCK_ID = ObjectBuilderTestConstants.id("second_multi_betrayal_block");
-	static final Block SECOND_MULTI_BETRAYAL_BLOCK = new BetrayalBlock(MapColor.YELLOW);
+    public static void onInitialize(IEventBus bus) {
+        BLOCKS.register(bus);
+		ITEMS.register(bus);
+		BLOCK_ENTITY_TYPES.register(bus);
+    }
 
-	private static final Identifier BLOCK_ENTITY_TYPE_ID = ObjectBuilderTestConstants.id("betrayal_block");
-	public static final BlockEntityType<?> BLOCK_ENTITY_TYPE = FabricBlockEntityTypeBuilder.create(BetrayalBlockEntity::new, INITIAL_BETRAYAL_BLOCK)
-			.addBlock(ADDED_BETRAYAL_BLOCK)
-			.addBlocks(FIRST_MULTI_BETRAYAL_BLOCK, SECOND_MULTI_BETRAYAL_BLOCK)
-			.build();
+    private static RegistryObject<Block> registerBlock(String name, Supplier<Block> supplier) {
+        RegistryObject<Block> block = BLOCKS.register(name, supplier);
+        ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+        return block;
+    }
 
-	@Override
-	public void onInitialize() {
-		register(INITIAL_BETRAYAL_BLOCK_ID, INITIAL_BETRAYAL_BLOCK);
-		register(ADDED_BETRAYAL_BLOCK_ID, ADDED_BETRAYAL_BLOCK);
-		register(FIRST_MULTI_BETRAYAL_BLOCK_ID, FIRST_MULTI_BETRAYAL_BLOCK);
-		register(SECOND_MULTI_BETRAYAL_BLOCK_ID, SECOND_MULTI_BETRAYAL_BLOCK);
+    private static class BetrayalBlock extends Block implements EntityBlock {
+        private BetrayalBlock(MaterialColor color) {
+            super(BlockBehaviour.Properties.copy(Blocks.STONE).color(color));
+        }
 
-		Registry.register(Registries.BLOCK_ENTITY_TYPE, BLOCK_ENTITY_TYPE_ID, BLOCK_ENTITY_TYPE);
-	}
+        @Override
+        public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+            if (!world.isClientSide()) {
+                BlockEntity blockEntity = world.getBlockEntity(pos);
 
-	private static void register(Identifier id, Block block) {
-		Registry.register(Registries.BLOCK, id, block);
+                if (blockEntity == null) {
+                    throw new AssertionError("Missing block entity for betrayal block at " + pos);
+                } else if (!BLOCK_ENTITY_TYPE.get().equals(blockEntity.getType())) {
+                    ResourceLocation id = BlockEntityType.getKey(blockEntity.getType());
+                    throw new AssertionError("Incorrect block entity for betrayal block at " + pos + ": " + id);
+                }
 
-		Item item = new BlockItem(block, new Item.Settings());
-		Registry.register(Registries.ITEM, id, item);
-	}
+                Component posText = Component.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ());
+				Component message = Component.translatable("text.fabric_object_builder_api_v1_testmod.block_entity_type_success", posText, BLOCK_ENTITY_TYPE.getId());
 
-	private static class BetrayalBlock extends Block implements BlockEntityProvider {
-		private BetrayalBlock(MapColor color) {
-			super(AbstractBlock.Settings.copy(Blocks.STONE).mapColor(color));
-		}
+                player.displayClientMessage(message, false);
+            }
 
-		@Override
-		public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-			if (!world.isClient()) {
-				BlockEntity blockEntity = world.getBlockEntity(pos);
+            return InteractionResult.SUCCESS;
+        }
 
-				if (blockEntity == null) {
-					throw new AssertionError("Missing block entity for betrayal block at " + pos);
-				} else if (!BLOCK_ENTITY_TYPE.equals(blockEntity.getType())) {
-					Identifier id = BlockEntityType.getId(blockEntity.getType());
-					throw new AssertionError("Incorrect block entity for betrayal block at " + pos + ": " + id);
-				}
+        @Override
+        public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+            return new BetrayalBlockEntity(pos, state);
+        }
+    }
 
-				Text posText = Text.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ());
-				Text message = Text.translatable("text.fabric-object-builder-api-v1-testmod.block_entity_type_success", posText, BLOCK_ENTITY_TYPE_ID);
-
-				player.sendMessage(message, false);
-			}
-
-			return ActionResult.SUCCESS;
-		}
-
-		@Override
-		public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-			return new BetrayalBlockEntity(pos, state);
-		}
-	}
-
-	private static class BetrayalBlockEntity extends BlockEntity {
-		private BetrayalBlockEntity(BlockPos pos, BlockState state) {
-			super(BLOCK_ENTITY_TYPE, pos, state);
-		}
-	}
+    private static class BetrayalBlockEntity extends BlockEntity {
+        private BetrayalBlockEntity(BlockPos pos, BlockState state) {
+            super(BLOCK_ENTITY_TYPE.get(), pos, state);
+        }
+    }
 }

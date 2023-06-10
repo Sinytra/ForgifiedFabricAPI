@@ -16,21 +16,20 @@
 
 package net.fabricmc.fabric.test.object.builder;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TradeOffers;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.item.trading.MerchantOffer;
 
-class SimpleTradeFactory implements TradeOffers.Factory {
-	private final TradeOffer offer;
+class SimpleTradeFactory implements VillagerTrades.ItemListing {
+	private final MerchantOffer offer;
 
-	SimpleTradeFactory(TradeOffer offer) {
+	SimpleTradeFactory(MerchantOffer offer) {
 		this.offer = offer;
 	}
-
 	@Override
-	public TradeOffer create(Entity entity, Random random) {
+	public MerchantOffer getOffer(Entity entity, RandomSource random) {
 		// ALWAYS supply a copy of the offer.
-		return new TradeOffer(this.offer.toNbt());
+		return new MerchantOffer(this.offer.createTag());
 	}
 }

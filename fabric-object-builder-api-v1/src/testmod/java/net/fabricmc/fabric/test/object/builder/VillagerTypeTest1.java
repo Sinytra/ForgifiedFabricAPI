@@ -16,36 +16,33 @@
 
 package net.fabricmc.fabric.test.object.builder;
 
-import static net.minecraft.command.argument.EntityArgumentType.entity;
-import static net.minecraft.command.argument.EntityArgumentType.getEntity;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
-
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.WanderingTraderEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TradeOffers;
-import net.minecraft.village.VillagerProfession;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.MerchantOffer;
 
-public class VillagerTypeTest1 implements ModInitializer {
-	@Override
-	public void onInitialize() {
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+import static net.minecraft.commands.arguments.EntityArgument.entity;
+import static net.minecraft.commands.arguments.EntityArgument.getEntity;
+
+public class VillagerTypeTest1 {
+
+	public static void onInitialize() {
 		TradeOfferHelper.registerVillagerOffers(VillagerProfession.ARMORER, 1, factories -> {
-			factories.add(new SimpleTradeFactory(new TradeOffer(new ItemStack(Items.GOLD_INGOT, 3), new ItemStack(Items.NETHERITE_SCRAP, 4), new ItemStack(Items.NETHERITE_INGOT), 2, 6, 0.15F)));
+			factories.add(new SimpleTradeFactory(new MerchantOffer(new ItemStack(Items.GOLD_INGOT, 3), new ItemStack(Items.NETHERITE_SCRAP, 4), new ItemStack(Items.NETHERITE_INGOT), 2, 6, 0.15F)));
 		});
 
 		TradeOfferHelper.registerWanderingTraderOffers(1, factories -> {
-			factories.add(new SimpleTradeFactory(new TradeOffer(new ItemStack(Items.GOLD_INGOT, 3), new ItemStack(Items.NETHERITE_SCRAP, 4), new ItemStack(Items.NETHERITE_INGOT), 2, 6, 0.35F)));
+			factories.add(new SimpleTradeFactory(new MerchantOffer(new ItemStack(Items.GOLD_INGOT, 3), new ItemStack(Items.NETHERITE_SCRAP, 4), new ItemStack(Items.NETHERITE_INGOT), 2, 6, 0.35F)));
 		});
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -53,16 +50,15 @@ public class VillagerTypeTest1 implements ModInitializer {
 					.then(argument("entity", entity()).executes(context -> {
 						final Entity entity = getEntity(context, "entity");
 
-						if (!(entity instanceof WanderingTraderEntity)) {
-							throw new SimpleCommandExceptionType(Text.literal("Entity is not a wandering trader")).create();
+						if (!(entity instanceof WanderingTrader trader)) {
+							throw new SimpleCommandExceptionType(Component.literal("Entity is not a wandering trader")).create();
 						}
 
-						WanderingTraderEntity trader = (WanderingTraderEntity) entity;
 						trader.getOffers().clear();
 
-						for (TradeOffers.Factory[] value : TradeOffers.WANDERING_TRADER_TRADES.values()) {
-							for (TradeOffers.Factory factory : value) {
-								final TradeOffer result = factory.create(trader, Random.create());
+						for (VillagerTrades.ItemListing[] value : VillagerTrades.WANDERING_TRADER_TRADES.values()) {
+							for (VillagerTrades.ItemListing factory : value) {
+								final MerchantOffer result = factory.getOffer(trader, RandomSource.create());
 
 								if (result == null) {
 									continue;

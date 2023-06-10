@@ -17,30 +17,28 @@
 package net.fabricmc.fabric.test.object.builder;
 
 import com.google.gson.JsonObject;
-
-import net.minecraft.advancement.criterion.ImpossibleCriterion;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.util.Identifier;
-
-import net.fabricmc.fabric.api.object.builder.v1.advancement.CriterionRegistry;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.ImpossibleTrigger;
+import net.minecraft.resources.ResourceLocation;
 
 public final class CriterionRegistryTest {
 	public static void init() {
-		CriterionRegistry.register(new CustomCriterion());
+		CriteriaTriggers.register(new CustomCriterion());
 	}
 
-	static class CustomCriterion extends ImpossibleCriterion {
-		static final Identifier ID = ObjectBuilderTestConstants.id("custom");
+	static class CustomCriterion extends ImpossibleTrigger {
+		static final ResourceLocation ID = ObjectBuilderTestConstants.id("custom");
 
 		@Override
-		public Identifier getId() {
+		public ResourceLocation getId() {
 			return ID;
 		}
 
 		@Override
-		public Conditions conditionsFromJson(JsonObject jsonObject, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
+		public ImpossibleTrigger.TriggerInstance createInstance(JsonObject jsonObject, DeserializationContext advancementEntityPredicateDeserializer) {
 			ObjectBuilderTestConstants.LOGGER.info("Loading custom criterion in advancement!");
-			return super.conditionsFromJson(jsonObject, advancementEntityPredicateDeserializer);
+			return super.createInstance(jsonObject, advancementEntityPredicateDeserializer);
 		}
 	}
 }
