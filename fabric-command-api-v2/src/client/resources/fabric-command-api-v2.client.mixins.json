@@ -8,5 +8,7 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-command-api-v2-refmap.json"
 }

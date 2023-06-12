@@ -8,5 +8,7 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-models-v0-refmap.json"
 }

@@ -7,6 +7,7 @@ withTestMod()
 withGameTest("fabric_recipe_api_v1_testmod")
 
 mixin {
+    add(sourceSets.main.get(), "fabric-recipe-api-v1-refmap.json")
     config("fabric-recipe-api-v1.mixins.json")
 }
 

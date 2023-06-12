@@ -11,7 +11,7 @@ import java.util.List;
 @Mixin(CreativeModeTabRegistry.class)
 public interface CreativeModeTabRegistryAccessor {
 
-    @Invoker
+    @Invoker(remap = false)
     static void callProcessCreativeModeTab(CreativeModeTab creativeModeTab, ResourceLocation name, List<Object> afterEntries, List<Object> beforeEntries) {
         throw new UnsupportedOperationException();
     }

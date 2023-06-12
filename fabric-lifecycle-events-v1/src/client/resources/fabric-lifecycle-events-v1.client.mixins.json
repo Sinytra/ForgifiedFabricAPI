@@ -12,5 +12,7 @@
     "injectors": {
         "defaultRequire": 1,
         "maxShiftBy": 3
-    }
+    },
+    "minVersion": "0.8.4",
+    "refmap": "fabric-lifecycle-events-v1-refmap.json"
 }

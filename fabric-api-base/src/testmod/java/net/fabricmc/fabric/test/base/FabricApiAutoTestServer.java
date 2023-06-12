@@ -18,7 +18,6 @@ package net.fabricmc.fabric.test.base;
 
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
-import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
 public class FabricApiAutoTestServer {

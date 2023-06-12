@@ -5,6 +5,7 @@ withTestMod()
 withGameTest("fabric_content_registries_v0_testmod")
 
 mixin {
+    add(sourceSets.main.get(), "fabric-content-registries-v0-refmap.json")
     config("fabric-content-registries-v0.mixins.json")
 }
 

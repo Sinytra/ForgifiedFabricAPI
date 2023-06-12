@@ -17,7 +17,6 @@
 package net.fabricmc.fabric.impl.recipe.ingredient;
 
 import io.netty.channel.ChannelHandler;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;

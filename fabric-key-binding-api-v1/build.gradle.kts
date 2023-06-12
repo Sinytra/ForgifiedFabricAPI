@@ -5,6 +5,7 @@ withClientSourceSet()
 withTestMod()
 
 mixin {
+    add(sourceSets.main.get(), "fabric-key-binding-api-v1-refmap.json")
     config("fabric-key-binding-api-v1.mixins.json")
 }
 

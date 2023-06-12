@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.mixin.object.builder;
 
 import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.npc.VillagerType;
@@ -29,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Random;
 import java.util.stream.Stream;
 
 @Mixin(VillagerTrades.EmeraldsForVillagerTypeItem.class)
@@ -49,7 +49,7 @@ public abstract class TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin {
 	 * To prevent "item" -> "air" trades, if the result of a type aware trade is air, make sure no offer is created.
 	 */
 	@Inject(method = "getOffer", at = @At(value = "NEW", target = "net/minecraft/world/item/trading/MerchantOffer"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
-	private void failOnNullItem(Entity entity, Random random, CallbackInfoReturnable<MerchantOffer> cir, ItemStack buyingItem) {
+	private void failOnNullItem(Entity entity, RandomSource random, CallbackInfoReturnable<MerchantOffer> cir, ItemStack buyingItem) {
 		if (buyingItem.isEmpty()) { // Will return true for an "empty" item stack that had null passed in the ctor
 			cir.setReturnValue(null); // Return null to prevent creation of empty trades
 		}

@@ -27,8 +27,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HoneycombItem.class)
 public class HoneycombItemMixin {
-	@Dynamic("lambda$static$1: Synthetic lambda body for Suppliers.memoize in initialization of UNWAXED_TO_WAXED_BLOCKS")
-	@Inject(method = "lambda$static$0", at = @At("RETURN"), cancellable = true)
+	@Dynamic("lambda$static$0: Synthetic lambda body for Suppliers.memoize in initialization of UNWAXED_TO_WAXED_BLOCKS")
+	@Inject(method = {"lambda$static$0", "m_150881_"}, at = @At("RETURN"), require = 1, cancellable = true)
 	private static void createUnwaxedToWaxedMap(CallbackInfoReturnable<BiMap> cir) {
 		cir.setReturnValue(HashBiMap.create(cir.getReturnValue()));
 	}

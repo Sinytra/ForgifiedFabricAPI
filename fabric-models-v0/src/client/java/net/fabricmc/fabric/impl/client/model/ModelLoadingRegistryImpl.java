@@ -24,7 +24,6 @@ import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelProviderException;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
 import net.fabricmc.fabric.api.client.model.ModelVariantProvider;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -32,6 +31,7 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ModelLoadingRegistryImpl implements ModelLoadingRegistry {
-    private static final boolean DEBUG_MODEL_LOADING = FabricLoader.getInstance().isDevelopmentEnvironment()
+    private static final boolean DEBUG_MODEL_LOADING = !FMLEnvironment.production
         || Boolean.valueOf(System.getProperty("fabric.debugModelLoading", "false"));
 
     @FunctionalInterface

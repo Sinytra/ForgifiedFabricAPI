@@ -5,6 +5,7 @@ withTestMod()
 withGameTest("fabric_block_api_v1_testmod")
 
 mixin {
+    add(sourceSets.main.get(), "fabric-block-api-v1-refmap.json")
     config("fabric-block-api-v1.mixins.json")
 }
 

@@ -99,7 +99,7 @@ abstract class LivingEntityMixin {
     // This is needed 1) so that the vanilla logic in wakeUp runs for modded beds and 2) for the injector below.
     // The injector is shared because lambda$stopSleeping$11 and sleep share much of the structure here.
     @Dynamic("lambda$stopSleeping$11: Synthetic lambda body for Optional.ifPresent in wakeUp")
-    @ModifyVariable(method = {"lambda$stopSleeping$11", "startSleeping"}, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"))
+    @ModifyVariable(method = {"lambda$stopSleeping$11", "m_260785_", "startSleeping"}, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"), require = 2)
     private BlockState modifyBedForOccupiedState(BlockState state, BlockPos sleepingPos) {
         LivingEntity entity = (LivingEntity) (Object) this;
         InteractionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed(entity, sleepingPos, state, state.isBed(entity.level, sleepingPos, entity));
@@ -115,7 +115,7 @@ abstract class LivingEntityMixin {
 
     // The injector is shared because method_18404 and sleep share much of the structure here.
     @Dynamic("lambda$stopSleeping$11: Synthetic lambda body for Optional.ifPresent in wakeUp")
-    @Redirect(method = {"lambda$stopSleeping$11", "startSleeping"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;setBedOccupied(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;Z)V"))
+    @Redirect(method = {"lambda$stopSleeping$11", "m_260785_", "startSleeping"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;setBedOccupied(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;Z)V"), require = 2)
     private void setOccupiedState(BlockState state, Level level, BlockPos pos, LivingEntity entity, boolean occupied) {
         // This might have been replaced by a red bed above, so we get it again.
         // Note that we *need* to replace it so the state.with(OCCUPIED, ...) call doesn't crash
@@ -130,7 +130,7 @@ abstract class LivingEntityMixin {
     }
 
     @Dynamic("lambda$stopSleeping$11: Synthetic lambda body for Optional.ifPresent in wakeUp")
-    @Redirect(method = "lambda$stopSleeping$11", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/BedBlock;findStandUpPosition(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/CollisionGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;F)Ljava/util/Optional;"))
+    @Redirect(method = {"lambda$stopSleeping$11", "m_260785_"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/BedBlock;findStandUpPosition(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/CollisionGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;F)Ljava/util/Optional;"), require = 1)
     private Optional<Vec3> modifyWakeUpPosition(EntityType<?> entityType, CollisionGetter level, BlockPos pos, Direction direction, float yaw) {
         Optional<Vec3> original = Optional.empty();
         BlockState bedState = level.getBlockState(pos);

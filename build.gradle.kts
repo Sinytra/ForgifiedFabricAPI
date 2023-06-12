@@ -18,29 +18,12 @@ plugins {
 version = "1.0"
 
 val versionMc: String by project
+val versionYarn: String by project
 
 val yarnMappings: Configuration by configurations.creating
 
 dependencies {
-    yarnMappings(group = "net.fabricmc", name = "yarn", version = "1.19.4+build.2")
-}
-
-tasks {
-    jar {
-        finalizedBy("reobfJar")
-
-        manifest {
-            attributes(
-                "Specification-Title" to "fabric-api",
-                "Specification-Vendor" to "FabricMC",
-                "Specification-Version" to "1",
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-                "Implementation-Vendor" to "Sinytra",
-                "Implementation-Timestamp" to LocalDateTime.now()
-            )
-        }
-    }
+    yarnMappings(group = "net.fabricmc", name = "yarn", version = versionYarn)
 }
 
 val createIntermediaryToSrg by tasks.registering(ConvertSRGTask::class) {
@@ -98,7 +81,27 @@ allprojects {
         minecraft(group = "net.minecraftforge", name = "forge", version = "$versionMc-45.0.66")
     }
 
+    // Clean without deleting fg_cache to preserve ATs
+    val cachedClean by tasks.registering(Delete::class) {
+        group = "build"
+        delete(fileTree(project.buildDir) {
+            exclude("fg_cache/**")
+        })
+    }
+
     tasks {
+        setOf(jar, named<Jar>("sourcesJar")).forEach { provider ->
+            provider.configure { 
+                from(rootProject.file("LICENSE")) {
+                    rename { "${it}-${project.base.archivesName.get()}" }
+                }
+            }
+        }
+        
+        jar {
+            finalizedBy("reobfJar")
+        }
+
         withType<JavaCompile> {
             options.encoding = "UTF-8"
         }
@@ -215,9 +218,36 @@ subprojects {
     //@formatter:on
 
     dependencies {
-        implementation(group = "net.fabricmc", name = "fabric-loader", version = "0.14.19")
-
         annotationProcessor(group = "org.spongepowered", name = "mixin", version = "0.8.5", classifier = "processor")
+    }
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes(
+                "Specification-Title" to "fabric-api",
+                "Specification-Vendor" to "FabricMC",
+                "Specification-Version" to "1",
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version,
+                "Implementation-Vendor" to "Sinytra",
+                "Implementation-Timestamp" to LocalDateTime.now(),
+                "FMLModType" to "LIBRARY"
+            )
+        }
+    }
+    
+    this.jarJar {
+        project.subprojects.forEach { subproject ->
+            dependsOn(subproject.tasks.jarJar, subproject.tasks.jar)
+        }
+    }
+}
+
+dependencies {
+    project.subprojects.forEach { subproject ->
+        include(project(":${subproject.name}"))
     }
 }
 
@@ -252,6 +282,14 @@ open class ConvertSRGTask : DefaultTask() {
         }
 
         intermediaryToSrg.write(outputFile.get().asFile.toPath(), IMappingFile.Format.TSRG2, false)
+    }
+}
+
+fun DependencyHandler.include(dependency: ModuleDependency) {
+    dependency.isTransitive = false
+    val nextMajor = dependency.version!!.substringBefore('.').toInt() + 1
+    jarJar(dependency) {
+        jarJar.ranged(dependency, "[${dependency.version}, $nextMajor.0)")
     }
 }
 

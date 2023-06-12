@@ -39,18 +39,18 @@ public abstract class ModelLoaderMixin implements ModelLoaderHooks {
 	// this is the first one
 	@Final
 	@Shadow
-	public static ModelResourceLocation MISSING_ID;
+	public static ModelResourceLocation MISSING_MODEL_LOCATION;
 	@Final
 	@Shadow
-	private Set<ResourceLocation> modelsToLoad;
+	private Set<ResourceLocation> loadingStack;
 	@Final
 	@Shadow
-	private Map<ResourceLocation, UnbakedModel> unbakedModels;
+	private Map<ResourceLocation, UnbakedModel> unbakedCache;
 
 	private ModelLoadingRegistryImpl.LoaderInstance fabric_mlrLoaderInstance;
 
 	@Shadow
-	private void putModel(ResourceLocation id, UnbakedModel unbakedModel) {
+	private void cacheAndQueueDependencies(ResourceLocation id, UnbakedModel unbakedModel) {
 	}
 
 	@Shadow
@@ -62,14 +62,14 @@ public abstract class ModelLoaderMixin implements ModelLoaderHooks {
 		UnbakedModel customModel = fabric_mlrLoaderInstance.loadModelFromVariant(id);
 
 		if (customModel != null) {
-			putModel(id, customModel);
+			cacheAndQueueDependencies(id, customModel);
 			ci.cancel();
 		}
 	}
 
 	@Inject(at = @At("HEAD"), method = "loadTopLevel")
 	private void addModelHook(ModelResourceLocation id, CallbackInfo info) {
-		if (id == MISSING_ID) {
+		if (id == MISSING_MODEL_LOCATION) {
 			ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 			fabric_mlrLoaderInstance = ModelLoadingRegistryImpl.begin((ModelBakery) (Object) this, resourceManager);
 		}
@@ -83,12 +83,12 @@ public abstract class ModelLoaderMixin implements ModelLoaderHooks {
 
 	@Override
 	public UnbakedModel fabric_loadModel(ResourceLocation id) {
-		if (!modelsToLoad.add(id)) {
+		if (!loadingStack.add(id)) {
 			throw new IllegalStateException("Circular reference while loading " + id);
 		}
 
 		loadModel(id);
-		modelsToLoad.remove(id);
-		return unbakedModels.get(id);
+		loadingStack.remove(id);
+		return unbakedCache.get(id);
 	}
 }

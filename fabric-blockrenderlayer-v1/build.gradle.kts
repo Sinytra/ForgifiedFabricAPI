@@ -5,6 +5,7 @@ withClientSourceSet()
 withTestMod()
 
 mixin {
+    add(sourceSets.main.get(), "fabric-blockrenderlayer-v1-refmap.json")
     config("fabric-blockrenderlayer-v1.mixins.json")
 }
 

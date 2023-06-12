@@ -28,10 +28,10 @@ import java.util.Map;
 @Mixin(ModelManager.class)
 public class BakedModelManagerMixin implements BakedModelManagerHooks {
 	@Shadow
-	private Map<ResourceLocation, BakedModel> models;
+	private Map<ResourceLocation, BakedModel> bakedRegistry;
 
 	@Override
 	public BakedModel fabric_getModel(ResourceLocation id) {
-		return models.get(id);
+		return bakedRegistry.get(id);
 	}
 }

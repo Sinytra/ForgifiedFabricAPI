@@ -9,5 +9,7 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-mining-level-api-v1-refmap.json"
 }

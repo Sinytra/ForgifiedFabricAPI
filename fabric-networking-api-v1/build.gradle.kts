@@ -5,6 +5,7 @@ withClientSourceSet()
 withTestMod()
 
 mixin {
+    add(sourceSets.main.get(), "fabric-networking-api-v1-refmap.json")
     config("fabric-networking-api-v1.mixins.json")
     config("fabric-networking-api-v1.client.mixins.json")
 }

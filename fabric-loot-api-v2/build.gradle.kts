@@ -3,6 +3,7 @@ val withTestMod: () -> Unit by extra
 withTestMod()
 
 mixin {
+    add(sourceSets.main.get(), "fabric-loot-api-v2-refmap.json")
     config("fabric-loot-api-v2.mixins.json")
 }
 

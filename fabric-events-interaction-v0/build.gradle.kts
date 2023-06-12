@@ -7,6 +7,7 @@ withTestMod()
 withGameTest("fabric_events_interaction_v0_testmod")
 
 mixin {
+    add(sourceSets.main.get(), "fabric-events-interaction-v0-refmap.json")
     config("fabric-events-interaction-v0.client.mixins.json")
     config("fabric-events-interaction-v0.mixins.json")
 }

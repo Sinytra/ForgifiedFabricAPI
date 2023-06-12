@@ -5,6 +5,7 @@ withClientSourceSet()
 withTestMod()
 
 mixin {
+    add(sourceSets.main.get(), "fabric-lifecycle-events-v1-refmap.json")
     config("fabric-lifecycle-events-v1.mixins.json")
     config("fabric-lifecycle-events-v1.client.mixins.json")
 }

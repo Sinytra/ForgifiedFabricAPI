@@ -16,30 +16,23 @@
 
 package net.fabricmc.fabric.mixin.gamerule;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.impl.gamerule.EnumRuleCommand;
 import net.fabricmc.fabric.impl.gamerule.EnumRuleType;
-import net.minecraft.commands.CommandSourceStack;
+import net.fabricmc.fabric.impl.gamerule.GameRuleReflectionUtils;
 import net.minecraft.world.level.GameRules;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net/minecraft/server/commands/GameRuleCommand$1")
 public abstract class GameRuleCommandVisitorMixin {
-	@Final
-	@Shadow(aliases = "f_137760_")
-	LiteralArgumentBuilder<CommandSourceStack> val$literalargumentbuilder;
-
 	@Inject(at = @At("HEAD"), method = "visit(Lnet/minecraft/world/level/GameRules$Key;Lnet/minecraft/world/level/GameRules$Type;)V", cancellable = true)
 	private <T extends GameRules.Value<T>> void onRegisterCommand(GameRules.Key<T> key, GameRules.Type<T> type, CallbackInfo ci) {
 		// Check if our type is a EnumRuleType
 		if (type instanceof EnumRuleType) {
 			//noinspection rawtypes,unchecked
-			EnumRuleCommand.register(this.val$literalargumentbuilder, (GameRules.Key) key, (EnumRuleType) type);
+			EnumRuleCommand.register(GameRuleReflectionUtils.getLiteralArgumentBuilder(this), (GameRules.Key) key, (EnumRuleType) type);
 			ci.cancel();
 		}
 	}
