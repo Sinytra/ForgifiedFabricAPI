@@ -105,6 +105,14 @@ allprojects {
         withType<JavaCompile> {
             options.encoding = "UTF-8"
         }
+        
+        configureEach {
+            if (name.startsWith("configureReobfTaskForReobf")) {
+                val target = name.substringAfter("configureReobfTaskForReobf")
+                val taskName = target[0].lowercase() + target.substring(1)
+                mustRunAfter(taskName)
+            }
+        }
     }
 }
 
