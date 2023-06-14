@@ -22,6 +22,8 @@ val versionYarn: String by project
 
 val yarnMappings: Configuration by configurations.creating
 
+jarJar.enable()
+
 dependencies {
     yarnMappings(group = "net.fabricmc", name = "yarn", version = versionYarn)
 }
@@ -34,6 +36,7 @@ val createIntermediaryToSrg by tasks.registering(ConvertSRGTask::class) {
 
 allprojects {
     apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
     apply(plugin = "net.minecraftforge.gradle")
     apply(plugin = "org.parchmentmc.librarian.forgegradle")
 
@@ -105,12 +108,25 @@ allprojects {
         withType<JavaCompile> {
             options.encoding = "UTF-8"
         }
+
+        withType<GenerateModuleMetadata> {
+            enabled = false
+        }
         
         configureEach {
             if (name.startsWith("configureReobfTaskForReobf")) {
                 val target = name.substringAfter("configureReobfTaskForReobf")
                 val taskName = target[0].lowercase() + target.substring(1)
                 mustRunAfter(taskName)
+            }
+        }
+    }
+
+    publishing {
+        publications { 
+            create<MavenPublication>("mavenJava") {
+                from(components["java"])
+                fg.component(this)
             }
         }
     }
@@ -232,6 +248,8 @@ subprojects {
 
 tasks {
     jar {
+        archiveClassifier.set("slim")
+        
         manifest {
             attributes(
                 "Specification-Title" to "fabric-api",
@@ -250,12 +268,21 @@ tasks {
         project.subprojects.forEach { subproject ->
             dependsOn(subproject.tasks.jarJar, subproject.tasks.jar)
         }
+        archiveClassifier.set("")
     }
 }
 
 dependencies {
     project.subprojects.forEach { subproject ->
-        include(project(":${subproject.name}"))
+        include(api(project(":${subproject.name}")) as ModuleDependency)
+    }
+}
+
+publishing {
+    publications { 
+        named<MavenPublication>("mavenJava") {
+            jarJar.component(this)
+        }
     }
 }
 

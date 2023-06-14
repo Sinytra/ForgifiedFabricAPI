@@ -1,5 +1,6 @@
 package net.fabricmc.fabric.impl.itemgroup;
 
+import net.fabricmc.fabric.api.itemgroup.v1.IdentifiableItemGroup;
 import net.fabricmc.fabric.mixin.itemgroup.CreativeModeTabRegistryAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -11,15 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class FabricItemGroupsRegistryImpl {
+public final class ItemGroupHelper {
     private static final Map<ResourceLocation, CreativeModeTab> TABS = new HashMap<>();
 
-    public static void register(ResourceLocation id, CreativeModeTab tab) {
-        TABS.put(id, tab);
+    public static void appendItemGroup(CreativeModeTab tab) {
+        TABS.put(((IdentifiableItemGroup) tab).getId(), tab);
     }
 
     static void registerCreativeTabs(CreativeModeTabEvent.Register event) {
-        TABS.forEach(FabricItemGroupsRegistryImpl::registerCreativeModeTab);
+        TABS.forEach(ItemGroupHelper::registerCreativeModeTab);
     }
 
     private static void registerCreativeModeTab(ResourceLocation name, CreativeModeTab tab) {
@@ -32,5 +33,5 @@ public final class FabricItemGroupsRegistryImpl {
         CreativeModeTabRegistryAccessor.callProcessCreativeModeTab(tab, name, List.of(CreativeModeTabs.SPAWN_EGGS), List.of());
     }
 
-    private FabricItemGroupsRegistryImpl() {}
+    private ItemGroupHelper() {}
 }

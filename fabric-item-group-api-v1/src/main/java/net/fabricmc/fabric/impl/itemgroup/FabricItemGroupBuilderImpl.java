@@ -35,7 +35,7 @@ public final class FabricItemGroupBuilderImpl extends CreativeModeTab.Builder {
 		final CreativeModeTab itemGroup = super.build();
 		final FabricItemGroup fabricItemGroup = (FabricItemGroup) itemGroup;
 		fabricItemGroup.setId(identifier);
-		FabricItemGroupsRegistryImpl.register(identifier, itemGroup);
+		ItemGroupHelper.appendItemGroup(itemGroup);
 		return itemGroup;
 	}
 }

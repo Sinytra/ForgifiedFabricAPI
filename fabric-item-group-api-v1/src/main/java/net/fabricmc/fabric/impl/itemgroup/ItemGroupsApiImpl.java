@@ -8,7 +8,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class ItemGroupsApiImpl {
     public ItemGroupsApiImpl() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener(FabricItemGroupsRegistryImpl::registerCreativeTabs);
+        bus.addListener(ItemGroupHelper::registerCreativeTabs);
         bus.addListener(ItemGroupEventsImpl::onCreativeModeTabBuildContents);
     }
 }
