@@ -101,9 +101,9 @@ allprojects {
             }
         }
         
-        jar {
-            finalizedBy("reobfJar")
-        }
+//        jar {
+//            finalizedBy("reobfJar")
+//        }
 
         withType<JavaCompile> {
             options.encoding = "UTF-8"
