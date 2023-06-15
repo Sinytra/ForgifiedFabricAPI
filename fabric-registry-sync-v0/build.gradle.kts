@@ -5,7 +5,7 @@ withClientSourceSet()
 //withTestMod()
 
 mixin {
-    add(sourceSets.main.get(), "fabric-registry-sync-v0.mixins.json")
+    add(sourceSets.main.get(), "fabric-registry-sync-v0-refmap.json")
     config("fabric-registry-sync-v0.mixins.json")
     config("fabric-registry-sync-v0.client.mixins.json")
 }
