@@ -8,7 +8,9 @@
     "MinecraftServerMixin",
     "RegistriesAccessor",
     "RegistriesMixin",
-    "RegistryLoaderMixin"
+    "RegistryLoaderMixin",
+    "SimpleRegistryMixin",
+    "NamespacedWrapperMixin"
   ],
   "injectors": {
     "defaultRequire": 1
