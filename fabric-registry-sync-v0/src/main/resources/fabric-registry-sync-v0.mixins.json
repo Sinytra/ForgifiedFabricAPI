@@ -10,7 +10,8 @@
     "RegistriesMixin",
     "RegistryLoaderMixin",
     "SimpleRegistryMixin",
-    "NamespacedWrapperMixin"
+    "NamespacedWrapperMixin",
+    "LevelStorageSessionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

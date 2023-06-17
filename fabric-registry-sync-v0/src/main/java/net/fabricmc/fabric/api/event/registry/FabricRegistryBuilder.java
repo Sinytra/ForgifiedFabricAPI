@@ -132,16 +132,15 @@ public final class FabricRegistryBuilder<T, R extends WritableRegistry<T>> {
      * @return the registry instance with the attributes applied
      */
     public R buildAndRegister() {
-        throw new UnsupportedOperationException("Not yet implemented");
-//        ResourceKey<?> key = registry.key();
-//
-//        for (RegistryAttribute attribute : attributes) {
-//            RegistryAttributeHolder.get(key).addAttribute(attribute);
-//        }
-//
-//        //noinspection unchecked
-//        RegistriesAccessor.getWRITABLE_REGISTRY().register((ResourceKey<WritableRegistry<?>>) key, registry, Lifecycle.stable());
-//
-//        return registry;
+        ResourceKey<?> key = registry.key();
+
+        for (RegistryAttribute attribute : attributes) {
+            RegistryAttributeHolder.get(key).addAttribute(attribute);
+        }
+
+        //noinspection unchecked
+        RegistriesAccessor.getWRITABLE_REGISTRY().register((ResourceKey<WritableRegistry<?>>) key, registry, Lifecycle.stable());
+
+        return registry;
     }
 }
