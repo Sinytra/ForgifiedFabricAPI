@@ -42,7 +42,7 @@ Missing -> Added -> Tested
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
 | fabric-resource-conditions-api-v1    |        ⚠️ Missing        |              |
 | fabric-resource-loader-v0            |        ⚠️ Missing        |              |
-| fabric-screen-api-v1                 |        ⚠️ Missing        |              |
+| fabric-screen-api-v1                 |         ✅ Tested         |    Stable    |
 | fabric-screen-handler-api-v1         |        ⚠️ Missing        |              |
 | fabric-sound-api-v1                  |        ⚠️ Missing        |              |
 | fabric-transfer-api-v1               |        ⚠️ Missing        |              |
