@@ -1,0 +1,5 @@
+{
+  "block.fabric_screen_handler_api_v1_testmod.box": "Box",
+  "item.fabric_screen_handler_api_v1_testmod.bag": "Bag",
+  "item.fabric_screen_handler_api_v1_testmod.positioned_bag": "Positioned Bag"
+}

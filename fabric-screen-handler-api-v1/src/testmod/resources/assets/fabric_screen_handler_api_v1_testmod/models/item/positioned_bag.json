@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "fabric_screen_handler_api_v1_testmod:item/positioned_bag"
+  }
+}

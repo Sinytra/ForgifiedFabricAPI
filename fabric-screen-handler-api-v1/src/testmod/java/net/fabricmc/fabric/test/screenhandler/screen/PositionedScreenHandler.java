@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.test.entity.event.client;
+package net.fabricmc.fabric.test.screenhandler.screen;
 
-public class EntityEventTestsClient {
-//  TODO
-//	@Override
-//	public void onInitializeClient() {
-//		LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(player -> {
-//			return !player.getEquippedStack(EquipmentSlot.CHEST).isOf(EntityEventTests.DIAMOND_ELYTRA);
-//		});
-//	}
+import net.minecraft.core.BlockPos;
+
+public interface PositionedScreenHandler {
+	BlockPos getPos();
 }

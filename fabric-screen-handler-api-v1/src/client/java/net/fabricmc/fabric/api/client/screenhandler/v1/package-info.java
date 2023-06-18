@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.test.entity.event.client;
-
-public class EntityEventTestsClient {
-//  TODO
-//	@Override
-//	public void onInitializeClient() {
-//		LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(player -> {
-//			return !player.getEquippedStack(EquipmentSlot.CHEST).isOf(EntityEventTests.DIAMOND_ELYTRA);
-//		});
-//	}
-}
+/**
+ * API for working with screen handlers on the client.
+ */
+package net.fabricmc.fabric.api.client.screenhandler.v1;

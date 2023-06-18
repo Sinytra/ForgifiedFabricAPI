@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.screenhandler",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "NamedScreenHandlerFactoryMixin",
+    "SimpleMenuProviderAccessor",
+    "ServerPlayerEntityMixin",
+    "NetworkHooksMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

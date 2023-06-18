@@ -1,0 +1,146 @@
+/*
+ * Copyright (c) 2016, 2017, 2018, 2019 FabricMC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.fabricmc.fabric.api.screenhandler.v1;
+
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+
+/**
+ * An API for creating and registering {@linkplain MenuType screen handler types}.
+ *
+ * <p>This class exposes the private {@link MenuType} constructor,
+ * as well as adds support for creating types using Fabric's extended screen handler API.
+ *
+ * <p>Screen handlers types are used to synchronize {@linkplain AbstractContainerMenu screen handlers}
+ * between the server and the client. Screen handlers manage the items and integer properties that are
+ * needed to show on screens, such as the items in a chest or the progress of a furnace.
+ *
+ * <h2>Simple and extended screen handlers</h2>
+ * Simple screen handlers are the type of screen handlers used in vanilla.
+ * They can automatically synchronize items and integer properties between the server and the client,
+ * but they don't support having custom data sent in the opening packet.
+ *
+ * <p>This module adds <i>extended screen handlers</i> that can synchronize their own custom data
+ * when they are opened, which can be useful for defining additional properties of a screen on the server.
+ * For example, a mod can synchronize text that will show up as a label.
+ *
+ * <h2>Example</h2>
+ * <pre>
+ * {@code
+ * // Creating the screen handler type
+ * public static final ScreenHandlerType<OvenScreenHandler> OVEN = ScreenHandlerRegistry.registerSimple(new Identifier("my_mod", "oven"), OvenScreenHandler::new);
+ *
+ * // Screen handler class
+ * public class OvenScreenHandler extends ScreenHandler {
+ * 	public OvenScreenHandler(int syncId) {
+ * 		super(MyScreenHandlers.OVEN, syncId);
+ * 	}
+ * }
+ *
+ * // Opening the screen
+ * NamedScreenHandlerFactory factory = ...;
+ * player.openHandledScreen(factory); // only works on ServerPlayerEntity instances
+ * }
+ * </pre>
+ *
+ * @see net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry registering screens for screen handlers
+ * @deprecated Replaced by <ul>
+ * <li>Creating simple screen handler types directly with {@link MenuType}
+ * using an access widener in Fabric Transitive Access Wideners (v1)</li>
+ * <li>Creating extended screen handler types with {@link ExtendedScreenHandlerType}</li>
+ * <li>Registering using {@link BuiltInRegistries#MENU} directly</li>
+ * </ul>
+ */
+@Deprecated
+public final class ScreenHandlerRegistry {
+	private ScreenHandlerRegistry() {
+	}
+
+	/**
+	 * Creates and registers a new {@code ScreenHandlerType} that creates client-sided screen handlers using the factory.
+	 *
+	 * @param id      the registry ID
+	 * @param factory the client-sided screen handler factory
+	 * @param <T>     the screen handler type
+	 * @return the created type object
+	 * @deprecated Replaced by access widener for {@link MenuType#MenuType(MenuType.MenuSupplier, FeatureFlagSet)} in Fabric Transitive Access Wideners (v1).
+	 */
+	@Deprecated
+	public static <T extends AbstractContainerMenu> MenuType<T> registerSimple(ResourceLocation id, SimpleClientHandlerFactory<T> factory) {
+		// Wrap our factory in vanilla's factory; it will not be public for users.
+		// noinspection Convert2MethodRef - Must be a lambda or else dedicated server will crash
+		MenuType<T> type = new MenuType<>((syncId, inventory) -> factory.create(syncId, inventory), FeatureFlags.VANILLA_SET);
+		return Registry.register(BuiltInRegistries.MENU, id, type);
+	}
+
+	/**
+	 * Creates and registers a new {@code ScreenHandlerType} that creates client-sided screen handlers with additional
+	 * networked opening data.
+	 *
+	 * <p>These screen handlers must be opened with a {@link ExtendedScreenHandlerFactory}.
+	 *
+	 * @param id      the registry ID
+	 * @param factory the client-sided screen handler factory
+	 * @param <T>     the screen handler type
+	 * @return the created type object
+	 * @deprecated Replaced with creating an {@link ExtendedScreenHandlerType} manually and registering it
+	 * in the vanilla registry.
+	 */
+	@Deprecated
+	public static <T extends AbstractContainerMenu> MenuType<T> registerExtended(ResourceLocation id, ExtendedClientHandlerFactory<T> factory) {
+		MenuType<T> type = new ExtendedScreenHandlerType<>(factory);
+		return Registry.register(BuiltInRegistries.MENU, id, type);
+	}
+
+	/**
+	 * A factory for screen handler instances.
+	 * This is typically used on the client but is also available on the server.
+	 *
+	 * @param <T> the screen handler type
+	 * @deprecated Replaced by access widener for {@link MenuType.MenuSupplier} in Fabric Transitive Access Wideners (v1).
+	 */
+	@Deprecated
+	public interface SimpleClientHandlerFactory<T extends AbstractContainerMenu> {
+		/**
+		 * Creates a new client-sided screen handler.
+		 *
+		 * @param syncId    the synchronization ID
+		 * @param inventory the player inventory
+		 * @return the created screen handler
+		 */
+		T create(int syncId, Inventory inventory);
+	}
+
+	/**
+	 * A factory for screen handler instances
+	 * with additional screen opening data.
+	 * This is typically used on the client but is also available on the server.
+	 *
+	 * @param <T> the screen handler type
+	 * @see ExtendedScreenHandlerFactory
+	 * @deprecated Replaced with {@link ExtendedScreenHandlerType.ExtendedFactory}.
+	 */
+	@Deprecated
+	public interface ExtendedClientHandlerFactory<T extends AbstractContainerMenu> extends ExtendedScreenHandlerType.ExtendedFactory<T> {
+	}
+}
