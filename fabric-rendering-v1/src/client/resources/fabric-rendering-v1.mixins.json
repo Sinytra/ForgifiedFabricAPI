@@ -17,5 +17,5 @@
     "defaultRequire": 1
   },
   "minVersion": "0.8.4",
-    "refmap": "fabric-rendering-v1-refmap.json"
+  "refmap": "fabric-rendering-v1-refmap.json"
 }

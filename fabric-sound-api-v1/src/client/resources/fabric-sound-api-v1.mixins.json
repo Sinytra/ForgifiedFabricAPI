@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.client.sound",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "SoundInstanceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-sound-api-v1-refmap.json"
+}

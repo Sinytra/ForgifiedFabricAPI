@@ -7,5 +7,7 @@
     "JsonDataLoaderMixin",
     "SinglePreparationResourceReloaderMixin",
     "TagManagerLoaderMixin"
-  ]
+  ],
+  "minVersion": "0.8.4",
+  "refmap": "fabric-resource-conditions-api-v1-refmap.json"
 }

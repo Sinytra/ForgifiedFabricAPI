@@ -44,7 +44,7 @@ Missing -> Added -> Tested
 | fabric-resource-loader-v0            |        ⚠️ Missing        |              |
 | fabric-screen-api-v1                 |         ✅ Tested         |    Stable    |
 | fabric-screen-handler-api-v1         |         ✅ Tested         |    Stable    |
-| fabric-sound-api-v1                  |        ⚠️ Missing        |              |
+| fabric-sound-api-v1                  |         ✅ Tested         |    Stable    |
 | fabric-transfer-api-v1               |        ⚠️ Missing        |              |
 | fabric-transitive-access-wideners-v1 |        ⚠️ Missing        |              |
 | fabric-command-api-v1                |        ⚠️ Missing        |  Deprecated  |

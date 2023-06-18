@@ -12,5 +12,7 @@
   "mixins": [
     "MouseMixin",
     "ScreenAccessor"
-  ]
+  ],
+  "minVersion": "0.8.4",
+  "refmap": "fabric-screen-api-v1-refmap.json"
 }
