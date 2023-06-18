@@ -40,7 +40,7 @@ Missing -> Added -> Tested
 | fabric-rendering-data-attachment-v1  |        ⚠️ Missing        |              |
 | fabric-rendering-fluids-v1           |        ⚠️ Missing        |              |
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
-| fabric-resource-conditions-api-v1    |        ⚠️ Missing        |              |
+| fabric-resource-conditions-api-v1    |         ✅ Tested         | Experimental |
 | fabric-resource-loader-v0            |        ⚠️ Missing        |              |
 | fabric-screen-api-v1                 |         ✅ Tested         |    Stable    |
 | fabric-screen-handler-api-v1         |         ✅ Tested         |    Stable    |
