@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.renderer",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "client.BakedModelMixin",
+    "client.MultipartBakedModelMixin",
+    "client.WeightedBakedModelMixin",
+    "client.SpriteAtlasTextureMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-renderer-api-v1-refmap.json"
+}
