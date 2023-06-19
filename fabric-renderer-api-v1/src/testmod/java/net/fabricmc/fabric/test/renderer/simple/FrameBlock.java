@@ -16,33 +16,33 @@
 
 package net.fabricmc.fabric.test.renderer.simple;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.Block;
+import net.fabricmc.fabric.api.block.v1.FabricBlock;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.World;
-
-import net.fabricmc.fabric.api.block.v1.FabricBlock;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import org.jetbrains.annotations.Nullable;
 
 // Need to implement FabricBlock manually because this is a testmod for another Fabric module, otherwise it would be injected.
-public final class FrameBlock extends Block implements BlockEntityProvider, FabricBlock {
-	public final Identifier id;
+public final class FrameBlock extends Block implements EntityBlock, FabricBlock {
+	public final ResourceLocation id;
 
-	public FrameBlock(Identifier id) {
+	public FrameBlock(ResourceLocation id) {
 		super(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque());
 		this.id = id;
 	}

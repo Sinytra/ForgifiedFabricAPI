@@ -16,20 +16,18 @@
 
 package net.fabricmc.fabric.test.renderer.simple;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
 public final class FrameBlockEntity extends BlockEntity implements RenderAttachmentBlockEntity {
 	@Nullable
@@ -40,25 +38,25 @@ public final class FrameBlockEntity extends BlockEntity implements RenderAttachm
 	}
 
 	@Override
-	public void readNbt(NbtCompound tag) {
-		super.readNbt(tag);
+	public void load(CompoundTag tag) {
+		super.load(tag);
 
-		if (tag.contains("block", NbtElement.STRING_TYPE)) {
-			this.block = Registries.BLOCK.get(new Identifier(tag.getString("block")));
+		if (tag.contains("block", Tag.TAG_STRING)) {
+			this.block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(tag.getString("block")));
 		} else {
 			this.block = null;
 		}
 
-		if (this.getWorld() != null && this.getWorld().isClient()) {
+		if (this.getLevel() != null && this.getLevel().isClientSide()) {
 			// This call forces a chunk remesh.
-			world.updateListeners(pos, null, null, 0);
+			level.sendBlockUpdated(worldPosition, null, null, 0);
 		}
 	}
 
 	@Override
-	public void writeNbt(NbtCompound tag) {
+	public void saveAdditional(CompoundTag tag) {
 		if (this.block != null) {
-			tag.putString("block", Registries.BLOCK.getId(this.block).toString());
+			tag.putString("block", ForgeRegistries.BLOCKS.getKey(this.block).toString());
 		} else {
 			// Always need something in the tag, otherwise S2C syncing will never apply the packet.
 			tag.putInt("block", -1);
@@ -66,11 +64,11 @@ public final class FrameBlockEntity extends BlockEntity implements RenderAttachm
 	}
 
 	@Override
-	public void markDirty() {
-		super.markDirty();
+	public void setChanged() {
+		super.setChanged();
 
-		if (this.hasWorld() && !this.getWorld().isClient()) {
-			((ServerWorld) world).getChunkManager().markForUpdate(getPos());
+		if (this.hasLevel() && !this.getLevel().isClientSide()) {
+			((ServerLevel) level).getChunkSource().blockChanged(getBlockPos());
 		}
 	}
 
@@ -81,7 +79,7 @@ public final class FrameBlockEntity extends BlockEntity implements RenderAttachm
 
 	public void setBlock(@Nullable Block block) {
 		this.block = block;
-		this.markDirty();
+		this.setChanged();
 	}
 
 	@Nullable
@@ -91,12 +89,12 @@ public final class FrameBlockEntity extends BlockEntity implements RenderAttachm
 	}
 
 	@Override
-	public BlockEntityUpdateS2CPacket toUpdatePacket() {
-		return BlockEntityUpdateS2CPacket.create(this);
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
-	public NbtCompound toInitialChunkDataNbt() {
-		return this.createNbt();
+	public CompoundTag getUpdateTag() {
+		return this.saveWithoutMetadata();
 	}
 }

@@ -16,32 +16,30 @@
 
 package net.fabricmc.fabric.test.renderer.simple.client;
 
-import static net.fabricmc.fabric.test.renderer.simple.RendererTest.id;
-
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.registry.Registries;
-
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.test.renderer.simple.FrameBlock;
 import net.fabricmc.fabric.test.renderer.simple.RendererTest;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public final class RendererClientTest implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		ModelLoadingRegistry.INSTANCE.registerResourceProvider(manager -> new FrameModelResourceProvider());
-		ModelLoadingRegistry.INSTANCE.registerVariantProvider(manager -> new PillarModelVariantProvider());
+import static net.fabricmc.fabric.test.renderer.simple.RendererTest.id;
 
-		for (FrameBlock frameBlock : RendererTest.FRAMES) {
-			// We don't specify a material for the frame mesh,
-			// so it will use the default material, i.e. the one from BlockRenderLayerMap.
-			BlockRenderLayerMap.INSTANCE.putBlock(frameBlock, RenderLayer.getCutoutMipped());
+public final class RendererClientTest {
 
-			String itemPath = Registries.ITEM.getId(frameBlock.asItem()).getPath();
-			FrameModelResourceProvider.FRAME_MODELS.add(id("item/" + itemPath));
-		}
+    public static void onInitializeClient() {
+        ModelLoadingRegistry.INSTANCE.registerResourceProvider(manager -> new FrameModelResourceProvider());
+        ModelLoadingRegistry.INSTANCE.registerVariantProvider(manager -> new PillarModelVariantProvider());
 
-		FrameModelResourceProvider.FRAME_MODELS.add(id("block/frame"));
-	}
+        for (FrameBlock frameBlock : RendererTest.FRAMES) {
+            // We don't specify a material for the frame mesh,
+            // so it will use the default material, i.e. the one from BlockRenderLayerMap.
+            BlockRenderLayerMap.INSTANCE.putBlock(frameBlock, RenderType.cutoutMipped());
+
+            String itemPath = ForgeRegistries.ITEMS.getKey(frameBlock.asItem()).getPath();
+            FrameModelResourceProvider.FRAME_MODELS.add(id("item/" + itemPath));
+        }
+
+        FrameModelResourceProvider.FRAME_MODELS.add(id("block/frame"));
+    }
 }

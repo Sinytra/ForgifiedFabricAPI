@@ -16,26 +16,24 @@
 
 package net.fabricmc.fabric.test.renderer.simple.client;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.util.Identifier;
-
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Provides the unbaked model for use with the frame block.
  */
 final class FrameModelResourceProvider implements ModelResourceProvider {
-	static final Set<Identifier> FRAME_MODELS = new HashSet<>();
+	static final Set<ResourceLocation> FRAME_MODELS = new HashSet<>();
 
 	@Nullable
 	@Override
-	public UnbakedModel loadModelResource(Identifier resourceId, ModelProviderContext context) {
+	public UnbakedModel loadModelResource(ResourceLocation resourceId, ModelProviderContext context) {
 		if (FRAME_MODELS.contains(resourceId)) {
 			return new FrameUnbakedModel();
 		}

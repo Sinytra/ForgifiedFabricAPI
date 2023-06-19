@@ -16,23 +16,6 @@
 
 package net.fabricmc.fabric.test.renderer.simple.client;
 
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.json.ModelOverrideList;
-import net.minecraft.client.render.model.json.ModelTransformation;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-
 import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
@@ -44,6 +27,21 @@ import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.util.TriState;
 import net.fabricmc.fabric.test.renderer.simple.RendererTest;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Very crude implementation of a pillar block model that connects with pillars above and below.
@@ -54,11 +52,11 @@ public class PillarBakedModel implements BakedModel, FabricBakedModel {
 	}
 
 	// alone, bottom, middle, top
-	private final Sprite[] sprites;
+	private final TextureAtlasSprite[] sprites;
 	private final RenderMaterial defaultMaterial;
 	private final RenderMaterial glintMaterial;
 
-	public PillarBakedModel(Sprite[] sprites) {
+	public PillarBakedModel(TextureAtlasSprite[] sprites) {
 		this.sprites = sprites;
 
 		MaterialFinder finder = RendererAccess.INSTANCE.getRenderer().materialFinder();
@@ -73,24 +71,24 @@ public class PillarBakedModel implements BakedModel, FabricBakedModel {
 	}
 
 	@Override
-	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		emitQuads(context.getEmitter(), blockView, state, pos);
 	}
 
 	@Override
-	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		emitQuads(context.getEmitter(), null, null, null);
 	}
 
-	private void emitQuads(QuadEmitter emitter, @Nullable BlockRenderView blockView, @Nullable BlockState state, @Nullable BlockPos pos) {
+	private void emitQuads(QuadEmitter emitter, @Nullable BlockAndTintGetter blockView, @Nullable BlockState state, @Nullable BlockPos pos) {
 		for (Direction side : Direction.values()) {
 			ConnectedTexture texture = ConnectedTexture.ALONE;
 			RenderMaterial material = defaultMaterial;
 
 			if (side.getAxis().isHorizontal()) {
 				if (blockView != null && state != null && pos != null) {
-					boolean connectAbove = canConnect(blockView, pos.offset(Direction.UP), side, state, pos);
-					boolean connectBelow = canConnect(blockView, pos.offset(Direction.DOWN), side, state, pos);
+					boolean connectAbove = canConnect(blockView, pos.relative(Direction.UP), side, state, pos);
+					boolean connectBelow = canConnect(blockView, pos.relative(Direction.DOWN), side, state, pos);
 
 					if (connectAbove && connectBelow) {
 						texture = ConnectedTexture.MIDDLE;
@@ -112,13 +110,13 @@ public class PillarBakedModel implements BakedModel, FabricBakedModel {
 		}
 	}
 
-	private static boolean canConnect(BlockRenderView blockView, BlockPos pos, Direction side, BlockState sourceState, BlockPos sourcePos) {
+	private static boolean canConnect(BlockAndTintGetter blockView, BlockPos pos, Direction side, BlockState sourceState, BlockPos sourcePos) {
 		// In this testmod we can't rely on injected interfaces - in normal mods the (FabricBlockState) cast will be unnecessary
-		return ((FabricBlockState) blockView.getBlockState(pos)).getAppearance(blockView, pos, side, sourceState, sourcePos).isOf(RendererTest.PILLAR);
+		return ((FabricBlockState) blockView.getBlockState(pos)).getAppearance(blockView, pos, side, sourceState, sourcePos).is(RendererTest.PILLAR);
 	}
 
 	@Override
-	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction face, Random random) {
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction face, RandomSource random) {
 		return List.of();
 	}
 
@@ -128,32 +126,32 @@ public class PillarBakedModel implements BakedModel, FabricBakedModel {
 	}
 
 	@Override
-	public boolean hasDepth() {
+	public boolean isGui3d() {
 		return false;
 	}
 
 	@Override
-	public boolean isSideLit() {
+	public boolean usesBlockLight() {
 		return true;
 	}
 
 	@Override
-	public boolean isBuiltin() {
+	public boolean isCustomRenderer() {
 		return false;
 	}
 
 	@Override
-	public Sprite getParticleSprite() {
+	public TextureAtlasSprite getParticleIcon() {
 		return sprites[0];
 	}
 
 	@Override
-	public ModelTransformation getTransformation() {
+	public ItemTransforms getTransforms() {
 		return ModelHelper.MODEL_TRANSFORM_BLOCK;
 	}
 
 	@Override
-	public ModelOverrideList getOverrides() {
-		return ModelOverrideList.EMPTY;
+	public ItemOverrides getOverrides() {
+		return ItemOverrides.EMPTY;
 	}
 }

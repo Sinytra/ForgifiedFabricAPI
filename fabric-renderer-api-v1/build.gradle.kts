@@ -14,4 +14,9 @@ dependencies {
     referenceApi(group = "net.fabricmc.fabric-api", name = project.name, version = "2.2.7+ebc93ff3f4")
     
     api(project(":fabric-api-base"))
+//    "testModImplementation"(project(":fabric-block-api-v1"))
+//    "testModImplementation"(project(":fabric-blockrenderlayer-v1"))
+//    "testModImplementation"(project(":fabric-models-v0"))
+//    "testModImplementation"(project(":fabric-object-builder-api-v1"))
+//    "testModImplementation"(project(":fabric-renderer-indigo"))
 }

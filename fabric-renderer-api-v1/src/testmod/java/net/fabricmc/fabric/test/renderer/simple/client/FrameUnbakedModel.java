@@ -16,39 +16,33 @@
 
 package net.fabricmc.fabric.test.renderer.simple.client;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.function.Function;
-
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.Baker;
-import net.minecraft.client.render.model.ModelBakeSettings;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.*;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Function;
 
 final class FrameUnbakedModel implements UnbakedModel {
 	FrameUnbakedModel() {
 	}
 
 	@Override
-	public Collection<Identifier> getModelDependencies() {
+	public Collection<ResourceLocation> getDependencies() {
 		return Collections.emptySet();
 	}
 
 	@Override
-	public void setParents(Function<Identifier, UnbakedModel> function) {
+	public void resolveParents(Function<ResourceLocation, UnbakedModel> function) {
 	}
 
 	/*
@@ -57,7 +51,7 @@ final class FrameUnbakedModel implements UnbakedModel {
 	 */
 	@Nullable
 	@Override
-	public BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
+	public BakedModel bake(ModelBaker baker, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
 		// The renderer api may not have an implementation.
 		// For this reason we will just null check the renderer impl
 		if (RendererAccess.INSTANCE.hasRenderer()) {
@@ -65,7 +59,7 @@ final class FrameUnbakedModel implements UnbakedModel {
 			MeshBuilder builder = renderer.meshBuilder();
 			QuadEmitter emitter = builder.getEmitter();
 			// TODO: Just some random texture to get a missing texture, we should get a proper texture soon
-			Sprite frameSprite = textureGetter.apply(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier("foo:foo")));
+			TextureAtlasSprite frameSprite = textureGetter.apply(new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation("foo:foo")));
 
 			for (Direction direction : Direction.values()) {
 				// Draw outer frame

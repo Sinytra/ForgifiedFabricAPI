@@ -16,19 +16,17 @@
 
 package net.fabricmc.fabric.test.renderer.simple.client;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.util.ModelIdentifier;
-
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelVariantProvider;
 import net.fabricmc.fabric.test.renderer.simple.RendererTest;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.UnbakedModel;
+import org.jetbrains.annotations.Nullable;
 
 public class PillarModelVariantProvider implements ModelVariantProvider {
 	@Override
 	@Nullable
-	public UnbakedModel loadModelVariant(ModelIdentifier modelId, ModelProviderContext context) {
+	public UnbakedModel loadModelVariant(ModelResourceLocation modelId, ModelProviderContext context) {
 		if (RendererTest.PILLAR_ID.equals(modelId)) {
 			return new PillarUnbakedModel();
 		} else {

@@ -50,8 +50,10 @@ allprojects {
     minecraft {
         mappings("parchment", "1.19.3-2023.03.12-$versionMc")
 
-        val atFile = file("src/main/resources/META-INF/accesstransformer.cfg")
-        if (atFile.exists()) accessTransformer(atFile)
+        setOf("main", "client").forEach { folder -> 
+            val atFile = file("src/$folder/resources/META-INF/accesstransformer.cfg")
+            if (atFile.exists()) accessTransformer(atFile)
+        }
 
         runs {
             val config = Action<RunConfig> {
