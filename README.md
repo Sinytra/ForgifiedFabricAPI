@@ -37,7 +37,7 @@ Missing -> Added -> Tested
 | fabric-registry-sync-v0              |        ⚠️ Missing        |    Stable    |
 | fabric-renderer-api-v1               |         ❓ Added          |    Stable    |
 | fabric-renderer-indigo               |         ❓ Added          |    Stable    |
-| fabric-rendering-data-attachment-v1  |        ⚠️ Missing        |              |
+| fabric-rendering-data-attachment-v1  |         ❓ Added          |    Stable    |
 | fabric-rendering-fluids-v1           |        ⚠️ Missing        |              |
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
 | fabric-resource-conditions-api-v1    |         ✅ Tested         | Experimental |

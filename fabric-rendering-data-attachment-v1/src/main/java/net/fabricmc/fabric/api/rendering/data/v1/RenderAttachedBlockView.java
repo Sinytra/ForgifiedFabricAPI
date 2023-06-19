@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2016, 2017, 2018, 2019 FabricMC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.fabricmc.fabric.api.rendering.data.v1;
+
+import net.fabricmc.fabric.impl.rendering.data.attachment.RenderingDataAttachmentImpl;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraftforge.client.model.data.ModelData;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * {@link BlockAndTintGetter}-extending interface to be used by {@code FabricBakedModel}
+ * for dynamic model customization. It ensures thread safety and exploits data cached in render
+ * chunks for performance and data consistency. This interface is guaranteed to be implemented on
+ * every {@link BlockAndTintGetter} subclass, and as such any {@link BlockAndTintGetter}
+ * can be safely cast to {@link RenderAttachedBlockView}.
+ *
+ * <p>There are differences from regular {@link net.minecraft.world.level.Level} access that consumers must understand:
+ *
+ * <p>BlockEntity implementations that provide data for model customization should implement
+ * {@link RenderAttachmentBlockEntity} which will be queried on the main thread when a render
+ * chunk is enqueued for rebuild. The model should retrieve the results by casting the
+ * {@link BlockAndTintGetter} to this class and then calling {@link #getBlockEntityRenderAttachment(BlockPos)}.
+ * While {@link #getBlockEntity(BlockPos)} is not disabled, it
+ * is not thread-safe for use on render threads.  Models that violate this guidance are
+ * responsible for any necessary synchronization or collision detection.
+ *
+ * <p>{@link #getBlockState(BlockPos)} and {@link #getFluidState(BlockPos)}
+ * will always reflect the state cached with the render chunk.  Block and fluid states
+ * can thus be different from main-thread world state due to lag between block update
+ * application from network packets and render chunk rebuilds. Use of {link #getCachedRenderData()}
+ * will ensure consistency of model state with the rest of the chunk being rendered.
+ *
+ * <p>Models should avoid using {@link BlockAndTintGetter#getBlockEntity(BlockPos)}
+ * to ensure thread safety because this view may be accessed outside the main client thread.
+ * Models that require Block Entity data should implement {@link RenderAttachmentBlockEntity}
+ * on their block entity class, cast the {@link BlockAndTintGetter} to {@link RenderAttachedBlockView}
+ * and then use {@link #getBlockEntityRenderAttachment(BlockPos)} to retrieve the data. When called from the
+ * main thread, that method will simply retrieve the data directly.
+ */
+public interface RenderAttachedBlockView extends BlockAndTintGetter {
+	/**
+	 * For models associated with Block Entities that implement {@link RenderAttachmentBlockEntity}
+	 * this will be the most recent value provided by that implementation for the given block position.
+	 *
+	 * <p>Null in all other cases, or if the result from the implementation was null.
+	 *
+	 * @param pos Position of the block for the block model.
+	 */
+	@Nullable
+	default Object getBlockEntityRenderAttachment(BlockPos pos) {
+		ModelData data = getModelDataManager().getAt(pos);
+		return data == null ? null : data.get(RenderingDataAttachmentImpl.MODEL_RENDER_DATA_ATTACHMENT);
+	}
+}
