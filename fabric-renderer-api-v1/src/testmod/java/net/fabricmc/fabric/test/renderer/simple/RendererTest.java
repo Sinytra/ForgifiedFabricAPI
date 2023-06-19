@@ -19,8 +19,6 @@ package net.fabricmc.fabric.test.renderer.simple;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.test.renderer.simple.client.RendererClientTest;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -28,8 +26,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple testmod that renders a simple block rendered using the fabric renderer api.
@@ -40,37 +46,44 @@ import net.minecraftforge.fml.loading.FMLLoader;
  */
 @Mod(RendererTest.MODID)
 public final class RendererTest {
-	public static final String MODID = "fabric_renderer_api_v1_testmod";
-	public static final FrameBlock[] FRAMES = new FrameBlock[]{
-			new FrameBlock(id("frame")),
-			new FrameBlock(id("frame_multipart")),
-			new FrameBlock(id("frame_weighted")),
-	};
-	public static final BlockEntityType<FrameBlockEntity> FRAME_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(FrameBlockEntity::new, FRAMES).build(null);
+    public static final String MODID = "fabric_renderer_api_v1_testmod";
 
-	public static final ResourceLocation PILLAR_ID = id("pillar");
-	public static final Block PILLAR = new Block(FabricBlockSettings.of(Material.STONE));
+    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
 
-	public RendererTest() {
-		if (FMLLoader.getDist() == Dist.CLIENT) {
-			RendererClientTest.onInitializeClient();
-		}
-		
-		for (FrameBlock frameBlock : FRAMES) {
-			Registry.register(Registries.BLOCK, frameBlock.id, frameBlock);
-			Registry.register(Registries.ITEM, frameBlock.id, new BlockItem(frameBlock, new Item.Properties()));
-		}
+    public static final List<RegistryObject<FrameBlock>> FRAMES = new ArrayList<>();
 
-		// To anyone testing this: pillars are supposed to connect vertically with each other.
-		// Additionally, they should also connect vertically to frame blocks containing a pillar.
-		// (The frame block will not change, but adjacent pillars should adjust their textures).
-		Registry.register(Registries.BLOCK, PILLAR_ID, PILLAR);
-		Registry.register(Registries.ITEM, PILLAR_ID, new BlockItem(PILLAR, new Item.Properties()));
+    static {
+        String[] frames = {"frame", "frame_multipart", "frame_weighted"};
 
-		Registry.register(Registries.BLOCK_ENTITY_TYPE, id("frame"), FRAME_BLOCK_ENTITY);
-	}
+        for (String name : frames) {
+            RegistryObject<FrameBlock> block = BLOCKS.register(name, () -> new FrameBlock(id(name)));
+            FRAMES.add(block);
+            ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+        }
+    }
 
-	public static ResourceLocation id(String path) {
-		return new ResourceLocation(MODID, path);
-	}
+    public static final RegistryObject<BlockEntityType<FrameBlockEntity>> FRAME_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("frame", () -> FabricBlockEntityTypeBuilder.create(FrameBlockEntity::new, FRAMES.stream().map(RegistryObject::get).toArray(Block[]::new)).build(null));
+
+    // To anyone testing this: pillars are supposed to connect vertically with each other.
+    // Additionally, they should also connect vertically to frame blocks containing a pillar.
+    // (The frame block will not change, but adjacent pillars should adjust their textures).
+    public static final ResourceLocation PILLAR_ID = id("pillar");
+    public static final RegistryObject<Block> PILLAR = BLOCKS.register(PILLAR_ID.getPath(), () -> new Block(FabricBlockSettings.of(Material.STONE)));
+    public static final RegistryObject<Item> PILLAR_ITEM = ITEMS.register(PILLAR_ID.getPath(), () -> new BlockItem(PILLAR.get(), new Item.Properties()));
+
+    public RendererTest() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        if (FMLLoader.getDist() == Dist.CLIENT) {
+            bus.addListener(RendererClientTest::onInitializeClient);
+        }
+        BLOCKS.register(bus);
+        ITEMS.register(bus);
+        BLOCK_ENTITY_TYPES.register(bus);
+    }
+
+    public static ResourceLocation id(String path) {
+        return new ResourceLocation(MODID, path);
+    }
 }

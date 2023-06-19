@@ -38,7 +38,7 @@ public class SpriteAtlasTextureMixin implements SpriteFinderImpl.SpriteFinderAcc
 
 	private SpriteFinderImpl fabric_spriteFinder = null;
 
-	@Inject(at = @At("RETURN"), method = "uploadFirstFrame")
+	@Inject(at = @At("RETURN"), method = "upload")
 	private void uploadHook(SpriteLoader.Preparations arg, CallbackInfo ci) {
 		fabric_spriteFinder = null;
 	}

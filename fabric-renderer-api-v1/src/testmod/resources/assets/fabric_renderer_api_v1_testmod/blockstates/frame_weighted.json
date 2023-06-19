@@ -1,0 +1,13 @@
+{
+  "__comment": "We test that WeightedBakedModel works correctly, hence the two variants.",
+  "variants": {
+    "": [
+      {
+        "model": "fabric_renderer_api_v1_testmod:block/frame"
+      },
+      {
+        "model": "fabric_renderer_api_v1_testmod:block/frame"
+      }
+    ]
+  }
+}

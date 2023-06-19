@@ -16,7 +16,7 @@
 
 package net.fabricmc.fabric.impl.client.indigo;
 
-import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -41,7 +41,7 @@ public class IndigoMixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void loadIfNeeded() {
 		if (needsLoad) {
-			for (IModInfo mod : ModList.get().getMods()) {
+			for (IModInfo mod : LoadingModList.get().getMods()) {
 				Map<String,Object> properties = mod.getModProperties();
 				if (properties.containsKey(JSON_KEY_DISABLE_INDIGO)) {
 					indigoApplicable = false;

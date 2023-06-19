@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "fabric_renderer_api_v1_testmod:block/frame" }
+  }
+}

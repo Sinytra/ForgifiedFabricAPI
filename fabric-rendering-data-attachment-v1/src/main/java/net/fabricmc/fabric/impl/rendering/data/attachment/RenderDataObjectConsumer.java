@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.rendering.data.attachment;
+package net.fabricmc.fabric.impl.rendering.data.attachment;
 
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import org.spongepowered.asm.mixin.Mixin;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-@Mixin(BlockEntity.class)
-public abstract class BlockEntityMixin implements RenderAttachmentBlockEntity {
-
-	@Override
-	public Object getRenderAttachmentData() {
-		return null;
-	}
+public interface RenderDataObjectConsumer {
+	void fabric_acceptRenderDataObjects(Long2ObjectOpenHashMap<Object> renderDataObjects);
 }

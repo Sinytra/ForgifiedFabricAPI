@@ -1,6 +1,11 @@
+val withClientSourceSet: () -> Unit by extra
+
+withClientSourceSet()
+
 mixin {
     add(sourceSets.main.get(), "fabric-rendering-data-attachment-v1-refmap.json")
     config("fabric-rendering-data-attachment-v1.mixins.json")
+    config("fabric-rendering-data-attachment-v1.client.mixins.json")
 }
 
 dependencies {

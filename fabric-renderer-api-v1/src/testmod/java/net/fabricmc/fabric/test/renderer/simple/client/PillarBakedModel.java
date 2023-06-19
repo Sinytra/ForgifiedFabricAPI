@@ -112,7 +112,7 @@ public class PillarBakedModel implements BakedModel, FabricBakedModel {
 
 	private static boolean canConnect(BlockAndTintGetter blockView, BlockPos pos, Direction side, BlockState sourceState, BlockPos sourcePos) {
 		// In this testmod we can't rely on injected interfaces - in normal mods the (FabricBlockState) cast will be unnecessary
-		return ((FabricBlockState) blockView.getBlockState(pos)).getAppearance(blockView, pos, side, sourceState, sourcePos).is(RendererTest.PILLAR);
+		return blockView.getBlockState(pos).getAppearance(blockView, pos, side, sourceState, sourcePos).is(RendererTest.PILLAR.get());
 	}
 
 	@Override

@@ -16,10 +16,9 @@
 
 package net.fabricmc.fabric.api.rendering.data.v1;
 
-import net.fabricmc.fabric.impl.rendering.data.attachment.RenderingDataAttachmentImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraftforge.client.model.data.ModelData;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -53,17 +52,17 @@ import org.jetbrains.annotations.Nullable;
  * main thread, that method will simply retrieve the data directly.
  */
 public interface RenderAttachedBlockView extends BlockAndTintGetter {
-	/**
-	 * For models associated with Block Entities that implement {@link RenderAttachmentBlockEntity}
-	 * this will be the most recent value provided by that implementation for the given block position.
-	 *
-	 * <p>Null in all other cases, or if the result from the implementation was null.
-	 *
-	 * @param pos Position of the block for the block model.
-	 */
-	@Nullable
-	default Object getBlockEntityRenderAttachment(BlockPos pos) {
-		ModelData data = getModelDataManager().getAt(pos);
-		return data == null ? null : data.get(RenderingDataAttachmentImpl.MODEL_RENDER_DATA_ATTACHMENT);
-	}
+    /**
+     * For models associated with Block Entities that implement {@link RenderAttachmentBlockEntity}
+     * this will be the most recent value provided by that implementation for the given block position.
+     *
+     * <p>Null in all other cases, or if the result from the implementation was null.
+     *
+     * @param pos Position of the block for the block model.
+     */
+    @Nullable
+    default Object getBlockEntityRenderAttachment(BlockPos pos) {
+        BlockEntity be = this.getBlockEntity(pos);
+        return be == null ? null : ((RenderAttachmentBlockEntity) be).getRenderAttachmentData();
+    }
 }

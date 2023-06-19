@@ -6,7 +6,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public final class BlockRenderLayerClientInit {
     
     public static void onClientSetup(FMLClientSetupEvent event) {
-        BlockRenderLayerMapImpl.initialize(ItemBlockRenderTypes::setRenderLayer);
+        event.enqueueWork(() -> BlockRenderLayerMapImpl.initialize(ItemBlockRenderTypes::setRenderLayer));
     }
     
     private BlockRenderLayerClientInit() {}

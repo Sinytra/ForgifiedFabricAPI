@@ -36,6 +36,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.model.data.ModelData;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -66,7 +67,7 @@ import java.util.Set;
 @Mixin(ChunkRenderDispatcher.RenderChunk.RebuildTask.class)
 public abstract class ChunkBuilderBuiltChunkRebuildTaskMixin {
     @Final
-    @Shadow
+    @Shadow(aliases = "this$1")
     ChunkRenderDispatcher.RenderChunk f_112859_;
 
     @Inject(method = "compile",
@@ -101,8 +102,8 @@ public abstract class ChunkBuilderBuiltChunkRebuildTaskMixin {
      * driven off of render type. (Not recommended or encouraged, but also not prevented.)
      */
     @Redirect(method = "compile", require = 1, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/block/BlockRenderDispatcher;renderBatched(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZLnet/minecraft/util/RandomSource;)V"))
-    private void hookChunkBuildTesselate(BlockRenderDispatcher renderManager, BlockState blockState, BlockPos blockPos, BlockAndTintGetter blockView, PoseStack matrix, VertexConsumer bufferBuilder, boolean checkSides, RandomSource random) {
+            target = "Lnet/minecraft/client/renderer/block/BlockRenderDispatcher;renderBatched(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/BlockAndTintGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZLnet/minecraft/util/RandomSource;Lnet/minecraftforge/client/model/data/ModelData;Lnet/minecraft/client/renderer/RenderType;Z)V"))
+    private void hookChunkBuildTesselate(BlockRenderDispatcher renderManager, BlockState blockState, BlockPos blockPos, BlockAndTintGetter blockView, PoseStack matrix, VertexConsumer bufferBuilder, boolean checkSides, RandomSource random, ModelData modelData, RenderType renderType, boolean queryModelSpecificData) {
         if (blockState.getRenderShape() == RenderShape.MODEL) {
             final BakedModel model = renderManager.getBlockModel(blockState);
 

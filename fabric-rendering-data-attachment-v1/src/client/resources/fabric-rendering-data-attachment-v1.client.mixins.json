@@ -1,10 +1,10 @@
 {
   "required": true,
-  "package": "net.fabricmc.fabric.mixin.rendering.data.attachment",
+  "package": "net.fabricmc.fabric.mixin.rendering.data.attachment.client",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "BlockEntityMixin",
-    "WorldViewMixin"
+  "client": [
+    "ChunkRendererRegionMixin",
+    "ChunkRendererRegionBuilderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

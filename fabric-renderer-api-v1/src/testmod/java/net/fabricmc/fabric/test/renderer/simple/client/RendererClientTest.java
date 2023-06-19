@@ -21,22 +21,24 @@ import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.test.renderer.simple.FrameBlock;
 import net.fabricmc.fabric.test.renderer.simple.RendererTest;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import static net.fabricmc.fabric.test.renderer.simple.RendererTest.id;
 
 public final class RendererClientTest {
 
-    public static void onInitializeClient() {
+    public static void onInitializeClient(FMLClientSetupEvent event) {
         ModelLoadingRegistry.INSTANCE.registerResourceProvider(manager -> new FrameModelResourceProvider());
         ModelLoadingRegistry.INSTANCE.registerVariantProvider(manager -> new PillarModelVariantProvider());
 
-        for (FrameBlock frameBlock : RendererTest.FRAMES) {
+        for (RegistryObject<FrameBlock> frameBlock : RendererTest.FRAMES) {
             // We don't specify a material for the frame mesh,
             // so it will use the default material, i.e. the one from BlockRenderLayerMap.
-            BlockRenderLayerMap.INSTANCE.putBlock(frameBlock, RenderType.cutoutMipped());
+            BlockRenderLayerMap.INSTANCE.putBlock(frameBlock.get(), RenderType.cutoutMipped());
 
-            String itemPath = ForgeRegistries.ITEMS.getKey(frameBlock.asItem()).getPath();
+            String itemPath = ForgeRegistries.ITEMS.getKey(frameBlock.get().asItem()).getPath();
             FrameModelResourceProvider.FRAME_MODELS.add(id("item/" + itemPath));
         }
 

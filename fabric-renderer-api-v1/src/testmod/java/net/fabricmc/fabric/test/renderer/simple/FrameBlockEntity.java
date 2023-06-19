@@ -34,7 +34,7 @@ public final class FrameBlockEntity extends BlockEntity implements RenderAttachm
 	private Block block = null;
 
 	public FrameBlockEntity(BlockPos blockPos, BlockState blockState) {
-		super(RendererTest.FRAME_BLOCK_ENTITY, blockPos, blockState);
+		super(RendererTest.FRAME_BLOCK_ENTITY.get(), blockPos, blockState);
 	}
 
 	@Override

@@ -1,0 +1,10 @@
+{
+  "__comment": "We test that MultipartBakedModel works correctly.",
+  "multipart": [
+    {
+      "apply": {
+        "model": "fabric_renderer_api_v1_testmod:block/frame"
+      }
+    }
+  ]
+}
