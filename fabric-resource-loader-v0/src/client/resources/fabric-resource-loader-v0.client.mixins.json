@@ -5,7 +5,8 @@
   "client": [
     "FontManagerMixin",
     "KeyedResourceReloadListenerClientMixin",
-    "DefaultClientResourcePackProviderMixin"
+    "DefaultClientResourcePackProviderMixin",
+    "ReloadableResourceManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

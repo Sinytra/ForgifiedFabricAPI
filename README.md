@@ -29,7 +29,7 @@ Missing -> Added -> Tested
 | fabric-loot-api-v2                   |         ✅ Tested         |    Stable    |
 | fabric-message-api-v1                |         ✅ Tested         | Experimental |
 | fabric-mining-level-api-v1           |         ✅ Tested         |    Stable    |
-| fabric-models-v0                     |         ❓ Added          |    Stable    |
+| fabric-models-v0                     |         ✅ Tested         |    Stable    |
 | fabric-networking-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-object-builder-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-particles-v1                  |         ✅ Tested         |    Stable    |

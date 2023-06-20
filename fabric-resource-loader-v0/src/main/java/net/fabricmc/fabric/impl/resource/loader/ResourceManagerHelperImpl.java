@@ -28,7 +28,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.slf4j.Logger;
@@ -165,14 +164,15 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 
         if (instance != null) {
             List<PreparableReloadListener> mutable = new ArrayList<>(listeners);
-            instance.sort(mutable);
-            return Collections.unmodifiableList(mutable);
+            return Collections.unmodifiableList(instance.sort(mutable));
         }
 
         return listeners;
     }
 
-    protected void sort(List<PreparableReloadListener> listeners) {
+    protected List<PreparableReloadListener> sort(List<PreparableReloadListener> listeners) {
+        List<PreparableReloadListener> fabricListeners = new ArrayList<>();
+        
         listeners.removeAll(addedListeners);
 
         // General rules:
@@ -202,7 +202,7 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 
                 if (resolvedIds.containsAll(listener.getFabricDependencies())) {
                     resolvedIds.add(listener.getFabricId());
-                    listeners.add(listener);
+                    fabricListeners.add(listener);
                     it.remove();
                 }
             }
@@ -211,6 +211,8 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
         for (IdentifiableResourceReloadListener listener : listenersToAdd) {
             LOGGER.warn("Could not resolve dependencies for listener: " + listener.getFabricId() + "!");
         }
+        
+        return fabricListeners;
     }
 
     @Override
@@ -223,11 +225,6 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
         if (!addedListeners.add(listener)) {
             throw new RuntimeException("Listener with previously unknown ID " + listener.getFabricId() + " already in listener set!");
         }
-    }
-
-    static void onClientResourcesReload(RegisterClientReloadListenersEvent event) {
-        List<PreparableReloadListener> listeners = sort(PackType.CLIENT_RESOURCES, List.of());
-        listeners.forEach(event::registerReloadListener);
     }
 
     static void onServerDataReload(AddReloadListenerEvent event) {

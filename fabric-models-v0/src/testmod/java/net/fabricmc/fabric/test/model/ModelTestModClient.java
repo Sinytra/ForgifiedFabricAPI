@@ -17,7 +17,11 @@
 package net.fabricmc.fabric.test.model;
 
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod("fabric_models_v0_testmod")
@@ -31,13 +35,12 @@ public class ModelTestModClient {
 			out.accept(MODEL_ID);
 		});
 
-		// TODO
-//		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(SpecificModelReloadListener.INSTANCE);
-//
-//		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
-//			if (entityRenderer instanceof PlayerRenderer playerRenderer) {
-//				registrationHelper.register(new BakedModelFeatureRenderer<>(playerRenderer, SpecificModelReloadListener.INSTANCE::getSpecificModel));
-//			}
-//		});
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(SpecificModelReloadListener.INSTANCE);
+
+		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
+			if (entityRenderer instanceof PlayerRenderer playerRenderer) {
+				registrationHelper.register(new BakedModelFeatureRenderer<>(playerRenderer, SpecificModelReloadListener.INSTANCE::getSpecificModel));
+			}
+		});
 	}
 }

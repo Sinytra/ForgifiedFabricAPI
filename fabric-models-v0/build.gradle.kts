@@ -11,4 +11,7 @@ mixin {
 
 dependencies {
     referenceApi(group = "net.fabricmc.fabric-api", name = project.name, version = "0.3.32+504944c8f4")
+    
+    "testModImplementation"(project(":fabric-resource-loader-v0"))
+    "testModImplementation"(project(":fabric-rendering-v1"))
 }

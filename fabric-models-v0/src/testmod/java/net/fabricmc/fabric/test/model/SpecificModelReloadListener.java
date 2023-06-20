@@ -17,6 +17,8 @@
 package net.fabricmc.fabric.test.model;
 
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +27,10 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 
-public class SpecificModelReloadListener extends SimplePreparableReloadListener<Unit> /*implements IdentifiableResourceReloadListener*/ {
+import java.util.Collection;
+import java.util.List;
+
+public class SpecificModelReloadListener extends SimplePreparableReloadListener<Unit> implements IdentifiableResourceReloadListener {
 	public static final SpecificModelReloadListener INSTANCE = new SpecificModelReloadListener();
 	public static final ResourceLocation ID = new ResourceLocation(ModelTestModClient.MODID, "specific_model");
 
@@ -45,13 +50,13 @@ public class SpecificModelReloadListener extends SimplePreparableReloadListener<
 		specificModel = BakedModelManagerHelper.getModel(Minecraft.getInstance().getModelManager(), ModelTestModClient.MODEL_ID);
 	}
 
-	/*@Override
+	@Override
 	public ResourceLocation getFabricId() {
 		return ID;
 	}
 
 	@Override
 	public Collection<ResourceLocation> getFabricDependencies() {
-		return Arrays.asList(ResourceReloadListenerKeys.MODELS);
-	}*/
+		return List.of(ResourceReloadListenerKeys.MODELS);
+	}
 }

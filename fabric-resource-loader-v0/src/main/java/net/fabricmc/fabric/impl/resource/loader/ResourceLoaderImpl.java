@@ -1,5 +1,6 @@
 package net.fabricmc.fabric.impl.resource.loader;
 
+import net.fabricmc.fabric.impl.client.resource.loader.ResourceLoaderClient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
@@ -14,7 +15,8 @@ public class ResourceLoaderImpl {
     public ResourceLoaderImpl() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         if (FMLLoader.getDist() == Dist.CLIENT) {
-            bus.addListener(ResourceManagerHelperImpl::onClientResourcesReload);
+            // Run first
+            bus.addListener(ResourceLoaderClient::onClientResourcesReload);
         }
         bus.addListener(ResourceLoaderImpl::addPackFinders);
         MinecraftForge.EVENT_BUS.addListener(ResourceManagerHelperImpl::onServerDataReload);
