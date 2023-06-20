@@ -79,7 +79,7 @@ allprojects {
             name = "Fabric"
             url = uri("https://maven.fabricmc.net")
         }
-        maven("https://maven.su5ed.dev/releases")
+        exclusiveRepo("https://maven.su5ed.dev/releases", "dev.su5ed.sinytra")
     }
 
     dependencies {
@@ -102,10 +102,6 @@ allprojects {
                 }
             }
         }
-        
-//        jar {
-//            finalizedBy("reobfJar")
-//        }
 
         withType<JavaCompile> {
             options.encoding = "UTF-8"
