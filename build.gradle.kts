@@ -79,7 +79,7 @@ allprojects {
             name = "Fabric"
             url = uri("https://maven.fabricmc.net")
         }
-        exclusiveRepo("https://maven.su5ed.dev/releases", "dev.su5ed.sinytra")
+        maven("https://maven.su5ed.dev/releases")
     }
 
     dependencies {

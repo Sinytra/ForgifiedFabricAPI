@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.resource.loader.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "FontManagerMixin",
+    "KeyedResourceReloadListenerClientMixin",
+    "DefaultClientResourcePackProviderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-resource-loader-v0-refmap.json"
+}

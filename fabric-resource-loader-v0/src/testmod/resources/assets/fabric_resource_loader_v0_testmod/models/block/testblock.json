@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "fabric_resource_loader_v0_testmod:block/testblock"
+  }
+}
