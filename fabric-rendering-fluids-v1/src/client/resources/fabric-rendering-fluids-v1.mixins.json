@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.client.rendering.fluid",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "FluidRendererMixin",
+    "BlockStateMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1,
+    "maxShiftBy": 5
+  },
+  "minVersion": "0.8.4",
+  "refmap": "fabric-rendering-fluids-v1-refmap.json"
+}

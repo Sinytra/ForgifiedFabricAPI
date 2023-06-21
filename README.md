@@ -38,7 +38,7 @@ Missing -> Added -> Tested
 | fabric-renderer-api-v1               |         ✅ Tested         |    Stable    |
 | fabric-renderer-indigo               |         ✅ Tested         |    Stable    |
 | fabric-rendering-data-attachment-v1  |         ✅ Tested         |    Stable    |
-| fabric-rendering-fluids-v1           |        ⚠️ Missing        |              |
+| fabric-rendering-fluids-v1           |         ✅ Tested         |    Stable    |
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
 | fabric-resource-conditions-api-v1    |         ✅ Tested         | Experimental |
 | fabric-resource-loader-v0            |         ✅ Tested         |    Stable    |
