@@ -1,0 +1,1 @@
+MixinConfigs: fabric-transfer-api-v1-testmod.mixins.json

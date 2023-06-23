@@ -27,7 +27,7 @@ displayName = "[Forgified] Fabric Sound API (v1)" #mandatory
 # A URL for the "homepage" for this mod, displayed in the mod UI
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile = "assets/fabric-sound-api-v1/icon.png" #optional
+logoFile = "assets/fabric_sound_api_v1/icon.png" #optional
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI

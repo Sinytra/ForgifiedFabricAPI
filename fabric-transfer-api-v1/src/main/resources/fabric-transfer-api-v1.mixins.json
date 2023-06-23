@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.transfer",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractFurnaceBlockEntityMixin",
+    "BucketItemMixin",
+    "ChiseledBookshelfBlockEntityMixin",
+    "DoubleInventoryAccessor",
+    "FluidMixin",
+    "ItemMixin",
+    "LootableContainerBlockEntityMixin",
+    "SimpleInventoryMixin"
+  ],
+  "minVersion": "0.8.4",
+  "refmap": "fabric-transfer-api-v1-refmap.json"
+}
