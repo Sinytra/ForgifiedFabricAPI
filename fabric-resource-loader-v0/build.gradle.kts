@@ -26,8 +26,9 @@ dependencies {
 
 tasks.jar {
     // Hand pick classes that are used by the api for minimum overhead
-    from(zipTree(provider { shade.singleFile })) {
-        include("net/fabricmc/loader/api/metadata/ModMetadata.class")
-        include("net/fabricmc/loader/api/ModContainer.class")
-    }
+    // TODO Have a second jar for shadowed classes
+//    from(zipTree(provider { shade.singleFile })) {
+//        include("net/fabricmc/loader/api/metadata/ModMetadata.class")
+//        include("net/fabricmc/loader/api/ModContainer.class")
+//    }
 }

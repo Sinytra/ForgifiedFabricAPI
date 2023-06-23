@@ -65,7 +65,7 @@ public class BlockRenderLayerMapImpl implements BlockRenderLayerMap {
 		if (fluid == null) throw new IllegalArgumentException("Request to map null fluid to BlockRenderLayer");
 		if (renderLayer == null) throw new IllegalArgumentException("Request to map fluid " + fluid + " to null BlockRenderLayer");
 
-		ItemBlockRenderTypes.setRenderLayer(fluid, renderLayer);
+		fluidHandler.accept(fluid, renderLayer);
 	}
 
 	@Override
@@ -77,21 +77,25 @@ public class BlockRenderLayerMapImpl implements BlockRenderLayerMap {
 
 	private static final Map<Block, RenderType> blockRenderLayerMap = new HashMap<>();
 	private static final Map<Item, RenderType> itemRenderLayerMap = new HashMap<>();
+	private static final Map<Fluid, RenderType> fluidRenderLayerMap = new HashMap<>();
 
 	//This consumers initially add to the maps above, and then are later set (when initialize is called) to insert straight into the target map.
 	private static BiConsumer<Block, RenderType> blockHandler = blockRenderLayerMap::put;
 	private static BiConsumer<Item, RenderType> itemHandler = itemRenderLayerMap::put;
+	private static BiConsumer<Fluid, RenderType> fluidHandler = fluidRenderLayerMap::put;
 
-	public static void initialize(BiConsumer<Block, RenderType> blockHandlerIn) {
+	public static void initialize() {
 		//Done to handle backwards compat, in previous snapshots Items had their own map for render layers, now the BlockItem is used.
-		BiConsumer<Item, RenderType> itemHandlerIn = (item, renderLayer) -> blockHandlerIn.accept(Block.byItem(item), renderLayer);
+		BiConsumer<Item, RenderType> itemHandlerIn = (item, renderLayer) -> ItemBlockRenderTypes.setRenderLayer(Block.byItem(item), renderLayer);
 
 		//Add all the pre existing render layers
-		blockRenderLayerMap.forEach(blockHandlerIn);
+		blockRenderLayerMap.forEach(ItemBlockRenderTypes::setRenderLayer);
 		itemRenderLayerMap.forEach(itemHandlerIn);
+		fluidRenderLayerMap.forEach(ItemBlockRenderTypes::setRenderLayer);
 
 		//Set the handlers to directly accept later additions
-		blockHandler = blockHandlerIn;
+		blockHandler = ItemBlockRenderTypes::setRenderLayer;
 		itemHandler = itemHandlerIn;
+		fluidHandler = ItemBlockRenderTypes::setRenderLayer;
 	}
 }
