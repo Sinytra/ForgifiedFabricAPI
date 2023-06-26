@@ -32,14 +32,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 
-public final class FeatureRendererTest implements ClientModInitializer {
+public final class FeatureRendererTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FeatureRendererTest.class);
 	private int playerRegistrations = 0;
 
-	@Override
 	public void onInitializeClient() {
 		LOGGER.info("Registering feature renderer tests");
 		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {

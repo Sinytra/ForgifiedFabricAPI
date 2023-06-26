@@ -23,13 +23,12 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.test.rendering.TooltipComponentTestInit;
 
-public class TooltipComponentTests implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class TooltipComponentTests {
+
+	public static void onInitializeClient() {
 		TooltipComponentCallback.EVENT.register(data -> {
 			if (data instanceof TooltipComponentTestInit.Data d) {
 				return TooltipComponent.of(Text.literal(d.string()).setStyle(Style.EMPTY.withColor(Formatting.GREEN)).asOrderedText());

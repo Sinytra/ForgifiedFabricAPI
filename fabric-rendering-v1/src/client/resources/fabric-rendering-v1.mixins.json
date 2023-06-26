@@ -5,21 +5,13 @@
   "client": [
     "CapeFeatureRendererMixin",
     "ArmorFeatureRendererMixin",
-    "BlockColorsMixin",
     "BuiltinModelItemRendererMixin",
-    "InGameHudMixin",
-    "ItemColorsMixin",
     "WorldRendererMixin",
-    "EntityModelLayersAccessor",
     "EntityModelsMixin",
-    "LivingEntityRendererAccessor",
-    "BlockEntityRendererFactoriesMixin",
     "EntityRenderersMixin",
-    "TooltipComponentMixin",
     "DimensionEffectsAccessor",
-    "shader.GameRendererMixin",
-    "shader.ShaderProgramImportProcessorMixin",
-    "shader.ShaderProgramMixin"
+    "shader.ShaderProgramMixin",
+    "shader.ShaderProgramMixin$ShaderProgramGlslProcessorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

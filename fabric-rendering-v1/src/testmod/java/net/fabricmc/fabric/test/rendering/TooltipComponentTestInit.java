@@ -18,6 +18,16 @@ package net.fabricmc.fabric.test.rendering;
 
 import java.util.Optional;
 
+import com.mojang.serialization.Codec;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.client.item.TooltipData;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
@@ -25,22 +35,40 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.test.rendering.client.ArmorRenderingTests;
+import net.fabricmc.fabric.test.rendering.client.DimensionalRenderingTest;
+import net.fabricmc.fabric.test.rendering.client.FeatureRendererTest;
+import net.fabricmc.fabric.test.rendering.client.HudAndShaderTest;
+import net.fabricmc.fabric.test.rendering.client.TooltipComponentTests;
+import net.fabricmc.fabric.test.rendering.client.WorldRenderEventsTests;
 
-public class TooltipComponentTestInit implements ModInitializer {
-	public static Item CUSTOM_TOOLTIP_ITEM = new CustomTooltipItem();
-	public static Item CUSTOM_ARMOR_ITEM = new ArmorItem(TestArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new Item.Settings());
+@Mod(TooltipComponentTestInit.MODID)
+public class TooltipComponentTestInit {
+	public static final String MODID = "fabric_rendering_v1_testmod";
+	private static final DeferredRegister<Codec<? extends ChunkGenerator>> CHUNK_GENERATORS = DeferredRegister.create(RegistryKeys.CHUNK_GENERATOR, MODID);
+	public static final RegistryObject<Codec<? extends ChunkGenerator>> VOID_CHUNK_GENERATOR = CHUNK_GENERATORS.register("void", () -> VoidChunkGenerator.CODEC);
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.ITEM, new Identifier("fabric-rendering-v1-testmod", "custom_tooltip"), CUSTOM_TOOLTIP_ITEM);
-		Registry.register(Registries.ITEM, new Identifier("fabric-rendering-v1-testmod", "test_chest"), CUSTOM_ARMOR_ITEM);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+	public static final RegistryObject<Item> CUSTOM_TOOLTIP_ITEM = ITEMS.register("custom_tooltip", CustomTooltipItem::new);
+	public static final RegistryObject<Item> CUSTOM_ARMOR_ITEM = ITEMS.register("test_chest", () -> new ArmorItem(TestArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new Item.Settings()));
+
+	public TooltipComponentTestInit() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		CHUNK_GENERATORS.register(bus);
+		ITEMS.register(bus);
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			new ArmorRenderingTests().onInitializeClient();
+			DimensionalRenderingTest.onInitializeClient();
+			new FeatureRendererTest().onInitializeClient();
+			HudAndShaderTest.onInitializeClient();
+			TooltipComponentTests.onInitializeClient();
+			WorldRenderEventsTests.onInitializeClient();
+		}
 	}
 
 	private static class CustomTooltipItem extends Item {
@@ -90,7 +118,7 @@ public class TooltipComponentTestInit implements ModInitializer {
 
 		@Override
 		public String getName() {
-			return "fabric-rendering-v1-testmod:test";
+			return "fabric_rendering_v1_testmod:test";
 		}
 
 		@Override

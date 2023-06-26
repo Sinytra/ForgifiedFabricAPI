@@ -17,23 +17,25 @@
 package net.fabricmc.fabric.test.rendering.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.fabricmc.fabric.test.rendering.TooltipComponentTestInit;
+
 import org.joml.Matrix4f;
 
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.Identifier;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.DimensionRenderingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 
-public class DimensionalRenderingTest implements ClientModInitializer {
+public class DimensionalRenderingTest {
 	private static final Identifier END_SKY = new Identifier("textures/block/dirt.png");
 
 	private static void render(WorldRenderContext context) {
@@ -82,9 +84,8 @@ public class DimensionalRenderingTest implements ClientModInitializer {
 		RenderSystem.disableBlend();
 	}
 
-	@Override
-	public void onInitializeClient() {
-		DimensionRenderingRegistry.registerSkyRenderer(RegistryKey.of(RegistryKeys.WORLD, new Identifier("fabric_dimension", "void")), DimensionalRenderingTest::render);
-		DimensionRenderingRegistry.registerDimensionEffects(new Identifier("fabric_dimension", "void"), new DimensionEffects.End());
+	public static void onInitializeClient() {
+		DimensionRenderingRegistry.registerSkyRenderer(RegistryKey.of(RegistryKeys.WORLD, new Identifier(TooltipComponentTestInit.MODID, "void")), DimensionalRenderingTest::render);
+		DimensionRenderingRegistry.registerDimensionEffects(new Identifier(TooltipComponentTestInit.MODID, "void"), new DimensionEffects.End());
 	}
 }

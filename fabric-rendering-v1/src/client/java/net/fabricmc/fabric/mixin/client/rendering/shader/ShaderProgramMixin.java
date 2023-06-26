@@ -16,43 +16,41 @@
 
 package net.fabricmc.fabric.mixin.client.rendering.shader;
 
-import org.spongepowered.asm.mixin.Final;
+import net.fabricmc.fabric.impl.client.rendering.HackyValueHolder;
+
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderStage;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.impl.client.rendering.FabricShaderProgram;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ShaderProgram.class)
 abstract class ShaderProgramMixin {
-	@Shadow
-	@Final
-	private String name;
+    // Allow loading shader stages from arbitrary namespaces.
+    @Inject(method = "loadShader", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/PathUtil;getPosixFullPath(Ljava/lang/String;)Ljava/lang/String;"))
+    private static void captureProgramName(ResourceFactory resourceProvider, ShaderStage.Type type, String name, CallbackInfoReturnable<ShaderStage> cir) {
+        if (name.contains(String.valueOf(Identifier.NAMESPACE_SEPARATOR))) {
+            HackyValueHolder.fabric_programNamespace = name.substring(0, name.indexOf(Identifier.NAMESPACE_SEPARATOR));
+        }
+    }
 
-	// Allow loading FabricShaderPrograms from arbitrary namespaces.
-	@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Identifier;<init>(Ljava/lang/String;)V"), allow = 1)
-	private String modifyProgramId(String id) {
-		if ((Object) this instanceof FabricShaderProgram) {
-			return FabricShaderProgram.rewriteAsId(id, name);
-		}
+    @Inject(method = "loadShader", at = @At("TAIL"))
+    private static void releaseProgramName(ResourceFactory resourceProvider, ShaderStage.Type type, String name, CallbackInfoReturnable<ShaderStage> cir) {
+        HackyValueHolder.fabric_programNamespace = null;
+    }
 
-		return id;
-	}
+    @Mixin(targets = "net/minecraft/client/gl/ShaderProgram$1")
+    abstract static class ShaderProgramGlslProcessorMixin {
 
-	// Allow loading shader stages from arbitrary namespaces.
-	@ModifyVariable(method = "loadShader", at = @At("STORE"), ordinal = 1)
-	private static String modifyStageId(String id, ResourceFactory factory, ShaderStage.Type type, String name) {
-		if (name.contains(String.valueOf(Identifier.NAMESPACE_SEPARATOR))) {
-			return FabricShaderProgram.rewriteAsId(id, name);
-		}
-
-		return id;
-	}
+        @ModifyArg(method = "loadImport", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;getShaderImportLocation(Ljava/lang/String;ZLjava/lang/String;)Lnet/minecraft/util/Identifier;"), index = 2)
+        private String modifyImportNamespace(String basePath, boolean isRelative, String name) {
+            return isRelative && HackyValueHolder.fabric_programNamespace != null ? HackyValueHolder.fabric_programNamespace + Identifier.NAMESPACE_SEPARATOR + name : name;
+        }
+    }
 }
