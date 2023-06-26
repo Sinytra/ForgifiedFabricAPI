@@ -100,7 +100,7 @@ def moduleDependencies(project, List<String> depNames) {
 
 def testDependencies(project, List<String> depNames) {
 	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-	def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+	def clientOutputs = /*depNames.iterator().collect { findProject(":$it").sourceSets.client.output }*/ []
 
 	project.dependencies {
 		deps.each {

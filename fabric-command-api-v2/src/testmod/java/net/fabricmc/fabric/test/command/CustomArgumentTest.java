@@ -26,32 +26,30 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.test.command.argument.SmileyArgument;
 import net.fabricmc.fabric.test.command.argument.SmileyArgumentType;
 
-public class CustomArgumentTest implements ModInitializer {
+public class CustomArgumentTest {
 	private static final String ARG_NAME = "smiley_value";
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		ArgumentTypeRegistry.registerArgumentType(new Identifier("fabric-command-test", "smiley"), SmileyArgumentType.class, ConstantArgumentSerializer.of(SmileyArgumentType::smiley));
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(
 					literal("fabric_custom_argument_test").then(
 							argument(ARG_NAME, SmileyArgumentType.smiley())
-								.executes(CustomArgumentTest::executeSmileyCommand)));
+									.executes(CustomArgumentTest::executeSmileyCommand)));
 		});
 	}
 
 	private static int executeSmileyCommand(CommandContext<ServerCommandSource> context) {
 		SmileyArgument smiley = context.getArgument(ARG_NAME, SmileyArgument.class);
 		String feedback = switch (smiley) {
-		case SAD -> "Oh no, here is a heart: <3";
-		case HAPPY -> "Nice to see that you are having a good day :)";
+			case SAD -> "Oh no, here is a heart: <3";
+			case HAPPY -> "Nice to see that you are having a good day :)";
 		};
 		context.getSource().sendFeedback(() -> Text.literal(feedback), false);
 

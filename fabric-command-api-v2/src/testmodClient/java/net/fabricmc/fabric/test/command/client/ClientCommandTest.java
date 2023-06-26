@@ -36,14 +36,13 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
-public final class ClientCommandTest implements ClientModInitializer {
+public final class ClientCommandTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientCommandTest.class);
 	private static final DynamicCommandExceptionType IS_NULL = new DynamicCommandExceptionType(x -> Text.literal("The " + x + " is null"));
 	private static final SimpleCommandExceptionType UNEXECUTABLE_EXECUTED = new SimpleCommandExceptionType(Text.literal("Executed an unexecutable command!"));
 
 	private boolean wasTested = false;
 
-	@Override
 	public void onInitializeClient() {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			dispatcher.register(ClientCommandManager.literal("test_client_command").executes(context -> {
