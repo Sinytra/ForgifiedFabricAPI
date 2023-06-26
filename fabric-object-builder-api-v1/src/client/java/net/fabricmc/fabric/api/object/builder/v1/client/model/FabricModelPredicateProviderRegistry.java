@@ -16,12 +16,10 @@
 
 package net.fabricmc.fabric.api.object.builder.v1.client.model;
 
+import net.minecraft.client.item.ClampedModelPredicateProvider;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import net.minecraft.client.item.ClampedModelPredicateProvider;
-
-import net.fabricmc.fabric.mixin.object.builder.client.ModelPredicateProviderRegistryAccessor;
-import net.fabricmc.fabric.mixin.object.builder.client.ModelPredicateProviderRegistrySpecificAccessor;
 
 /**
  * Allows registering model predicate providers for item models.
@@ -42,7 +40,7 @@ public final class FabricModelPredicateProviderRegistry {
 	 * @param provider the provider
 	 */
 	public static void register(Identifier id, ClampedModelPredicateProvider provider) {
-		ModelPredicateProviderRegistryAccessor.callRegister(id, provider);
+		ModelPredicateProviderRegistry.register(id, provider);
 	}
 
 	/**
@@ -53,6 +51,6 @@ public final class FabricModelPredicateProviderRegistry {
 	 * @param provider the provider
 	 */
 	public static void register(Item item, Identifier id, ClampedModelPredicateProvider provider) {
-		ModelPredicateProviderRegistrySpecificAccessor.callRegister(item, id, provider);
+		ModelPredicateProviderRegistry.register(item, id, provider);
 	}
 }

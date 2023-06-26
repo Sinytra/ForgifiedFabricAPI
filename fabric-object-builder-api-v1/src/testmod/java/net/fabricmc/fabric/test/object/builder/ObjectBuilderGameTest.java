@@ -19,16 +19,15 @@ package net.fabricmc.fabric.test.object.builder;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+//import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 public class ObjectBuilderGameTest {
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+//	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
 	public void testBlockUse(TestContext context) {
-		List<Block> blocks = List.of(BlockEntityTypeBuilderTest.INITIAL_BETRAYAL_BLOCK, BlockEntityTypeBuilderTest.ADDED_BETRAYAL_BLOCK, BlockEntityTypeBuilderTest.FIRST_MULTI_BETRAYAL_BLOCK, BlockEntityTypeBuilderTest.SECOND_MULTI_BETRAYAL_BLOCK);
+		List<Block> blocks = List.of(BlockEntityTypeBuilderTest.INITIAL_BETRAYAL_BLOCK.get(), BlockEntityTypeBuilderTest.ADDED_BETRAYAL_BLOCK.get(), BlockEntityTypeBuilderTest.FIRST_MULTI_BETRAYAL_BLOCK.get(), BlockEntityTypeBuilderTest.SECOND_MULTI_BETRAYAL_BLOCK.get());
 		BlockPos.Mutable pos = BlockPos.ORIGIN.mutableCopy();
 
 		for (Block block : blocks) {

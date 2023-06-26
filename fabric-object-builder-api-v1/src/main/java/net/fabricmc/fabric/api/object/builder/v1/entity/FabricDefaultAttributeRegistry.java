@@ -21,12 +21,12 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.minecraft.registry.Registries;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.registry.Registries;
 
-import net.fabricmc.fabric.mixin.object.builder.DefaultAttributeRegistryAccessor;
+import net.fabricmc.fabric.impl.object.builder.FabricDefaultAttributeRegistryImpl;
 
 /**
  * Allows registering custom default attributes for living entities.
@@ -78,7 +78,7 @@ public final class FabricDefaultAttributeRegistry {
 	 * @see	FabricEntityTypeBuilder.Living#defaultAttributes(Supplier)
 	 */
 	public static void register(EntityType<? extends LivingEntity> type, DefaultAttributeContainer container) {
-		if (DefaultAttributeRegistryAccessor.getRegistry().put(type, container) != null) {
+		if (FabricDefaultAttributeRegistryImpl.register(type, container) != null) {
 			LOGGER.debug("Overriding existing registration for entity type {}", Registries.ENTITY_TYPE.getId(type));
 		}
 	}

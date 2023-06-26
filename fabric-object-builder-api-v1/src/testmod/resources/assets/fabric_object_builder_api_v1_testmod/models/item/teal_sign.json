@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fabric_object_builder_api_v1_testmod:item/teal_sign"
+  }
+}
