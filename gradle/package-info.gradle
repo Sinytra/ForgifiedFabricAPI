@@ -16,13 +16,13 @@ for (def sourceSet in [
 		// sources to the source set.
 		sourceRoot = file("src/$sourceSetName/java")
 		header = rootProject.file('HEADER')
-		outputDir = file("src/generated/$sourceSetName")
+		outputDir = file("src/generated/$sourceSetName/java")
 	}
 	sourceSet.java.srcDir task
 
 	def cleanTask = tasks.register(sourceSet.getTaskName('clean', 'ImplPackageInfos'), Delete) {
 		group = 'fabric'
-		delete file("src/generated/$sourceSetName")
+		delete file("src/generated/$sourceSetName/java")
 	}
 	clean.dependsOn cleanTask
 }
