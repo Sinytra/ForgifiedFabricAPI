@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registries;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -34,12 +33,11 @@ import net.fabricmc.fabric.test.event.lifecycle.ServerLifecycleTests;
 /**
  * Tests related to the lifecycle of entities.
  */
-public final class ClientEntityLifecycleTests implements ClientModInitializer {
+public final class ClientEntityLifecycleTests {
 	private static final boolean PRINT_CLIENT_ENTITY_MESSAGES = System.getProperty("fabric-lifecycle-events-testmod.printClientEntityMessages") != null;
 	private final List<Entity> clientEntities = new ArrayList<>();
 	private int clientTicks;
 
-	@Override
 	public void onInitializeClient() {
 		final Logger logger = ServerLifecycleTests.LOGGER;
 

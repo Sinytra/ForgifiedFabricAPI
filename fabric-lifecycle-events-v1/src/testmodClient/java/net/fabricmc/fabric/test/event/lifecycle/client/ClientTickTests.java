@@ -22,15 +22,13 @@ import java.util.Map;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.test.event.lifecycle.ServerLifecycleTests;
 
-public final class ClientTickTests implements ClientModInitializer {
+public final class ClientTickTests {
 	private final Map<RegistryKey<World>, Integer> tickTracker = new HashMap<>();
 	private int ticks;
 
-	@Override
 	public void onInitializeClient() {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			this.ticks++; // Just track our own tick since the client doesn't have a ticks value.

@@ -19,6 +19,7 @@ package net.fabricmc.fabric.mixin.event.lifecycle.client;
 import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -82,8 +83,20 @@ abstract class WorldChunkMixin {
 	}
 
 	// Use the slice to not redirect codepath where block entity is loaded
-	@Redirect(method = "getBlockEntity(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/chunk/WorldChunk$CreationType;)Lnet/minecraft/block/entity/BlockEntity;", at = @At(value = "INVOKE", target = "Ljava/util/Map;remove(Ljava/lang/Object;)Ljava/lang/Object;"),
-			slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;createBlockEntity(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity;")))
+	@Redirect(
+			method = "getBlockEntity(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/chunk/WorldChunk$CreationType;)Lnet/minecraft/block/entity/BlockEntity;",
+	        at = @At(
+	            value = "INVOKE",
+	            target = "Ljava/util/Map;remove(Ljava/lang/Object;)Ljava/lang/Object;"
+	        ),
+	        slice = @Slice(
+	            to = @At(
+	                value = "FIELD",
+	                target = "Lnet/minecraft/world/chunk/WorldChunk;blockEntityNbts:Ljava/util/Map;",
+	                opcode = Opcodes.GETFIELD
+	            )
+	        )
+	    )
 	private <K, V> Object onRemoveBlockEntity(Map<K, V> map, K key) {
 		@Nullable
 		final V removed = map.remove(key);

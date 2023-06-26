@@ -22,16 +22,14 @@ import java.util.Map;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
 /**
  * Test related to ticking events on the server.
  */
-public final class ServerTickTests implements ModInitializer {
+public final class ServerTickTests {
 	private final Map<RegistryKey<World>, Integer> tickTracker = new HashMap<>();
 
-	@Override
 	public void onInitialize() {
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (server.getTicks() % 200 == 0) { // Log every 200 ticks to verify the tick callback works on the server

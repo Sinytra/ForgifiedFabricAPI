@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerWorld;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -33,12 +32,11 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 /**
  * Tests related to the lifecycle of entities.
  */
-public final class ServerEntityLifecycleTests implements ModInitializer {
+public final class ServerEntityLifecycleTests {
 	private static final boolean PRINT_SERVER_ENTITY_MESSAGES = System.getProperty("fabric-lifecycle-events-testmod.printServerEntityMessages") != null;
 	private final List<Entity> serverEntities = new ArrayList<>();
 	private int serverTicks = 0;
 
-	@Override
 	public void onInitialize() {
 		final Logger logger = ServerLifecycleTests.LOGGER;
 

@@ -16,16 +16,14 @@
 
 package net.fabricmc.fabric.test.event.lifecycle;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-public final class ServerResourceReloadTests implements ModInitializer {
+public final class ServerResourceReloadTests {
 	public static final Logger LOGGER = LoggerFactory.getLogger("LifecycleEventsTest");
 
-	@Override
 	public void onInitialize() {
 		ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, serverResourceManager) -> {
 			LOGGER.info("PREPARING FOR RELOAD");

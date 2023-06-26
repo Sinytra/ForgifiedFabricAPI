@@ -16,7 +16,7 @@ import java.nio.file.Files
 
 for (def sourceSet in [
 	sourceSets.main,
-	sourceSets.client,
+//	sourceSets.client,
 	sourceSets.testmod
 ]) {
 	// We have to capture the source set name for the lazy string literals,
@@ -35,8 +35,28 @@ for (def sourceSet in [
 		minecraftVersionString = rootProject.minecraft_version
 		dataPackFormat = rootProject.server_data_pack_format.toInteger()
 		packFormat = rootProject.pack_format.toInteger()
+		addMixinConfigs = sourceSet.name.startsWith("test")
 	}
 	sourceSet.resources.srcDir task
+
+	if (!sourceSet.name.startsWith("test")) {
+		def fabricMetadata = file("src/$sourceSetName/resources/fabric.mod.json")
+		if (fabricMetadata.exists()) {
+			def parser = new JsonSlurper()
+			def json = parser.parse(fabricMetadata)
+			if (json.mixins) {
+				for (def mixin in json.mixins) {
+					if (mixin instanceof Map) {
+						loom.forge.mixinConfig mixin.config
+					} else if (mixin instanceof String) {
+						loom.forge.mixinConfig mixin
+					} else {
+						throw new RuntimeException("Unknown mixin config type ${mixin.getClass()}")
+					}
+				}
+			}
+		}
+	}
 
 	def cleanTask = tasks.register(sourceSet.getTaskName('clean', 'ForgeModMetadata'), Delete) {
 		group = 'fabric'
@@ -64,6 +84,9 @@ class GenerateForgeModMetadata extends DefaultTask {
 	
 	@Input
 	final Property<Integer> packFormat = project.objects.property(Integer)
+	
+	@Input
+	final Property<Boolean> addMixinConfigs = project.objects.property(Boolean)
 
 	def normalizeModid(String modid) {
 		return modid.replaceAll('-', '_')
@@ -142,14 +165,14 @@ class GenerateForgeModMetadata extends DefaultTask {
 		Files.createDirectories(modsToml.parent)
 		modsToml.withWriter { toml.writeTo(it) }
 
-		if (json.mixins) {
+		if (addMixinConfigs.get() && json.mixins) {
 			def configs = json.mixins.collect {
 				if (it instanceof Map) {
 					return it.config
 				} else if (it instanceof String) {
 					return it
 				} else {
-					throw new RuntimeException("Unknown mixin config type ${mixin.getClass()}")
+					throw new RuntimeException("Unknown mixin config type ${it.getClass()}")
 				}
 			}.join(',')
 			def manifest = output.resolve("META-INF/MANIFEST.MF")

@@ -18,14 +18,13 @@ package net.fabricmc.fabric.impl.client.event.lifecycle;
 
 import net.minecraft.block.entity.BlockEntity;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.impl.event.lifecycle.LoadedChunksCache;
 
-public final class ClientLifecycleEventsImpl implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public final class ClientLifecycleEventsImpl {
+
+	public static void onInitializeClient() {
 		// Part of impl for block entity events
 		ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
 			((LoadedChunksCache) world).fabric_markLoaded(chunk);
