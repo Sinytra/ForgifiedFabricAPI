@@ -8,8 +8,8 @@ buildscript {
 }
 
 
-import groovy.json.JsonSlurper
 import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import groovy.toml.TomlBuilder
 
 import java.nio.file.Files
@@ -22,6 +22,7 @@ for (def sourceSet in [
 	// We have to capture the source set name for the lazy string literals,
 	// otherwise it'll just be whatever the last source set is in the list.
 	def sourceSetName = sourceSet.name
+	def resourceRoots = sourceSet.resources.srcDirs
 	def taskName = sourceSet.getTaskName('generate', 'ForgeModMetadata')
 	def task = tasks.register(taskName, GenerateForgeModMetadata) {
 		group = 'fabric'
@@ -29,7 +30,7 @@ for (def sourceSet in [
 
 		// Only apply to default source directory since we also add the generated
 		// sources to the source set.
-		sourceRoot = file("src/$sourceSetName/resources")
+		sourceRoots.from(resourceRoots)
 		outputDir = file("src/generated/$sourceSetName/resources")
 		loaderVersionString = rootProject.forge_version.tokenize('-')[1].tokenize('.')[0]
 		minecraftVersionString = rootProject.minecraft_version
@@ -67,8 +68,8 @@ for (def sourceSet in [
 
 class GenerateForgeModMetadata extends DefaultTask {
 	@SkipWhenEmpty
-	@InputDirectory
-	final DirectoryProperty sourceRoot = project.objects.directoryProperty()
+	@InputFiles
+	final ConfigurableFileCollection sourceRoots = project.objects.fileCollection()
 
 	@OutputDirectory
 	final DirectoryProperty outputDir = project.objects.directoryProperty()
@@ -78,13 +79,13 @@ class GenerateForgeModMetadata extends DefaultTask {
 
 	@Input
 	final Property<String> minecraftVersionString = project.objects.property(String)
-	
+
 	@Input
 	final Property<Integer> dataPackFormat = project.objects.property(Integer)
-	
+
 	@Input
 	final Property<Integer> packFormat = project.objects.property(Integer)
-	
+
 	@Input
 	final Property<Boolean> addMixinConfigs = project.objects.property(Boolean)
 
@@ -96,103 +97,109 @@ class GenerateForgeModMetadata extends DefaultTask {
 	def run() {
 		def output = outputDir.get().asFile.toPath()
 		output.deleteDir()
-		def root = sourceRoot.get().asFile.toPath()
-		def fabricMetadata = root.resolve("fabric.mod.json")
-
-		if (Files.notExists(fabricMetadata)) {
-			return
-		}
-
-		def parser = new JsonSlurper()
-		def json = parser.parse(fabricMetadata)
-		def toml = new TomlBuilder()
-		def nextMajor = (minecraftVersionString.get().tokenize('.')[1].toInteger()) + 1
-		def modDependencies = json.depends.findAll { it.key != 'fabricloader' }.collect {
-			def normalModid = normalizeModid(it.key as String)
-			return { _ ->
-				modId normalModid
-				mandatory true
-				versionRange "[0, )"
-				ordering "NONE"
-				side "BOTH"
+		for (def sourceRoot in sourceRoots) {
+			if (!sourceRoot.isDirectory()) {
+				continue
 			}
-		}
-		def normalModid = normalizeModid(json.id)
-		toml {
-			modLoader "javafml"
-			loaderVersion "[${loaderVersionString.get()},)"
-			license json.license ?: "All Rights Reserved"
 
-			mods([
-				{
+			def root = sourceRoot.toPath()
+			def fabricMetadata = root.resolve("fabric.mod.json")
+
+			if (Files.notExists(fabricMetadata)) {
+				continue
+			}
+
+			def parser = new JsonSlurper()
+			def json = parser.parse(fabricMetadata)
+			def toml = new TomlBuilder()
+			def nextMajor = (minecraftVersionString.get().tokenize('.')[1].toInteger()) + 1
+			def modDependencies = json.depends.findAll { it.key != 'fabricloader' }.collect {
+				def normalModid = normalizeModid(it.key as String)
+				return { _ ->
 					modId normalModid
-					version '${file.jarVersion}'
-					displayName json.name
-					if (json.icon) {
-						logoFile json.icon
-					}
-					if (json.authors) {
-						authors json.authors.join(', ')
-					}
-					if (json.description) {
-						description json.description
-					}
+					mandatory true
+					versionRange "[0, )"
+					ordering "NONE"
+					side "BOTH"
 				}
-			])
+			}
+			def normalModid = normalizeModid(json.id)
+			toml {
+				modLoader "javafml"
+				loaderVersion "[${loaderVersionString.get()},)"
+				license json.license ?: "All Rights Reserved"
 
-			dependencies {
-				"$normalModid"([
+				mods([
 					{
-						modId "forge"
-						mandatory true
-						versionRange "[${loaderVersionString.get()},)"
-						ordering "NONE"
-						side "BOTH"
-					},
-					{
-						modId "minecraft"
-						mandatory true
-						versionRange "[${minecraftVersionString.get()},1.$nextMajor)"
-						ordering "NONE"
-						side "BOTH"
+						modId normalModid
+						version '${file.jarVersion}'
+						displayName json.name
+						if (json.icon) {
+							logoFile json.icon
+						}
+						if (json.authors) {
+							authors json.authors.join(', ')
+						}
+						if (json.description) {
+							description json.description
+						}
 					}
-				] + modDependencies)
-			}
-		}
+				])
 
-		def modsToml = output.resolve("META-INF/mods.toml")
-		Files.deleteIfExists(modsToml)
-		Files.createDirectories(modsToml.parent)
-		modsToml.withWriter { toml.writeTo(it) }
-
-		if (addMixinConfigs.get() && json.mixins) {
-			def configs = json.mixins.collect {
-				if (it instanceof Map) {
-					return it.config
-				} else if (it instanceof String) {
-					return it
-				} else {
-					throw new RuntimeException("Unknown mixin config type ${it.getClass()}")
+				dependencies {
+					"$normalModid"([
+						{
+							modId "forge"
+							mandatory true
+							versionRange "[${loaderVersionString.get()},)"
+							ordering "NONE"
+							side "BOTH"
+						},
+						{
+							modId "minecraft"
+							mandatory true
+							versionRange "[${minecraftVersionString.get()},1.$nextMajor)"
+							ordering "NONE"
+							side "BOTH"
+						}
+					] + modDependencies)
 				}
-			}.join(',')
-			def manifest = output.resolve("META-INF/MANIFEST.MF")
-			Files.createDirectories(manifest.parent)
-			manifest.withPrintWriter {
-				it.println("MixinConfigs: $configs")
 			}
-		}
 
-		def metadataJson = new JsonBuilder()
-		metadataJson {
-			pack {
-				description {
-					text "$normalModid resources"
+			def modsToml = output.resolve("META-INF/mods.toml")
+			Files.deleteIfExists(modsToml)
+			Files.createDirectories(modsToml.parent)
+			modsToml.withWriter { toml.writeTo(it) }
+
+			if (addMixinConfigs.get() && json.mixins) {
+				def configs = json.mixins.collect {
+					if (it instanceof Map) {
+						return it.config
+					} else if (it instanceof String) {
+						return it
+					} else {
+						throw new RuntimeException("Unknown mixin config type ${it.getClass()}")
+					}
+				}.join(',')
+				def manifest = output.resolve("META-INF/MANIFEST.MF")
+				Files.createDirectories(manifest.parent)
+				manifest.withPrintWriter {
+					it.println("MixinConfigs: $configs")
 				}
-				"forge:server_data_pack_format" dataPackFormat.get()
-				pack_format packFormat.get()
 			}
+
+			def metadataJson = new JsonBuilder()
+			metadataJson {
+				pack {
+					description {
+						text "$normalModid resources"
+					}
+					"forge:server_data_pack_format" dataPackFormat.get()
+					pack_format packFormat.get()
+				}
+			}
+			def packMcMeta = output.resolve("pack.mcmeta")
+			packMcMeta.withWriter { metadataJson.writeTo(it) }
 		}
-		def packMcMeta = output.resolve("pack.mcmeta")
-		packMcMeta.withWriter { metadataJson.writeTo(it) } 
 	}
 }

@@ -22,11 +22,10 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 
-public class WorldRenderEventsTests implements ClientModInitializer {
+public class WorldRenderEventsTests {
 	private static boolean onBlockOutline(WorldRenderContext wrc, WorldRenderContext.BlockOutlineContext blockOutlineContext) {
 		if (blockOutlineContext.blockState().isOf(Blocks.DIAMOND_BLOCK)) {
 			wrc.matrixStack().push();
@@ -49,8 +48,7 @@ public class WorldRenderEventsTests implements ClientModInitializer {
 	}
 
 	// Renders a diamond block above diamond blocks when they are looked at.
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		WorldRenderEvents.BLOCK_OUTLINE.register(WorldRenderEventsTests::onBlockOutline);
 	}
 }

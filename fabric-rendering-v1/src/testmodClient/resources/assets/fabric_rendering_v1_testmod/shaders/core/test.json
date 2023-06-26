@@ -4,8 +4,8 @@
     "srcrgb": "srcalpha",
     "dstrgb": "1-srcalpha"
   },
-  "vertex": "fabric-rendering-v1-testmod:test",
-  "fragment": "fabric-rendering-v1-testmod:test",
+  "vertex": "fabric_rendering_v1_testmod:test",
+  "fragment": "fabric_rendering_v1_testmod:test",
   "attributes": [
   ],
   "samplers": [

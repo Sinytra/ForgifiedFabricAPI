@@ -29,7 +29,6 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 
@@ -37,14 +36,13 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
  * Tests {@link HudRenderCallback} and {@link CoreShaderRegistrationCallback} by drawing a green rectangle
  * in the lower-right corner of the screen.
  */
-public class HudAndShaderTest implements ClientModInitializer {
+public class HudAndShaderTest {
 	private static ShaderProgram testShader;
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		CoreShaderRegistrationCallback.EVENT.register(context -> {
 			// Register a custom shader taking POSITION vertices.
-			Identifier id = new Identifier("fabric-rendering-v1-testmod", "test");
+			Identifier id = new Identifier("fabric_rendering_v1_testmod", "test");
 			context.register(id, VertexFormats.POSITION, program -> testShader = program);
 		});
 

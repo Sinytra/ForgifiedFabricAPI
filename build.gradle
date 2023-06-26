@@ -198,6 +198,12 @@ allprojects {
 		}
 
 		runs {
+			configureEach {
+				property "coremod.yarn", "true"
+				// (ugly) workaround for https://github.com/MinecraftForge/CoreMods/issues/31
+				property "true", "true"
+			}
+			
 			testmodClient {
 				client()
 				ideConfigGenerated project.rootProject == project

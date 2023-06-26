@@ -4,22 +4,13 @@
   "compatibilityLevel": "JAVA_16",
   "client": [
     "ArmorFeatureRendererMixin",
-    "BlockColorsMixin",
-    "BlockEntityRendererFactoriesMixin",
     "BuiltinModelItemRendererMixin",
-    "CapeFeatureRendererMixin",
-    "DimensionEffectsAccessor",
-    "EntityModelLayersAccessor",
+    "WorldRendererMixin",
     "EntityModelsMixin",
     "EntityRenderersMixin",
-    "InGameHudMixin",
-    "ItemColorsMixin",
-    "LivingEntityRendererAccessor",
-    "TooltipComponentMixin",
-    "WorldRendererMixin",
-    "shader.GameRendererMixin",
-    "shader.ShaderProgramImportProcessorMixin",
-    "shader.ShaderProgramMixin"
+    "DimensionEffectsAccessor",
+    "shader.ShaderProgramMixin",
+    "shader.ShaderProgramMixin$ShaderProgramGlslProcessorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

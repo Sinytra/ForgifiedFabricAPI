@@ -43,7 +43,7 @@ include 'fabric-object-builder-api-v1'
 //include 'fabric-renderer-api-v1'
 //include 'fabric-renderer-indigo'
 
-//include 'fabric-rendering-v1'
+include 'fabric-rendering-v1'
 //include 'fabric-rendering-data-attachment-v1'
 //include 'fabric-rendering-fluids-v1'
 //include 'fabric-resource-conditions-api-v1'

@@ -16,11 +16,11 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.BipedEntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.feature.ElytraFeatureRenderer;
@@ -34,15 +34,14 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 
 /**
  * This test exists solely for testing generics.
  * As such it is not in the mod json
  */
-public class FeatureRendererGenericTests implements ClientModInitializer {
-	@Override
+public class FeatureRendererGenericTests {
+
 	public void onInitializeClient() {
 		// These aren't tests in the normal sense. These exist to test that generics are sane.
 		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {

@@ -1,6 +1,6 @@
 #version 150
 
-#moj_import <fabric-rendering-v1-testmod:test_include.glsl>
+#moj_import <fabric_rendering_v1_testmod:test_include.glsl>
 
 uniform vec4 ColorModulator;
 out vec4 fragColor;
