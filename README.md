@@ -1,4 +1,4 @@
-# Fabric API
+# \[Forgified] Fabric API
 
 Essential hooks for modding with Fabric.
 
@@ -9,81 +9,69 @@ Fabric API is the library for essential hooks and interoperability mechanisms fo
 - Essential features such as registry synchronization and adding information to crash reports.
 - An advanced rendering API designed for compatibility with optimization mods and graphics overhaul mods.
 
-Also check out [Fabric Loader](https://github.com/FabricMC/fabric-loader), the (mostly) version-independent mod loader that powers Fabric. Fabric API is a mod like any other Fabric mod which requires Fabric Loader to be installed.
+## Porting Status
 
-For support and discussion for both developers and users, visit [the Fabric Discord server](https://discord.gg/v6v4pMv).
+Missing -> Added -> Tested
 
-## Using Fabric API to play with mods
+| API                                  |          State           |  Lifecycle   |
+|:-------------------------------------|:------------------------:|:------------:|
+| fabric-api-base                      |         ✅ Tested         |    Stable    |
+| fabric-api-lookup-api-v1             |        ⚠️ Missing        |    Stable    |
+| fabric-biome-api-v1                  |        ⚠️ Missing        | Experimental |
+| fabric-block-api-v1                  |        ⚠️ Missing        |    Stable    |
+| fabric-blockrenderlayer-v1           |        ⚠️ Missing        |    Stable    |
+| fabric-client-tags-api-v1            |        ⚠️ Missing        |    Stable    |
+| fabric-command-api-v2                |         ✅ Tested         |    Stable    |
+| fabric-content-registries-v0         |        ⚠️ Missing        |    Stable    |
+| fabric-convention-tags-v1            |        ⚠️ Missing        |    Stable    |
+| fabric-crash-report-info-v1          | 🚧 Not Planned [[1]](#1) |    Stable    |
+| fabric-data-generation-api-v1        |        ⚠️ Missing        |    Stable    |
+| fabric-dimensions-v1                 |        ⚠️ Missing        |    Stable    |
+| fabric-entity-events-v1              |        ⚠️ Missing        |    Stable    |
+| fabric-events-interaction-v0         |        ⚠️ Missing        |    Stable    |
+| fabric-game-rule-api-v1              |        ⚠️ Missing        |    Stable    |
+| fabric-gametest-api-v1               |        ⚠️ Missing        |    Stable    |
+| fabric-item-api-v1                   |        ⚠️ Missing        |    Stable    |
+| fabric-item-group-api-v1             |        ⚠️ Missing        |    Stable    |
+| fabric-key-binding-api-v1            |        ⚠️ Missing        |    Stable    |
+| fabric-lifecycle-events-v1           |         ✅ Tested         |    Stable    |
+| fabric-loot-api-v2                   |        ⚠️ Missing        |    Stable    |
+| fabric-message-api-v1                |        ⚠️ Missing        | Experimental |
+| fabric-mining-level-api-v1           |        ⚠️ Missing        |    Stable    |
+| fabric-models-v0                     |        ⚠️ Missing        |    Stable    |
+| fabric-networking-api-v1             |        ⚠️ Missing        |    Stable    |
+| fabric-object-builder-api-v1         |        ⚠️ Missing        |    Stable    |
+| fabric-particles-v1                  |        ⚠️ Missing        |    Stable    |
+| fabric-recipe-api-v1                 |        ⚠️ Missing        |    Stable    |
+| fabric-registry-sync-v0              |        ⚠️ Missing        |    Stable    |
+| fabric-renderer-api-v1               |        ⚠️ Missing        |    Stable    |
+| fabric-renderer-indigo               |        ⚠️ Missing        |    Stable    |
+| fabric-rendering-data-attachment-v1  |        ⚠️ Missing        |    Stable    |
+| fabric-rendering-fluids-v1           |        ⚠️ Missing        |    Stable    |
+| fabric-rendering-v1                  |        ⚠️ Missing        |    Stable    |
+| fabric-resource-conditions-api-v1    |        ⚠️ Missing        | Experimental |
+| fabric-resource-loader-v0            |        ⚠️ Missing        |    Stable    |
+| fabric-screen-api-v1                 |        ⚠️ Missing        |    Stable    |
+| fabric-screen-handler-api-v1         |        ⚠️ Missing        |    Stable    |
+| fabric-sound-api-v1                  |        ⚠️ Missing        |    Stable    |
+| fabric-transfer-api-v1               |        ⚠️ Missing        | Experimental |
+| fabric-transitive-access-wideners-v1 |        ⚠️ Missing        |              |
+| fabric-command-api-v1                |        ⚠️ Missing        |  Deprecated  |
+| fabric-commands-v0                   |        ⚠️ Missing        |  Deprecated  |
+| fabric-containers-v0                 |        ⚠️ Missing        |  Deprecated  |
+| fabric-events-lifecycle-v0           |        ⚠️ Missing        |  Deprecated  |
+| fabric-keybindings-v0                |        ⚠️ Missing        |  Deprecated  |
+| fabric-loot-tables-v1                |        ⚠️ Missing        |  Deprecated  |
+| fabric-networking-v0                 |        ⚠️ Missing        |  Deprecated  |
+| fabric-renderer-registries-v1        |        ⚠️ Missing        |  Deprecated  |
+| fabric-rendering-v0                  |        ⚠️ Missing        |  Deprecated  |
 
-Make sure you have install fabric loader first. More information about installing Fabric Loader can be found [here](https://fabricmc.net/use/).
-
-To use Fabric API, download it from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api), [GitHub Releases](https://github.com/FabricMC/fabric/releases) or [Modrinth](https://modrinth.com/mod/fabric-api).
-
-The downloaded jar file should be placed in your `mods` folder.
-
-## Using Fabric API to develop mods
-
-To setup a Fabric development environment, check out the [Fabric example mod](https://github.com/FabricMC/fabric-example-mod) and follow the instructions there. The example mod already depends on Fabric API.
-
-To include the full Fabric API with all modules in the development environment, add the following to your `dependencies` block in the gradle buildscript:
-
-### Groovy DSL
-
-```groovy
-modImplementation "net.fabricmc.fabric-api:fabric-api:FABRIC_API_VERSION"
-```
-
-### Kotlin DSL
-
-```kotlin
-modImplementation("net.fabricmc.fabric-api:fabric-api:FABRIC_API_VERSION")
-```
-
-Alternatively, modules from Fabric API can be specified individually as shown below (including module jar to your mod jar):
-
-### Groovy DSL
-
-```groovy
-// Make a collection of all api modules we wish to use
-Set<String> apiModules = [
-    "fabric-api-base",
-    "fabric-command-api-v1",
-    "fabric-lifecycle-events-v1",
-    "fabric-networking-api-v1"
-]
-
-// Add each module as a dependency
-apiModules.forEach {
-    include(modImplementation(fabricApi.module(it, FABRIC_API_VERSION)))
-}
-```
-
-### Kotlin DSL
-
-```kotlin
-// Make a set of all api modules we wish to use
-setOf(
-    "fabric-api-base",
-    "fabric-command-api-v1",
-    "fabric-lifecycle-events-v1",
-    "fabric-networking-api-v1"
-).forEach {
-    // Add each module as a dependency
-    modImplementation(fabricApi.module(it, FABRIC_API_VERSION))
-}
-```
-
-<!--Linked to gradle documentation on properties-->
-Instead of hardcoding version constants all over the build script, Gradle properties may be used to replace these constants. Properties are defined in the `gradle.properties` file at the root of a project. More information is available [here](https://docs.gradle.org/current/userguide/organizing_gradle_projects.html#declare_properties_in_gradle_properties_file).
-
-## Contributing
-
-See something Fabric API doesn't support, a bug or something that may be useful? We welcome contributions to improve Fabric API.
-Make sure to read [the development guidelines](./CONTRIBUTING.md).
+<a id="1">[1]</a> Does not provide an API, features already implemented by FML.
 
 ## Modules
 
-Fabric API is designed to be modular for ease of updating. This also has the advantage of splitting up the codebase into smaller chunks.
+Fabric API is designed to be modular for ease of updating. This also has the advantage of splitting up the codebase into
+smaller chunks.
 
 Each module contains its own `README.md`* explaining the module's purpose and additional info on using the module.
 
