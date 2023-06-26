@@ -16,12 +16,11 @@
 
 package net.fabricmc.fabric.test.event.lifecycle;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 
-public class CommonLifecycleTests implements ModInitializer {
-	@Override
-	public void onInitialize() {
+public class CommonLifecycleTests {
+
+	public static void onInitialize() {
 		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
 			ServerLifecycleTests.LOGGER.info("Tags (re)loaded on {} {}", client ? "client" : "server", Thread.currentThread());
 		});

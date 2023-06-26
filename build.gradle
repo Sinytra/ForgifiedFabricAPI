@@ -67,7 +67,7 @@ def getBranch() {
 
 def moduleDependencies(project, List<String> depNames) {
 	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-	def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+	def clientOutputs = /*depNames.iterator().collect { findProject(":$it").sourceSets.client.output }*/ []
 
 	project.dependencies {
 		deps.each {
@@ -108,7 +108,7 @@ def testDependencies(project, List<String> depNames) {
 		}
 
 		clientOutputs.each {
-			testmodClientImplementation it
+			testmodImplementation it
 		}
 	}
 }
@@ -163,29 +163,30 @@ allprojects {
 	}
 
 	sourceSets {
-		client {
-			compileClasspath += main.compileClasspath
-			runtimeClasspath += main.runtimeClasspath
+		main {
+			java {
+				srcDir "src/client/java"
+			}
+			resources {
+				srcDir "src/client/resources"
+			}
 		}
 		
 		testmod {
 			compileClasspath += main.compileClasspath
 			runtimeClasspath += main.runtimeClasspath
-		}
 
-		testmodClient {
-			compileClasspath += main.compileClasspath
-			runtimeClasspath += main.runtimeClasspath
-			compileClasspath += client.compileClasspath
-			runtimeClasspath += client.runtimeClasspath
-
-			compileClasspath += testmod.compileClasspath
-			runtimeClasspath += testmod.runtimeClasspath
+			java {
+				srcDir "src/testmodClient/java"
+			}
+			resources {
+				srcDir "src/testmodClient/resources"
+			}
 		}
 
 		test {
-			compileClasspath += testmodClient.compileClasspath
-			runtimeClasspath += testmodClient.runtimeClasspath
+			compileClasspath += testmod.compileClasspath
+			runtimeClasspath += testmod.runtimeClasspath
 		}
 	}
 
@@ -201,7 +202,7 @@ allprojects {
 				client()
 				ideConfigGenerated project.rootProject == project
 				name = "Testmod Client"
-				source sourceSets.testmodClient
+				source sourceSets.testmod
 			}
 			testmodServer {
 				server()
@@ -213,7 +214,7 @@ allprojects {
 	}
 	
 	configureLaunch {
-		dependsOn(configurations.testmodRuntimeClasspath, configurations.testmodClientRuntimeClasspath)
+		dependsOn(configurations.testmodRuntimeClasspath/*, configurations.testmodClientRuntimeClasspath*/)
 	}
 
 	allprojects.each { p ->
@@ -223,12 +224,12 @@ allprojects {
 
 		loom.mods.register(p.name) {
 			sourceSet p.sourceSets.main
-			sourceSet p.sourceSets.client
+//			sourceSet p.sourceSets.client
 		}
 
 		loom.mods.register(p.name + "-testmod") {
 			sourceSet p.sourceSets.testmod
-			sourceSet p.sourceSets.testmodClient
+//			sourceSet p.sourceSets.testmodClient
 		}
 	}
 
@@ -239,12 +240,12 @@ allprojects {
 		modApi "net.fabricmc:fabric-loader:${project.loader_version}"
 
 		testmodImplementation sourceSets.main.output
-		testmodClientImplementation sourceSets.main.output
-		testmodClientImplementation sourceSets.client.output
-		testmodClientImplementation sourceSets.testmod.output
+//		testmodClientImplementation sourceSets.main.output
+//		testmodClientImplementation sourceSets.client.output
+//		testmodClientImplementation sourceSets.testmod.output
 
 		testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-		testImplementation sourceSets.testmodClient.output
+		testImplementation sourceSets.testmod.output
 	}
 
 	test {
@@ -302,7 +303,7 @@ allprojects {
 
 	tasks.register('testmodJar', Jar) {
 		from sourceSets.testmod.output
-		from sourceSets.testmodClient.output
+//		from sourceSets.testmodClient.output
 		destinationDirectory = new File(project.buildDir, "devlibs")
 		archiveClassifier = "testmod"
 	}
@@ -329,7 +330,7 @@ allprojects {
 		archiveClassifier = "testmod"
 		addNestedDependencies = false
 		includesClientOnlyClasses = true
-		clientOnlySourceSetName = sourceSets.testmodClient.name
+//		clientOnlySourceSetName = sourceSets.testmodClient.name
 	}
 	build.dependsOn remapTestmodJar
 
@@ -358,7 +359,7 @@ remapTestmodJar {
 
 	nestedJars.setFrom(testModJarTasks)
 	addNestedDependencies = true
-	clientOnlySourceSetName = sourceSets.testmodClient.name
+//	clientOnlySourceSetName = sourceSets.testmodClient.name
 }
 
 // Apply auxiliary buildscripts to submodules
@@ -396,10 +397,10 @@ javadoc {
 		}
 
 		source(it.sourceSets.main.allJava)
-		source(it.sourceSets.client.allJava)
+//		source(it.sourceSets.client.allJava)
 	}
 
-	classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
+	classpath = files(sourceSets.main.compileClasspath/*, sourceSets.client.compileClasspath*/)
 	include("**/api/**")
 	failOnError true
 }
@@ -474,7 +475,7 @@ tasks.register('coverage', JacocoReport) {
 		if (p.path.startsWith(":deprecated")) {
 			return
 		}
-		sourceSets p.sourceSets.main, p.sourceSets.client, p.sourceSets.testmod, p.sourceSets.testmodClient
+		sourceSets p.sourceSets.main, p.sourceSets.client, p.sourceSets.testmod/*, p.sourceSets.testmodClient*/
 	}
 
 	// Exclude mixins
@@ -727,10 +728,10 @@ dependencies {
 			}
 
 			api project(path: "${it.path}", configuration: "namedElements")
-			clientImplementation project("${it.path}:").sourceSets.client.output
+//			clientImplementation project("${it.path}:").sourceSets.client.output
 
 			testmodImplementation project("${it.path}:").sourceSets.testmod.output
-			testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
+//			testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
 		}
 	}
 }

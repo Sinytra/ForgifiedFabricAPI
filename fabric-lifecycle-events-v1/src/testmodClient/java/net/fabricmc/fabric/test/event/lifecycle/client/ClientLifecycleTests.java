@@ -16,14 +16,12 @@
 
 package net.fabricmc.fabric.test.event.lifecycle.client;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 
-public final class ClientLifecycleTests implements ClientModInitializer {
+public final class ClientLifecycleTests {
 	private boolean startCalled;
 	private boolean stopCalled;
 
-	@Override
 	public void onInitializeClient() {
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			if (startCalled) {
