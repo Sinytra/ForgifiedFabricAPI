@@ -21,15 +21,14 @@ import net.minecraft.item.Items;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.VillagerProfession;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
 
 /*
  * Second entrypoint to validate class loading does not break this.
  */
-public class VillagerTypeTest2 implements ModInitializer {
-	@Override
-	public void onInitialize() {
+public class VillagerTypeTest2 {
+
+	public static void onInitialize() {
 		TradeOfferHelper.registerVillagerOffers(VillagerProfession.ARMORER, 1, factories -> {
 			factories.add(new SimpleTradeFactory(new TradeOffer(new ItemStack(Items.DIAMOND, 5), new ItemStack(Items.NETHERITE_INGOT), 3, 4, 0.15F)));
 		});

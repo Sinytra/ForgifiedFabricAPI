@@ -16,10 +16,9 @@
 
 package net.fabricmc.fabric.api.object.builder.v1.advancement;
 
+import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.advancement.criterion.Criterion;
 import net.minecraft.util.Identifier;
-
-import net.fabricmc.fabric.mixin.object.builder.CriteriaAccessor;
 
 /**
  * Allows registering advancement criteria for triggers.
@@ -43,7 +42,7 @@ public final class CriterionRegistry {
 	 *                                  Criterion#getId() id} exists
 	 */
 	public static <T extends Criterion<?>> T register(T criterion) {
-		CriteriaAccessor.callRegister(criterion);
+		Criteria.register(criterion);
 		return criterion;
 	}
 }

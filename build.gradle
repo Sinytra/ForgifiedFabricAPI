@@ -336,7 +336,7 @@ allprojects {
 
 	tasks.register('validateMixinNames', net.fabricmc.loom.task.ValidateMixinNameTask) {
 		source(sourceSets.main.output)
-		source(sourceSets.client.output)
+//		source(sourceSets.client.output)
 		source(sourceSets.testmod.output)
 	}
 

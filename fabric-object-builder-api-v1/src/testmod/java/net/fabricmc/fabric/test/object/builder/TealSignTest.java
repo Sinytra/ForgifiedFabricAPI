@@ -16,6 +16,14 @@
 
 package net.fabricmc.fabric.test.object.builder;
 
+import net.minecraft.util.Identifier;
+
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockSetType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -30,62 +38,54 @@ import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.item.HangingSignItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.SignItem;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 
-public class TealSignTest implements ModInitializer {
+public class TealSignTest {
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ObjectBuilderTestConstants.MOD_ID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ObjectBuilderTestConstants.MOD_ID);
+	private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ObjectBuilderTestConstants.MOD_ID);
+
 	public static final Identifier TEAL_TYPE_ID = ObjectBuilderTestConstants.id("teal");
 	public static final BlockSetType TEAL_BLOCK_SET_TYPE = BlockSetTypeBuilder.copyOf(BlockSetType.OAK).build(TEAL_TYPE_ID);
 	public static final WoodType TEAL_WOOD_TYPE = WoodTypeBuilder.copyOf(WoodType.OAK).build(TEAL_TYPE_ID, TEAL_BLOCK_SET_TYPE);
-	public static final SignBlock TEAL_SIGN = new SignBlock(FabricBlockSettings.copy(Blocks.OAK_SIGN), TEAL_WOOD_TYPE) {
+	public static final RegistryObject<SignBlock> TEAL_SIGN = BLOCKS.register("teal_sign", () -> new SignBlock(FabricBlockSettings.copy(Blocks.OAK_SIGN), TEAL_WOOD_TYPE) {
 		@Override
 		public TealSign createBlockEntity(BlockPos pos, BlockState state) {
 			return new TealSign(pos, state);
 		}
-	};
-	public static final WallSignBlock TEAL_WALL_SIGN = new WallSignBlock(FabricBlockSettings.copy(Blocks.OAK_SIGN), TEAL_WOOD_TYPE) {
+	});
+	public static final RegistryObject<WallSignBlock> TEAL_WALL_SIGN = BLOCKS.register("teal_wall_sign", () -> new WallSignBlock(FabricBlockSettings.copy(Blocks.OAK_SIGN), TEAL_WOOD_TYPE) {
 		@Override
 		public TealSign createBlockEntity(BlockPos pos, BlockState state) {
 			return new TealSign(pos, state);
 		}
-	};
-	public static final HangingSignBlock TEAL_HANGING_SIGN = new HangingSignBlock(FabricBlockSettings.copy(Blocks.OAK_HANGING_SIGN), TEAL_WOOD_TYPE) {
+	});
+	public static final RegistryObject<HangingSignBlock> TEAL_HANGING_SIGN = BLOCKS.register("teal_hanging_sign", () -> new HangingSignBlock(FabricBlockSettings.copy(Blocks.OAK_HANGING_SIGN), TEAL_WOOD_TYPE) {
 		@Override
 		public TealHangingSign createBlockEntity(BlockPos pos, BlockState state) {
 			return new TealHangingSign(pos, state);
 		}
-	};
-	public static final WallHangingSignBlock TEAL_WALL_HANGING_SIGN = new WallHangingSignBlock(FabricBlockSettings.copy(Blocks.OAK_HANGING_SIGN), TEAL_WOOD_TYPE) {
+	});
+	public static final RegistryObject<WallHangingSignBlock> TEAL_WALL_HANGING_SIGN = BLOCKS.register("teal_wall_hanging_sign", () -> new WallHangingSignBlock(FabricBlockSettings.copy(Blocks.OAK_HANGING_SIGN), TEAL_WOOD_TYPE) {
 		@Override
 		public TealHangingSign createBlockEntity(BlockPos pos, BlockState state) {
 			return new TealHangingSign(pos, state);
 		}
-	};
-	public static final SignItem TEAL_SIGN_ITEM = new SignItem(new Item.Settings(), TEAL_SIGN, TEAL_WALL_SIGN);
-	public static final HangingSignItem TEAL_HANGING_SIGN_ITEM = new HangingSignItem(TEAL_HANGING_SIGN, TEAL_WALL_HANGING_SIGN, new Item.Settings());
-	public static final BlockEntityType<TealSign> TEST_SIGN_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(TealSign::new, TEAL_SIGN, TEAL_WALL_SIGN).build();
-	public static final BlockEntityType<TealHangingSign> TEST_HANGING_SIGN_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(TealHangingSign::new, TEAL_HANGING_SIGN, TEAL_WALL_HANGING_SIGN).build();
+	});
+	public static final RegistryObject<SignItem> TEAL_SIGN_ITEM = ITEMS.register("teal_sign", () -> new SignItem(new Item.Settings(), TEAL_SIGN.get(), TEAL_WALL_SIGN.get()));
+	public static final RegistryObject<HangingSignItem> TEAL_HANGING_SIGN_ITEM = ITEMS.register("teal_hanging_sign", () -> new HangingSignItem(TEAL_HANGING_SIGN.get(), TEAL_WALL_HANGING_SIGN.get(), new Item.Settings()));
+	public static final RegistryObject<BlockEntityType<TealSign>> TEST_SIGN_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("teal_sign", () -> FabricBlockEntityTypeBuilder.create(TealSign::new, TEAL_SIGN.get(), TEAL_WALL_SIGN.get()).build());
+	public static final RegistryObject<BlockEntityType<TealHangingSign>> TEST_HANGING_SIGN_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("teal_hanging_sign", () -> FabricBlockEntityTypeBuilder.create(TealHangingSign::new, TEAL_HANGING_SIGN.get(), TEAL_WALL_HANGING_SIGN.get()).build());
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.BLOCK, ObjectBuilderTestConstants.id("teal_sign"), TEAL_SIGN);
-		Registry.register(Registries.BLOCK, ObjectBuilderTestConstants.id("teal_wall_sign"), TEAL_WALL_SIGN);
-		Registry.register(Registries.BLOCK, ObjectBuilderTestConstants.id("teal_hanging_sign"), TEAL_HANGING_SIGN);
-		Registry.register(Registries.BLOCK, ObjectBuilderTestConstants.id("teal_wall_hanging_sign"), TEAL_WALL_HANGING_SIGN);
-
-		Registry.register(Registries.ITEM, ObjectBuilderTestConstants.id("teal_sign"), TEAL_SIGN_ITEM);
-		Registry.register(Registries.ITEM, ObjectBuilderTestConstants.id("teal_hanging_sign"), TEAL_HANGING_SIGN_ITEM);
-
-		Registry.register(Registries.BLOCK_ENTITY_TYPE, ObjectBuilderTestConstants.id("teal_sign"), TEST_SIGN_BLOCK_ENTITY);
-		Registry.register(Registries.BLOCK_ENTITY_TYPE, ObjectBuilderTestConstants.id("teal_hanging_sign"), TEST_HANGING_SIGN_BLOCK_ENTITY);
+	public static void onInitialize(IEventBus bus) {
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
+		BLOCK_ENTITY_TYPES.register(bus);
 	}
 
 	public static class TealSign extends SignBlockEntity {
@@ -95,7 +95,7 @@ public class TealSignTest implements ModInitializer {
 
 		@Override
 		public BlockEntityType<?> getType() {
-			return TEST_SIGN_BLOCK_ENTITY;
+			return TEST_SIGN_BLOCK_ENTITY.get();
 		}
 	}
 
@@ -106,7 +106,7 @@ public class TealSignTest implements ModInitializer {
 
 		@Override
 		public BlockEntityType<?> getType() {
-			return TEST_HANGING_SIGN_BLOCK_ENTITY;
+			return TEST_HANGING_SIGN_BLOCK_ENTITY.get();
 		}
 	}
 }
