@@ -23,6 +23,12 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+
+import net.fabricmc.fabric.test.command.client.ClientCommandTest;
+
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +42,20 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.command.v2.EntitySelectorOptionRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-public final class CommandTest implements ModInitializer {
+@Mod(CommandTest.MODID)
+public final class CommandTest {
+	public static final String MODID = "fabric_command_api_v2_testmod";
 	private static final Logger LOGGER = LoggerFactory.getLogger(CommandTest.class);
-	static final Identifier SELECTOR_ID = new Identifier("fabric-command-api-v2-testmod", "min_health");
+	static final Identifier SELECTOR_ID = new Identifier(CommandTest.MODID, "min_health");
 	private static final SimpleCommandExceptionType WRONG_SIDE_SHOULD_BE_INTEGRATED = new SimpleCommandExceptionType(Text.literal("This command was registered incorrectly. Should only be present on an integrated server but was ran on a dedicated server!"));
 	private static final SimpleCommandExceptionType WRONG_SIDE_SHOULD_BE_DEDICATED = new SimpleCommandExceptionType(Text.literal("This command was registered incorrectly. Should only be present on an dedicated server but was ran on an integrated server!"));
 
-	@Override
-	public void onInitialize() {
+	public CommandTest() {
+		CustomArgumentTest.onInitialize();
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			new ClientCommandTest().onInitializeClient();
+		}
+
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			// A command that exists on both types of servers
 			dispatcher.register(literal("fabric_common_test_command").executes(this::executeCommonCommand));

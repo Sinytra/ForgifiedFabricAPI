@@ -23,8 +23,6 @@ import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.mixin.command.EntitySelectorOptionsAccessor;
-
 /**
  * Contains a function to register an entity selector option.
  */
@@ -64,7 +62,7 @@ public final class EntitySelectorOptionRegistry {
 	 * @param canUse the predicate that checks whether the option is syntactically valid
 	 */
 	public static void register(Identifier id, Text description, EntitySelectorOptions.SelectorHandler handler, Predicate<EntitySelectorReader> canUse) {
-		EntitySelectorOptionsAccessor.callPutOption(id.toUnderscoreSeparatedString(), handler, canUse, description);
+		EntitySelectorOptions.putOption(id.toUnderscoreSeparatedString(), handler, canUse, description);
 	}
 
 	/**
