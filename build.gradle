@@ -10,7 +10,7 @@ plugins {
 	id "idea"
 	id "maven-publish"
 	id 'jacoco'
-	id "fabric-loom" version "1.2.7" apply false
+	id "dev.architectury.loom" version "1.2-SNAPSHOT" apply false
 	id "com.diffplug.spotless" version "6.18.0"
 	id "org.ajoberstar.grgit" version "3.1.0"
 	id "com.matthewprenger.cursegradle" version "1.4.0"
@@ -146,7 +146,7 @@ allprojects {
 
 	apply plugin: "java-library"
 	apply plugin: "checkstyle"
-	apply plugin: "fabric-loom"
+	apply plugin: "dev.architectury.loom"
 	apply plugin: "com.diffplug.spotless"
 
 	tasks.withType(JavaCompile).configureEach {
@@ -159,10 +159,15 @@ allprojects {
 	}
 
 	loom {
-		splitEnvironmentSourceSets()
+//		splitEnvironmentSourceSets()
 	}
 
 	sourceSets {
+		client {
+			compileClasspath += main.compileClasspath
+			runtimeClasspath += main.runtimeClasspath
+		}
+		
 		testmod {
 			compileClasspath += main.compileClasspath
 			runtimeClasspath += main.runtimeClasspath
@@ -187,6 +192,10 @@ allprojects {
 	loom {
 		runtimeOnlyLog4j = true
 
+		forge {
+			convertAccessWideners = true
+		}
+
 		runs {
 			testmodClient {
 				client()
@@ -201,6 +210,10 @@ allprojects {
 				source sourceSets.testmod
 			}
 		}
+	}
+	
+	configureLaunch {
+		dependsOn(configurations.testmodRuntimeClasspath, configurations.testmodClientRuntimeClasspath)
 	}
 
 	allprojects.each { p ->
@@ -222,6 +235,7 @@ allprojects {
 	dependencies {
 		minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
 		mappings "net.fabricmc:yarn:${rootProject.minecraft_version}${project.yarn_version}:v2"
+		forge "net.minecraftforge:forge:${rootProject.forge_version}"
 		modApi "net.fabricmc:fabric-loader:${project.loader_version}"
 
 		testmodImplementation sourceSets.main.output
@@ -251,10 +265,11 @@ allprojects {
 	}
 
 	tasks.withType(ProcessResources).configureEach {
-		inputs.property "version", project.version
-
-		filesMatching("fabric.mod.json") {
-			expand "version": project.version
+		exclude "fabric.mod.json"
+	}
+	tasks.withType(Jar).configureEach {
+		manifest {
+			attributes(["Implementation-Version" : project.version])
 		}
 	}
 
@@ -326,6 +341,7 @@ allprojects {
 
 	// Apply to each valid subproject.
 	apply from: rootProject.file('gradle/package-info.gradle')
+	apply from: rootProject.file('gradle/mods-toml.gradle')
 	apply from: rootProject.file('gradle/validate-annotations.gradle')
 }
 
@@ -600,16 +616,16 @@ subprojects {
 
 		// Make all modules depend on the gametest api (and thus res loader) to try and promote its usage.
 		if (project.name != "fabric-gametest-api-v1") {
-			testmodImplementation project(path: ':fabric-gametest-api-v1', configuration: 'namedElements')
-			testmodClientImplementation project(":fabric-gametest-api-v1").sourceSets.client.output
-			testmodImplementation project(path: ':fabric-resource-loader-v0', configuration: 'namedElements')
-			testmodClientImplementation project(":fabric-resource-loader-v0").sourceSets.client.output
+//			testmodImplementation project(path: ':fabric-gametest-api-v1', configuration: 'namedElements')
+//			testmodClientImplementation project(":fabric-gametest-api-v1").sourceSets.client.output
+//			testmodImplementation project(path: ':fabric-resource-loader-v0', configuration: 'namedElements')
+//			testmodClientImplementation project(":fabric-resource-loader-v0").sourceSets.client.output
 		}
 
 		// Make all testmods run with registry-sync-v0 as it is required to register new objects.
 		if (project.name != "fabric-registry-sync-v0") {
-			testmodRuntimeOnly project(path: ':fabric-registry-sync-v0', configuration: 'namedElements')
-			testmodClientImplementation project(":fabric-registry-sync-v0").sourceSets.client.output
+//			testmodRuntimeOnly project(path: ':fabric-registry-sync-v0', configuration: 'namedElements')
+//			testmodClientImplementation project(":fabric-registry-sync-v0").sourceSets.client.output
 		}
 	}
 
