@@ -22,9 +22,9 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 
-public class DisconnectScreenTest implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class DisconnectScreenTest {
+
+	public static void onInitializeClient() {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 				dispatcher.register(ClientCommandManager.literal("disconnect_screen_test").executes(context -> {
 					StringBuilder builder = new StringBuilder("A very long disconnect reason:");

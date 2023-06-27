@@ -20,6 +20,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl;
+
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +38,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerLoginNetworkHandlerAccessor;
 
+@Mod(NetworkingImpl.MOD_ID)
 public final class NetworkingImpl {
-	public static final String MOD_ID = "fabric-networking-api-v1";
+	public static final String MOD_ID = "fabric_networking_api_v1";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	/**
 	 * Id of packet used to register supported channels.
@@ -50,7 +56,11 @@ public final class NetworkingImpl {
 	 */
 	public static final Identifier EARLY_REGISTRATION_CHANNEL = new Identifier(MOD_ID, "early_registration");
 
-	public static void init() {
+	public NetworkingImpl() {
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			ClientNetworkingImpl.clientInit();
+		}
+
 		// Login setup
 		ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, synchronizer) -> {
 			// Send early registration packet

@@ -31,10 +31,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.test.networking.NetworkingTestmods;
 import net.fabricmc.fabric.test.networking.play.NetworkingPlayPacketTest;
 
-public final class NetworkingLoginQueryTest implements ModInitializer {
+public final class NetworkingLoginQueryTest {
 	private static final boolean useLoginDelayTest = System.getProperty("fabric-networking-api-v1.loginDelayTest") != null;
 
-	@Override
 	public void onInitialize() {
 		ServerLoginConnectionEvents.QUERY_START.register(this::onLoginStart);
 		ServerLoginConnectionEvents.QUERY_START.register(this::delaySimply);

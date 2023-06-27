@@ -21,7 +21,6 @@ import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -30,11 +29,10 @@ import net.fabricmc.fabric.test.networking.keybindreciever.NetworkingKeybindPack
 
 // Sends a packet to the server when a keybinding was pressed
 // The server in response will send a chat message to the client.
-public class NetworkingKeybindClientPacketTest implements ClientModInitializer {
+public class NetworkingKeybindClientPacketTest {
 	public static final KeyBinding TEST_BINDING = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.fabric-networking-api-v1-testmod.test", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_BRACKET, "key.category.fabric-networking-api-v1-testmod"));
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			// Player must be in game to send packets, i.e. client.player != null
 			if (client.getNetworkHandler() != null) {

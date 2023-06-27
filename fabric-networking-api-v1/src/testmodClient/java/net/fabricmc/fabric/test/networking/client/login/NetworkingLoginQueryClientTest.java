@@ -18,14 +18,13 @@ package net.fabricmc.fabric.test.networking.client.login;
 
 import java.util.concurrent.CompletableFuture;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.test.networking.play.NetworkingPlayPacketTest;
 
-public final class NetworkingLoginQueryClientTest implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public final class NetworkingLoginQueryClientTest {
+
+	public static void onInitializeClient() {
 		// Send a dummy response to the server in return, by registering here we essentially say we understood the server's query
 		ClientLoginNetworking.registerGlobalReceiver(NetworkingPlayPacketTest.TEST_CHANNEL, (client, handler, buf, listenerAdder) -> {
 			return CompletableFuture.completedFuture(PacketByteBufs.empty());

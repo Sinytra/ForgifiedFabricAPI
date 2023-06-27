@@ -41,7 +41,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.test.networking.NetworkingTestmods;
 
-public final class NetworkingPlayPacketTest implements ModInitializer {
+public final class NetworkingPlayPacketTest {
 	public static final Identifier TEST_CHANNEL = NetworkingTestmods.id("test_channel");
 
 	public static void sendToTestChannel(ServerPlayerEntity player, String stuff) {
@@ -72,8 +72,7 @@ public final class NetworkingPlayPacketTest implements ModInitializer {
 				})));
 	}
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		NetworkingTestmods.LOGGER.info("Hello from networking user!");
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
