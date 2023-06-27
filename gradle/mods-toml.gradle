@@ -7,11 +7,9 @@ buildscript {
 	}
 }
 
-
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.toml.TomlBuilder
-
 import java.nio.file.Files
 
 for (def sourceSet in [

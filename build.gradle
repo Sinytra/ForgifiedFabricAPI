@@ -838,3 +838,67 @@ github.mustRunAfter checkVersion
 project.tasks.modrinth.mustRunAfter checkVersion
 publish.mustRunAfter checkVersion
 project.tasks.curseforge.mustRunAfter checkVersion
+
+import net.fabricmc.loom.task.service.MappingsService
+import net.fabricmc.loom.util.service.BuildSharedServiceManager
+import net.fabricmc.loom.util.service.UnsafeWorkQueueHelper
+import org.gradle.build.event.BuildEventsListenerRegistry
+import dev.architectury.loom.extensions.ModBuildExtensions
+import javax.inject.Inject
+
+subprojects {
+	def localDevJar = tasks.register("localDevJar", Jar) {
+		dependsOn(jar)
+		from zipTree(jar.archiveFile)
+		archiveClassifier.set("local")
+		destinationDirectory.set(new File(getProject().getBuildDir(), "devlibs"))
+	}
+	def convertTask = tasks.register("convertLocalDevAW", ConvertAW) {
+		sourceNamespace.set(remapJar.sourceNamespace)
+		targetNamespace.set(remapJar.sourceNamespace)
+		outputFile.set(localDevJar.flatMap { it.archiveFile })
+		accessWideners.set(remapJar.atAccessWideners)
+	}
+	localDevJar.configure {
+		finalizedBy convertTask
+	}
+	configurations.configureEach {
+		outgoing.artifacts.clear()
+		outgoing.artifact(localDevJar)
+	}
+}
+
+abstract class ConvertAW extends DefaultTask {
+	@Inject
+	protected abstract BuildEventsListenerRegistry getBuildEventsListenerRegistry()
+
+	@Input
+	final Property<String> sourceNamespace = project.objects.property(String)
+
+	@Input
+	final Property<String> targetNamespace = project.objects.property(String)
+
+	@Input
+	final SetProperty<String> accessWideners = project.objects.setProperty(String)
+
+	@InputFile
+	final RegularFileProperty outputFile = project.objects.fileProperty()
+
+	private final Property<String> mappingServiceUuid = project.objects.property(String)
+
+	@Inject
+	public ConvertAW() {
+		Provider<BuildSharedServiceManager> serviceManagerProvider = BuildSharedServiceManager.createForTask(this, getBuildEventsListenerRegistry())
+
+		mappingServiceUuid.value(project.provider { UnsafeWorkQueueHelper.create(MappingsService.createDefault(project, serviceManagerProvider.get().get(), sourceNamespace.get(), targetNamespace.get())) })
+	}
+
+	@TaskAction
+	void execute() {
+		try {
+			ModBuildExtensions.convertAwToAt(accessWideners, outputFile.get().asFile.toPath(), mappingServiceUuid)
+		} catch (Exception e) {
+			
+		}
+	}
+}
