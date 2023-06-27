@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.lookup.entity;
 
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -23,11 +26,8 @@ import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.test.lookup.FabricApiLookupTest;
 import net.fabricmc.fabric.test.lookup.api.Inspectable;
@@ -36,18 +36,22 @@ public class FabricEntityApiLookupTest {
 	public static final EntityApiLookup<Inspectable, Void> INSPECTABLE =
 			EntityApiLookup.get(new Identifier(FabricApiLookupTest.MOD_ID, "inspectable"), Inspectable.class, Void.class);
 
-	public static final EntityType<InspectablePigEntity> INSPECTABLE_PIG = FabricEntityTypeBuilder.create()
-			.spawnGroup(SpawnGroup.CREATURE)
-			.entityFactory(InspectablePigEntity::new)
-			.dimensions(EntityDimensions.changing(0.9F, 0.9F))
-			.trackRangeChunks(10)
-			.build();
+	public static final RegistryObject<EntityType<InspectablePigEntity>> INSPECTABLE_PIG = FabricApiLookupTest.ENTITY_TYPE_REGISTER.register("inspectable_pig", 
+			() -> FabricEntityTypeBuilder.create()
+					.spawnGroup(SpawnGroup.CREATURE)
+					.entityFactory(InspectablePigEntity::new)
+					.dimensions(EntityDimensions.changing(0.9F, 0.9F))
+					.trackRangeChunks(10)
+					.build());
 
-	public static void onInitialize() {
-		Registry.register(Registries.ENTITY_TYPE, new Identifier(FabricApiLookupTest.MOD_ID, "inspectable_pig"), INSPECTABLE_PIG);
-		FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, PigEntity.createPigAttributes());
+	public static void onAttributesCreate(EntityAttributeCreationEvent event) {
+		event.put(INSPECTABLE_PIG.get(), PigEntity.createPigAttributes().build());
+	}
 
-		INSPECTABLE.registerSelf(INSPECTABLE_PIG);
+	public static void onInitialize() {}
+
+	public static void runTests() {
+		INSPECTABLE.registerSelf(INSPECTABLE_PIG.get());
 		INSPECTABLE.registerForTypes(
 				(entity, context) -> () -> Text.literal("registerForTypes: " + entity.getClass().getName()),
 				EntityType.PLAYER,
@@ -55,7 +59,8 @@ public class FabricEntityApiLookupTest {
 		INSPECTABLE.registerFallback((entity, context) -> {
 			if (entity instanceof CreeperEntity) {
 				return () -> Text.literal("registerFallback: CreeperEntity");
-			} else {
+			}
+			else {
 				return null;
 			}
 		});

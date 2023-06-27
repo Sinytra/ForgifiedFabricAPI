@@ -37,7 +37,7 @@ public class ChuteBlockEntity extends BlockEntity {
 	private BlockApiCache<ItemExtractable, @NotNull Direction> cachedExtractable = null;
 
 	public ChuteBlockEntity(BlockPos pos, BlockState state) {
-		super(FabricApiLookupTest.CHUTE_BLOCK_ENTITY_TYPE, pos, state);
+		super(FabricApiLookupTest.CHUTE_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
 	public static void serverTick(World world, BlockPos pos, BlockState blockState, ChuteBlockEntity blockEntity) {

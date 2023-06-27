@@ -48,14 +48,14 @@ Missing -> Added -> Tested
 | fabric-renderer-indigo               |        ⚠️ Missing        |    Stable    |
 | fabric-rendering-data-attachment-v1  |        ⚠️ Missing        |    Stable    |
 | fabric-rendering-fluids-v1           |        ⚠️ Missing        |    Stable    |
-| fabric-rendering-v1                  |        ⚠️ Missing        |    Stable    |
+| fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
 | fabric-resource-conditions-api-v1    |        ⚠️ Missing        | Experimental |
 | fabric-resource-loader-v0            |        ⚠️ Missing        |    Stable    |
 | fabric-screen-api-v1                 |        ⚠️ Missing        |    Stable    |
 | fabric-screen-handler-api-v1         |        ⚠️ Missing        |    Stable    |
 | fabric-sound-api-v1                  |        ⚠️ Missing        |    Stable    |
 | fabric-transfer-api-v1               |        ⚠️ Missing        | Experimental |
-| fabric-transitive-access-wideners-v1 |        ⚠️ Missing        |              |
+| fabric-transitive-access-wideners-v1 |        ⚠️ Missing        |    Stable    |
 | fabric-command-api-v1                |        ⚠️ Missing        |  Deprecated  |
 | fabric-commands-v0                   |        ⚠️ Missing        |  Deprecated  |
 | fabric-containers-v0                 |        ⚠️ Missing        |  Deprecated  |
