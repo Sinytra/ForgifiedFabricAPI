@@ -16,19 +16,44 @@
 
 package net.fabricmc.fabric.test.networking;
 
-import org.slf4j.LoggerFactory;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.minecraft.util.Identifier;
 
+import net.fabricmc.fabric.test.networking.channeltest.NetworkingChannelTest;
+import net.fabricmc.fabric.test.networking.client.DisconnectScreenTest;
+import net.fabricmc.fabric.test.networking.client.channeltest.NetworkingChannelClientTest;
+import net.fabricmc.fabric.test.networking.client.keybindreciever.NetworkingKeybindClientPacketTest;
+import net.fabricmc.fabric.test.networking.client.login.NetworkingLoginQueryClientTest;
+import net.fabricmc.fabric.test.networking.client.play.NetworkingPlayPacketClientTest;
+import net.fabricmc.fabric.test.networking.keybindreciever.NetworkingKeybindPacketTest;
+import net.fabricmc.fabric.test.networking.login.NetworkingLoginQueryTest;
+import net.fabricmc.fabric.test.networking.play.NetworkingPlayPacketTest;
+
+@Mod(NetworkingTestmods.ID)
 public final class NetworkingTestmods {
-	public static final String ID = "fabric-networking-api-v1-testmod";
+	public static final String ID = "fabric_networking_api_v1_testmod";
 	public static final Logger LOGGER = LoggerFactory.getLogger(ID);
 
 	public static Identifier id(String name) {
 		return new Identifier(ID, name);
 	}
 
-	private NetworkingTestmods() {
+	public NetworkingTestmods() {
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			DisconnectScreenTest.onInitializeClient();
+			new NetworkingPlayPacketClientTest().onInitializeClient();
+			NetworkingLoginQueryClientTest.onInitializeClient();
+			NetworkingKeybindClientPacketTest.onInitializeClient();
+			new NetworkingChannelClientTest().onInitializeClient();
+		}
+		NetworkingPlayPacketTest.onInitialize();
+		new NetworkingLoginQueryTest().onInitialize();
+		NetworkingKeybindPacketTest.onInitialize();
+		NetworkingChannelTest.onInitialize();
 	}
 }

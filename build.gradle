@@ -890,18 +890,23 @@ allprojects {
 		sourceSet.resources.srcDir task
 	
 		if (!sourceSet.name.startsWith("test")) {
-			def fabricMetadata = file("src/$sourceSetName/resources/fabric.mod.json")
-			if (fabricMetadata.exists()) {
-				def parser = new JsonSlurper()
-				def json = parser.parse(fabricMetadata)
-				if (json.mixins) {
-					for (def mixin in json.mixins) {
-						if (mixin instanceof Map) {
-							loom.forge.mixinConfig mixin.config
-						} else if (mixin instanceof String) {
-							loom.forge.mixinConfig mixin
-						} else {
-							throw new RuntimeException("Unknown mixin config type ${mixin.getClass()}")
+			for (def sourceRoot in resourceRoots) {
+				if (!sourceRoot.isDirectory()) {
+					continue
+				}
+				def fabricMetadata = sourceRoot.toPath().resolve("fabric.mod.json").toFile()
+				if (fabricMetadata.exists()) {
+					def parser = new JsonSlurper()
+					def json = parser.parse(fabricMetadata)
+					if (json.mixins) {
+						for (def mixin in json.mixins) {
+							if (mixin instanceof Map) {
+								loom.forge.mixinConfig mixin.config
+							} else if (mixin instanceof String) {
+								loom.forge.mixinConfig mixin
+							} else {
+								throw new RuntimeException("Unknown mixin config type ${mixin.getClass()}")
+							}
 						}
 					}
 				}

@@ -24,7 +24,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -32,15 +31,14 @@ import net.fabricmc.fabric.test.networking.NetworkingTestmods;
 
 // Listens for a packet from the client which is sent to the server when a keybinding is pressed.
 // In response the server will send a message containing the keybind text letting the client know it pressed that key.
-public final class NetworkingKeybindPacketTest implements ModInitializer {
+public final class NetworkingKeybindPacketTest {
 	public static final Identifier KEYBINDING_PACKET_ID = NetworkingTestmods.id("keybind_press_test");
 
 	private static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 		server.execute(() -> player.sendMessage(Text.literal("So you pressed ").append(Text.keybind("fabric-networking-api-v1-testmod-keybind").styled(style -> style.withFormatting(Formatting.BLUE))), false));
 	}
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		ServerPlayConnectionEvents.INIT.register((handler, server) -> ServerPlayNetworking.registerReceiver(handler, KEYBINDING_PACKET_ID, NetworkingKeybindPacketTest::receive));
 	}
 }

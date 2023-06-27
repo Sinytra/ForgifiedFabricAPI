@@ -16,7 +16,7 @@ Missing -> Added -> Tested
 | API                                  |          State           |  Lifecycle   |
 |:-------------------------------------|:------------------------:|:------------:|
 | fabric-api-base                      |         ✅ Tested         |    Stable    |
-| fabric-api-lookup-api-v1             |        ⚠️ Missing        |    Stable    |
+| fabric-api-lookup-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-biome-api-v1                  |        ⚠️ Missing        | Experimental |
 | fabric-block-api-v1                  |        ⚠️ Missing        |    Stable    |
 | fabric-blockrenderlayer-v1           |        ⚠️ Missing        |    Stable    |
@@ -33,13 +33,13 @@ Missing -> Added -> Tested
 | fabric-gametest-api-v1               |        ⚠️ Missing        |    Stable    |
 | fabric-item-api-v1                   |        ⚠️ Missing        |    Stable    |
 | fabric-item-group-api-v1             |        ⚠️ Missing        |    Stable    |
-| fabric-key-binding-api-v1            |        ⚠️ Missing        |    Stable    |
+| fabric-key-binding-api-v1            |         ✅ Tested         |    Stable    |
 | fabric-lifecycle-events-v1           |         ✅ Tested         |    Stable    |
 | fabric-loot-api-v2                   |        ⚠️ Missing        |    Stable    |
 | fabric-message-api-v1                |        ⚠️ Missing        | Experimental |
 | fabric-mining-level-api-v1           |        ⚠️ Missing        |    Stable    |
 | fabric-models-v0                     |        ⚠️ Missing        |    Stable    |
-| fabric-networking-api-v1             |        ⚠️ Missing        |    Stable    |
+| fabric-networking-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-object-builder-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-particles-v1                  |        ⚠️ Missing        |    Stable    |
 | fabric-recipe-api-v1                 |        ⚠️ Missing        |    Stable    |

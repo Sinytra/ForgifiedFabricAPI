@@ -40,13 +40,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
-public final class NetworkingChannelTest implements ModInitializer {
-	@Override
-	public void onInitialize() {
+public final class NetworkingChannelTest {
+
+	public static void onInitialize() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			final LiteralCommandNode<ServerCommandSource> channelTestCommand = literal("network_channel_test").build();
 
