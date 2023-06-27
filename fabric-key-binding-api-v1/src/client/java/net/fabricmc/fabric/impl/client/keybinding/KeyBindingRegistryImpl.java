@@ -28,6 +28,8 @@ import net.minecraft.client.option.KeyBinding;
 
 import net.fabricmc.fabric.mixin.client.keybinding.KeyBindingAccessor;
 
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+
 public final class KeyBindingRegistryImpl {
 	private static final List<KeyBinding> MODDED_KEY_BINDINGS = new ReferenceArrayList<>(); // ArrayList with identity based comparisons for contains/remove/indexOf etc., required for correctly handling duplicate keybinds
 
@@ -52,10 +54,6 @@ public final class KeyBindingRegistryImpl {
 	}
 
 	public static KeyBinding registerKeyBinding(KeyBinding binding) {
-		if (MinecraftClient.getInstance().options != null) {
-			throw new IllegalStateException("GameOptions has already been initialised");
-		}
-
 		for (KeyBinding existingKeyBindings : MODDED_KEY_BINDINGS) {
 			if (existingKeyBindings == binding) {
 				throw new IllegalArgumentException("Attempted to register a key binding twice: " + binding.getTranslationKey());
@@ -79,5 +77,9 @@ public final class KeyBindingRegistryImpl {
 		newKeysAll.removeAll(MODDED_KEY_BINDINGS);
 		newKeysAll.addAll(MODDED_KEY_BINDINGS);
 		return newKeysAll.toArray(new KeyBinding[0]);
+	}
+
+	static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+		MODDED_KEY_BINDINGS.forEach(event::register);
 	}
 }
