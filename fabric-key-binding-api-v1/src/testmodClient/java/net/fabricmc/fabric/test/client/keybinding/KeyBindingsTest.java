@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.test.client.keybinding;
 
+import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.option.KeyBinding;
@@ -23,13 +24,13 @@ import net.minecraft.client.option.StickyKeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
-public class KeyBindingsTest implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+@Mod("fabric_key_binding_api_v1_testmod")
+public class KeyBindingsTest {
+
+	public KeyBindingsTest() {
 		KeyBinding binding1 = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.fabric-key-binding-api-v1-testmod.test_keybinding_1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_P, "key.category.first.test"));
 		KeyBinding binding2 = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.fabric-key-binding-api-v1-testmod.test_keybinding_2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_U, "key.category.second.test"));
 		KeyBinding stickyBinding = KeyBindingHelper.registerKeyBinding(new StickyKeyBinding("key.fabric-key-binding-api-v1-testmod.test_keybinding_sticky", GLFW.GLFW_KEY_R, "key.category.first.test", () -> true));
