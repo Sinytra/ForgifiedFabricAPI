@@ -1,6 +1,6 @@
 {
   "generator": {
-    "type": "fabric_dimension:void",
+    "type": "fabric_dimensions_v1_testmod:void",
     "custom_bool": true,
     "biome_source": {
       "type": "minecraft:fixed",

@@ -23,36 +23,30 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.TeleportTarget;
 
+import net.minecraftforge.fml.common.Mod;
+
+@Mod("fabric_dimensions_v1")
 public final class FabricDimensionInternals {
-	private FabricDimensionInternals() {
-		throw new AssertionError();
-	}
 
 	@SuppressWarnings("unchecked")
 	public static <E extends Entity> E changeDimension(E teleported, ServerWorld dimension, TeleportTarget target) {
 		Preconditions.checkArgument(!teleported.world.isClient, "Entities can only be teleported on the server side");
 		Preconditions.checkArgument(Thread.currentThread() == ((ServerWorld) teleported.world).getServer().getThread(), "Entities must be teleported from the main server thread");
 
-		try {
-			((Teleportable) teleported).fabric_setCustomTeleportTarget(target);
-
-			// Fast path for teleporting within the same dimension.
-			if (teleported.getWorld() == dimension) {
-				if (teleported instanceof ServerPlayerEntity serverPlayerEntity) {
-					serverPlayerEntity.networkHandler.requestTeleport(target.position.x, target.position.y, target.position.z, target.yaw, teleported.getPitch());
-				} else {
-					teleported.refreshPositionAndAngles(target.position.x, target.position.y, target.position.z, target.yaw, teleported.getPitch());
-				}
-
-				teleported.setVelocity(target.velocity);
-				teleported.setHeadYaw(target.yaw);
-
-				return teleported;
+		// Fast path for teleporting within the same dimension.
+		if (teleported.getWorld() == dimension) {
+			if (teleported instanceof ServerPlayerEntity serverPlayerEntity) {
+				serverPlayerEntity.networkHandler.requestTeleport(target.position.x, target.position.y, target.position.z, target.yaw, teleported.getPitch());
+			}
+			else {
+				teleported.refreshPositionAndAngles(target.position.x, target.position.y, target.position.z, target.yaw, teleported.getPitch());
 			}
 
-			return (E) teleported.moveToWorld(dimension);
-		} finally {
-			((Teleportable) teleported).fabric_setCustomTeleportTarget(null);
+			teleported.setVelocity(target.velocity);
+			teleported.setHeadYaw(target.yaw);
+
+			return teleported;
 		}
+		return (E) teleported.changeDimension(dimension, new SimpleTeleporter(target, dimension.getPortalForcer()));
 	}
 }

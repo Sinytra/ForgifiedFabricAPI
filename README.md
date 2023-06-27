@@ -26,7 +26,7 @@ Missing -> Added -> Tested
 | fabric-convention-tags-v1            |        ⚠️ Missing        |    Stable    |
 | fabric-crash-report-info-v1          | 🚧 Not Planned [[1]](#1) |    Stable    |
 | fabric-data-generation-api-v1        |        ⚠️ Missing        |    Stable    |
-| fabric-dimensions-v1                 |        ⚠️ Missing        |    Stable    |
+| fabric-dimensions-v1                 |         ✅ Tested         |    Stable    |
 | fabric-entity-events-v1              |        ⚠️ Missing        |    Stable    |
 | fabric-events-interaction-v0         |        ⚠️ Missing        |    Stable    |
 | fabric-game-rule-api-v1              |        ⚠️ Missing        |    Stable    |
