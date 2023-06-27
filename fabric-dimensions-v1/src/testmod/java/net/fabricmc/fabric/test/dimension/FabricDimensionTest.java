@@ -22,13 +22,17 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.entity.Entity;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.CommandManager;
@@ -42,24 +46,27 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-public class FabricDimensionTest implements ModInitializer {
+@Mod(FabricDimensionTest.MODID)
+public class FabricDimensionTest {
+	public static final String MODID = "fabric_dimensions_v1_testmod";
+	private static final DeferredRegister<Codec<? extends ChunkGenerator>> CHUNK_GENERATORS = DeferredRegister.create(RegistryKeys.CHUNK_GENERATOR, MODID);
+	public static final RegistryObject<Codec<? extends ChunkGenerator>> VOID_CHUNK_GENERATOR = CHUNK_GENERATORS.register("void", () -> VoidChunkGenerator.CODEC);
+
 	// The dimension options refer to the JSON-file in the dimension subfolder of the data pack,
 	// which will always share its ID with the world that is created from it
 	private static final RegistryKey<DimensionOptions> DIMENSION_KEY = RegistryKey.of(RegistryKeys.DIMENSION, new Identifier("fabric_dimension", "void"));
 
-	private static RegistryKey<World> WORLD_KEY = RegistryKey.of(RegistryKeys.WORLD, DIMENSION_KEY.getValue());
+	private static final RegistryKey<World> WORLD_KEY = RegistryKey.of(RegistryKeys.WORLD, DIMENSION_KEY.getValue());
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.CHUNK_GENERATOR, new Identifier("fabric_dimension", "void"), VoidChunkGenerator.CODEC);
-
-		WORLD_KEY = RegistryKey.of(RegistryKeys.WORLD, new Identifier("fabric_dimension", "void"));
+	public FabricDimensionTest() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		CHUNK_GENERATORS.register(bus);
 
 		if (System.getProperty("fabric-api.gametest") != null) {
 			// The gametest server does not support custom worlds
@@ -106,8 +113,8 @@ public class FabricDimensionTest implements ModInitializer {
 			// Used to test teleport to vanilla dimension
 			dispatcher.register(literal("fabric_dimension_test_tp")
 					.then(argument("target", DimensionArgumentType.dimension())
-					.executes((context) ->
-							testVanillaTeleport(context, DimensionArgumentType.getDimensionArgument(context, "target")))));
+							.executes((context) ->
+									testVanillaTeleport(context, DimensionArgumentType.getDimensionArgument(context, "target")))));
 		});
 	}
 
@@ -132,7 +139,8 @@ public class FabricDimensionTest implements ModInitializer {
 
 			modWorld.setBlockState(new BlockPos(0, 100, 0), Blocks.DIAMOND_BLOCK.getDefaultState());
 			modWorld.setBlockState(new BlockPos(0, 101, 0), Blocks.TORCH.getDefaultState());
-		} else {
+		}
+		else {
 			TeleportTarget target = new TeleportTarget(new Vec3d(0, 100, 0), Vec3d.ZERO,
 					(float) Math.random() * 360 - 180, (float) Math.random() * 360 - 180);
 			FabricDimensions.teleport(player, getWorld(context, World.OVERWORLD), target);
