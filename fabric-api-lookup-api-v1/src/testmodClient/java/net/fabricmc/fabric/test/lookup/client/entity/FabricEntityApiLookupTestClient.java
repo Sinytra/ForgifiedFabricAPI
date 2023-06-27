@@ -19,8 +19,10 @@ package net.fabricmc.fabric.test.lookup.client.entity;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.test.lookup.entity.FabricEntityApiLookupTest;
 
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
 public class FabricEntityApiLookupTestClient {
-	public static void onInitializeClient() {
-		EntityRendererRegistry.register(FabricEntityApiLookupTest.INSPECTABLE_PIG, InspectablePigEntityRenderer::new);
+	public static void onInitializeClient(FMLClientSetupEvent event) {
+		EntityRendererRegistry.register(FabricEntityApiLookupTest.INSPECTABLE_PIG.get(), InspectablePigEntityRenderer::new);
 	}
 }

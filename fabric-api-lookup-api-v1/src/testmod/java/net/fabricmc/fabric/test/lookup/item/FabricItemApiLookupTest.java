@@ -18,13 +18,13 @@ package net.fabricmc.fabric.test.lookup.item;
 
 import static net.fabricmc.fabric.test.lookup.FabricApiLookupTest.ensureException;
 
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.ToolItem;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.test.lookup.FabricApiLookupTest;
@@ -34,11 +34,11 @@ public class FabricItemApiLookupTest {
 	public static final ItemApiLookup<Inspectable, Void> INSPECTABLE =
 			ItemApiLookup.get(new Identifier("testmod:inspectable"), Inspectable.class, Void.class);
 
-	public static final InspectableItem HELLO_ITEM = new InspectableItem("Hello Fabric API tester!");
+	public static final RegistryObject<InspectableItem> HELLO_ITEM = FabricApiLookupTest.ITEM_REGISTER.register("hello", () -> new InspectableItem("Hello Fabric API tester!"));
 
-	public static void onInitialize() {
-		Registry.register(Registries.ITEM, new Identifier(FabricApiLookupTest.MOD_ID, "hello"), HELLO_ITEM);
-
+	public static void onInitialize() {}
+	
+	public static void runTests() {
 		// Diamonds and diamond blocks can be inspected and will also print their name.
 		INSPECTABLE.registerForItems((stack, ignored) -> () -> {
 			if (stack.hasCustomName()) {
@@ -48,7 +48,7 @@ public class FabricItemApiLookupTest {
 			}
 		}, Items.DIAMOND, Items.DIAMOND_BLOCK);
 		// Test registerSelf
-		INSPECTABLE.registerSelf(HELLO_ITEM);
+		INSPECTABLE.registerSelf(HELLO_ITEM.get());
 		// Tools report their mining level
 		INSPECTABLE.registerFallback((stack, ignored) -> {
 			Item item = stack.getItem();

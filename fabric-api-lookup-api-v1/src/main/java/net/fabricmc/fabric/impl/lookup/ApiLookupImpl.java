@@ -16,13 +16,15 @@
 
 package net.fabricmc.fabric.impl.lookup;
 
-import net.fabricmc.api.ModInitializer;
+import net.minecraftforge.fml.common.Mod;
+
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.impl.lookup.entity.EntityApiLookupImpl;
 
-public class ApiLookupImpl implements ModInitializer {
-	@Override
-	public void onInitialize() {
+@Mod("fabric_api_lookup_api_v1")
+public class ApiLookupImpl {
+
+	public ApiLookupImpl() {
 		ServerLifecycleEvents.SERVER_STARTED.register(EntityApiLookupImpl::checkSelfImplementingTypes);
 	}
 }
