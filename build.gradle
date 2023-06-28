@@ -945,6 +945,22 @@ allprojects {
 	}
 }
 
+subprojects {
+	loom {
+		runs {
+			gametest {
+				server()
+				ideConfigGenerated project.rootProject == project
+				name = "Testmod Game Test Server"
+				source sourceSets.testmod
+
+				// Enable the gametest runner
+				property "forge.gameTestServer", "true"
+			}
+		}
+	}
+}
+
 abstract class GenerateForgeModMetadata extends DefaultTask {
 	@SkipWhenEmpty
 	@InputFiles

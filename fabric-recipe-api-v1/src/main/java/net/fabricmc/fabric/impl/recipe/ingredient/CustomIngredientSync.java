@@ -26,7 +26,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.PacketEncoder;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
@@ -44,7 +43,7 @@ import net.fabricmc.fabric.mixin.recipe.ingredient.PacketEncoderMixin;
  *     and based on that we decide whether to send the custom ingredient, or a vanilla ingredient with the matching stacks.</li>
  * </ul>
  */
-public class CustomIngredientSync implements ModInitializer {
+public class CustomIngredientSync {
 	public static final Identifier PACKET_ID = new Identifier("fabric", "custom_ingredient_sync");
 	public static final int PROTOCOL_VERSION_1 = 1;
 	public static final ThreadLocal<Set<Identifier>> CURRENT_SUPPORTED_INGREDIENTS = new ThreadLocal<>();
@@ -79,8 +78,7 @@ public class CustomIngredientSync implements ModInitializer {
 		}
 	}
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, synchronizer) -> {
 			// Send packet with 1 so the client can send us back the list of supported tags.
 			// 1 is sent in case we need a different protocol later for some reason.

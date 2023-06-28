@@ -28,11 +28,15 @@ import net.minecraft.test.GameTestException;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+@GameTestHolder(IngredientTestsImpl.NAMESPACE)
 public class IngredientMatchTests {
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = IngredientTestsImpl.NAMESPACE, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testAllIngredient(TestContext context) {
 		Ingredient allIngredient = DefaultCustomIngredients.all(Ingredient.ofItems(Items.APPLE, Items.CARROT), Ingredient.ofItems(Items.STICK, Items.CARROT));
 
@@ -55,7 +59,8 @@ public class IngredientMatchTests {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = IngredientTestsImpl.NAMESPACE, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testAnyIngredient(TestContext context) {
 		Ingredient anyIngredient = DefaultCustomIngredients.any(Ingredient.ofItems(Items.APPLE, Items.CARROT), Ingredient.ofItems(Items.STICK, Items.CARROT));
 
@@ -73,7 +78,8 @@ public class IngredientMatchTests {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = IngredientTestsImpl.NAMESPACE, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testDifferenceIngredient(TestContext context) {
 		Ingredient differenceIngredient = DefaultCustomIngredients.difference(Ingredient.ofItems(Items.APPLE, Items.CARROT), Ingredient.ofItems(Items.STICK, Items.CARROT));
 
@@ -88,7 +94,8 @@ public class IngredientMatchTests {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = IngredientTestsImpl.NAMESPACE, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testNbtIngredient(TestContext context) {
 		for (boolean strict : List.of(true, false)) {
 			NbtCompound undamagedNbt = new NbtCompound();
