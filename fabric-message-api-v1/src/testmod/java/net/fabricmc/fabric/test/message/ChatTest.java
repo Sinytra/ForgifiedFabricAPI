@@ -19,6 +19,9 @@ package net.fabricmc.fabric.test.message;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,15 +30,19 @@ import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.message.v1.ServerMessageDecoratorEvent;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
+import net.fabricmc.fabric.test.message.client.ChatTestClient;
 
-public class ChatTest implements ModInitializer {
+@Mod("fabric_message_api_v1_testmod")
+public class ChatTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ChatTest.class);
 
-	@Override
-	public void onInitialize() {
+	public ChatTest() {
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			ChatTestClient.onInitializeClient();
+		}
+
 		Executor ioWorkerExecutor = Util.getIoWorkerExecutor();
 
 		// Basic content phase testing
