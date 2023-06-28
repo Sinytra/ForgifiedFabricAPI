@@ -41,7 +41,7 @@ Missing -> Added -> Tested
 | fabric-models-v0                     |        ⚠️ Missing        |    Stable    |
 | fabric-networking-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-object-builder-api-v1         |         ✅ Tested         |    Stable    |
-| fabric-particles-v1                  |        ⚠️ Missing        |    Stable    |
+| fabric-particles-v1                  |         ✅ Tested         |    Stable    |
 | fabric-recipe-api-v1                 |        ⚠️ Missing        |    Stable    |
 | fabric-registry-sync-v0              |        ⚠️ Missing        |    Stable    |
 | fabric-renderer-api-v1               |        ⚠️ Missing        |    Stable    |
