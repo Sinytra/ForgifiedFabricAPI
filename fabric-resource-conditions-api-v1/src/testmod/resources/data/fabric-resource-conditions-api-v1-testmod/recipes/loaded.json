@@ -12,7 +12,7 @@
     {
       "condition": "fabric:all_mods_loaded",
       "values": [
-        "fabric-resource-conditions-api-v1"
+        "fabric_resource_conditions_api_v1"
       ]
     }
   ]
