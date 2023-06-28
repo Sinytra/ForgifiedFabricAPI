@@ -36,7 +36,7 @@ public class BagScreenHandler extends Generic3x3ContainerScreenHandler {
 	}
 
 	public BagScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-		this(ScreenHandlerTest.BAG_SCREEN_HANDLER, syncId, playerInventory, inventory);
+		this(ScreenHandlerTest.BAG_SCREEN_HANDLER.get(), syncId, playerInventory, inventory);
 	}
 
 	protected BagScreenHandler(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, Inventory inventory) {

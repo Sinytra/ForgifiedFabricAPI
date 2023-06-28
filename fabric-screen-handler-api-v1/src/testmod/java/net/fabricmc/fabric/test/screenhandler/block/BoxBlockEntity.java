@@ -35,7 +35,7 @@ public class BoxBlockEntity extends LootableContainerBlockEntity implements Exte
 	private DefaultedList<ItemStack> items = DefaultedList.ofSize(size(), ItemStack.EMPTY);
 
 	public BoxBlockEntity(BlockPos blockPos, BlockState blockState) {
-		super(ScreenHandlerTest.BOX_ENTITY, blockPos, blockState);
+		super(ScreenHandlerTest.BOX_ENTITY.get(), blockPos, blockState);
 	}
 
 	@Override

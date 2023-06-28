@@ -16,17 +16,18 @@
 
 package net.fabricmc.fabric.test.screenhandler.client;
 
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
 import net.minecraft.client.gui.screen.ingame.Generic3x3ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 
 import net.fabricmc.fabric.test.screenhandler.ScreenHandlerTest;
-import net.fabricmc.api.ClientModInitializer;
 
-public class ClientScreenHandlerTest implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		HandledScreens.register(ScreenHandlerTest.BAG_SCREEN_HANDLER, Generic3x3ContainerScreen::new);
-		HandledScreens.register(ScreenHandlerTest.POSITIONED_BAG_SCREEN_HANDLER, PositionedScreen::new);
-		HandledScreens.register(ScreenHandlerTest.BOX_SCREEN_HANDLER, PositionedScreen::new);
+public class ClientScreenHandlerTest {
+
+	public static void onInitializeClient(FMLClientSetupEvent event) {
+		HandledScreens.register(ScreenHandlerTest.BAG_SCREEN_HANDLER.get(), Generic3x3ContainerScreen::new);
+		HandledScreens.register(ScreenHandlerTest.POSITIONED_BAG_SCREEN_HANDLER.get(), PositionedScreen::new);
+		HandledScreens.register(ScreenHandlerTest.BOX_SCREEN_HANDLER.get(), PositionedScreen::new);
 	}
 }

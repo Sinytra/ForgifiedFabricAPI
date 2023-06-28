@@ -38,7 +38,7 @@ public class PositionedBagScreenHandler extends BagScreenHandler implements Posi
 	}
 
 	public PositionedBagScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, BlockPos pos) {
-		super(ScreenHandlerTest.POSITIONED_BAG_SCREEN_HANDLER, syncId, playerInventory, inventory);
+		super(ScreenHandlerTest.POSITIONED_BAG_SCREEN_HANDLER.get(), syncId, playerInventory, inventory);
 		this.pos = pos;
 	}
 

@@ -45,6 +45,6 @@ public class BoxScreenHandler extends Generic3x3ContainerScreenHandler implement
 
 	@Override
 	public ScreenHandlerType<?> getType() {
-		return ScreenHandlerTest.BOX_SCREEN_HANDLER;
+		return ScreenHandlerTest.BOX_SCREEN_HANDLER.get();
 	}
 }
