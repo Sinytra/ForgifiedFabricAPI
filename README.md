@@ -19,7 +19,7 @@ Missing -> Added -> Tested
 | fabric-api-lookup-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-biome-api-v1                  |        ⚠️ Missing        | Experimental |
 | fabric-block-api-v1                  |        ⚠️ Missing        |    Stable    |
-| fabric-blockrenderlayer-v1           |        ⚠️ Missing        |    Stable    |
+| fabric-blockrenderlayer-v1           |         ✅ Tested         |    Stable    |
 | fabric-client-tags-api-v1            |        ⚠️ Missing        |    Stable    |
 | fabric-command-api-v2                |         ✅ Tested         |    Stable    |
 | fabric-content-registries-v0         |         ✅ Tested         |    Stable    |

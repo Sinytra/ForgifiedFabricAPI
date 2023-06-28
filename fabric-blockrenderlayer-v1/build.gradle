@@ -2,3 +2,7 @@ archivesBaseName = "fabric-blockrenderlayer-v1"
 version = getSubprojectVersion(project)
 
 moduleDependencies(project, ['fabric-api-base'])
+
+testDependencies(project, [
+	':fabric-lifecycle-events-v1'
+])
