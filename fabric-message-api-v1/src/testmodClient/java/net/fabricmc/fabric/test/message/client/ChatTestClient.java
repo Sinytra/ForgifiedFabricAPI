@@ -21,17 +21,15 @@ import org.slf4j.LoggerFactory;
 
 import net.minecraft.text.Text;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 
-public class ChatTestClient implements ClientModInitializer {
+public class ChatTestClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ChatTestClient.class);
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		//Register test client commands
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(ClientCommandManager.literal("block").then(ClientCommandManager.literal("send").executes(context -> {
 			throw new AssertionError("This client command should be blocked!");
