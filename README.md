@@ -35,7 +35,7 @@ Missing -> Added -> Tested
 | fabric-item-group-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-key-binding-api-v1            |         ✅ Tested         |    Stable    |
 | fabric-lifecycle-events-v1           |         ✅ Tested         |    Stable    |
-| fabric-loot-api-v2                   |        ⚠️ Missing        |    Stable    |
+| fabric-loot-api-v2                   |         ✅ Tested         |    Stable    |
 | fabric-message-api-v1                |         ✅ Tested         | Experimental |
 | fabric-mining-level-api-v1           |         ✅ Tested         |    Stable    |
 | fabric-models-v0                     |        ⚠️ Missing        |    Stable    |
