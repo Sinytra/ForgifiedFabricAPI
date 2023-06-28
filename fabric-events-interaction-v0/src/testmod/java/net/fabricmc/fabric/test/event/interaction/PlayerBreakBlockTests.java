@@ -16,19 +16,17 @@
 
 package net.fabricmc.fabric.test.event.interaction;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.minecraft.block.Blocks;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 
-public class PlayerBreakBlockTests implements ModInitializer {
+public class PlayerBreakBlockTests {
 	public static final Logger LOGGER = LoggerFactory.getLogger("InteractionEventsTest");
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		PlayerBlockBreakEvents.BEFORE.register(((world, player, pos, state, entity) -> {
 			return state.getBlock() != Blocks.BEDROCK;
 		}));

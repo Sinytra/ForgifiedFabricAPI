@@ -20,12 +20,11 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.village.VillagerProfession;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 
-public class UseEntityTests implements ModInitializer {
-	@Override
-	public void onInitialize() {
+public class UseEntityTests {
+
+	public static void onInitialize() {
 		// Disallow interactions with toolsmiths
 		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			if (entity instanceof VillagerEntity villager && villager.getVillagerData().getProfession() == VillagerProfession.TOOLSMITH) {

@@ -16,20 +16,29 @@
 
 package net.fabricmc.fabric.impl.event.interaction;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
 
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.block.BlockAttackInteractionAware;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 
-public class InteractionEventsRouter implements ModInitializer {
-	@Override
-	public void onInitialize() {
+@Mod("fabric_events_interaction_v0")
+public class InteractionEventsRouter {
+
+	public InteractionEventsRouter() {
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			InteractionEventsRouterClient.onInitializeClient();
+		}
+
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
 			BlockState state = world.getBlockState(pos);
 
@@ -62,5 +71,7 @@ public class InteractionEventsRouter implements ModInitializer {
 				}
 			}
 		}));
+
+		MinecraftForge.EVENT_BUS.register(InteractionEventHooks.class);
 	}
 }
