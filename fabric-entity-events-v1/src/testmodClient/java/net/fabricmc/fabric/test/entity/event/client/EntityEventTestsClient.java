@@ -18,15 +18,14 @@ package net.fabricmc.fabric.test.entity.event.client;
 
 import net.minecraft.entity.EquipmentSlot;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.fabricmc.fabric.test.entity.event.EntityEventTests;
 
-public class EntityEventTestsClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class EntityEventTestsClient {
+
+	public static void onInitializeClient() {
 		LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(player -> {
-			return !player.getEquippedStack(EquipmentSlot.CHEST).isOf(EntityEventTests.DIAMOND_ELYTRA);
+			return !player.getEquippedStack(EquipmentSlot.CHEST).isOf(EntityEventTests.DIAMOND_ELYTRA.get());
 		});
 	}
 }
