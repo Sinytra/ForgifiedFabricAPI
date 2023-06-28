@@ -18,19 +18,21 @@ package net.fabricmc.fabric.test.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.GameTestException;
 import net.minecraft.test.TestContext;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-
+@GameTestHolder(IngredientTestsImpl.NAMESPACE)
 public class SerializationTests {
 	/**
 	 * Check that trying to use a custom ingredient inside an array ingredient fails.
 	 */
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = IngredientTestsImpl.NAMESPACE, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testArrayDeserialization(TestContext context) {
 		String ingredientJson = """
 [

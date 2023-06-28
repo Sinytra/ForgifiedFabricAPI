@@ -95,8 +95,8 @@ public class CustomIngredientImpl extends Ingredient {
 		return stack != null && customIngredient.test(stack);
 	}
 
-	@Override
-	public void write(PacketByteBuf buf) {
+	// FFAPI: Injected via mixin into Ingredient.toNetwork
+	public void fabric_toNetwork(PacketByteBuf buf) {
 		// Can be null if we're not writing a packet from the PacketEncoder; in that case, always write the full ingredient.
 		// Chances are this is a mod's doing and the client has the Ingredient API with the relevant ingredients.
 		Set<Identifier> supportedIngredients = CustomIngredientSync.CURRENT_SUPPORTED_INGREDIENTS.get();

@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.network.PacketByteBuf;
@@ -37,17 +38,21 @@ import net.fabricmc.fabric.impl.recipe.ingredient.builtin.AnyIngredient;
 public class IngredientMixin implements FabricIngredient {
 	/**
 	 * Inject right when vanilla detected a json object and check for our custom key.
+	 * 
+	 * @implNote FFAPI: Inject before forge checks for its ingredient serializers.
 	 */
 	@Inject(
 			at = @At(
 					value = "INVOKE",
-					target = "net/minecraft/recipe/Ingredient.entryFromJson (Lcom/google/gson/JsonObject;)Lnet/minecraft/recipe/Ingredient$Entry;",
+					target = "Lnet/minecraftforge/common/crafting/CraftingHelper;getIngredient(Lcom/google/gson/JsonElement;)Lnet/minecraft/recipe/Ingredient;",
 					ordinal = 0
 			),
 			method = "fromJson",
 			cancellable = true
 	)
 	private static void injectFromJson(JsonElement json, CallbackInfoReturnable<Ingredient> cir) {
+		if (!json.isJsonObject()) return;
+
 		JsonObject obj = json.getAsJsonObject();
 
 		if (obj.has(CustomIngredientImpl.TYPE_KEY)) {
@@ -93,6 +98,14 @@ public class IngredientMixin implements FabricIngredient {
 		} else {
 			// Reset index for vanilla's normal deserialization logic.
 			buf.readerIndex(index);
+		}
+	}
+
+	@Inject(method = "write", at = @At("HEAD"))
+	private void injectToNetwork(PacketByteBuf buf, CallbackInfo ci) {
+		if ((Ingredient) (Object) this instanceof CustomIngredientImpl customIngredient) {
+			customIngredient.fabric_toNetwork(buf);
+			ci.cancel();
 		}
 	}
 }

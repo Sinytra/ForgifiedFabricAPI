@@ -18,16 +18,15 @@ package net.fabricmc.fabric.impl.recipe.ingredient.client;
 
 import java.util.concurrent.CompletableFuture;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientSync;
 
 /**
  * @see CustomIngredientSync
  */
-public class CustomIngredientSyncClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class CustomIngredientSyncClient {
+
+	public static void onInitializeClient() {
 		ClientLoginNetworking.registerGlobalReceiver(CustomIngredientSync.PACKET_ID, (client, handler, buf, listenerAdder) -> {
 			int protocolVersion = buf.readVarInt();
 

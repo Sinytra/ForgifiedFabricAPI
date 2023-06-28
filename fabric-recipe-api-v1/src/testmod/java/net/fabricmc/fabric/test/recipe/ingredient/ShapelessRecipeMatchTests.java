@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.recipe.ingredient;
 
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -27,13 +30,13 @@ import net.minecraft.test.GameTestException;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-
+@GameTestHolder(IngredientTestsImpl.NAMESPACE)
 public class ShapelessRecipeMatchTests {
 	/**
 	 * The recipe requires at least one undamaged pickaxe.
 	 */
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = IngredientTestsImpl.NAMESPACE, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testShapelessMatch(TestContext context) {
 		Identifier recipeId = new Identifier("fabric-recipe-api-v1-testmod", "test_shapeless_match");
 		ShapelessRecipe recipe = (ShapelessRecipe) context.getWorld().getRecipeManager().get(recipeId).get();
