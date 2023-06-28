@@ -18,13 +18,11 @@ package net.fabricmc.fabric.impl.loot;
 
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourcePackSource;
+import net.minecraft.resource.ResourcePack;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
-import net.fabricmc.fabric.impl.resource.loader.BuiltinModResourcePackSource;
-import net.fabricmc.fabric.impl.resource.loader.FabricResource;
-import net.fabricmc.fabric.impl.resource.loader.ModResourcePackCreator;
+import net.fabricmc.fabric.mixin.loot.ResourcePackLoaderAccessor;
 
 public final class LootUtil {
 	public static LootTableSource determineSource(Identifier lootTableId, ResourceManager resourceManager) {
@@ -33,11 +31,12 @@ public final class LootUtil {
 		Resource resource = resourceManager.getResource(resourceId).orElse(null);
 
 		if (resource != null) {
-			ResourcePackSource packSource = ((FabricResource) resource).getFabricPackSource();
+			ResourcePack resources = resource.getPack();
 
-			if (packSource == ResourcePackSource.BUILTIN) {
+			if (resources.isAlwaysStable()) {
 				return LootTableSource.VANILLA;
-			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModResourcePackSource) {
+			}
+			else if (ResourcePackLoaderAccessor.getModResourcePacks().containsValue(resources)) {
 				return LootTableSource.MOD;
 			}
 		}

@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.test.loot;
 
+import net.minecraftforge.fml.common.Mod;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootPool;
@@ -25,13 +27,13 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.SetNameLootFunction;
 import net.minecraft.text.Text;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 
-public class LootTest implements ModInitializer {
-	@Override
-	public void onInitialize() {
+@Mod("fabric_loot_api_v2_testmod")
+public class LootTest {
+
+	public LootTest() {
 		// Test loot table load event
 		// The LootTable.Builder LootPool.Builder methods here should use
 		// prebuilt entries and pools to test the injected methods.
