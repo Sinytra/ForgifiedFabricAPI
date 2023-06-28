@@ -16,13 +16,14 @@
 
 package net.fabricmc.fabric.api.screenhandler.v1;
 
-import net.minecraft.registry.Registries;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registry;
 
 /**
  * An API for creating and registering {@linkplain ScreenHandlerType screen handler types}.
@@ -82,7 +83,7 @@ public final class ScreenHandlerRegistry {
 	 * @param factory the client-sided screen handler factory
 	 * @param <T>     the screen handler type
 	 * @return the created type object
-	 * @deprecated Replaced by access widener for {@link ScreenHandlerType#ScreenHandlerType(ScreenHandlerType.Factory)} in Fabric Transitive Access Wideners (v1).
+	 * @deprecated Replaced by access widener for {@link ScreenHandlerType#ScreenHandlerType(ScreenHandlerType.Factory, FeatureSet)} in Fabric Transitive Access Wideners (v1).
 	 */
 	@Deprecated
 	public static <T extends ScreenHandler> ScreenHandlerType<T> registerSimple(Identifier id, SimpleClientHandlerFactory<T> factory) {
