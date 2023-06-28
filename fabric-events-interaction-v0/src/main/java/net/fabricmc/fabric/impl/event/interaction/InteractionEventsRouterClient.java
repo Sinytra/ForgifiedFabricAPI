@@ -25,14 +25,13 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import net.fabricmc.fabric.api.entity.EntityPickInteractionAware;
 import net.fabricmc.fabric.api.event.client.player.ClientPickBlockGatherCallback;
 
-public class InteractionEventsRouterClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class InteractionEventsRouterClient {
+
+	public static void onInitializeClient() {
 		ClientPickBlockGatherCallback.EVENT.register(((player, result) -> {
 			if (result instanceof BlockHitResult && result.getType() != HitResult.Type.MISS) {
 				BlockView view = player.getEntityWorld();

@@ -21,14 +21,12 @@ import org.slf4j.LoggerFactory;
 
 import net.minecraft.item.Items;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 
-public class ClientPreAttackTests implements ClientModInitializer {
+public class ClientPreAttackTests {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientPreAttackTests.class);
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		ClientPreAttackCallback.EVENT.register((client, player, clickCount) -> {
 			if (!player.isSpectator() && player.getMainHandStack().getItem() == Items.TORCH) {
 				LOGGER.info("Attacking using torch intercepted. Attack key clicks: {}", clickCount != 0);

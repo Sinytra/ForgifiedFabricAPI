@@ -18,27 +18,13 @@ package net.fabricmc.fabric.api.entity;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.UUID;
 
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
-import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.passive.AbstractHorseEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket;
-import net.minecraft.scoreboard.AbstractTeam;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.stat.Stat;
-import net.minecraft.util.math.BlockPos;
-
-import net.fabricmc.fabric.impl.event.interaction.FakePlayerNetworkHandler;
 
 /**
  * A "fake player" is a {@link ServerPlayerEntity} that is not a human player.
@@ -61,7 +47,7 @@ import net.fabricmc.fabric.impl.event.interaction.FakePlayerNetworkHandler;
  * In some edge cases, or for gameplay considerations, it might be necessary to check whether a {@link ServerPlayerEntity} is a fake player.
  * This can be done with an {@code instanceof} check: {@code player instanceof FakePlayer}.
  */
-public class FakePlayer extends ServerPlayerEntity {
+public class FakePlayer extends net.minecraftforge.common.util.FakePlayer {
 	/**
 	 * Default UUID, for fake players not associated with a specific (human) player.
 	 */
@@ -102,53 +88,6 @@ public class FakePlayer extends ServerPlayerEntity {
 	private static final Map<FakePlayerKey, FakePlayer> FAKE_PLAYER_MAP = new MapMaker().weakValues().makeMap();
 
 	protected FakePlayer(ServerWorld world, GameProfile profile) {
-		super(world.getServer(), world, profile);
-
-		this.networkHandler = new FakePlayerNetworkHandler(this);
+		super(world, profile);
 	}
-
-	@Override
-	public void tick() { }
-
-	@Override
-	public void setClientSettings(ClientSettingsC2SPacket packet) { }
-
-	@Override
-	public void increaseStat(Stat<?> stat, int amount) { }
-
-	@Override
-	public void resetStat(Stat<?> stat) { }
-
-	@Override
-	public boolean isInvulnerableTo(DamageSource damageSource) {
-		return true;
-	}
-
-	@Nullable
-	@Override
-	public AbstractTeam getScoreboardTeam() {
-		// Scoreboard team is checked using the gameprofile name by default, which we don't want.
-		return null;
-	}
-
-	@Override
-	public void sleep(BlockPos pos) {
-		// Don't lock bed forever.
-	}
-
-	@Override
-	public boolean startRiding(Entity entity, boolean force) {
-		return false;
-	}
-
-	@Override
-	public void openEditSignScreen(SignBlockEntity sign) { }
-
-	@Override
-	public OptionalInt openHandledScreen(@Nullable NamedScreenHandlerFactory factory) {
-		return OptionalInt.empty();
-	}
-
-	@Override
-	public void openHorseInventory(AbstractHorseEntity horse, Inventory inventory) { }
 }

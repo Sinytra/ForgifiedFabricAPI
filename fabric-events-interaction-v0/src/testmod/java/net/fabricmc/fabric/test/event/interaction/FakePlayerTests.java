@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.event.interaction;
 
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -30,13 +33,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
+@GameTestHolder(EntityInteractionTestMod.MODID)
 public class FakePlayerTests {
 	/**
 	 * Try placing a sign with a fake player.
 	 */
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = EntityInteractionTestMod.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testFakePlayerPlaceSign(TestContext context) {
 		// This is for Fabric internal testing only, if you copy this to your mod you're on your own...
 
