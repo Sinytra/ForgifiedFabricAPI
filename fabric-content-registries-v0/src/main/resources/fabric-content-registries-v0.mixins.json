@@ -6,12 +6,10 @@
     "AxeItemAccessor",
     "FarmerWorkTaskAccessor",
     "GiveGiftsToHeroTaskAccessor",
-    "HoeItemAccessor",
     "HoneycombItemMixin",
     "LandPathNodeMakerMixin",
-    "AbstractFurnaceBlockEntityMixin",
     "FireBlockMixin",
-    "OxidizableMixin",
+    "VibrationListenerMixin",
     "ShovelItemAccessor",
     "VillagerEntityAccessor"
   ],

@@ -18,6 +18,8 @@ package net.fabricmc.fabric.api.registry;
 
 import java.util.Objects;
 
+import net.fabricmc.fabric.impl.content.registry.BrewingRegistryImpl;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.PotionItem;
 import net.minecraft.potion.Potion;
@@ -45,7 +47,7 @@ public final class FabricBrewingRecipeRegistry {
 		Objects.requireNonNull(ingredient, "Ingredient cannot be null!");
 		Objects.requireNonNull(output, "Output cannot be null!");
 
-		BrewingRecipeRegistry.ITEM_RECIPES.add(new BrewingRecipeRegistry.Recipe<>(input, ingredient, output));
+		BrewingRegistryImpl.addContainerRecipe(input, ingredient, output);
 	}
 
 	/**
@@ -62,6 +64,6 @@ public final class FabricBrewingRecipeRegistry {
 		Objects.requireNonNull(ingredient, "Ingredient cannot be null!");
 		Objects.requireNonNull(output, "Output cannot be null");
 
-		BrewingRecipeRegistry.POTION_RECIPES.add(new BrewingRecipeRegistry.Recipe<>(input, ingredient, output));
+		BrewingRegistryImpl.addMix(input, ingredient, output);
 	}
 }

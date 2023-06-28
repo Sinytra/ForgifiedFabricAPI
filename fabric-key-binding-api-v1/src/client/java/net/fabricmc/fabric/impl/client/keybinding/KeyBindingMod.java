@@ -18,12 +18,9 @@ package net.fabricmc.fabric.impl.client.keybinding;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.IExtensionPoint;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.network.NetworkConstants;
 
 @Mod("fabric_key_binding_api_v1")
 public final class KeyBindingMod {
@@ -33,6 +30,5 @@ public final class KeyBindingMod {
 			final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 			bus.addListener(KeyBindingRegistryImpl::onRegisterKeyMappings);
 		}
-		ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
 	}
 }

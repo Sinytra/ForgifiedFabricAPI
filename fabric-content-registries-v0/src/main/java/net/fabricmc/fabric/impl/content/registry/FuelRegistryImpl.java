@@ -16,22 +16,19 @@
 
 package net.fabricmc.fabric.impl.content.registry;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 
 // TODO: Clamp values to 32767 (+ add hook for mods which extend the limit to disable the check?)
@@ -39,28 +36,14 @@ public final class FuelRegistryImpl implements FuelRegistry {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FuelRegistryImpl.class);
 	private final Object2IntMap<ItemConvertible> itemCookTimes = new Object2IntLinkedOpenHashMap<>();
 	private final Object2IntMap<TagKey<Item>> tagCookTimes = new Object2IntLinkedOpenHashMap<>();
-	private volatile Map<Item, Integer> fuelTimeCache = null; // thread safe via copy-on-write mechanism
 
 	public FuelRegistryImpl() {
-		// Reset cache after tags change since it depends on tags.
-		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
-			resetCache();
-		});
-	}
-
-	public Map<Item, Integer> getFuelTimes() {
-		Map<Item, Integer> ret = fuelTimeCache;
-
-		if (ret == null) {
-			fuelTimeCache = ret = new IdentityHashMap<>(AbstractFurnaceBlockEntity.createFuelTimeMap()); // IdentityHashMap is faster than vanilla's LinkedHashMap and suitable for Item keys
-		}
-
-		return ret;
+		MinecraftForge.EVENT_BUS.addListener(this::onFurnaceFueldBurnTime);
 	}
 
 	@Override
 	public Integer get(ItemConvertible item) {
-		return getFuelTimes().get(item.asItem());
+		return ForgeHooks.getBurnTime(new ItemStack(item), null);
 	}
 
 	@Override
@@ -70,7 +53,6 @@ public final class FuelRegistryImpl implements FuelRegistry {
 		}
 
 		itemCookTimes.put(item, cookTime.intValue());
-		resetCache();
 	}
 
 	@Override
@@ -80,64 +62,53 @@ public final class FuelRegistryImpl implements FuelRegistry {
 		}
 
 		tagCookTimes.put(tag, cookTime.intValue());
-		resetCache();
 	}
 
 	@Override
 	public void remove(ItemConvertible item) {
 		add(item, 0);
-		resetCache();
 	}
 
 	@Override
 	public void remove(TagKey<Item> tag) {
 		add(tag, 0);
-		resetCache();
 	}
 
 	@Override
 	public void clear(ItemConvertible item) {
 		itemCookTimes.removeInt(item);
-		resetCache();
 	}
 
 	@Override
 	public void clear(TagKey<Item> tag) {
 		tagCookTimes.removeInt(tag);
-		resetCache();
-	}
-
-	public void apply(Map<Item, Integer> map) {
-		// tags take precedence before blocks
-		for (TagKey<Item> tag : tagCookTimes.keySet()) {
-			int time = tagCookTimes.getInt(tag);
-
-			if (time <= 0) {
-				for (RegistryEntry<Item> key : Registries.ITEM.iterateEntries(tag)) {
-					final Item item = key.value();
-					map.remove(item);
-				}
-			} else {
-				AbstractFurnaceBlockEntity.addFuel(map, tag, time);
-			}
-		}
-
-		for (ItemConvertible item : itemCookTimes.keySet()) {
-			int time = itemCookTimes.getInt(item);
-
-			if (time <= 0) {
-				map.remove(item.asItem());
-			} else {
-				AbstractFurnaceBlockEntity.addFuel(map, item, time);
-			}
-		}
 	}
 
 	private static String getTagName(TagKey<?> tag) {
 		return tag.id().toString();
 	}
 
-	public void resetCache() {
-		fuelTimeCache = null;
+	private void onFurnaceFueldBurnTime(FurnaceFuelBurnTimeEvent event) {
+		ItemStack stack = event.getItemStack();
+
+		for (ItemConvertible item : itemCookTimes.keySet()) {
+			if (stack.isOf(item.asItem())) {
+				int time = itemCookTimes.getInt(item);
+				if (time > 0) {
+					event.setBurnTime(time);
+					return;
+				}
+			}
+		}
+
+		for (TagKey<Item> tag : tagCookTimes.keySet()) {
+			if (stack.isIn(tag)) {
+				int time = tagCookTimes.getInt(tag);
+				if (time > 0) {
+					event.setBurnTime(time);
+					return;
+				}
+			}
+		}
 	}
 }
