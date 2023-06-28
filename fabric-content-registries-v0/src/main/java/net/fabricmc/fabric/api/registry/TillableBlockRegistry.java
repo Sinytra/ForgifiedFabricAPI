@@ -20,15 +20,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.mojang.datafixers.util.Pair;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemUsageContext;
 
-import net.fabricmc.fabric.mixin.content.registry.HoeItemAccessor;
+import net.fabricmc.fabric.impl.content.registry.TillableBlockRegistryImpl;
 
 /**
  * A registry for hoe tilling interactions. A vanilla example is turning dirt to dirt paths.
@@ -55,7 +53,7 @@ public final class TillableBlockRegistry {
 	 */
 	public static void register(Block input, Predicate<ItemUsageContext> usagePredicate, Consumer<ItemUsageContext> tillingAction) {
 		Objects.requireNonNull(input, "input block cannot be null");
-		HoeItemAccessor.getTillingActions().put(input, Pair.of(usagePredicate, tillingAction));
+		TillableBlockRegistryImpl.register(input, usagePredicate, tillingAction);
 	}
 
 	/**

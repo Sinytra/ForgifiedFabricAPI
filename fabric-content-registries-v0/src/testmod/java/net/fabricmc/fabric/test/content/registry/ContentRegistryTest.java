@@ -16,15 +16,15 @@
 
 package net.fabricmc.fabric.test.content.registry;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.PotionItem;
-import net.minecraft.potion.Potions;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.text.Text;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -32,21 +32,25 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.HoeItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.PotionItem;
+import net.minecraft.potion.Potions;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.village.VillagerProfession;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -61,14 +65,27 @@ import net.fabricmc.fabric.api.registry.VillagerInteractionRegistries;
 import net.fabricmc.fabric.api.registry.VillagerPlantableRegistry;
 import net.fabricmc.fabric.test.mixin.content.registry.BrewingRecipeRegistryAccessor;
 
-public final class ContentRegistryTest implements ModInitializer {
+@Mod(ContentRegistryTest.MODID)
+public final class ContentRegistryTest {
+	public static final String MODID = "fabric_content_registries_v0_testmod";
 	public static final Logger LOGGER = LoggerFactory.getLogger(ContentRegistryTest.class);
 
 	public static final Identifier TEST_EVENT_ID = new Identifier("fabric-content-registries-v0-testmod", "test_event");
-	public static final GameEvent TEST_EVENT = new GameEvent(TEST_EVENT_ID.toString(), GameEvent.DEFAULT_RANGE);
 
-	@Override
-	public void onInitialize() {
+	public static final DeferredRegister<GameEvent> GAME_EVENTS = DeferredRegister.create(RegistryKeys.GAME_EVENT, ContentRegistryTest.MODID);
+	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(RegistryKeys.BLOCK, ContentRegistryTest.MODID);
+	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(RegistryKeys.ITEM, ContentRegistryTest.MODID);
+
+	public static final RegistryObject<GameEvent> TEST_EVENT = GAME_EVENTS.register(TEST_EVENT_ID.getPath(), () -> new GameEvent(TEST_EVENT_ID.toString(), GameEvent.DEFAULT_RANGE));
+	public static final RegistryObject<Block> TEST_BLOCK = BLOCKS.register(TEST_EVENT_ID.getPath(), () -> new TestEventBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
+	public static final RegistryObject<PotionItem> DIRTY_POTION = ITEMS.register(TEST_EVENT_ID.getPath(), () -> new DirtyPotionItem(new Item.Settings().maxCount(1)));
+
+	public ContentRegistryTest() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		GAME_EVENTS.register(bus);
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
+		bus.addListener(this::onCommonSetup);
 		// Expected behavior:
 		//  - obsidian is now compostable
 		//  - diamond block is now flammable
@@ -151,10 +168,6 @@ public final class ContentRegistryTest implements ModInitializer {
 
 		VillagerInteractionRegistries.registerGiftLootTable(VillagerProfession.NITWIT, new Identifier("fake_loot_table"));
 
-		Registry.register(Registries.GAME_EVENT, TEST_EVENT_ID, TEST_EVENT);
-		Registry.register(Registries.BLOCK, TEST_EVENT_ID, new TestEventBlock(AbstractBlock.Settings.copy(Blocks.STONE)));
-		SculkSensorFrequencyRegistry.register(TEST_EVENT, 2);
-
 		// assert that SculkSensorFrequencyRegistry throws when registering a frequency outside the allowed range
 		try {
 			SculkSensorFrequencyRegistry.register(GameEvent.SHRIEK, 18);
@@ -166,13 +179,12 @@ public final class ContentRegistryTest implements ModInitializer {
 		}
 
 		FabricBrewingRecipeRegistry.registerPotionRecipe(Potions.AWKWARD, Ingredient.fromTag(ItemTags.SMALL_FLOWERS), Potions.HEALING);
-		var dirtyPotion = new DirtyPotionItem(new Item.Settings().maxCount(1));
-		Registry.register(Registries.ITEM, new Identifier("fabric-content-registries-v0-testmod", "dirty_potion"),
-				dirtyPotion);
-		/* Mods should use BrewingRecipeRegistry.registerPotionType(Item), which is access widened by fabric-transitive-access-wideners-v1
-		 * This testmod uses an accessor due to Loom limitations that prevent TAWs from applying across Gradle subproject boundaries */
-		BrewingRecipeRegistryAccessor.callRegisterPotionType(dirtyPotion);
-		FabricBrewingRecipeRegistry.registerItemRecipe((PotionItem) Items.POTION, Ingredient.fromTag(ItemTags.DIRT), dirtyPotion);
+	}
+
+	private void onCommonSetup(FMLCommonSetupEvent event) {
+		SculkSensorFrequencyRegistry.register(TEST_EVENT.get(), 2);
+		BrewingRecipeRegistryAccessor.callRegisterPotionType(DIRTY_POTION.get());
+		FabricBrewingRecipeRegistry.registerItemRecipe((PotionItem) Items.POTION, Ingredient.fromTag(ItemTags.DIRT), DIRTY_POTION.get());
 	}
 
 	public static class TestEventBlock extends Block {
@@ -183,7 +195,7 @@ public final class ContentRegistryTest implements ModInitializer {
 		@Override
 		public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 			// Emit the test event
-			world.emitGameEvent(player, TEST_EVENT, pos);
+			world.emitGameEvent(player, TEST_EVENT.get(), pos);
 			return ActionResult.SUCCESS;
 		}
 	}

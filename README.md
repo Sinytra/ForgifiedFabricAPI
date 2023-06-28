@@ -22,7 +22,7 @@ Missing -> Added -> Tested
 | fabric-blockrenderlayer-v1           |        ⚠️ Missing        |    Stable    |
 | fabric-client-tags-api-v1            |        ⚠️ Missing        |    Stable    |
 | fabric-command-api-v2                |         ✅ Tested         |    Stable    |
-| fabric-content-registries-v0         |        ⚠️ Missing        |    Stable    |
+| fabric-content-registries-v0         |         ✅ Tested         |    Stable    |
 | fabric-convention-tags-v1            |        ⚠️ Missing        |    Stable    |
 | fabric-crash-report-info-v1          | 🚧 Not Planned [[1]](#1) |    Stable    |
 | fabric-data-generation-api-v1        |        ⚠️ Missing        |    Stable    |
