@@ -29,6 +29,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraftforge.fml.ModList;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
-import net.fabricmc.loader.api.FabricLoader;
 
 public final class ResourceConditionsImpl {
 	public static final Logger LOGGER = LoggerFactory.getLogger("Fabric Resource Conditions");
@@ -184,7 +184,7 @@ public final class ResourceConditionsImpl {
 
 		for (JsonElement element : array) {
 			if (element.isJsonPrimitive()) {
-				if (FabricLoader.getInstance().isModLoaded(element.getAsString()) != and) {
+				if (ModList.get().isLoaded(element.getAsString()) != and) {
 					return !and;
 				}
 			} else {

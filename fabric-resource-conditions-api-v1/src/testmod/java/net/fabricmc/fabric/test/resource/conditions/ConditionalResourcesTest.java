@@ -16,21 +16,23 @@
 
 package net.fabricmc.fabric.test.resource.conditions;
 
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-
+@GameTestHolder(ConditionalResourcesTestMod.MOD_ID)
 public class ConditionalResourcesTest {
-	private static final String MOD_ID = "fabric-resource-conditions-api-v1-testmod";
 
 	private static Identifier id(String path) {
-		return new Identifier(MOD_ID, path);
+		return new Identifier(ConditionalResourcesTestMod.MOD_ID, path);
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = ConditionalResourcesTestMod.MOD_ID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void conditionalRecipes(TestContext context) {
 		RecipeManager manager = context.getWorld().getRecipeManager();
 
@@ -62,7 +64,7 @@ public class ConditionalResourcesTest {
 			throw new AssertionError("features_enabled recipe should have been loaded.");
 		}
 
-		long loadedRecipes = manager.values().stream().filter(r -> r.getId().getNamespace().equals(MOD_ID)).count();
+		long loadedRecipes = manager.values().stream().filter(r -> r.getId().getNamespace().equals(ConditionalResourcesTestMod.MOD_ID)).count();
 		if (loadedRecipes != 5) throw new AssertionError("Unexpected loaded recipe count: " + loadedRecipes);
 
 		context.complete();
