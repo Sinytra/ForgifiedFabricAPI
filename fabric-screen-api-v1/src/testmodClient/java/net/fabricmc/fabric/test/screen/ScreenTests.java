@@ -18,6 +18,7 @@ package net.fabricmc.fabric.test.screen;
 
 import java.util.List;
 
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,17 +28,16 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 
-public final class ScreenTests implements ClientModInitializer {
+@Mod("fabric_screen_api_v1_testmod")
+public final class ScreenTests {
 	public static final Identifier GUI_ICONS_TEXTURE = new Identifier("textures/gui/icons.png");
 	private static final Logger LOGGER = LoggerFactory.getLogger("FabricScreenApiTests");
 
-	@Override
-	public void onInitializeClient() {
+	public ScreenTests() {
 		LOGGER.info("Started Screen Testmod");
 		ScreenEvents.BEFORE_INIT.register((client, screen, width, height) -> {
 			// TODO: Write tests listening to addition of child elements
@@ -53,13 +53,13 @@ public final class ScreenTests implements ClientModInitializer {
 			final List<ClickableWidget> buttons = Screens.getButtons(screen);
 
 			// Shrink the realms button, should be the third button on the list
-			final ClickableWidget optionsButton = buttons.get(2);
-			optionsButton.setWidth(98);
+//			final ClickableWidget optionsButton = buttons.get(2);
+//			optionsButton.setWidth(98);
 
 			// Add a new button
-			buttons.add(new SoundButton((screen.width / 2) + 2, ((screen.height / 4) + 96), 72, 20));
+			buttons.add(new SoundButton(2, ((screen.height / 4) + 96), 72, 20));
 			// And another button
-			buttons.add(new StopSoundButton(screen, (screen.width / 2) + 80, ((screen.height / 4) + 95), 20, 20));
+			buttons.add(new StopSoundButton(screen, screen.width - 80, ((screen.height / 4) + 95), 20, 20));
 
 			// Testing:
 			// Some automatic validation that the screen list works, make sure the buttons we added are on the list of child elements

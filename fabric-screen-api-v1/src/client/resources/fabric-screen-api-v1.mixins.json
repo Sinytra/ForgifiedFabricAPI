@@ -3,7 +3,6 @@
   "package": "net.fabricmc.fabric.mixin.screen",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "GameRendererMixin",
     "MinecraftClientMixin",
     "ScreenMixin"
   ],
@@ -11,7 +10,6 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "KeyboardMixin",
     "MouseMixin",
     "ScreenAccessor"
   ]
