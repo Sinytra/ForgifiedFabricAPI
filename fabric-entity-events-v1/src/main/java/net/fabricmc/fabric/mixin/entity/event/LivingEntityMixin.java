@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -56,6 +57,9 @@ abstract class LivingEntityMixin {
 
 	@Shadow
 	public abstract Optional<BlockPos> getSleepingPosition();
+	
+	@Unique
+	private BlockState fabric_originalState;
 
 	@Inject(method = "onDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;onKilledOther(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/LivingEntity;)Z", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void onEntityKilledOther(DamageSource source, CallbackInfo ci, Entity attacker) {
@@ -74,13 +78,6 @@ abstract class LivingEntityMixin {
 		return isDead() && ServerLivingEntityEvents.ALLOW_DEATH.invoker().allowDeath(livingEntity, source, amount);
 	}
 
-	@Inject(method = "damage", at = @At(value = "INVOKE", target = "net/minecraft/entity/LivingEntity.isSleeping()Z"), cancellable = true)
-	private void beforeDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-		if (!ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage((LivingEntity) (Object) this, source, amount)) {
-			cir.setReturnValue(false);
-		}
-	}
-
 	@Inject(method = "sleep", at = @At("RETURN"))
 	private void onSleep(BlockPos pos, CallbackInfo info) {
 		EntitySleepEvents.START_SLEEPING.invoker().onStartSleeping((LivingEntity) (Object) this, pos);
@@ -96,17 +93,6 @@ abstract class LivingEntityMixin {
 		}
 	}
 
-	@Dynamic("method_18405: Synthetic lambda body for Optional.map in isSleepingInBed")
-	@Inject(method = "method_18405", at = @At("RETURN"), cancellable = true)
-	private void onIsSleepingInBed(BlockPos sleepingPos, CallbackInfoReturnable<Boolean> info) {
-		BlockState bedState = ((LivingEntity) (Object) this).world.getBlockState(sleepingPos);
-		ActionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed((LivingEntity) (Object) this, sleepingPos, bedState, info.getReturnValueZ());
-
-		if (result != ActionResult.PASS) {
-			info.setReturnValue(result.isAccepted());
-		}
-	}
-
 	@Inject(method = "getSleepingDirection", at = @At("RETURN"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
 	private void onGetSleepingDirection(CallbackInfoReturnable<Direction> info, @Nullable BlockPos sleepingPos) {
 		if (sleepingPos != null) {
@@ -117,37 +103,38 @@ abstract class LivingEntityMixin {
 	// This is needed 1) so that the vanilla logic in wakeUp runs for modded beds and 2) for the injector below.
 	// The injector is shared because method_18404 and sleep share much of the structure here.
 	@Dynamic("method_18404: Synthetic lambda body for Optional.ifPresent in wakeUp")
-	@ModifyVariable(method = {"method_18404", "sleep"}, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"))
+	@ModifyVariable(method = {"lambda$stopSleeping$11", "method_18404", "sleep"}, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"), require = 2)
 	private BlockState modifyBedForOccupiedState(BlockState state, BlockPos sleepingPos) {
-		ActionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed((LivingEntity) (Object) this, sleepingPos, state, state.getBlock() instanceof BedBlock);
+		LivingEntity entity = (LivingEntity) (Object) this;
+		ActionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed((LivingEntity) (Object) this, sleepingPos, state, state.isBed(entity.world, sleepingPos, entity));
 
-		// If a valid bed, replace with vanilla red bed so that the vanilla instanceof check succeeds.
-		return result.isAccepted() ? Blocks.RED_BED.getDefaultState() : state;
+		// If a valid bed, replace with vanilla red bed so that the BlockState#isBed and BlockState#getValue(FACING) check both succeed
+		if (result.isAccepted()) {
+			fabric_originalState = state;
+			return Blocks.RED_BED.getDefaultState();
+		}
+		fabric_originalState = null;
+		return state;
 	}
 
 	// The injector is shared because method_18404 and sleep share much of the structure here.
 	@Dynamic("method_18404: Synthetic lambda body for Optional.ifPresent in wakeUp")
-	@Redirect(method = {"method_18404", "sleep"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))
-	private boolean setOccupiedState(World world, BlockPos pos, BlockState state, int flags) {
+	@Redirect(method = {"lambda$stopSleeping$11", "method_18404", "sleep"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;setBedOccupied(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;Z)V"), require = 2)
+	private void setOccupiedState(BlockState state, World world, BlockPos pos, LivingEntity entity, boolean occupied) {
 		// This might have been replaced by a red bed above, so we get it again.
 		// Note that we *need* to replace it so the state.with(OCCUPIED, ...) call doesn't crash
 		// when the bed doesn't have the property.
-		BlockState originalState = world.getBlockState(pos);
-		boolean occupied = state.get(BedBlock.OCCUPIED);
+		BlockState originalState = fabric_originalState != null ? fabric_originalState : state;
 
-		if (EntitySleepEvents.SET_BED_OCCUPATION_STATE.invoker().setBedOccupationState((LivingEntity) (Object) this, pos, originalState, occupied)) {
-			return true;
-		} else if (originalState.contains(BedBlock.OCCUPIED)) {
-			// This check is widened from (instanceof BedBlock) to a property check to allow modded blocks
-			// that don't use the event.
-			return world.setBlockState(pos, originalState.with(BedBlock.OCCUPIED, occupied), flags);
-		} else {
-			return false;
+		if (!EntitySleepEvents.SET_BED_OCCUPATION_STATE.invoker().setBedOccupationState((LivingEntity) (Object) this, pos, originalState, occupied)) {
+			originalState.setBedOccupied(world, pos, entity, occupied);
 		}
+
+		fabric_originalState = null;
 	}
 
 	@Dynamic("method_18404: Synthetic lambda body for Optional.ifPresent in wakeUp")
-	@Redirect(method = "method_18404", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BedBlock;findWakeUpPosition(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/CollisionView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Ljava/util/Optional;"))
+	@Redirect(method = {"lambda$stopSleeping$11", "method_18404"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BedBlock;findWakeUpPosition(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/CollisionView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;F)Ljava/util/Optional;"), require = 1)
 	private Optional<Vec3d> modifyWakeUpPosition(EntityType<?> type, CollisionView world, BlockPos pos, Direction direction, float yaw) {
 		Optional<Vec3d> original = Optional.empty();
 		BlockState bedState = world.getBlockState(pos);

@@ -16,6 +16,14 @@
 
 package net.fabricmc.fabric.test.entity.event;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,17 +38,13 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
@@ -48,17 +52,27 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.test.entity.event.client.EntityEventTestsClient;
 
-public final class EntityEventTests implements ModInitializer {
+@Mod(EntityEventTests.MODID)
+public final class EntityEventTests {
+	public static final String MODID = "fabric_entity_events_v1_testmod";
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntityEventTests.class);
-	public static final Block TEST_BED = new TestBedBlock(AbstractBlock.Settings.of(Material.WOOL).strength(1, 1));
-	public static final Item DIAMOND_ELYTRA = new DiamondElytraItem();
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.BLOCK, new Identifier("fabric-entity-events-v1-testmod", "test_bed"), TEST_BED);
-		Registry.register(Registries.ITEM, new Identifier("fabric-entity-events-v1-testmod", "test_bed"), new BlockItem(TEST_BED, new Item.Settings()));
-		Registry.register(Registries.ITEM, new Identifier("fabric-entity-events-v1-testmod", "diamond_elytra"), DIAMOND_ELYTRA);
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+
+	public static final RegistryObject<Block> TEST_BED = BLOCKS.register("test_bed", () -> new TestBedBlock(AbstractBlock.Settings.of(Material.WOOL).strength(1, 1)));
+	public static final RegistryObject<Item> TEST_BED_ITEM = ITEMS.register("test_bed", () -> new BlockItem(TEST_BED.get(), new Item.Settings()));
+	public static final RegistryObject<Item> DIAMOND_ELYTRA = ITEMS.register("diamond_elytra", DiamondElytraItem::new);
+
+	public EntityEventTests() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			EntityEventTestsClient.onInitializeClient();
+		}
 
 		ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register((world, entity, killed) -> {
 			LOGGER.info("Entity Killed: {}", killed);
@@ -128,7 +142,7 @@ public final class EntityEventTests implements ModInitializer {
 			LOGGER.info("Entity {} sleeping at {}", entity, sleepingPos);
 			BlockState bedState = entity.world.getBlockState(sleepingPos);
 
-			if (bedState.isOf(TEST_BED)) {
+			if (bedState.isOf(TEST_BED.get())) {
 				boolean shouldBeOccupied = !entity.getStackInHand(Hand.MAIN_HAND).isOf(Items.ORANGE_WOOL);
 
 				if (bedState.get(TestBedBlock.OCCUPIED) != shouldBeOccupied) {
@@ -142,11 +156,11 @@ public final class EntityEventTests implements ModInitializer {
 		});
 
 		EntitySleepEvents.ALLOW_BED.register((entity, sleepingPos, state, vanillaResult) -> {
-			return state.isOf(TEST_BED) ? ActionResult.SUCCESS : ActionResult.PASS;
+			return state.isOf(TEST_BED.get()) ? ActionResult.SUCCESS : ActionResult.PASS;
 		});
 
 		EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.register((entity, sleepingPos, sleepingDirection) -> {
-			return entity.world.getBlockState(sleepingPos).isOf(TEST_BED) ? Direction.NORTH : sleepingDirection;
+			return entity.world.getBlockState(sleepingPos).isOf(TEST_BED.get()) ? Direction.NORTH : sleepingDirection;
 		});
 
 		EntitySleepEvents.ALLOW_SLEEP_TIME.register((player, sleepingPos, vanillaResult) -> {
