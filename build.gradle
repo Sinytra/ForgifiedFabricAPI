@@ -1008,7 +1008,8 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 			def json = parser.parse(fabricMetadata)
 			def toml = new TomlBuilder()
 			def nextMajor = (minecraftVersionString.get().tokenize('.')[1].toInteger()) + 1
-			def modDependencies = json.depends.findAll { it.key != 'fabricloader' }.collect {
+			def excludedDeps = ["fabricloader", "java", "minecraft"]
+			def modDependencies = json.depends.findAll { !excludedDeps.contains(it.key) }.collect {
 				def normalModid = normalizeModid(it.key as String)
 				return { _ ->
 					modId normalModid
