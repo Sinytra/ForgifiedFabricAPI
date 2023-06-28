@@ -19,6 +19,12 @@ package net.fabricmc.fabric.test.mininglevel;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,69 +37,69 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 // This test must pass without the tool attribute API present.
 // It has its own handlers for mining levels, which might "hide" this module
 // not working on its own.
-public final class MiningLevelTest implements ModInitializer {
-	private static final String ID = "fabric-mining-level-api-v1-testmod";
+@Mod("fabric_mining_level_api_v1_testmod")
+public final class MiningLevelTest {
+	private static final String MODID = "fabric-mining-level-api-v1-testmod";
 	private static final Logger LOGGER = LoggerFactory.getLogger(MiningLevelTest.class);
+
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
 	/// Tagged blocks
 	// sword + dynamic mining level tag
-	public static final Block NEEDS_NETHERITE_SWORD = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_NETHERITE_SWORD = BLOCKS.register("needs_netherite_sword", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_NETHERITE_SWORD_ITEM = blockItem(NEEDS_NETHERITE_SWORD);
 	// sword + vanilla mining level tag
-	public static final Block NEEDS_STONE_SWORD = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_STONE_SWORD = BLOCKS.register("needs_stone_sword", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_STONE_SWORD_ITEM = blockItem(NEEDS_STONE_SWORD);
 	// any sword
-	public static final Block NEEDS_ANY_SWORD = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_ANY_SWORD = BLOCKS.register("needs_any_sword", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_ANY_SWORD_ITEM = blockItem(NEEDS_ANY_SWORD);
 	// shears
-	public static final Block NEEDS_SHEARS = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_SHEARS = BLOCKS.register("needs_shears", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_SHEARS_ITEM = blockItem(NEEDS_SHEARS);
 	// vanilla mineable tag + dynamic mining level tag
-	public static final Block NEEDS_NETHERITE_PICKAXE = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_NETHERITE_PICKAXE = BLOCKS.register("needs_netherite_pickaxe", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_NETHERITE_PICKAXE_ITEM = blockItem(NEEDS_NETHERITE_PICKAXE);
 	// vanilla mineable tag, requires tool (this type of block doesn't exist in vanilla)
-	public static final Block NEEDS_AXE = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_AXE = BLOCKS.register("needs_axe", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_AXE_ITEM = blockItem(NEEDS_AXE);
 	// vanilla mineable tag, requires tool (this type of block doesn't exist in vanilla)
-	public static final Block NEEDS_HOE = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_HOE = BLOCKS.register("needs_hoe", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_HOE_ITEM = blockItem(NEEDS_HOE);
 	// vanilla mineable tag, requires tool (this type of block doesn't exist in vanilla)
-	public static final Block NEEDS_SHOVEL = new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool());
+	public static final RegistryObject<Block> NEEDS_SHOVEL = BLOCKS.register("needs_shovel", () -> new Block(AbstractBlock.Settings.of(Material.STONE).strength(2, 3).requiresTool()));
+	public static final RegistryObject<Item> NEEDS_SHOVEL_ITEM = blockItem(NEEDS_SHOVEL);
 
-	@Override
-	public void onInitialize() {
-		register("needs_netherite_sword", NEEDS_NETHERITE_SWORD);
-		register("needs_stone_sword", NEEDS_STONE_SWORD);
-		register("needs_any_sword", NEEDS_ANY_SWORD);
-		register("needs_shears", NEEDS_SHEARS);
-		register("needs_netherite_pickaxe", NEEDS_NETHERITE_PICKAXE);
-		register("needs_axe", NEEDS_AXE);
-		register("needs_hoe", NEEDS_HOE);
-		register("needs_shovel", NEEDS_SHOVEL);
+	public MiningLevelTest() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> test());
 	}
 
-	private static void register(String id, Block block) {
-		Identifier identifier = new Identifier(ID, id);
-		Registry.register(Registries.BLOCK, identifier, block);
-		Registry.register(Registries.ITEM, identifier, new BlockItem(block, new Item.Settings()));
+	private static RegistryObject<Item> blockItem(RegistryObject<Block> block) {
+		return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Settings()));
 	}
 
 	private static void test() {
 		List<AssertionError> errors = new ArrayList<>();
-		test(errors, () -> checkMiningLevel(NEEDS_NETHERITE_SWORD, List.of(Items.NETHERITE_SWORD), List.of(Items.NETHERITE_PICKAXE, Items.STONE_SWORD)));
-		test(errors, () -> checkMiningLevel(NEEDS_STONE_SWORD, List.of(Items.STONE_SWORD, Items.IRON_SWORD), List.of(Items.STONE_PICKAXE, Items.WOODEN_SWORD)));
-		test(errors, () -> checkMiningLevel(NEEDS_ANY_SWORD, List.of(Items.WOODEN_SWORD), List.of()));
-		test(errors, () -> checkMiningLevel(NEEDS_SHEARS, List.of(Items.SHEARS), List.of()));
-		test(errors, () -> checkMiningLevel(NEEDS_NETHERITE_PICKAXE, List.of(Items.NETHERITE_PICKAXE), List.of(Items.DIAMOND_PICKAXE, Items.NETHERITE_AXE)));
+		test(errors, () -> checkMiningLevel(NEEDS_NETHERITE_SWORD.get(), List.of(Items.NETHERITE_SWORD), List.of(Items.NETHERITE_PICKAXE, Items.STONE_SWORD)));
+		test(errors, () -> checkMiningLevel(NEEDS_STONE_SWORD.get(), List.of(Items.STONE_SWORD, Items.IRON_SWORD), List.of(Items.STONE_PICKAXE, Items.WOODEN_SWORD)));
+		test(errors, () -> checkMiningLevel(NEEDS_ANY_SWORD.get(), List.of(Items.WOODEN_SWORD), List.of()));
+		test(errors, () -> checkMiningLevel(NEEDS_SHEARS.get(), List.of(Items.SHEARS), List.of()));
+		test(errors, () -> checkMiningLevel(NEEDS_NETHERITE_PICKAXE.get(), List.of(Items.NETHERITE_PICKAXE), List.of(Items.DIAMOND_PICKAXE, Items.NETHERITE_AXE)));
 		test(errors, () -> checkMiningLevel(Blocks.STONE, List.of(Items.WOODEN_PICKAXE), List.of(Items.STICK)));
-		test(errors, () -> checkMiningLevel(NEEDS_AXE, List.of(Items.WOODEN_AXE), List.of(Items.STICK)));
-		test(errors, () -> checkMiningLevel(NEEDS_HOE, List.of(Items.WOODEN_HOE), List.of(Items.STICK)));
-		test(errors, () -> checkMiningLevel(NEEDS_SHOVEL, List.of(Items.WOODEN_SHOVEL), List.of(Items.STICK)));
+		test(errors, () -> checkMiningLevel(NEEDS_AXE.get(), List.of(Items.WOODEN_AXE), List.of(Items.STICK)));
+		test(errors, () -> checkMiningLevel(NEEDS_HOE.get(), List.of(Items.WOODEN_HOE), List.of(Items.STICK)));
+		test(errors, () -> checkMiningLevel(NEEDS_SHOVEL.get(), List.of(Items.WOODEN_SHOVEL), List.of(Items.STICK)));
 
 		if (errors.isEmpty()) {
 			LOGGER.info("Mining level tests passed!");
