@@ -16,20 +16,21 @@
 
 package net.fabricmc.fabric.test.sound.client;
 
+import net.minecraftforge.fml.common.Mod;
+
 import net.minecraft.client.MinecraftClient;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 
 /**
  * Plays a sine wave when the {@code /sine} client command is run.
  */
-public class ClientSoundTest implements ClientModInitializer {
+@Mod("fabric_sound_api_v1_testmod")
+public class ClientSoundTest {
 	public static final String MOD_ID = "fabric-sound-api-v1-testmod";
 
-	@Override
-	public void onInitializeClient() {
+	public ClientSoundTest() {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, access) -> {
 			dispatcher.register(ClientCommandManager.literal("sine").executes(o -> {
 				MinecraftClient client = o.getSource().getClient();

@@ -16,12 +16,21 @@
 
 package net.fabricmc.fabric.mixin.client.sound;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.spongepowered.asm.mixin.Mixin;
 
+import net.minecraft.client.sound.AudioStream;
+import net.minecraft.client.sound.Sound;
 import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.client.sound.SoundLoader;
 
 import net.fabricmc.fabric.api.client.sound.v1.FabricSoundInstance;
 
 @Mixin(SoundInstance.class)
 public interface SoundInstanceMixin extends FabricSoundInstance {
+	// Override forge method in SoundInstance
+	default CompletableFuture<AudioStream> getStream(SoundLoader soundBuffers, Sound sound, boolean looping) {
+		return getAudioStream(soundBuffers, sound.getIdentifier(), looping);
+	}
 }
