@@ -18,8 +18,7 @@
   "depends": {
     "fabricloader": ">=0.4.0",
     "fabric-api-base": "*",
-    "fabric-lifecycle-events-v1": "*",
-    "fabric-resource-loader-v0": "*"
+    "fabric-lifecycle-events-v1": "*"
   },
   "description": "Adds support for custom mining levels.",
   "mixins": [

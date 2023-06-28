@@ -16,21 +16,23 @@
 
 package net.fabricmc.fabric.impl.mininglevel;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.item.ToolMaterial;
 import net.minecraft.registry.tag.TagKey;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
-import net.fabricmc.yarn.constants.MiningLevels;
+import net.minecraftforge.common.TierSortingRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class MiningLevelManagerImpl {
 	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-mining-level-api-v1/MiningLevelManagerImpl");
@@ -39,15 +41,17 @@ public final class MiningLevelManagerImpl {
 
 	// A cache of block state mining levels. Cleared when tags are updated.
 	private static final ThreadLocal<Reference2IntMap<BlockState>> CACHE = ThreadLocal.withInitial(Reference2IntOpenHashMap::new);
+	private static final ThreadLocal<Reference2IntMap<BlockState>> FABRIC_ONLY_CACHE = ThreadLocal.withInitial(Reference2IntOpenHashMap::new);
 
 	static {
-		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> CACHE.get().clear());
+		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
+			CACHE.get().clear();
+			FABRIC_ONLY_CACHE.get().clear();
+		});
 	}
 
-	public static int getRequiredMiningLevel(BlockState state) {
-		return CACHE.get().computeIfAbsent(state, s -> {
-			int miningLevel = MiningLevels.HAND;
-
+	public static int getRequiredFabricMiningLevel(BlockState state) {
+		return FABRIC_ONLY_CACHE.get().computeIfAbsent(state, s -> {
 			// Handle #fabric:needs_tool_level_N
 			for (TagKey<Block> tagId : state.streamTags().toList()) {
 				if (!tagId.id().getNamespace().equals(TOOL_TAG_NAMESPACE)) {
@@ -58,21 +62,27 @@ public final class MiningLevelManagerImpl {
 
 				if (matcher.matches()) {
 					try {
-						int tagMiningLevel = Integer.parseInt(matcher.group(1));
-						miningLevel = Math.max(miningLevel, tagMiningLevel);
+						return Integer.parseInt(matcher.group(1));
 					} catch (NumberFormatException e) {
 						LOGGER.error("Could not read mining level from tag #{}", tagId, e);
 					}
 				}
 			}
+			return -1;
+		});
+	}
 
-			// Handle vanilla tags
-			if (state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)) {
-				miningLevel = Math.max(miningLevel, MiningLevels.DIAMOND);
-			} else if (state.isIn(BlockTags.NEEDS_IRON_TOOL)) {
-				miningLevel = Math.max(miningLevel, MiningLevels.IRON);
-			} else if (state.isIn(BlockTags.NEEDS_STONE_TOOL)) {
-				miningLevel = Math.max(miningLevel, MiningLevels.STONE);
+	public static int getRequiredMiningLevel(BlockState state) {
+		return CACHE.get().computeIfAbsent(state, s -> {
+			int miningLevel = getRequiredFabricMiningLevel(state);
+
+			// Handle forge and vanilla sorted tiers
+			List<ToolMaterial> sortedTiers = TierSortingRegistry.getSortedTiers();
+			for (ToolMaterial sortedTier : sortedTiers) {
+				TagKey<Block> tag = sortedTier.getTag();
+				if (tag != null && state.isIn(tag)) {
+					return sortedTier.getMiningLevel();
+				}
 			}
 
 			return miningLevel;
