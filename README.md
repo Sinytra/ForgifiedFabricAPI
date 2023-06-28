@@ -29,7 +29,7 @@ Missing -> Added -> Tested
 | fabric-dimensions-v1                 |         ✅ Tested         |    Stable    |
 | fabric-entity-events-v1              |        ⚠️ Missing        |    Stable    |
 | fabric-events-interaction-v0         |        ⚠️ Missing        |    Stable    |
-| fabric-game-rule-api-v1              |        ⚠️ Missing        |    Stable    |
+| fabric-game-rule-api-v1              |         ✅ Tested         |    Stable    |
 | fabric-gametest-api-v1               |        ⚠️ Missing        |    Stable    |
 | fabric-item-api-v1                   |        ⚠️ Missing        |    Stable    |
 | fabric-item-group-api-v1             |        ⚠️ Missing        |    Stable    |

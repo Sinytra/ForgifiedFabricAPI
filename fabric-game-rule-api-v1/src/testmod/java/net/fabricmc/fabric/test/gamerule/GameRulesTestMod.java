@@ -22,6 +22,7 @@ import java.util.Collection;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameRules;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.gamerule.v1.CustomGameRuleCategory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
@@ -41,7 +41,8 @@ import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.gamerule.v1.rule.DoubleRule;
 import net.fabricmc.fabric.api.gamerule.v1.rule.EnumRule;
 
-public class GameRulesTestMod implements ModInitializer {
+@Mod("fabric_game_rule_api_v1_testmod")
+public class GameRulesTestMod {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GameRulesTestMod.class);
 	private static final Direction[] CARDINAL_DIRECTIONS = Arrays.stream(Direction.values()).filter(direction -> direction != Direction.UP && direction != Direction.DOWN).toArray(Direction[]::new);
 	public static final CustomGameRuleCategory GREEN_CATEGORY = new CustomGameRuleCategory(new Identifier("fabric", "green"), Text.literal("This One is Green").styled(style -> style.withBold(true).withColor(Formatting.DARK_GREEN)));
@@ -71,8 +72,7 @@ public class GameRulesTestMod implements ModInitializer {
 		return GameRuleRegistry.register(name, category, type);
 	}
 
-	@Override
-	public void onInitialize() {
+	public GameRulesTestMod() {
 		LOGGER.info("Loading GameRules test mod.");
 
 		// Test a vanilla rule
