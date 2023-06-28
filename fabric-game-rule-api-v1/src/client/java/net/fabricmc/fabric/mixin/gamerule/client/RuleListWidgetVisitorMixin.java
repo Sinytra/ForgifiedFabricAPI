@@ -18,6 +18,8 @@ package net.fabricmc.fabric.mixin.gamerule.client;
 
 import java.util.Locale;
 
+import net.fabricmc.fabric.impl.gamerule.GameRuleReflectionUtils;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,23 +38,20 @@ import net.fabricmc.fabric.impl.gamerule.widget.EnumRuleWidget;
 
 @Mixin(targets = "net/minecraft/client/gui/screen/world/EditGameRulesScreen$RuleListWidget$1")
 public abstract class RuleListWidgetVisitorMixin implements GameRules.Visitor, FabricGameRuleVisitor {
-	@Final
-	@Shadow
-	private EditGameRulesScreen field_24314;
 	@Shadow
 	protected abstract <T extends GameRules.Rule<T>> void createRuleWidget(GameRules.Key<T> key, EditGameRulesScreen.RuleWidgetFactory<T> ruleWidgetFactory);
 
 	@Override
 	public void visitDouble(GameRules.Key<DoubleRule> key, GameRules.Type<DoubleRule> type) {
 		this.createRuleWidget(key, (name, description, ruleName, rule) -> {
-			return new DoubleRuleWidget(this.field_24314, name, description, ruleName, rule);
+			return new DoubleRuleWidget(GameRuleReflectionUtils.getGameRulesScreen(this), name, description, ruleName, rule);
 		});
 	}
 
 	@Override
 	public <E extends Enum<E>> void visitEnum(GameRules.Key<EnumRule<E>> key, GameRules.Type<EnumRule<E>> type) {
 		this.createRuleWidget(key, (name, description, ruleName, rule) -> {
-			return new EnumRuleWidget<>(this.field_24314, name, description, ruleName, rule, key.getTranslationKey());
+			return new EnumRuleWidget<>(GameRuleReflectionUtils.getGameRulesScreen(this), name, description, ruleName, rule, key.getTranslationKey());
 		});
 	}
 
