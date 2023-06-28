@@ -23,4 +23,4 @@ import net.minecraft.block.BlockState;
 import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 
 @Mixin(BlockState.class)
-public class BlockStateMixin implements FabricBlockState { }
+public abstract class BlockStateMixin implements FabricBlockState { }

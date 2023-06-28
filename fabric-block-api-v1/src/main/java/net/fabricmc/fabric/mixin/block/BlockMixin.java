@@ -23,4 +23,4 @@ import net.minecraft.block.Block;
 import net.fabricmc.fabric.api.block.v1.FabricBlock;
 
 @Mixin(Block.class)
-public class BlockMixin implements FabricBlock { }
+public abstract class BlockMixin implements FabricBlock { }
