@@ -17,6 +17,12 @@
 package net.fabricmc.fabric.test.item.group;
 
 import com.google.common.base.Supplier;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
@@ -25,27 +31,24 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 
-public class ItemGroupTest implements ModInitializer {
-	private static final String MOD_ID = "fabric-item-group-api-v1-testmod";
-	private static Item TEST_ITEM;
+@Mod(ItemGroupTest.MOD_ID)
+public class ItemGroupTest {
+	public static final String MOD_ID = "fabric_item_group_api_v1_testmod";
 
-	private static final RegistryKey<ItemGroup> ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier(MOD_ID, "test_group"));
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+	private static final DeferredRegister<ItemGroup> ITEM_GROUPS = DeferredRegister.create(RegistryKeys.ITEM_GROUP, MOD_ID);
 
-	@Override
-	public void onInitialize() {
-		TEST_ITEM = Registry.register(Registries.ITEM, new Identifier("fabric-item-groups-v0-testmod", "item_test_group"), new Item(new Item.Settings()));
+	private static final RegistryObject<Item> TEST_ITEM = ITEMS.register("item_test_group", () -> new Item(new Item.Settings()));
 
-		Registry.register(Registries.ITEM_GROUP, ITEM_GROUP, FabricItemGroup.builder()
+	static {
+		//Adds an item group with all items in it
+		ITEM_GROUPS.register("test_group", () -> FabricItemGroup.builder()
 				.displayName(Text.literal("Test Item Group"))
 				.icon(() -> new ItemStack(Items.DIAMOND))
 				.entries((context, entries) -> {
@@ -56,8 +59,30 @@ public class ItemGroupTest implements ModInitializer {
 				})
 				.build());
 
+		for (int i = 0; i < 100; i++) {
+			final int index = i;
+
+			ITEM_GROUPS.register("test_group_" + index, () -> FabricItemGroup.builder()
+					.displayName(Text.literal("Test Item Group: " + index))
+					.icon((Supplier<ItemStack>) () -> new ItemStack(Registries.BLOCK.get(index)))
+					.entries((context, entries) -> {
+						var itemStack = new ItemStack(Registries.ITEM.get(index));
+
+						if (!itemStack.isEmpty()) {
+							entries.add(itemStack);
+						}
+					})
+					.build());
+		}
+	}
+
+	public ItemGroupTest() {
+		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		ITEMS.register(bus);
+		ITEM_GROUPS.register(bus);
+
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register((content) -> {
-			content.add(TEST_ITEM);
+			content.add(TEST_ITEM.get());
 
 			content.addBefore(Blocks.OAK_FENCE, Items.DIAMOND, Items.DIAMOND_BLOCK);
 			content.addAfter(Blocks.OAK_DOOR, Items.EMERALD, Items.EMERALD_BLOCK);
@@ -77,22 +102,6 @@ public class ItemGroupTest implements ModInitializer {
 			maxDmgPickaxe.setDamage(maxDmgPickaxe.getMaxDamage() - 1);
 			content.add(maxDmgPickaxe);
 		});
-
-		for (int i = 0; i < 100; i++) {
-			final int index = i;
-
-			Registry.register(Registries.ITEM_GROUP, new Identifier(MOD_ID, "test_group_" + i), FabricItemGroup.builder()
-					.displayName(Text.literal("Test Item Group: " + i))
-					.icon((Supplier<ItemStack>) () -> new ItemStack(Registries.BLOCK.get(index)))
-					.entries((context, entries) -> {
-						var itemStack = new ItemStack(Registries.ITEM.get(index));
-
-						if (!itemStack.isEmpty()) {
-							entries.add(itemStack);
-						}
-					})
-					.build());
-		}
 
 		try {
 			// Test to make sure that item groups must have a display name.

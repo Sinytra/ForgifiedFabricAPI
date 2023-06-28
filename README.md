@@ -32,7 +32,7 @@ Missing -> Added -> Tested
 | fabric-game-rule-api-v1              |         ✅ Tested         |    Stable    |
 | fabric-gametest-api-v1               |        ⚠️ Missing        |    Stable    |
 | fabric-item-api-v1                   |        ⚠️ Missing        |    Stable    |
-| fabric-item-group-api-v1             |        ⚠️ Missing        |    Stable    |
+| fabric-item-group-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-key-binding-api-v1            |         ✅ Tested         |    Stable    |
 | fabric-lifecycle-events-v1           |         ✅ Tested         |    Stable    |
 | fabric-loot-api-v2                   |        ⚠️ Missing        |    Stable    |
