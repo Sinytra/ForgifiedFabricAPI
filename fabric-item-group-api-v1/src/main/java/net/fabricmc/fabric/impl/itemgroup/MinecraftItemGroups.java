@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.impl.itemgroup;
 
+import static net.minecraftforge.common.CreativeModeTabRegistry.getName;
+
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -40,21 +42,25 @@ public final class MinecraftItemGroups {
 	public static final Identifier OP_ID = new Identifier("minecraft:op");
 	public static final Identifier INVENTORY_ID = new Identifier("minecraft:inventory");
 
-	public static final Map<ItemGroup, Identifier> GROUP_ID_MAP = new ImmutableMap.Builder<ItemGroup, Identifier>()
-			.put(ItemGroups.BUILDING_BLOCKS, MinecraftItemGroups.BUILDING_BLOCKS_ID)
-			.put(ItemGroups.COLORED_BLOCKS, MinecraftItemGroups.COLOURED_BLOCKS_ID)
-			.put(ItemGroups.NATURAL, MinecraftItemGroups.NATURAL_ID)
-			.put(ItemGroups.FUNCTIONAL, MinecraftItemGroups.FUNCTIONAL_ID)
-			.put(ItemGroups.REDSTONE, MinecraftItemGroups.REDSTONE_ID)
+	// Map of Forge CreativeModeTab ID to Fabric CreativeModeTabs ID
+	public static final Map<Identifier, Identifier> FORGE_ID_MAP = new ImmutableMap.Builder<Identifier, Identifier>()
+			.put(getName(ItemGroups.BUILDING_BLOCKS), MinecraftItemGroups.BUILDING_BLOCKS_ID)
+			.put(getName(ItemGroups.COLORED_BLOCKS), MinecraftItemGroups.COLOURED_BLOCKS_ID)
+			.put(getName(ItemGroups.NATURAL), MinecraftItemGroups.NATURAL_ID)
+			.put(getName(ItemGroups.FUNCTIONAL), MinecraftItemGroups.FUNCTIONAL_ID)
+			.put(getName(ItemGroups.REDSTONE), MinecraftItemGroups.REDSTONE_ID)
+			.put(getName(ItemGroups.TOOLS), MinecraftItemGroups.TOOLS_ID)
+			.put(getName(ItemGroups.COMBAT), MinecraftItemGroups.COMBAT_ID)
+			.put(getName(ItemGroups.FOOD_AND_DRINK), MinecraftItemGroups.FOOD_AND_DRINK_ID)
+			.put(getName(ItemGroups.INGREDIENTS), MinecraftItemGroups.INGREDIENTS_ID)
+			.put(getName(ItemGroups.SPAWN_EGGS), MinecraftItemGroups.SPAWN_EGGS_ID)
+			.build();
+	// Map of CreativeModeTab to Fabric CreativeModeTabs ID
+	public static final Map<ItemGroup, Identifier> FABRIC_ID_MAP = new ImmutableMap.Builder<ItemGroup, Identifier>()
 			.put(ItemGroups.HOTBAR, MinecraftItemGroups.HOTBAR_ID)
-			.put(ItemGroups.SEARCH, MinecraftItemGroups.SEARCH_ID)
-			.put(ItemGroups.TOOLS, MinecraftItemGroups.TOOLS_ID)
-			.put(ItemGroups.COMBAT, MinecraftItemGroups.COMBAT_ID)
-			.put(ItemGroups.FOOD_AND_DRINK, MinecraftItemGroups.FOOD_AND_DRINK_ID)
-			.put(ItemGroups.INGREDIENTS, MinecraftItemGroups.INGREDIENTS_ID)
-			.put(ItemGroups.SPAWN_EGGS, MinecraftItemGroups.SPAWN_EGGS_ID)
-			.put(ItemGroups.OPERATOR, MinecraftItemGroups.OP_ID)
 			.put(ItemGroups.INVENTORY, MinecraftItemGroups.INVENTORY_ID)
+			.put(ItemGroups.OPERATOR, MinecraftItemGroups.OP_ID)
+			.put(ItemGroups.SEARCH, MinecraftItemGroups.SEARCH_ID)
 			.build();
 
 	private MinecraftItemGroups() {

@@ -19,6 +19,12 @@ package net.fabricmc.fabric.test.item.group;
 import java.util.Objects;
 
 import com.google.common.base.Supplier;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
@@ -27,17 +33,18 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 
-public class ItemGroupTest implements ModInitializer {
-	private static final String MOD_ID = "fabric-item-group-api-v1-testmod";
-	private static Item TEST_ITEM;
+@Mod(ItemGroupTest.MOD_ID)
+public class ItemGroupTest {
+	public static final String MOD_ID = "fabric_item_group_api_v1_testmod";
+	
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+	private static final RegistryObject<Item> TEST_ITEM = ITEMS.register("item_test_group", () -> new Item(new Item.Settings()));
 
 	//Adds an item group with all items in it
 	private static final ItemGroup ITEM_GROUP = FabricItemGroup.builder(new Identifier(MOD_ID, "test_group"))
@@ -51,12 +58,12 @@ public class ItemGroupTest implements ModInitializer {
 			})
 			.build();
 
-	@Override
-	public void onInitialize() {
-		TEST_ITEM = Registry.register(Registries.ITEM, new Identifier("fabric-item-groups-v0-testmod", "item_test_group"), new Item(new Item.Settings()));
+	public ItemGroupTest() {
+		final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		ITEMS.register(bus);
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register((content) -> {
-			content.add(TEST_ITEM);
+			content.add(TEST_ITEM.get());
 
 			content.addBefore(Blocks.OAK_FENCE, Items.DIAMOND, Items.DIAMOND_BLOCK);
 			content.addAfter(Blocks.OAK_DOOR, Items.EMERALD, Items.EMERALD_BLOCK);
@@ -93,6 +100,6 @@ public class ItemGroupTest implements ModInitializer {
 		}
 
 		assert Objects.equals(ItemGroups.HOTBAR.getId().toString(), "minecraft:hotbar");
-		assert Objects.equals(ITEM_GROUP.getId().toString(), "fabric-item-group-api-v1-testmod:test_group");
+		assert Objects.equals(ITEM_GROUP.getId().toString(), MOD_ID + ":test_group");
 	}
 }

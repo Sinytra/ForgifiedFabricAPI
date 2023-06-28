@@ -16,99 +16,36 @@
 
 package net.fabricmc.fabric.mixin.itemgroup;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
-import org.jetbrains.annotations.Nullable;
+import net.minecraftforge.common.CreativeModeTabRegistry;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.IdentifiableItemGroup;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
-import net.fabricmc.fabric.impl.itemgroup.ItemGroupEventsImpl;
 import net.fabricmc.fabric.impl.itemgroup.MinecraftItemGroups;
 
 @Mixin(ItemGroup.class)
 abstract class ItemGroupMixin implements IdentifiableItemGroup, FabricItemGroup {
-	@Shadow
-	private Collection<ItemStack> displayStacks;
-
-	@Shadow
-	private Set<ItemStack> searchTabStacks;
-
-	@Unique
-	private int fabric_page = -1;
-
 	@Unique
 	private Identifier identifier;
 
-	@Unique
-	@Nullable
-	private UUID fabric_fallbackUUID;
-
-	@SuppressWarnings("ConstantConditions")
-	@Inject(method = "updateEntries", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemGroup;reloadSearchProvider()V"))
-	public void getStacks(ItemGroup.DisplayContext context, CallbackInfo ci) {
-		ItemGroup self = (ItemGroup) (Object) this;
-
-		// Do not modify special item groups (except Operator Blocks) at all.
-		// Special item groups include Saved Hotbars, Search, and Survival Inventory.
-		// Note, search gets modified as part of the parent item group.
-		if (self.isSpecial() && self != ItemGroups.OPERATOR) return;
-
-		// Sanity check for the injection point. It should be after these fields are set.
-		Objects.requireNonNull(displayStacks, "displayStacks");
-		Objects.requireNonNull(searchTabStacks, "searchTabStacks");
-
-		// Convert the entries to lists
-		var mutableDisplayStacks = new LinkedList<>(displayStacks);
-		var mutableSearchTabStacks = new LinkedList<>(searchTabStacks);
-		var entries = new FabricItemGroupEntries(context, mutableDisplayStacks, mutableSearchTabStacks);
-
-		final Event<ItemGroupEvents.ModifyEntries> modifyEntriesEvent = ItemGroupEventsImpl.getModifyEntriesEvent(getId());
-
-		if (modifyEntriesEvent != null) {
-			modifyEntriesEvent.invoker().modifyEntries(entries);
-		}
-
-		// Now trigger the global event
-		if (self != ItemGroups.OPERATOR || context.hasPermissions()) {
-			ItemGroupEvents.MODIFY_ENTRIES_ALL.invoker().modifyEntries(self, entries);
-		}
-
-		// Convert the stacks back to sets after the events had a chance to modify them
-		displayStacks.clear();
-		displayStacks.addAll(mutableDisplayStacks);
-
-		searchTabStacks.clear();
-		searchTabStacks.addAll(mutableSearchTabStacks);
-	}
-
 	@Override
 	public Identifier getId() {
-		if (this.identifier != null) {
-			return identifier;
+		final Identifier forgeTabId = CreativeModeTabRegistry.getName((ItemGroup) (Object) this);
+		if (forgeTabId != null) {
+			final Identifier fabricVanillaTabId = MinecraftItemGroups.FORGE_ID_MAP.get(forgeTabId);
+
+			return fabricVanillaTabId != null ? fabricVanillaTabId : forgeTabId;
 		}
 
-		final Identifier vanillaId = MinecraftItemGroups.GROUP_ID_MAP.get((ItemGroup) (Object) this);
-
-		if (vanillaId != null) {
-			return vanillaId;
+		final Identifier fabricVanillaTabId = MinecraftItemGroups.FABRIC_ID_MAP.get((ItemGroup) (Object) this);
+		if (fabricVanillaTabId != null) {
+			return fabricVanillaTabId;
 		}
 
 		// No id known, generate a random one
@@ -117,20 +54,6 @@ abstract class ItemGroupMixin implements IdentifiableItemGroup, FabricItemGroup 
 		}
 
 		return identifier;
-	}
-
-	@Override
-	public int getPage() {
-		if (fabric_page < 0) {
-			throw new IllegalStateException("Item group has no page");
-		}
-
-		return fabric_page;
-	}
-
-	@Override
-	public void setPage(int page) {
-		this.fabric_page = page;
 	}
 
 	@Override

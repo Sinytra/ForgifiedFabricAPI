@@ -19,36 +19,35 @@ package net.fabricmc.fabric.impl.itemgroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.item.ItemGroup;
+import net.fabricmc.fabric.mixin.itemgroup.CreativeModeTabRegistryAccessor;
+
 import net.minecraft.item.ItemGroups;
 
-import net.fabricmc.fabric.mixin.itemgroup.ItemGroupsAccessor;
+import net.minecraftforge.common.CreativeModeTabRegistry;
+import net.minecraftforge.event.CreativeModeTabEvent;
+
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Identifier;
 
 public final class ItemGroupHelper {
-	private ItemGroupHelper() {
+	private static final List<ItemGroup> TABS = new ArrayList<>();
+
+	public static void appendItemGroup(ItemGroup tab) {
+		TABS.add(tab);
 	}
 
-	/**
-	 * A list of item groups, but with special groups grouped at the end.
-	 */
-	public static List<ItemGroup> sortedGroups = ItemGroups.getGroups();
+	static void registerCreativeTabs(CreativeModeTabEvent.Register event) {
+		TABS.forEach(ItemGroupHelper::registerCreativeModeTab);
+	}
 
-	public static void appendItemGroup(ItemGroup itemGroup) {
-		for (ItemGroup existingGroup : ItemGroups.getGroups()) {
-			if (existingGroup.getId().equals(itemGroup.getId())) {
-				throw new IllegalStateException("Duplicate item group: " + itemGroup.getId());
-			}
-		}
+	private static void registerCreativeModeTab(ItemGroup tab) {
+		Identifier name = tab.getId();
+		if (CreativeModeTabRegistry.getTab(name) != null)
+			throw new IllegalStateException("Duplicate creative mode tab with name: " + name);
 
-		var itemGroups = new ArrayList<>(ItemGroups.getGroups());
-		itemGroups.add(itemGroup);
+		if (tab.isSpecial())
+			throw new IllegalStateException("CreativeModeTab " + name + " is aligned right, this is not supported!");
 
-		List<ItemGroup> validated = ItemGroupsAccessor.invokeCollect(itemGroups.toArray(ItemGroup[]::new));
-		ItemGroupsAccessor.setGroups(validated);
-		sortedGroups = validated.stream().sorted((a, b) -> {
-			if (a.isSpecial() && !b.isSpecial()) return 1;
-			if (!a.isSpecial() && b.isSpecial()) return -1;
-			return 0;
-		}).toList();
+		CreativeModeTabRegistryAccessor.callProcessCreativeModeTab(tab, name, List.of(ItemGroups.SPAWN_EGGS), List.of());
 	}
 }
