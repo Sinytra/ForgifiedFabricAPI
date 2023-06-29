@@ -16,16 +16,19 @@
 
 package net.fabricmc.fabric.test.item;
 
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.item.Item;
 
-import net.fabricmc.api.ModInitializer;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
-public class ItemUpdateAnimationTest implements ModInitializer {
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.ITEM, new Identifier("fabric-item-api-v1-testmod", "updating_allowed"), new UpdatingItem(true));
-		Registry.register(Registries.ITEM, new Identifier("fabric-item-api-v1-testmod", "updating_disallowed"), new UpdatingItem(false));
+public class ItemUpdateAnimationTest {
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, FabricItemTestsImpl.MODID);
+	private static final RegistryObject<Item> UPDATING_ALLOWED = ITEMS.register("updating_allowed", () -> new UpdatingItem(true));
+	private static final RegistryObject<Item> UPDATING_DISALLOWED = ITEMS.register("updating_disallowed", () -> new UpdatingItem(false));
+
+	public static void onInitialize(IEventBus bus) {
+		ITEMS.register(bus);
 	}
 }

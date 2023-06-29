@@ -19,11 +19,13 @@ package net.fabricmc.fabric.api.item.v1;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import net.minecraftforge.common.extensions.IForgeItemStack;
+
 /*
  * Fabric-provided extensions for {@link ItemStack}.
  * This interface is automatically implemented on all item stacks via Mixin and interface injection.
  */
-public interface FabricItemStack {
+public interface FabricItemStack extends IForgeItemStack {
 	/**
 	 * Return a leftover item for use in recipes.
 	 *
@@ -34,6 +36,6 @@ public interface FabricItemStack {
 	 * @return the leftover item
 	 */
 	default ItemStack getRecipeRemainder() {
-		return ((ItemStack) this).getItem().getRecipeRemainder((ItemStack) this);
+		return IForgeItemStack.super.getCraftingRemainingItem();
 	}
 }

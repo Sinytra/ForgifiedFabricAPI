@@ -18,6 +18,8 @@ package net.fabricmc.fabric.test.item.gametest;
 
 import java.util.Objects;
 
+import net.fabricmc.fabric.test.item.FabricItemTestsImpl;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.FurnaceBlockEntity;
@@ -27,14 +29,18 @@ import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.test.item.CustomDamageTest;
 
-public class FurnaceGameTest implements FabricGameTest {
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+@GameTestHolder(FabricItemTestsImpl.MODID)
+public class FurnaceGameTest {
 	private static final int COOK_TIME = 200;
 	private static final BlockPos POS = new BlockPos(0, 1, 0);
 
-	@GameTest(templateName = EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = FabricItemTestsImpl.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void basicSmelt(TestContext context) {
 		context.setBlockState(POS, Blocks.FURNACE);
 		FurnaceBlockEntity blockEntity = (FurnaceBlockEntity) Objects.requireNonNull(context.getBlockEntity(POS));
@@ -56,7 +62,8 @@ public class FurnaceGameTest implements FabricGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = FabricItemTestsImpl.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void vanillaRemainderTest(TestContext context) {
 		context.setBlockState(POS, Blocks.FURNACE);
 		FurnaceBlockEntity blockEntity = (FurnaceBlockEntity) Objects.requireNonNull(context.getBlockEntity(POS));
@@ -72,23 +79,24 @@ public class FurnaceGameTest implements FabricGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = FabricItemTestsImpl.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void fabricRemainderTest(TestContext context) {
 		context.setBlockState(POS, Blocks.FURNACE);
 		FurnaceBlockEntity blockEntity = (FurnaceBlockEntity) Objects.requireNonNull(context.getBlockEntity(POS));
 
-		setInputs(blockEntity, new ItemStack(Blocks.COBBLESTONE, 32), new ItemStack(CustomDamageTest.WEIRD_PICK));
+		setInputs(blockEntity, new ItemStack(Blocks.COBBLESTONE, 32), new ItemStack(CustomDamageTest.WEIRD_PICK.get()));
 
 		cook(blockEntity, context, 1);
 		assertInventory(blockEntity, "Testing fabric smelting recipe remainder.",
 				new ItemStack(Blocks.COBBLESTONE, 31),
-				RecipeGameTest.withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 1),
+				RecipeGameTest.withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK.get()), 1),
 				new ItemStack(Blocks.STONE, 1));
 
 		cook(blockEntity, context, 30);
 		assertInventory(blockEntity, "Testing fabric smelting recipe remainder.",
 				new ItemStack(Blocks.COBBLESTONE, 1),
-				RecipeGameTest.withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 31),
+				RecipeGameTest.withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK.get()), 31),
 				new ItemStack(Blocks.STONE, 31));
 
 		cook(blockEntity, context, 1);

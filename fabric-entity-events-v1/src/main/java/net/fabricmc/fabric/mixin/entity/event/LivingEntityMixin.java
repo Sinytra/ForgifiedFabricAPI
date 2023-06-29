@@ -106,7 +106,7 @@ abstract class LivingEntityMixin {
 	@ModifyVariable(method = {"lambda$stopSleeping$11", "method_18404", "sleep"}, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"), require = 2)
 	private BlockState modifyBedForOccupiedState(BlockState state, BlockPos sleepingPos) {
 		LivingEntity entity = (LivingEntity) (Object) this;
-		ActionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed((LivingEntity) (Object) this, sleepingPos, state, state.isBed(entity.world, sleepingPos, entity));
+		ActionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed((LivingEntity) (Object) this, sleepingPos, state, state.isBed(entity.getWorld(), sleepingPos, entity));
 
 		// If a valid bed, replace with vanilla red bed so that the BlockState#isBed and BlockState#getValue(FACING) check both succeed
 		if (result.isAccepted()) {

@@ -24,7 +24,7 @@ public final class EntityEventHooks {
     @SubscribeEvent
     public static void onLivingAttack(LivingAttackEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!entity.world.isClient && !ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(entity, event.getSource(), event.getAmount())) {
+        if (!entity.getWorld().isClient && !ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(entity, event.getSource(), event.getAmount())) {
             event.setCanceled(true);
         }
     }
@@ -34,8 +34,8 @@ public final class EntityEventHooks {
         LivingEntity entity = event.getEntity();
         BlockPos sleepingPos = event.getSleepingLocation();
 
-        BlockState bedState = entity.world.getBlockState(sleepingPos);
-        boolean vanillaResult = bedState.getBlock().isBed(bedState, entity.world, sleepingPos, entity);
+        BlockState bedState = entity.getWorld().getBlockState(sleepingPos);
+        boolean vanillaResult = bedState.getBlock().isBed(bedState, entity.getWorld(), sleepingPos, entity);
         ActionResult result = EntitySleepEvents.ALLOW_BED.invoker().allowBed(entity, sleepingPos, bedState, vanillaResult);
 
         if (result != ActionResult.PASS) {
@@ -56,7 +56,7 @@ public final class EntityEventHooks {
     public static void onPlayerSleepingTimeCheck(SleepingTimeCheckEvent event) {
         event.getSleepingLocation().ifPresent(sleepingPos -> {
             PlayerEntity player = event.getEntity();
-			ActionResult result = EntitySleepEvents.ALLOW_SLEEP_TIME.invoker().allowSleepTime(player, sleepingPos, !player.world.isDay());
+			ActionResult result = EntitySleepEvents.ALLOW_SLEEP_TIME.invoker().allowSleepTime(player, sleepingPos, !player.getWorld().isDay());
             if (result != ActionResult.PASS) {
                 event.setResult(result.isAccepted() ? Event.Result.ALLOW : Event.Result.DENY);
             }

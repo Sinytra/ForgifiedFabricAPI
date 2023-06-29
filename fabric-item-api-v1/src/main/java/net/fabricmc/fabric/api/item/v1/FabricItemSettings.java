@@ -103,4 +103,10 @@ public class FabricItemSettings extends Item.Settings {
 		super.requires(features);
 		return this;
 	}
+
+	@Override
+	public FabricItemSettings setNoRepair() {
+		super.setNoRepair();
+		return this;
+	}
 }

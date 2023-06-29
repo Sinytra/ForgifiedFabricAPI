@@ -16,20 +16,20 @@
 
 package net.fabricmc.fabric.test.item;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
-
-public class ArmorKnockbackResistanceTest implements ModInitializer {
+public class ArmorKnockbackResistanceTest {
 	private static final ArmorMaterial WOOD_ARMOR = new ArmorMaterial() {
 		@Override
 		public int getDurability(ArmorItem.Type arg) {
@@ -72,9 +72,10 @@ public class ArmorKnockbackResistanceTest implements ModInitializer {
 		}
 	};
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.ITEM, new Identifier("fabric-item-api-v1-testmod",
-				"wooden_boots"), new ArmorItem(WOOD_ARMOR, ArmorItem.Type.BOOTS, new Item.Settings()));
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, FabricItemTestsImpl.MODID);
+	private static final RegistryObject<Item> WOODEN_BOOTS = ITEMS.register("wooden_boots", () -> new ArmorItem(WOOD_ARMOR, ArmorItem.Type.BOOTS, new Item.Settings()));
+
+	public static void onInitialize(IEventBus bus) {
+		ITEMS.register(bus);
 	}
 }

@@ -9,7 +9,6 @@
     "HoneycombItemMixin",
     "LandPathNodeMakerMixin",
     "FireBlockMixin",
-    "VibrationListenerMixin",
     "ShovelItemAccessor",
     "VillagerEntityAccessor"
   ],
