@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.item.gametest;
 
+import net.fabricmc.fabric.test.item.CustomDamageTest;
+import net.fabricmc.fabric.test.item.FabricItemTestsImpl;
+
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -30,11 +33,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.fabricmc.fabric.test.item.CustomDamageTest;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-public class RecipeGameTest implements FabricGameTest {
-	@GameTest(templateName = EMPTY_STRUCTURE)
+@GameTestHolder(FabricItemTestsImpl.MODID)
+public class RecipeGameTest {
+	@GameTest(templateNamespace = FabricItemTestsImpl.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void vanillaRemainderTest(TestContext context) {
 		Recipe<SimpleInventory> testRecipe = createTestingRecipeInstance();
 
@@ -51,21 +56,22 @@ public class RecipeGameTest implements FabricGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = FabricItemTestsImpl.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void fabricRemainderTest(TestContext context) {
 		Recipe<SimpleInventory> testRecipe = createTestingRecipeInstance();
 
 		SimpleInventory inventory = new SimpleInventory(
-				new ItemStack(CustomDamageTest.WEIRD_PICK),
-				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 10),
-				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 31),
+				new ItemStack(CustomDamageTest.WEIRD_PICK.get()),
+				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK.get()), 10),
+				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK.get()), 31),
 				new ItemStack(Items.DIAMOND));
 
 		DefaultedList<ItemStack> remainderList = testRecipe.getRemainder(inventory);
 
 		assertStackList(remainderList, "Testing fabric recipe remainder.",
-				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 1),
-				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK), 11),
+				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK.get()), 1),
+				withDamage(new ItemStack(CustomDamageTest.WEIRD_PICK.get()), 11),
 				ItemStack.EMPTY,
 				ItemStack.EMPTY);
 

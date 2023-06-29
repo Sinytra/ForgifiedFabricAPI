@@ -16,38 +16,46 @@
 
 package net.fabricmc.fabric.test.item;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ToolMaterials;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.Potions;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
-import net.fabricmc.fabric.test.item.mixin.BrewingRecipeRegistryAccessor;
 
-public class CustomDamageTest implements ModInitializer {
-	public static final Item WEIRD_PICK = new WeirdPick();
+public class CustomDamageTest {
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, FabricItemTestsImpl.MODID);
+	public static final RegistryObject<Item> WEIRD_PICK = ITEMS.register("weird_pickaxe", WeirdPick::new);
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.ITEM, new Identifier("fabric-item-api-v1-testmod", "weird_pickaxe"), WEIRD_PICK);
-		FuelRegistry.INSTANCE.add(WEIRD_PICK, 200);
-		BrewingRecipeRegistryAccessor.callRegisterPotionRecipe(Potions.WATER, WEIRD_PICK, Potions.AWKWARD);
+	public static void onInitialize(IEventBus bus) {
+		bus.addListener(CustomDamageTest::onCommonSetup);
+		ITEMS.register(bus);
+	}
+
+	private static void onCommonSetup(FMLCommonSetupEvent event) {
+		FuelRegistry.INSTANCE.add(WEIRD_PICK.get(), 200);
+		FabricBrewingRecipeRegistry.registerPotionRecipe(Potions.WATER, Ingredient.ofItems(WEIRD_PICK.get()), Potions.AWKWARD);
 	}
 
 	public static final CustomDamageHandler WEIRD_DAMAGE_HANDLER = (stack, amount, entity, breakCallback) -> {
 		// If sneaking, apply all damage to vanilla. Otherwise, increment a tag on the stack by one and don't apply any damage
 		if (entity.isSneaking()) {
 			return amount;
-		} else {
+		}
+		else {
 			NbtCompound tag = stack.getOrCreateNbt();
 			tag.putInt("weird", tag.getInt("weird") + 1);
 			return 0;

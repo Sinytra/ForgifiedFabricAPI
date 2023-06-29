@@ -16,20 +16,22 @@
 
 package net.fabricmc.fabric.test.item;
 
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 
-public class FabricItemSettingsTests implements ModInitializer {
-	@Override
-	public void onInitialize() {
-		// Registers an item with a custom equipment slot.
-		Item testItem = new Item(new FabricItemSettings().equipmentSlot(stack -> EquipmentSlot.CHEST));
-		Registry.register(Registries.ITEM, new Identifier("fabric-item-api-v1-testmod", "test_item"), testItem);
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.Item;
+
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
+public class FabricItemSettingsTests {
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, FabricItemTestsImpl.MODID);
+	// Registers an item with a custom equipment slot.
+	private static final RegistryObject<Item> TEST_ITEM = ITEMS.register("test_item", () -> new Item(new FabricItemSettings().equipmentSlot(stack -> EquipmentSlot.CHEST)));
+
+	public static void onInitialize(IEventBus bus) {
+		ITEMS.register(bus);
 	}
 }
