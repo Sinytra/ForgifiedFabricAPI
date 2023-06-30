@@ -41,8 +41,9 @@ public class TagManagerLoaderMixin {
 	// lambda body inside thenAcceptAsync, in the reload method
 	@Dynamic
 	@Inject(
-			method = "method_40098(Ljava/util/List;Ljava/lang/Void;)V",
-			at = @At("RETURN")
+			method = { "method_40098(Ljava/util/List;Ljava/lang/Void;)V", "m_203915_(Ljava/util/List;Ljava/lang/Void;)V" },
+			at = @At("RETURN"),
+			require = 1, remap = false
 	)
 	private void hookApply(List<?> list, Void void_, CallbackInfo ci) {
 		ResourceConditionsImpl.setTags(registryTags);

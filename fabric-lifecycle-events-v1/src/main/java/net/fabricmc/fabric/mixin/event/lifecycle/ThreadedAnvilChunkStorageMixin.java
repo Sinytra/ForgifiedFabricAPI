@@ -47,7 +47,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	 * Injection is inside of tryUnloadChunk.
 	 * We inject just after "setLoadedToWorld" is made false, since here the WorldChunk is guaranteed to be unloaded.
 	 */
-	@Inject(method = "method_18843", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;setLoadedToWorld(Z)V", shift = At.Shift.AFTER))
+	@Inject(method = { "method_18843", "m_202998_" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;setLoadedToWorld(Z)V", shift = At.Shift.AFTER), require = 1)
 	private void onChunkUnload(ChunkHolder chunkHolder, CompletableFuture<Chunk> chunkFuture, long pos, Chunk chunk, CallbackInfo ci) {
 		ServerChunkEvents.CHUNK_UNLOAD.invoker().onChunkUnload(this.world, (WorldChunk) chunk);
 	}
@@ -60,7 +60,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	 * <ul><li>the chunk being loaded MUST be a WorldChunk.
 	 * <li>everything within the chunk has been loaded into the world. Entities, BlockEntities, etc.</ul>
 	 */
-	@Inject(method = "method_17227", at = @At("TAIL"))
+	@Inject(method = { "method_17227", "m_214854_" }, at = @At("TAIL"), require = 1, remap = false)
 	private void onChunkLoad(ChunkHolder chunkHolder, Chunk protoChunk, CallbackInfoReturnable<Chunk> callbackInfoReturnable) {
 		// We fire the event at TAIL since the chunk is guaranteed to be a WorldChunk then.
 		ServerChunkEvents.CHUNK_LOAD.invoker().onChunkLoad(this.world, (WorldChunk) callbackInfoReturnable.getReturnValue());
