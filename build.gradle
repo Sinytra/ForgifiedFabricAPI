@@ -354,21 +354,21 @@ allprojects {
 	apply from: rootProject.file('gradle/validate-annotations.gradle')
 }
 
-remapTestmodJar {
-	def testModJarTasks = []
-
-	subprojects {
-		if (it.name == "deprecated" || !(it.file("src/testmod").exists() || it.file("src/testmodClient").exists())) {
-			return
-		}
-
-		testModJarTasks += it.tasks.remapTestmodJar
-	}
-
-	nestedJars.setFrom(testModJarTasks)
-	addNestedDependencies = true
+//remapTestmodJar {
+//	def testModJarTasks = []
+//
+//	subprojects {
+//		if (it.name == "deprecated" || !(it.file("src/testmod").exists() || it.file("src/testmodClient").exists())) {
+//			return
+//		}
+//
+//		testModJarTasks += it.tasks.remapTestmodJar
+//	}
+//
+//	nestedJars.setFrom(testModJarTasks)
+//	addNestedDependencies = true
 //	clientOnlySourceSetName = sourceSets.testmodClient.name
-}
+//}
 
 // Apply auxiliary buildscripts to submodules
 // This must be done after all plugins are applied to subprojects
@@ -744,18 +744,18 @@ dependencies {
 	}
 }
 
-remapJar {
-	afterEvaluate {
-		subprojects.each {
-			if (it.name in devOnlyModules || it.name == "deprecated") {
-				return
-			}
-
-			// Include the signed or none signed jar from the sub project.
-			nestedJars.from project("${it.path}").tasks.getByName(signingEnabled ? "signRemapJar" : "remapJar")
-		}
-	}
-}
+//remapJar {
+//	afterEvaluate {
+//		subprojects.each {
+//			if (it.name in devOnlyModules || it.name == "deprecated") {
+//				return
+//			}
+//
+//			// Include the signed or none signed jar from the sub project.
+//			nestedJars.from project("${it.path}").tasks.getByName(signingEnabled ? "signRemapJar" : "remapJar")
+//		}
+//	}
+//}
 
 curseforge {
 	if (ENV.CURSEFORGE_API_KEY) {
@@ -856,6 +856,7 @@ import net.fabricmc.loom.util.service.BuildSharedServiceManager
 import org.gradle.build.event.BuildEventsListenerRegistry
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
 import net.fabricmc.loom.util.FileSystemUtil
+import net.fabricmc.loom.build.nesting.IncludedJarFactory
 
 import org.cadixdev.at.AccessTransformSet
 import org.cadixdev.at.io.AccessTransformFormats
@@ -943,6 +944,52 @@ allprojects {
 			outgoing.artifact(localDevJar)
 		}
 	}
+	tasks.withType(net.fabricmc.loom.task.AbstractRemapJarTask).configureEach {
+		remapperIsolation = false
+	}
+
+	configurations {
+		remappedJars {
+			canBeConsumed = true
+			canBeResolved = false
+		}
+		testModRemappedJars {
+			canBeConsumed = true
+			canBeResolved = false
+		}
+	}
+	artifacts {
+		remappedJars(signingEnabled ? tasks.named("signRemapJar") : remapJar)
+	}
+}
+
+configurations {
+	includedRemappedJars
+	includedTestModRemappedJars
+}
+subprojects.each { proj ->
+	if (!(proj.name in devOnlyModules) && proj.name != "deprecated") {
+		// Include the signed or none signed jar from the sub project.
+		dependencies {
+			includedRemappedJars project(path: proj.path, configuration: 'remappedJars')
+		}
+	}
+
+	if (proj.name != "deprecated" && (proj.file("src/testmod").exists() || proj.file("src/testmodClient").exists())) {
+		dependencies {
+			includedTestModRemappedJars project(path: proj.path, configuration: 'testModRemappedJars')
+		}
+	}
+}
+def includedJarFactory = new IncludedJarFactory(project)
+remapJar {
+	forgeNestedJars.addAll includedJarFactory.getForgeNestedJars(configurations.includedRemappedJars)
+		.map { it.left().collect { it.resolve() } }
+}
+remapTestmodJar {
+	forgeNestedJars.addAll includedJarFactory.getForgeNestedJars(configurations.includedTestModRemappedJars)
+		.map { it.left().collect { it.resolve() } }
+	addNestedDependencies = true
 }
 
 subprojects {
