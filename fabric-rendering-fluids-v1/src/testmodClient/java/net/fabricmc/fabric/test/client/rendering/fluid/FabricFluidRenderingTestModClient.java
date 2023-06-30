@@ -16,16 +16,17 @@
 
 package net.fabricmc.fabric.test.client.rendering.fluid;
 
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 
-public class FabricFluidRenderingTestModClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+public class FabricFluidRenderingTestModClient {
+
+	public static void onInitializeClient(FMLClientSetupEvent event) {
 		// Doors now will have overlay textures to the side
 		FluidRenderHandlerRegistry.INSTANCE.setBlockTransparency(Blocks.ACACIA_DOOR, true);
 		FluidRenderHandlerRegistry.INSTANCE.setBlockTransparency(Blocks.DARK_OAK_DOOR, true);
@@ -40,20 +41,20 @@ public class FabricFluidRenderingTestModClient implements ClientModInitializer {
 		// Red stained glass will have falling fluid textures to the side
 		FluidRenderHandlerRegistry.INSTANCE.setBlockTransparency(Blocks.RED_STAINED_GLASS, false);
 
-		FluidRenderHandlerRegistry.INSTANCE.register(TestFluids.NO_OVERLAY, TestFluids.NO_OVERLAY_FLOWING, new SimpleFluidRenderHandler(
+		FluidRenderHandlerRegistry.INSTANCE.register(TestFluids.NO_OVERLAY.get(), TestFluids.NO_OVERLAY_FLOWING.get(), new SimpleFluidRenderHandler(
 				new Identifier("fabric-rendering-fluids-v1-testmod:block/test_fluid_still"),
 				new Identifier("fabric-rendering-fluids-v1-testmod:block/test_fluid_flowing"),
 				0xFF5555
 		));
 
-		FluidRenderHandlerRegistry.INSTANCE.register(TestFluids.OVERLAY, TestFluids.OVERLAY_FLOWING, new SimpleFluidRenderHandler(
+		FluidRenderHandlerRegistry.INSTANCE.register(TestFluids.OVERLAY.get(), TestFluids.OVERLAY_FLOWING.get(), new SimpleFluidRenderHandler(
 				new Identifier("fabric-rendering-fluids-v1-testmod:block/test_fluid_still"),
 				new Identifier("fabric-rendering-fluids-v1-testmod:block/test_fluid_flowing"),
 				new Identifier("fabric-rendering-fluids-v1-testmod:block/test_fluid_overlay"),
 				0x5555FF
 		));
 
-		FluidRenderHandlerRegistry.INSTANCE.register(TestFluids.CUSTOM, TestFluids.CUSTOM_FLOWING, new CustomizedFluidRenderer(
+		FluidRenderHandlerRegistry.INSTANCE.register(TestFluids.CUSTOM.get(), TestFluids.CUSTOM_FLOWING.get(), new CustomizedFluidRenderer(
 				new Identifier("fabric-rendering-fluids-v1-testmod:block/test_fluid_overlay")
 		));
 	}

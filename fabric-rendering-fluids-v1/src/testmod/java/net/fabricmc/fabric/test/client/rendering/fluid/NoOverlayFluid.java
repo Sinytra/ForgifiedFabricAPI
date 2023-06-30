@@ -37,18 +37,21 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.fluids.FluidType;
+
 public abstract class NoOverlayFluid extends FlowableFluid {
 	public NoOverlayFluid() {
 	}
 
 	@Override
 	public Fluid getFlowing() {
-		return TestFluids.NO_OVERLAY_FLOWING;
+		return TestFluids.NO_OVERLAY_FLOWING.get();
 	}
 
 	@Override
 	public Fluid getStill() {
-		return TestFluids.NO_OVERLAY;
+		return TestFluids.NO_OVERLAY.get();
 	}
 
 	@Override
@@ -74,12 +77,12 @@ public abstract class NoOverlayFluid extends FlowableFluid {
 
 	@Override
 	public BlockState toBlockState(FluidState state) {
-		return TestFluids.NO_OVERLAY_BLOCK.getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
+		return TestFluids.NO_OVERLAY_BLOCK.get().getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
 	}
 
 	@Override
 	public boolean matchesType(Fluid fluid) {
-		return fluid == TestFluids.NO_OVERLAY || fluid == TestFluids.NO_OVERLAY_FLOWING;
+		return fluid == TestFluids.NO_OVERLAY.get() || fluid == TestFluids.NO_OVERLAY_FLOWING.get();
 	}
 
 	@Override
@@ -94,7 +97,7 @@ public abstract class NoOverlayFluid extends FlowableFluid {
 
 	@Override
 	public boolean canBeReplacedWith(FluidState state, BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
-		return direction == Direction.DOWN && !fluid.matchesType(TestFluids.NO_OVERLAY);
+		return direction == Direction.DOWN && !fluid.matchesType(TestFluids.NO_OVERLAY.get());
 	}
 
 	@Override
@@ -105,6 +108,11 @@ public abstract class NoOverlayFluid extends FlowableFluid {
 	@Override
 	public Optional<SoundEvent> getBucketFillSound() {
 		return Optional.of(SoundEvents.ITEM_BUCKET_FILL);
+	}
+
+	@Override
+	public FluidType getFluidType() {
+		return ForgeMod.EMPTY_TYPE.get();
 	}
 
 	public static class Flowing extends NoOverlayFluid {

@@ -16,34 +16,43 @@
 
 package net.fabricmc.fabric.test.client.rendering.fluid;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.fluid.Fluid;
 
 public class TestFluids {
-	public static final NoOverlayFluid NO_OVERLAY = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:no_overlay", new NoOverlayFluid.Still());
-	public static final NoOverlayFluid NO_OVERLAY_FLOWING = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:no_overlay_flowing", new NoOverlayFluid.Flowing());
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, "fabric-rendering-fluids-v1-testmod");
+	private static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS, "fabric-rendering-fluids-v1-testmod");
 
-	public static final FluidBlock NO_OVERLAY_BLOCK = Registry.register(Registries.BLOCK, "fabric-rendering-fluids-v1-testmod:no_overlay", new FluidBlock(NO_OVERLAY, AbstractBlock.Settings.copy(Blocks.WATER)) {
-	});
+	public static final RegistryObject<NoOverlayFluid> NO_OVERLAY = FLUIDS.register("no_overlay", NoOverlayFluid.Still::new);
+	public static final RegistryObject<NoOverlayFluid> NO_OVERLAY_FLOWING = FLUIDS.register("no_overlay_flowing", NoOverlayFluid.Flowing::new);
 
-	public static final OverlayFluid OVERLAY = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:overlay", new OverlayFluid.Still());
-	public static final OverlayFluid OVERLAY_FLOWING = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:overlay_flowing", new OverlayFluid.Flowing());
+	public static final RegistryObject<FluidBlock> NO_OVERLAY_BLOCK = BLOCKS.register("no_overlay", () -> new FluidBlock(NO_OVERLAY, AbstractBlock.Settings.copy(Blocks.WATER)) {});
 
-	public static final FluidBlock OVERLAY_BLOCK = Registry.register(Registries.BLOCK, "fabric-rendering-fluids-v1-testmod:overlay", new FluidBlock(OVERLAY, AbstractBlock.Settings.copy(Blocks.WATER)) {
-	});
+	public static final RegistryObject<OverlayFluid> OVERLAY = FLUIDS.register("overlay", OverlayFluid.Still::new);
+	public static final RegistryObject<OverlayFluid> OVERLAY_FLOWING = FLUIDS.register("overlay_flowing", OverlayFluid.Flowing::new);
 
-	public static final UnregisteredFluid UNREGISTERED = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:unregistered", new UnregisteredFluid.Still());
-	public static final UnregisteredFluid UNREGISTERED_FLOWING = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:unregistered_flowing", new UnregisteredFluid.Flowing());
+	public static final RegistryObject<FluidBlock> OVERLAY_BLOCK = BLOCKS.register("overlay", () -> new FluidBlock(OVERLAY, AbstractBlock.Settings.copy(Blocks.WATER)) {});
 
-	public static final FluidBlock UNREGISTERED_BLOCK = Registry.register(Registries.BLOCK, "fabric-rendering-fluids-v1-testmod:unregistered", new FluidBlock(UNREGISTERED, AbstractBlock.Settings.copy(Blocks.WATER)) {
-	});
+	public static final RegistryObject<UnregisteredFluid> UNREGISTERED = FLUIDS.register("unregistered", UnregisteredFluid.Still::new);
+	public static final RegistryObject<UnregisteredFluid> UNREGISTERED_FLOWING = FLUIDS.register("unregistered_flowing", UnregisteredFluid.Flowing::new);
 
-	public static final CustomFluid CUSTOM = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:custom", new CustomFluid.Still());
-	public static final CustomFluid CUSTOM_FLOWING = Registry.register(Registries.FLUID, "fabric-rendering-fluids-v1-testmod:custom_flowing", new CustomFluid.Flowing());
+	public static final RegistryObject<FluidBlock> UNREGISTERED_BLOCK = BLOCKS.register("unregistered", () -> new FluidBlock(UNREGISTERED, AbstractBlock.Settings.copy(Blocks.WATER)) {});
 
-	public static final FluidBlock CUSTOM_BLOCK = Registry.register(Registries.BLOCK, "fabric-rendering-fluids-v1-testmod:custom", new FluidBlock(CUSTOM, AbstractBlock.Settings.copy(Blocks.WATER)) {
-	});
+	public static final RegistryObject<CustomFluid> CUSTOM = FLUIDS.register("custom", CustomFluid.Still::new);
+	public static final RegistryObject<CustomFluid> CUSTOM_FLOWING = FLUIDS.register("custom_flowing", CustomFluid.Flowing::new);
+
+	public static final RegistryObject<FluidBlock> CUSTOM_BLOCK = BLOCKS.register("custom", () -> new FluidBlock(CUSTOM, AbstractBlock.Settings.copy(Blocks.WATER)) {});
+
+	public static void init(IEventBus bus) {
+		BLOCKS.register(bus);
+		FLUIDS.register(bus);
+	}
 }

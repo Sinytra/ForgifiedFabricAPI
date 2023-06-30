@@ -16,11 +16,20 @@
 
 package net.fabricmc.fabric.test.client.rendering.fluid;
 
-import net.fabricmc.api.ModInitializer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 
-public class FabricFluidRenderingTestMod implements ModInitializer {
-	@Override
-	public void onInitialize() {
-		new TestFluids();
+@Mod("fabric_rendering_fluids_v1_testmod")
+public class FabricFluidRenderingTestMod {
+
+	public FabricFluidRenderingTestMod() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			bus.addListener(FabricFluidRenderingTestModClient::onInitializeClient);
+		}
+		TestFluids.init(bus);
 	}
 }

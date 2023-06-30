@@ -37,18 +37,21 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.fluids.FluidType;
+
 public abstract class UnregisteredFluid extends FlowableFluid {
 	public UnregisteredFluid() {
 	}
 
 	@Override
 	public Fluid getFlowing() {
-		return TestFluids.UNREGISTERED_FLOWING;
+		return TestFluids.UNREGISTERED_FLOWING.get();
 	}
 
 	@Override
 	public Fluid getStill() {
-		return TestFluids.UNREGISTERED;
+		return TestFluids.UNREGISTERED.get();
 	}
 
 	@Override
@@ -74,12 +77,12 @@ public abstract class UnregisteredFluid extends FlowableFluid {
 
 	@Override
 	public BlockState toBlockState(FluidState state) {
-		return TestFluids.UNREGISTERED_BLOCK.getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
+		return TestFluids.UNREGISTERED_BLOCK.get().getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
 	}
 
 	@Override
 	public boolean matchesType(Fluid fluid) {
-		return fluid == TestFluids.UNREGISTERED || fluid == TestFluids.UNREGISTERED_FLOWING;
+		return fluid == TestFluids.UNREGISTERED.get() || fluid == TestFluids.UNREGISTERED_FLOWING.get();
 	}
 
 	@Override
@@ -94,7 +97,7 @@ public abstract class UnregisteredFluid extends FlowableFluid {
 
 	@Override
 	public boolean canBeReplacedWith(FluidState state, BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
-		return direction == Direction.DOWN && !fluid.matchesType(TestFluids.NO_OVERLAY);
+		return direction == Direction.DOWN && !fluid.matchesType(TestFluids.NO_OVERLAY.get());
 	}
 
 	@Override
@@ -105,6 +108,11 @@ public abstract class UnregisteredFluid extends FlowableFluid {
 	@Override
 	public Optional<SoundEvent> getBucketFillSound() {
 		return Optional.of(SoundEvents.ITEM_BUCKET_FILL);
+	}
+
+	@Override
+	public FluidType getFluidType() {
+		return ForgeMod.WATER_TYPE.get();
 	}
 
 	public static class Flowing extends UnregisteredFluid {

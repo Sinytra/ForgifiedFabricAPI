@@ -17,11 +17,16 @@
 package net.fabricmc.fabric.api.client.render.fluid.v1;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.TransparentBlock;
 import net.minecraft.fluid.Fluid;
 
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
+
+import net.minecraft.fluid.FluidState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockRenderView;
 
 /**
  * Registry for {@link FluidRenderHandler} instances.
@@ -94,4 +99,11 @@ public interface FluidRenderHandlerRegistry {
 	 * or not.
 	 */
 	boolean isBlockTransparent(Block block);
+
+	/**
+	 * FFAPI: Forge-sensitive version of {@link #isBlockTransparent(Block)}
+	 */
+	default boolean isBlockTransparent(BlockState state, BlockRenderView level, BlockPos pos, FluidState fluidState) {
+		return isBlockTransparent(state.getBlock());
+	}
 }
