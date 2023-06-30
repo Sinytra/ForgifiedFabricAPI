@@ -16,6 +16,11 @@
 
 package net.fabricmc.fabric.mixin.screen;
 
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -26,11 +31,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 
 @Mixin(MinecraftClient.class)
 abstract class MinecraftClientMixin {
@@ -57,7 +57,7 @@ abstract class MinecraftClientMixin {
 
 	// Synthetic method in `tick`
 	// These two injections should be caught by "Screen#wrapScreenError" if anything fails in an event and then rethrown in the crash report
-	@Inject(method = {"method_1572", "lambda$tick$40()V"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;tick()V"), require = 1, remap = false)
+	@Inject(method = { "m_231445_", "lambda$tick$40()V" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;tick()V"), require = 1)
 	private void beforeScreenTick(CallbackInfo ci) {
 		// Store the screen in a variable in case someone tries to change the screen during this before tick event.
 		// If someone changes the screen, the after tick event will likely have class cast exceptions or an NPE.
@@ -66,7 +66,7 @@ abstract class MinecraftClientMixin {
 	}
 
 	// Synthetic method in `tick`
-	@Inject(method = {"method_1572", "lambda$tick$40()V"}, at = @At("TAIL"), require = 1, remap = false)
+	@Inject(method = { "m_231445_", "lambda$tick$40()V" }, at = @At("TAIL"), require = 1, remap = false)
 	private void afterScreenTick(CallbackInfo ci) {
 		ScreenEvents.afterTick(this.tickingScreen).invoker().afterTick(this.tickingScreen);
 		// Finally set the currently ticking screen to null

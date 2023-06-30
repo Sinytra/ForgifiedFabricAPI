@@ -18,7 +18,7 @@ function initializeCoreMod() {
             },
             'transformer': function (node) {
                 var list = new InsnList();
-                list.add(new VarInsnNode(Opcodes.ALOAD_0));
+                list.add(new VarInsnNode(Opcodes.ALOAD, 0));
                 list.add(new FieldInsnNode(Opcodes.GETSTATIC, "net/fabricmc/fabric/api/resource/conditions/v1/ResourceConditions", "CONDITIONS_KEY", "Ljava/lang/String;"));
                 list.add(new LdcInsnNode(-100));
                 list.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap", "put", "(Ljava/lang/Object;I)I"));

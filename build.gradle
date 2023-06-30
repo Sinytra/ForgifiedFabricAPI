@@ -1084,7 +1084,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 			}
 			def normalModid = normalizeModid(json.id)
 			toml {
-				modLoader "javafml"
+				modLoader project == project.rootProject ? "lowcodefml" : "javafml"
 				loaderVersion "[${loaderVersionString.get()},)"
 				license json.license ?: "All Rights Reserved"
 				if (json.environment == "client") {
