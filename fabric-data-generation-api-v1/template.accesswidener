@@ -46,3 +46,5 @@ transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator
 transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool
 transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator$LogTexturePool
 transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator$BuiltinModelPool
+
+accessible  method net/minecraft/data/DataGenerator$Pack  <init>  (Lnet/minecraft/data/DataGenerator;ZLjava/lang/String;Lnet/minecraft/data/DataOutput;)V

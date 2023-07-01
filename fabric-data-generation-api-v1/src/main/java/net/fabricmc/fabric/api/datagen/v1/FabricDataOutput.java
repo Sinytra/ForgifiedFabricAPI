@@ -18,6 +18,7 @@ package net.fabricmc.fabric.api.datagen.v1;
 
 import java.nio.file.Path;
 
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.data.DataOutput;
@@ -28,22 +29,22 @@ import net.fabricmc.loader.api.ModContainer;
  * Extends {@link DataOutput} to keep track of the {@link ModContainer} that it originated from.
  */
 public final class FabricDataOutput extends DataOutput {
-	private final ModContainer modContainer;
+	private final IModInfo modContainer;
 	private final boolean strictValidation;
 
 	@ApiStatus.Internal
-	public FabricDataOutput(ModContainer modContainer, Path path, boolean strictValidation) {
+	public FabricDataOutput(IModInfo modContainer, Path path, boolean strictValidation) {
 		super(path);
 		this.modContainer = modContainer;
 		this.strictValidation = strictValidation;
 	}
 
 	/**
-	 * Returns the {@link ModContainer} for the mod that this data generator has been created for.
+	 * Returns the {@link IModInfo} for the mod that this data generator has been created for.
 	 *
-	 * @return a {@link ModContainer} instance
+	 * @return a {@link IModInfo} instance
 	 */
-	public ModContainer getModContainer() {
+	public IModInfo getModContainer() {
 		return modContainer;
 	}
 
@@ -53,7 +54,7 @@ public final class FabricDataOutput extends DataOutput {
 	 * @return a mod ID
 	 */
 	public String getModId() {
-		return getModContainer().getMetadata().getId();
+		return getModContainer().getModId();
 	}
 
 	/**

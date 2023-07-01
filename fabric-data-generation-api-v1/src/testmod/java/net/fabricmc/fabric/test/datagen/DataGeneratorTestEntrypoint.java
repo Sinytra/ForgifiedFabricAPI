@@ -16,29 +16,25 @@
 
 package net.fabricmc.fabric.test.datagen;
 
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.BLOCK_THAT_DROPS_NOTHING;
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.BLOCK_WITHOUT_ITEM;
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.BLOCK_WITHOUT_LOOT_TABLE;
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.BLOCK_WITH_VANILLA_LOOT_TABLE;
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.MOD_ID;
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_BLOCK;
-import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_ITEM_GROUP;
+import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.*;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.advancement.criterion.OnKilledCriterion;
 import net.minecraft.block.Blocks;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
@@ -65,8 +61,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
@@ -79,16 +73,18 @@ import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
-import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
+import net.fabricmc.fabric.test.datagen.client.DataGeneratorClientTestEntrypoint;
 
-public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DataGeneratorTestEntrypoint.class);
+public class DataGeneratorTestEntrypoint {
 	private static final ConditionJsonProvider NEVER_LOADED = DefaultResourceConditions.allModsLoaded("a");
 	private static final ConditionJsonProvider ALWAYS_LOADED = DefaultResourceConditions.not(NEVER_LOADED);
 
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-		final FabricDataGenerator.Pack pack = dataGenerator.createPack();
+	public static void onGatherData(GatherDataEvent event) {
+		final DataGenerator dataGenerator = event.getGenerator();
+		final IModInfo modInfo = ModList.get().getModContainerById(MOD_ID).orElseThrow().getModInfo();
+		final FabricDataGenerator fabricDataGenerator = new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, event.getLookupProvider());
+		final FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
 		pack.addProvider(TestRecipeProvider::new);
 		pack.addProvider(TestModelProvider::new);
@@ -103,14 +99,8 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		pack.addProvider(TestBiomeTagProvider::new);
 
 		// TODO replace with a client only entrypoint with FMJ 2
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-			try {
-				Class<?> clientEntrypointClass = Class.forName("net.fabricmc.fabric.test.datagen.client.DataGeneratorClientTestEntrypoint");
-				DataGeneratorEntrypoint entrypoint = (DataGeneratorEntrypoint) clientEntrypointClass.getConstructor().newInstance();
-				entrypoint.onInitializeDataGenerator(dataGenerator);
-			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			DataGeneratorClientTestEntrypoint.onInitializeDataGenerator(fabricDataGenerator);
 		}
 	}
 
@@ -121,7 +111,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generate(Consumer<RecipeJsonProvider> exporter) {
-			offerPlanksRecipe2(exporter, SIMPLE_BLOCK, ItemTags.ACACIA_LOGS, 1);
+			offerPlanksRecipe2(exporter, SIMPLE_BLOCK.get(), ItemTags.ACACIA_LOGS, 1);
 
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, Items.LEATHER, 4).input(Items.ITEM_FRAME)
 					.criterion("has_frame", conditionsFromItem(Items.ITEM_FRAME))
@@ -209,19 +199,15 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateTranslations(TranslationBuilder translationBuilder) {
-			translationBuilder.add(SIMPLE_BLOCK, "Simple Block");
+			translationBuilder.add(SIMPLE_BLOCK.get(), "Simple Block");
 			translationBuilder.add(new Identifier(MOD_ID, "identifier_test"), "Identifier Test");
 			translationBuilder.add(EntityType.ALLAY, "Allay");
 			translationBuilder.add(EntityAttributes.GENERIC_ARMOR, "Generic Armor");
 
 			try {
-				Optional<Path> path = dataOutput.getModContainer().findPath("assets/testmod/lang/en_us.base.json");
+				Path path = dataOutput.getModContainer().getOwningFile().getFile().findResource("assets/testmod/lang/en_us.base.json");
 
-				if (path.isPresent()) {
-					translationBuilder.add(path.get());
-				} else {
-					throw new RuntimeException("The existing language file could not be found in the testmod assets!");
-				}
+				translationBuilder.add(path);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -241,7 +227,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateTranslations(TranslationBuilder translationBuilder) {
-			translationBuilder.add(SIMPLE_BLOCK, "シンプルブロック");
+			translationBuilder.add(SIMPLE_BLOCK.get(), "シンプルブロック");
 			translationBuilder.add(SIMPLE_ITEM_GROUP, "データ生成項目");
 			translationBuilder.add("this.is.a.test", "こんにちは");
 		}
@@ -254,11 +240,11 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-			blockStateModelGenerator.registerSimpleCubeAll(SIMPLE_BLOCK);
-			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_WITHOUT_ITEM);
-			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_WITHOUT_LOOT_TABLE);
-			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_WITH_VANILLA_LOOT_TABLE);
-			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_THAT_DROPS_NOTHING);
+			blockStateModelGenerator.registerSimpleCubeAll(SIMPLE_BLOCK.get());
+			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_WITHOUT_ITEM.get());
+			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_WITHOUT_LOOT_TABLE.get());
+			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_WITH_VANILLA_LOOT_TABLE.get());
+			blockStateModelGenerator.registerSimpleCubeAll(BLOCK_THAT_DROPS_NOTHING.get());
 		}
 
 		@Override
@@ -274,8 +260,8 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void configure(RegistryWrapper.WrapperLookup registries) {
-			getOrCreateTagBuilder(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK);
-			getOrCreateTagBuilder(BlockTags.DIRT).add(SIMPLE_BLOCK);
+			getOrCreateTagBuilder(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK.get());
+			getOrCreateTagBuilder(BlockTags.DIRT).add(SIMPLE_BLOCK.get());
 			getOrCreateTagBuilder(BlockTags.ACACIA_LOGS).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
 		}
 	}
@@ -313,7 +299,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		public void generateAdvancement(Consumer<Advancement> consumer) {
 			Advancement root = Advancement.Builder.create()
 					.display(
-							SIMPLE_BLOCK,
+							SIMPLE_BLOCK.get(),
 							Text.translatable("advancements.test.root.title"),
 							Text.translatable("advancements.test.root.description"),
 							new Identifier("textures/gui/advancements/backgrounds/end.png"),
@@ -323,7 +309,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.build(consumer, MOD_ID + ":test/root");
 			Advancement rootNotLoaded = Advancement.Builder.create()
 					.display(
-							SIMPLE_BLOCK,
+							SIMPLE_BLOCK.get(),
 							Text.translatable("advancements.test.root_not_loaded.title"),
 							Text.translatable("advancements.test.root_not_loaded.description"),
 							new Identifier("textures/gui/advancements/backgrounds/end.png"),
@@ -342,10 +328,10 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		@Override
 		public void generate() {
 			// Same condition twice to test recursive condition adding
-			withConditions(ALWAYS_LOADED).withConditions(DefaultResourceConditions.not(NEVER_LOADED)).addDrop(SIMPLE_BLOCK);
-			addDrop(BLOCK_WITHOUT_ITEM, drops(SIMPLE_BLOCK));
+			withConditions(ALWAYS_LOADED).withConditions(DefaultResourceConditions.not(NEVER_LOADED)).addDrop(SIMPLE_BLOCK.get());
+			addDrop(BLOCK_WITHOUT_ITEM.get(), drops(SIMPLE_BLOCK.get()));
 
-			excludeFromStrictValidation(BLOCK_WITHOUT_LOOT_TABLE);
+			excludeFromStrictValidation(BLOCK_WITHOUT_LOOT_TABLE.get());
 		}
 	}
 
@@ -359,7 +345,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 			withConditions(consumer, ALWAYS_LOADED).accept(
 					LootTables.PIGLIN_BARTERING_GAMEPLAY,
 					LootTable.builder().pool(
-							LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F)).with(ItemEntry.builder(SIMPLE_BLOCK))
+							LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F)).with(ItemEntry.builder(SIMPLE_BLOCK.get()))
 					)
 			);
 		}

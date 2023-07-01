@@ -52,6 +52,9 @@ transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator
 transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator$LogTexturePool
 transitive-accessible   class net/minecraft/data/client/BlockStateModelGenerator$BuiltinModelPool
 
+accessible  method net/minecraft/data/DataGenerator$Pack  <init>  (Lnet/minecraft/data/DataGenerator;ZLjava/lang/String;Lnet/minecraft/data/DataOutput;)V
+
+transitive-accessible	method	net/minecraft/data/server/recipe/RecipeProvider	saveAdvancement	(Lnet/minecraft/data/DataWriter;Lnet/minecraft/data/server/recipe/RecipeJsonProvider;Lcom/google/gson/JsonObject;)Ljava/util/concurrent/CompletableFuture;
 transitive-accessible	method	net/minecraft/data/server/recipe/RecipeProvider	saveRecipeAdvancement	(Lnet/minecraft/data/DataWriter;Lnet/minecraft/util/Identifier;Lnet/minecraft/advancement/Advancement$Builder;)Ljava/util/concurrent/CompletableFuture;
 transitive-accessible	method	net/minecraft/data/server/recipe/RecipeProvider	generate	(Ljava/util/function/Consumer;)V
 transitive-accessible	method	net/minecraft/data/server/recipe/RecipeProvider	generateFamilies	(Ljava/util/function/Consumer;Lnet/minecraft/resource/featuretoggle/FeatureSet;)V
@@ -280,6 +283,7 @@ transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableG
 transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	flowerbedDrops	(Lnet/minecraft/block/Block;)Lnet/minecraft/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	candleCakeDrops	(Lnet/minecraft/block/Block;)Lnet/minecraft/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	generate	()V
+transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	getKnownBlocks	()Ljava/lang/Iterable;
 transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	addVinePlantDrop	(Lnet/minecraft/block/Block;Lnet/minecraft/block/Block;)V
 transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	doorDrops	(Lnet/minecraft/block/Block;)Lnet/minecraft/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/server/loottable/BlockLootTableGenerator	addPottedPlantDrops	(Lnet/minecraft/block/Block;)V
@@ -305,10 +309,8 @@ transitive-extendable	method	net/minecraft/data/client/ModelProvider	getName	()L
 transitive-extendable	method	net/minecraft/data/dev/NbtProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/report/BlockListProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/report/CommandSyntaxProvider	getName	()Ljava/lang/String;
-transitive-extendable	method	net/minecraft/data/report/DynamicRegistriesProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/report/RegistryDumpProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/server/BiomeParametersProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/server/advancement/AdvancementProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/server/loottable/LootTableProvider	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/server/recipe/RecipeProvider	getName	()Ljava/lang/String;
-transitive-extendable	method	net/minecraft/data/server/tag/TagProvider	getName	()Ljava/lang/String;
