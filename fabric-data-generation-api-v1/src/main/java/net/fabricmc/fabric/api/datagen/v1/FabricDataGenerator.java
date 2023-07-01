@@ -21,6 +21,11 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.datafixers.util.Pair;
+
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
+
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -42,6 +47,12 @@ public final class FabricDataGenerator extends DataGenerator {
 	private final CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture;
 	private final DataGenerator parent;
 
+	public static FabricDataGenerator create(String modid, GatherDataEvent event) {
+		final DataGenerator dataGenerator = event.getGenerator();
+		final IModInfo modInfo = ModList.get().getModContainerById(modid).orElseThrow().getModInfo();
+		return new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, event.getLookupProvider());
+	}
+	
 	@ApiStatus.Internal
 	public FabricDataGenerator(DataGenerator parent, Path output, IModInfo mod, boolean strictValidation, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
 		super(output, SharedConstants.getGameVersion(), true);

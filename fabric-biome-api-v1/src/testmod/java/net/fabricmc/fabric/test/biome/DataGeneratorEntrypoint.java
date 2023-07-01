@@ -32,9 +32,7 @@ import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 
 public class DataGeneratorEntrypoint {
 	public static void onGatherData(GatherDataEvent event) {
-		final DataGenerator dataGenerator = event.getGenerator();
-		final IModInfo modInfo = ModList.get().getModContainerById(FabricBiomeTest.MOD_ID).orElseThrow().getModInfo();
-		final FabricDataGenerator fabricDataGenerator = new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, event.getLookupProvider());
+		final FabricDataGenerator fabricDataGenerator = FabricDataGenerator.create(FabricBiomeTest.MOD_ID, event);
 
 		onInitializeDataGenerator(fabricDataGenerator);
 	}

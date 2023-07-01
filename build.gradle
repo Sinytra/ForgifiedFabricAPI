@@ -865,11 +865,7 @@ import org.cadixdev.at.io.AccessTransformFormats
 import org.cadixdev.lorenz.MappingSet
 
 allprojects {
-	for (def sourceSet in [
-		sourceSets.main,
-	//	sourceSets.client,
-		sourceSets.testmod
-	]) {
+	sourceSets.configureEach { sourceSet ->
 		// We have to capture the source set name for the lazy string literals,
 		// otherwise it'll just be whatever the last source set is in the list.
 		def sourceSetName = sourceSet.name

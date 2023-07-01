@@ -16,8 +16,13 @@
 
 package net.fabricmc.fabric.impl.tag.convention.datagen;
 
-import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.impl.tag.convention.ConventionTagsImpl;
 import net.fabricmc.fabric.impl.tag.convention.datagen.generators.BiomeTagGenerator;
 import net.fabricmc.fabric.impl.tag.convention.datagen.generators.BlockTagGenerator;
 import net.fabricmc.fabric.impl.tag.convention.datagen.generators.EnchantmentTagGenerator;
@@ -25,9 +30,16 @@ import net.fabricmc.fabric.impl.tag.convention.datagen.generators.EntityTypeTagG
 import net.fabricmc.fabric.impl.tag.convention.datagen.generators.FluidTagGenerator;
 import net.fabricmc.fabric.impl.tag.convention.datagen.generators.ItemTagGenerator;
 
-public class DatagenEntrypoint implements DataGeneratorEntrypoint {
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
+@Mod("fabric_convention_tags_v1_datagen")
+public class DatagenEntrypoint {
+
+	public DatagenEntrypoint() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		bus.addListener(DatagenEntrypoint::onGatherData);
+	}
+
+	private static void onGatherData(GatherDataEvent event) {
+		final FabricDataGenerator fabricDataGenerator = FabricDataGenerator.create(ConventionTagsImpl.MOD_ID, event);
 		final FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
 		BlockTagGenerator blockTags = pack.addProvider(BlockTagGenerator::new);
