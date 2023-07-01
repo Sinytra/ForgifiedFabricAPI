@@ -17,6 +17,9 @@
 package net.fabricmc.fabric.test.biome;
 
 import com.google.common.base.Preconditions;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -28,7 +31,6 @@ import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.PlacedFeature;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
@@ -45,20 +47,24 @@ import net.fabricmc.fabric.api.biome.v1.TheEndBiomes;
  *
  * <p>If you don't find a biome right away, teleport far away (~10000 blocks) from spawn and try again.
  */
-public class FabricBiomeTest implements ModInitializer {
-	public static final String MOD_ID = "fabric-biome-api-v1-testmod";
+@Mod(FabricBiomeTest.MOD_ID)
+public class FabricBiomeTest {
+	public static final String MOD_ID = "fabric_biome_api_v1_testmod";
+	public static final String NAMESPACE = "fabric-biome-api-v1-testmod";
 
 	public static final RegistryKey<ConfiguredFeature<?, ?>> COMMON_DESERT_WELL = RegistryKey.of(
 			RegistryKeys.CONFIGURED_FEATURE,
-			new Identifier(FabricBiomeTest.MOD_ID, "fab_desert_well")
+			new Identifier(FabricBiomeTest.NAMESPACE, "fab_desert_well")
 	);
 	public static final RegistryKey<PlacedFeature> PLACED_COMMON_DESERT_WELL = RegistryKey.of(
 			RegistryKeys.PLACED_FEATURE,
-			new Identifier(FabricBiomeTest.MOD_ID, "fab_desert_well")
+			new Identifier(FabricBiomeTest.NAMESPACE, "fab_desert_well")
 	);
 
-	@Override
-	public void onInitialize() {
+	public FabricBiomeTest() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		bus.addListener(DataGeneratorEntrypoint::onGatherData);
+		
 		Preconditions.checkArgument(NetherBiomes.canGenerateInNether(BiomeKeys.NETHER_WASTES));
 		Preconditions.checkArgument(!NetherBiomes.canGenerateInNether(BiomeKeys.END_HIGHLANDS));
 
@@ -86,7 +92,7 @@ public class FabricBiomeTest implements ModInitializer {
 							);
 						})
 				.add(ModificationPhase.ADDITIONS,
-						BiomeSelectors.tag(TagKey.of(RegistryKeys.BIOME, new Identifier(MOD_ID, "tag_selector_test"))),
+						BiomeSelectors.tag(TagKey.of(RegistryKeys.BIOME, new Identifier(NAMESPACE, "tag_selector_test"))),
 						context -> context.getEffects().setSkyColor(0x770000));
 
 		// Make sure data packs can define dynamic registry contents
@@ -94,7 +100,7 @@ public class FabricBiomeTest implements ModInitializer {
 		BiomeModifications.addFeature(
 				BiomeSelectors.foundInOverworld(),
 				GenerationStep.Feature.VEGETAL_DECORATION,
-				RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(MOD_ID, "concrete_pile"))
+				RegistryKey.of(RegistryKeys.PLACED_FEATURE, new Identifier(NAMESPACE, "concrete_pile"))
 		);
 
 		// Make sure data packs can define biomes
