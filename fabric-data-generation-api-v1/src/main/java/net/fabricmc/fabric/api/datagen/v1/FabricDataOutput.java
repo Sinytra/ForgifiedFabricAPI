@@ -23,10 +23,8 @@ import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.data.DataOutput;
 
-import net.fabricmc.loader.api.ModContainer;
-
 /**
- * Extends {@link DataOutput} to keep track of the {@link ModContainer} that it originated from.
+ * Extends {@link DataOutput} to keep track of the {@link IModInfo} that it originated from.
  */
 public final class FabricDataOutput extends DataOutput {
 	private final IModInfo modContainer;

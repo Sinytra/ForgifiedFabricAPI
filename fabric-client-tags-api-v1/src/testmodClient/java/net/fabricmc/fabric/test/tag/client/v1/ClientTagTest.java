@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.tag.client.v1;
 
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,6 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.BiomeKeys;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -34,16 +36,14 @@ import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEnchantmentTags;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 
-public class ClientTagTest implements ClientModInitializer {
+@Mod(ClientTagTest.MODID)
+public class ClientTagTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientTagTest.class);
-	private static final String MODID = "fabric-clients-tags-api-v1-testmod";
+	private static final String MODID = "fabric_clients_tags_api_v1_testmod";
 
-	@Override
-	public void onInitializeClient() {
-		final ModContainer container = FabricLoader.getInstance().getModContainer(MODID).get();
+	public ClientTagTest() {
+		final IModInfo container = ModList.get().getModContainerById(MODID).orElseThrow().getModInfo();
 
 		if (!ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(MODID, "test2"),
 				container, ResourcePackActivationType.ALWAYS_ENABLED)) {

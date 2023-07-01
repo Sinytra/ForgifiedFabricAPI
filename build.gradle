@@ -236,7 +236,7 @@ allprojects {
 //			sourceSet p.sourceSets.client
 		}
 
-		if (p.file("src/testmod").exists()) {
+		if (p.file("src/testmod").exists() || p.file("src/testmodClient").exists()) {
 			loom.mods.register(p.name + "-testmod") {
 				sourceSet p.sourceSets.testmod
 //			    sourceSet p.sourceSets.testmodClient
@@ -248,7 +248,6 @@ allprojects {
 		minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
 		mappings "net.fabricmc:yarn:${rootProject.minecraft_version}${project.yarn_version}:v2"
 		forge "net.minecraftforge:forge:${rootProject.forge_version}"
-		modApi "net.fabricmc:fabric-loader:${project.loader_version}"
 
 		testmodImplementation sourceSets.main.output
 //		testmodClientImplementation sourceSets.main.output

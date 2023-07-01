@@ -29,6 +29,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.forgespi.language.IModFileInfo;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +43,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.registry.tag.TagManagerLoader;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
 
 public class ClientTagsLoader {
 	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-client-tags-api-v1");
@@ -128,8 +129,11 @@ public class ClientTagsLoader {
 	private static HashSet<Path> getResourcePaths(String path) {
 		HashSet<Path> out = new HashSet<>();
 
-		for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
-			mod.findPath(path).ifPresent(out::add);
+		for (IModFileInfo modFile : ModList.get().getModFiles()) {
+			Path modPath = modFile.getFile().findResource(path);
+			if (Files.exists(modPath)) {
+				out.add(modPath);
+			}
 		}
 
 		return out;

@@ -16,17 +16,7 @@
 
 package net.fabricmc.fabric.test.base.client;
 
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.clickScreenButton;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.closeScreen;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.enableDebugHud;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.openGameMenu;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.openInventory;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.setPerspective;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.submitAndWait;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.takeScreenshot;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.waitForLoadingComplete;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.waitForScreen;
-import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.waitForWorldTicks;
+import static net.fabricmc.fabric.test.base.client.FabricClientTestHelper.*;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -34,6 +24,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
@@ -43,12 +34,9 @@ import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.option.Perspective;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
+public class FabricApiAutoTestClient {
 
-public class FabricApiAutoTestClient implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		if (System.getProperty("fabric.autoTest") == null) {
 			return;
 		}
@@ -65,7 +53,7 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 		thread.start();
 	}
 
-	private void runTest() {
+	private static void runTest() {
 		waitForLoadingComplete();
 
 		final boolean onboardAccessibility = submitAndWait(client -> client.options.onboardAccessibility);
@@ -82,7 +70,7 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 			clickScreenButton("menu.singleplayer");
 		}
 
-		if (!isDirEmpty(FabricLoader.getInstance().getGameDir().resolve("saves"))) {
+		if (!isDirEmpty(FMLPaths.GAMEDIR.get().resolve("saves"))) {
 			waitForScreen(SelectWorldScreen.class);
 			takeScreenshot("select_world_screen");
 			clickScreenButton("selectWorld.create");
@@ -134,7 +122,7 @@ public class FabricApiAutoTestClient implements ClientModInitializer {
 		}
 	}
 
-	private boolean isDirEmpty(Path path) {
+	private static boolean isDirEmpty(Path path) {
 		try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
 			return !directory.iterator().hasNext();
 		} catch (IOException e) {
