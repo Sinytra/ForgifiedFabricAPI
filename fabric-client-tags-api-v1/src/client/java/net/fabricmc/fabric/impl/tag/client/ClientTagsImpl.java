@@ -30,6 +30,9 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 
+import net.minecraftforge.fml.common.Mod;
+
+@Mod("fabric_client_tags_api_v1")
 public class ClientTagsImpl {
 	private static final Map<TagKey<?>, ClientTagsLoader.LoadedTag> LOCAL_TAG_HIERARCHY = new ConcurrentHashMap<>();
 

@@ -23,6 +23,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import net.minecraftforge.fml.loading.FMLPaths;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.GameMenuScreen;
@@ -41,7 +43,6 @@ import net.minecraft.text.Text;
 
 import net.fabricmc.fabric.test.base.client.mixin.CyclingButtonWidgetAccessor;
 import net.fabricmc.fabric.test.base.client.mixin.ScreenAccessor;
-import net.fabricmc.loader.api.FabricLoader;
 
 // Provides thread safe utils for interacting with a running game.
 public final class FabricClientTestHelper {
@@ -81,7 +82,7 @@ public final class FabricClientTestHelper {
 		waitFor(Duration.ofSeconds(1));
 
 		submitAndWait(client -> {
-			ScreenshotRecorder.saveScreenshot(FabricLoader.getInstance().getGameDir().toFile(), name + ".png", client.getFramebuffer(), (message) -> {
+			ScreenshotRecorder.saveScreenshot(FMLPaths.GAMEDIR.get().toFile(), name + ".png", client.getFramebuffer(), (message) -> {
 			});
 			return null;
 		});
