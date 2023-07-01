@@ -16,26 +16,26 @@
 
 package net.fabricmc.fabric.test.tag.convention.v1;
 
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.biome.BiomeKeys;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEnchantmentTags;
 import net.fabricmc.fabric.api.tag.convention.v1.TagUtil;
 
-public class TagUtilTest implements ModInitializer {
+@Mod("fabric_convention_tags_testmod")
+public class TagUtilTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TagUtilTest.class);
 
-	@Override
-	public void onInitialize() {
+	public TagUtilTest() {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			if (!TagUtil.isIn(ConventionalEnchantmentTags.INCREASES_BLOCK_DROPS, Enchantments.FORTUNE)) {
 				throw new AssertionError("Failed to find fortune in c:fortune!");

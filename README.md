@@ -23,7 +23,7 @@ Missing -> Added -> Tested
 | fabric-client-tags-api-v1            |        ⚠️ Missing        |    Stable    |
 | fabric-command-api-v2                |         ✅ Tested         |    Stable    |
 | fabric-content-registries-v0         |         ✅ Tested         |    Stable    |
-| fabric-convention-tags-v1            |        ⚠️ Missing        |    Stable    |
+| fabric-convention-tags-v1            |         ✅ Tested         |    Stable    |
 | fabric-crash-report-info-v1          | 🚧 Not Planned [[1]](#1) |    Stable    |
 | fabric-data-generation-api-v1        |         ✅ Tested         |    Stable    |
 | fabric-dimensions-v1                 |         ✅ Tested         |    Stable    |
