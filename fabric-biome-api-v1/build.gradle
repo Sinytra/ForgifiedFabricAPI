@@ -1,23 +1,17 @@
 archivesBaseName = "fabric-biome-api-v1"
 version = getSubprojectVersion(project)
 
-loom {
-	accessWidenerPath = file("src/main/resources/fabric-biome-api-v1.accesswidener")
-}
-
 testDependencies(project, [
 	':fabric-api-base',
-	':fabric-resource-loader-v0',
-	':fabric-registry-sync-v0',
+//	':fabric-resource-loader-v0',
+//	':fabric-registry-sync-v0',
 	':fabric-data-generation-api-v1'
 ])
 
 sourceSets {
 	testmod {
 		resources {
-			srcDirs += [
-				'src/testmod/generated'
-			]
+			srcDir 'src/testmod/generated'
 		}
 	}
 }
@@ -25,19 +19,21 @@ sourceSets {
 loom {
 	runs {
 		datagen {
-			inherit testmodServer
+			data()
 			name "Data Generation"
-			vmArg "-Dfabric-api.datagen"
-			vmArg "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
-			vmArg "-Dfabric-api.datagen.strict-validation"
+
+			programArgs "--mod", "fabric_biome_api_v1_testmod", "--all", "--output", file("src/testmod/generated").absolutePath
 
 			ideConfigGenerated = true
 			runDir "build/datagen"
+			source sourceSets.testmod
 		}
 	}
 }
 
-// Ensure the worldgen JSONs are re-created to ensure the data-gen still works
-test.dependsOn runDatagen
-runTestmodClient.dependsOn runDatagen
-generateResources.dependsOn runDatagen
+afterEvaluate {
+	// Ensure the worldgen JSONs are re-created to ensure the data-gen still works
+	test.dependsOn "runDatagen"
+//	runTestmodClient.dependsOn "runDatagen"
+//	generateResources.dependsOn "runDatagen"
+}

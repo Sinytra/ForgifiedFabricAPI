@@ -5,13 +5,11 @@
   "mixins": [
     "BiomeSourceMixin",
     "ChunkNoiseSamplerMixin",
-    "MultiNoiseBiomeSourceMixin",
     "MultiNoiseUtilMultiNoiseSamplerMixin",
     "NetherBiomePresetMixin",
     "NoiseConfigMixin",
     "TheEndBiomeSourceMixin",
-    "modification.DynamicRegistryManagerImmutableImplMixin",
-    "modification.MinecraftServerMixin"
+    "SpawnSettingsBuilderAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

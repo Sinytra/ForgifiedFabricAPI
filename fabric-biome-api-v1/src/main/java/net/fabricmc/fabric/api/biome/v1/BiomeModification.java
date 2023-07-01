@@ -20,11 +20,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.util.Identifier;
-
-import net.fabricmc.fabric.impl.biome.modification.BiomeModificationImpl;
 
 /**
  * <b>Experimental feature</b>, may be removed or changed without further notice.

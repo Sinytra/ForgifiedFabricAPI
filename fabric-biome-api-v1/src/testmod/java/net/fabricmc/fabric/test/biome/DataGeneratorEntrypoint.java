@@ -16,21 +16,33 @@
 
 package net.fabricmc.fabric.test.biome;
 
+import java.util.Set;
+
+import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.forgespi.language.IModInfo;
+
+import net.minecraft.data.DataGenerator;
 import net.minecraft.registry.RegistryBuilder;
 import net.minecraft.registry.RegistryKeys;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 
-public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint {
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
+public class DataGeneratorEntrypoint {
+	public static void onGatherData(GatherDataEvent event) {
+		final DataGenerator dataGenerator = event.getGenerator();
+		final IModInfo modInfo = ModList.get().getModContainerById(FabricBiomeTest.MOD_ID).orElseThrow().getModInfo();
+		final FabricDataGenerator fabricDataGenerator = new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, event.getLookupProvider());
+
+		onInitializeDataGenerator(fabricDataGenerator);
+	}
+
+	public static void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
 		FabricDataGenerator.Pack pack = dataGenerator.createPack();
 		pack.addProvider(WorldgenProvider::new);
 		pack.addProvider(TestBiomeTagProvider::new);
-	}
-
-	@Override
-	public void buildRegistry(RegistryBuilder registryBuilder) {
-		registryBuilder.addRegistry(RegistryKeys.BIOME, TestBiomes::bootstrap);
+		pack.addProvider((output, registries) -> new DatapackBuiltinEntriesProvider(output, registries, new RegistryBuilder().addRegistry(RegistryKeys.BIOME, TestBiomes::bootstrap), Set.of(FabricBiomeTest.NAMESPACE)));
 	}
 }

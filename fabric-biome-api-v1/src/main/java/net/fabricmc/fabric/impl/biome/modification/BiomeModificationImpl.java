@@ -19,27 +19,32 @@ package net.fabricmc.fabric.impl.biome.modification;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.google.common.base.Stopwatch;
+import com.mojang.serialization.Codec;
+import net.minecraftforge.common.world.BiomeModifier;
+import net.minecraftforge.common.world.ModifiableBiomeInfo;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.TestOnly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
+import net.fabricmc.fabric.impl.biome.BiomeApiImpl;
 
 public class BiomeModificationImpl {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BiomeModificationImpl.class);
@@ -47,6 +52,10 @@ public class BiomeModificationImpl {
 	private static final Comparator<ModifierRecord> MODIFIER_ORDER_COMPARATOR = Comparator.<ModifierRecord>comparingInt(r -> r.phase.ordinal()).thenComparingInt(r -> r.order).thenComparing(r -> r.id);
 
 	public static final BiomeModificationImpl INSTANCE = new BiomeModificationImpl();
+
+	public static final DeferredRegister<Codec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, BiomeApiImpl.MOD_ID);
+	public static final RegistryObject<Codec<FabricBiomeModifier>> FABRIC_BIOME_MODIFIER = BIOME_MODIFIER_SERIALIZERS.register("fabric_biome_modifier",
+		() -> Codec.unit(() -> new FabricBiomeModifier(BiomeModificationImpl.INSTANCE.getSortedModifiers())));
 
 	private final List<ModifierRecord> modifiers = new ArrayList<>();
 
@@ -71,16 +80,32 @@ public class BiomeModificationImpl {
 		modifiersUnsorted = true;
 	}
 
-	/**
-	 * This is currently not publicly exposed but likely useful for modpack support mods.
-	 */
-	void changeOrder(Identifier id, int order) {
-		modifiersUnsorted = true;
+	public record FabricBiomeModifier(List<ModifierRecord> modifiers) implements BiomeModifier {
 
-		for (ModifierRecord modifierRecord : modifiers) {
-			if (id.equals(modifierRecord.id)) {
-				modifierRecord.setOrder(order);
+		@Override
+		public void modify(RegistryEntry<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+			DynamicRegistryManager.Immutable registryAccess = ServerLifecycleHooks.getCurrentServer().getRegistryManager();
+			RegistryKey<Biome> key = biome.getKey().orElseThrow();
+			BiomeSelectionContext selectionContext = new BiomeSelectionContextImpl(registryAccess, key, biome);
+			BiomeModificationContext modificationContext = new BiomeModificationContextImpl(registryAccess, builder);
+			for (ModifierRecord modifier : this.modifiers) {
+				if (isInPhase(phase, modifier.phase) && modifier.selector.test(selectionContext)) {
+					LOGGER.trace("Applying modifier {} to {}", modifier, key);
+					modifier.apply(selectionContext, modificationContext);
+				}
 			}
+		}
+
+		@Override
+		public Codec<? extends BiomeModifier> codec() {
+			return Codec.unit(this);
+		}
+
+		private boolean isInPhase(Phase phase, ModificationPhase modificationPhase) {
+			return phase == Phase.ADD && modificationPhase == ModificationPhase.ADDITIONS
+				|| phase == Phase.REMOVE && modificationPhase == ModificationPhase.REMOVALS
+				|| phase == Phase.MODIFY && modificationPhase == ModificationPhase.REPLACEMENTS
+				|| phase == Phase.AFTER_EVERYTHING && modificationPhase == ModificationPhase.POST_PROCESSING;
 		}
 	}
 
@@ -98,67 +123,6 @@ public class BiomeModificationImpl {
 		}
 
 		return modifiers;
-	}
-
-	public void finalizeWorldGen(DynamicRegistryManager impl) {
-		Stopwatch sw = Stopwatch.createStarted();
-
-		// Now that we apply biome modifications inside the MinecraftServer constructor, we should only ever do
-		// this once for a dynamic registry manager. Marking the dynamic registry manager as modified ensures a crash
-		// if the precondition is violated.
-		BiomeModificationMarker modificationTracker = (BiomeModificationMarker) impl;
-		modificationTracker.fabric_markModified();
-
-		Registry<Biome> biomes = impl.get(RegistryKeys.BIOME);
-
-		// Build a list of all biome keys in ascending order of their raw-id to get a consistent result in case
-		// someone does something stupid.
-		List<RegistryKey<Biome>> keys = biomes.getEntrySet().stream()
-				.map(Map.Entry::getKey)
-				.sorted(Comparator.comparingInt(key -> biomes.getRawId(biomes.getOrThrow(key))))
-				.toList();
-
-		List<ModifierRecord> sortedModifiers = getSortedModifiers();
-
-		int biomesChanged = 0;
-		int biomesProcessed = 0;
-		int modifiersApplied = 0;
-
-		for (RegistryKey<Biome> key : keys) {
-			Biome biome = biomes.getOrThrow(key);
-
-			biomesProcessed++;
-
-			// Make a copy of the biome to allow selection contexts to see it unmodified,
-			// But do so only once it's known anything wants to modify the biome at all
-			BiomeSelectionContext context = new BiomeSelectionContextImpl(impl, key, biome);
-			BiomeModificationContextImpl modificationContext = null;
-
-			for (ModifierRecord modifier : sortedModifiers) {
-				if (modifier.selector.test(context)) {
-					LOGGER.trace("Applying modifier {} to {}", modifier, key.getValue());
-
-					// Create the copy only if at least one modifier applies, since it's pretty costly
-					if (modificationContext == null) {
-						biomesChanged++;
-						modificationContext = new BiomeModificationContextImpl(impl, biome);
-					}
-
-					modifier.apply(context, modificationContext);
-					modifiersApplied++;
-				}
-			}
-
-			// Re-freeze and apply certain cleanup actions
-			if (modificationContext != null) {
-				modificationContext.freeze();
-			}
-		}
-
-		if (biomesProcessed > 0) {
-			LOGGER.info("Applied {} biome modifications to {} of {} new biomes in {}", modifiersApplied, biomesChanged,
-					biomesProcessed, sw);
-		}
 	}
 
 	private static class ModifierRecord {
@@ -200,16 +164,12 @@ public class BiomeModificationImpl {
 			}
 		}
 
-		public void apply(BiomeSelectionContext context, BiomeModificationContextImpl modificationContext) {
+		public void apply(BiomeSelectionContext context, BiomeModificationContext modificationContext) {
 			if (contextSensitiveModifier != null) {
 				contextSensitiveModifier.accept(context, modificationContext);
 			} else {
 				modifier.accept(modificationContext);
 			}
-		}
-
-		public void setOrder(int order) {
-			this.order = order;
 		}
 	}
 }

@@ -16,22 +16,17 @@
 
 package net.fabricmc.fabric.impl.biome.modification;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
+import net.minecraftforge.common.world.BiomeSpecialEffectsBuilder;
+import net.minecraftforge.common.world.ClimateSettingsBuilder;
+import net.minecraftforge.common.world.MobSpawnSettingsBuilder;
+import net.minecraftforge.common.world.ModifiableBiomeInfo;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -40,35 +35,32 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.sound.BiomeAdditionsSound;
 import net.minecraft.sound.BiomeMoodSound;
 import net.minecraft.sound.MusicSound;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.collection.Pool;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.BiomeParticleConfig;
-import net.minecraft.world.biome.GenerationSettings;
 import net.minecraft.world.biome.SpawnSettings;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
-import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.PlacedFeature;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
+import net.fabricmc.fabric.mixin.biome.SpawnSettingsBuilderAccessor;
 
 public class BiomeModificationContextImpl implements BiomeModificationContext {
 	private final DynamicRegistryManager registries;
-	private final Biome biome;
+	private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
 	private final WeatherContext weather;
 	private final EffectsContext effects;
 	private final GenerationSettingsContextImpl generationSettings;
 	private final SpawnSettingsContextImpl spawnSettings;
 
-	public BiomeModificationContextImpl(DynamicRegistryManager registries, Biome biome) {
+	public BiomeModificationContextImpl(DynamicRegistryManager registries, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
 		this.registries = registries;
-		this.biome = biome;
+		this.builder = builder;
 		this.weather = new WeatherContextImpl();
 		this.effects = new EffectsContextImpl();
 		this.generationSettings = new GenerationSettingsContextImpl();
@@ -95,231 +87,121 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		return spawnSettings;
 	}
 
-	/**
-	 * Re-freeze any immutable lists and perform general post-modification cleanup.
-	 */
-	void freeze() {
-		generationSettings.freeze();
-		spawnSettings.freeze();
-	}
-
 	private class WeatherContextImpl implements WeatherContext {
+		ClimateSettingsBuilder climateSettings = builder.getClimateSettings();
+		
 		@Override
 		public void setPrecipitation(boolean hasPrecipitation) {
-			biome.weather = new Biome.Weather(hasPrecipitation, biome.weather.temperature(), biome.weather.temperatureModifier(), biome.weather.downfall());
+			climateSettings.setHasPrecipitation(hasPrecipitation);
 		}
 
 		@Override
 		public void setTemperature(float temperature) {
-			biome.weather = new Biome.Weather(biome.weather.hasPrecipitation(), temperature, biome.weather.temperatureModifier(), biome.weather.downfall());
+			climateSettings.setTemperature(temperature);
 		}
 
 		@Override
 		public void setTemperatureModifier(Biome.TemperatureModifier temperatureModifier) {
-			biome.weather = new Biome.Weather(biome.weather.hasPrecipitation(), biome.weather.temperature(), Objects.requireNonNull(temperatureModifier), biome.weather.downfall());
+			climateSettings.setTemperatureModifier(temperatureModifier);
 		}
 
 		@Override
 		public void setDownfall(float downfall) {
-			biome.weather = new Biome.Weather(biome.weather.hasPrecipitation(), biome.weather.temperature(), biome.weather.temperatureModifier(), downfall);
+			climateSettings.setDownfall(downfall);
 		}
 	}
 
 	private class EffectsContextImpl implements EffectsContext {
-		private final BiomeEffects effects = biome.getEffects();
+		private final BiomeSpecialEffectsBuilder effects = builder.getSpecialEffects();
 
 		@Override
 		public void setFogColor(int color) {
-			effects.fogColor = color;
+			effects.fogColor(color);
 		}
 
 		@Override
 		public void setWaterColor(int color) {
-			effects.waterColor = color;
+			effects.waterColor(color);
 		}
 
 		@Override
 		public void setWaterFogColor(int color) {
-			effects.waterFogColor = color;
+			effects.waterFogColor(color);
 		}
 
 		@Override
 		public void setSkyColor(int color) {
-			effects.skyColor = color;
+			effects.skyColor(color);
 		}
 
 		@Override
 		public void setFoliageColor(Optional<Integer> color) {
-			effects.foliageColor = Objects.requireNonNull(color);
+			color.ifPresent(effects::foliageColor);
 		}
 
 		@Override
 		public void setGrassColor(Optional<Integer> color) {
-			effects.grassColor = Objects.requireNonNull(color);
+			color.ifPresent(effects::grassColor);
 		}
 
 		@Override
 		public void setGrassColorModifier(@NotNull BiomeEffects.GrassColorModifier colorModifier) {
-			effects.grassColorModifier = Objects.requireNonNull(colorModifier);
+			effects.grassColorModifier(colorModifier);
 		}
 
 		@Override
 		public void setParticleConfig(Optional<BiomeParticleConfig> particleConfig) {
-			effects.particleConfig = Objects.requireNonNull(particleConfig);
+			particleConfig.ifPresent(effects::particleConfig);
 		}
 
 		@Override
 		public void setAmbientSound(Optional<RegistryEntry<SoundEvent>> sound) {
-			effects.loopSound = Objects.requireNonNull(sound);
+			sound.ifPresent(effects::loopSound);
 		}
 
 		@Override
 		public void setMoodSound(Optional<BiomeMoodSound> sound) {
-			effects.moodSound = Objects.requireNonNull(sound);
+			sound.ifPresent(effects::moodSound);
 		}
 
 		@Override
 		public void setAdditionsSound(Optional<BiomeAdditionsSound> sound) {
-			effects.additionsSound = Objects.requireNonNull(sound);
+			sound.ifPresent(effects::additionsSound);
 		}
 
 		@Override
 		public void setMusic(Optional<MusicSound> sound) {
-			effects.music = Objects.requireNonNull(sound);
+			sound.ifPresent(effects::music);
 		}
 	}
 
 	private class GenerationSettingsContextImpl implements GenerationSettingsContext {
 		private final Registry<ConfiguredCarver<?>> carvers = registries.get(RegistryKeys.CONFIGURED_CARVER);
 		private final Registry<PlacedFeature> features = registries.get(RegistryKeys.PLACED_FEATURE);
-		private final GenerationSettings generationSettings = biome.getGenerationSettings();
 
-		private boolean rebuildFlowerFeatures;
-
-		/**
-		 * Unfreeze the immutable lists found in the generation settings, and make sure they're filled up to every
-		 * possible step if they're dense lists.
-		 */
-		GenerationSettingsContextImpl() {
-			unfreezeCarvers();
-			unfreezeFeatures();
-
-			rebuildFlowerFeatures = false;
-		}
-
-		private void unfreezeCarvers() {
-			Map<GenerationStep.Carver, RegistryEntryList<ConfiguredCarver<?>>> carversByStep = new EnumMap<>(GenerationStep.Carver.class);
-			carversByStep.putAll(generationSettings.carvers);
-
-			generationSettings.carvers = carversByStep;
-		}
-
-		private void unfreezeFeatures() {
-			generationSettings.features = new ArrayList<>(generationSettings.features);
-		}
-
-		/**
-		 * Re-freeze the lists in the generation settings to immutable variants, also fixes the flower features.
-		 */
-		public void freeze() {
-			freezeCarvers();
-			freezeFeatures();
-
-			if (rebuildFlowerFeatures) {
-				rebuildFlowerFeatures();
-			}
-		}
-
-		private void freezeCarvers() {
-			generationSettings.carvers = ImmutableMap.copyOf(generationSettings.carvers);
-		}
-
-		private void freezeFeatures() {
-			generationSettings.features = ImmutableList.copyOf(generationSettings.features);
-			// Replace the supplier to force a rebuild next time its called.
-			generationSettings.allowedFeatures = Suppliers.memoize(() -> {
-				return generationSettings.features.stream().flatMap(RegistryEntryList::stream).map(RegistryEntry::value).collect(Collectors.toSet());
-			});
-		}
-
-		private void rebuildFlowerFeatures() {
-			// Replace the supplier to force a rebuild next time its called.
-			generationSettings.flowerFeatures = Suppliers.memoize(() -> {
-				return generationSettings.features.stream().flatMap(RegistryEntryList::stream).map(RegistryEntry::value).flatMap(PlacedFeature::getDecoratedFeatures).filter((configuredFeature) -> {
-					return configuredFeature.feature() == Feature.FLOWER;
-				}).collect(ImmutableList.toImmutableList());
-			});
-		}
+		private final BiomeGenerationSettingsBuilder generationSettings = builder.getGenerationSettings();
 
 		@Override
 		public boolean removeFeature(GenerationStep.Feature step, RegistryKey<PlacedFeature> placedFeatureKey) {
 			PlacedFeature placedFeature = getEntry(features, placedFeatureKey).value();
-
-			int stepIndex = step.ordinal();
-			List<RegistryEntryList<PlacedFeature>> featureSteps = generationSettings.features;
-
-			if (stepIndex >= featureSteps.size()) {
-				return false; // The step was not populated with any features yet
-			}
-
-			RegistryEntryList<PlacedFeature> featuresInStep = featureSteps.get(stepIndex);
-			List<RegistryEntry<PlacedFeature>> features = new ArrayList<>(featuresInStep.stream().toList());
-
-			if (features.removeIf(feature -> feature.value() == placedFeature)) {
-				featureSteps.set(stepIndex, RegistryEntryList.of(features));
-				rebuildFlowerFeatures = true;
-
-				return true;
-			}
-
-			return false;
+			List<RegistryEntry<PlacedFeature>> featureSteps = generationSettings.getFeatures(step);
+			return featureSteps.removeIf(feature -> feature.value() == placedFeature);
 		}
 
 		@Override
 		public void addFeature(GenerationStep.Feature step, RegistryKey<PlacedFeature> entry) {
-			List<RegistryEntryList<PlacedFeature>> featureSteps = generationSettings.features;
-			int index = step.ordinal();
-
-			// Add new empty lists for the generation steps that have no features yet
-			while (index >= featureSteps.size()) {
-				featureSteps.add(RegistryEntryList.of(Collections.emptyList()));
-			}
-
-			featureSteps.set(index, plus(featureSteps.get(index), getEntry(features, entry)));
-
-			// Ensure the list of flower features is up-to-date
-			rebuildFlowerFeatures = true;
+			generationSettings.feature(step, features.entryOf(entry));
 		}
 
 		@Override
 		public void addCarver(GenerationStep.Carver step, RegistryKey<ConfiguredCarver<?>> entry) {
-			// We do not need to delay evaluation of this since the registries are already fully built
-			generationSettings.carvers.put(step, plus(generationSettings.carvers.get(step), getEntry(carvers, entry)));
+			generationSettings.carver(step, carvers.entryOf(entry));
 		}
 
 		@Override
 		public boolean removeCarver(GenerationStep.Carver step, RegistryKey<ConfiguredCarver<?>> configuredCarverKey) {
 			ConfiguredCarver<?> carver = getEntry(carvers, configuredCarverKey).value();
-			RegistryEntryList<ConfiguredCarver<?>> carvers = generationSettings.carvers.get(step);
-
-			if (carvers == null) return false;
-
-			List<RegistryEntry<ConfiguredCarver<?>>> genCarvers = new ArrayList<>(carvers.stream().toList());
-
-			if (genCarvers.removeIf(entry -> entry.value() == carver)) {
-				generationSettings.carvers.put(step, RegistryEntryList.of(genCarvers));
-				return true;
-			}
-
-			return false;
-		}
-
-		private <T> RegistryEntryList<T> plus(@Nullable RegistryEntryList<T> values, RegistryEntry<T> entry) {
-			if (values == null) return RegistryEntryList.of(entry);
-
-			List<RegistryEntry<T>> list = new ArrayList<>(values.stream().toList());
-			list.add(entry);
-			return RegistryEntryList.of(list);
+			return generationSettings.getCarvers(step).removeIf(holder -> holder.value() == carver);
 		}
 	}
 
@@ -340,58 +222,11 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 	}
 
 	private class SpawnSettingsContextImpl implements SpawnSettingsContext {
-		private final SpawnSettings spawnSettings = biome.getSpawnSettings();
-		private final EnumMap<SpawnGroup, List<SpawnSettings.SpawnEntry>> fabricSpawners = new EnumMap<>(SpawnGroup.class);
-
-		SpawnSettingsContextImpl() {
-			unfreezeSpawners();
-			unfreezeSpawnCost();
-		}
-
-		private void unfreezeSpawners() {
-			fabricSpawners.clear();
-
-			for (SpawnGroup spawnGroup : SpawnGroup.values()) {
-				Pool<SpawnSettings.SpawnEntry> entries = spawnSettings.spawners.get(spawnGroup);
-
-				if (entries != null) {
-					fabricSpawners.put(spawnGroup, new ArrayList<>(entries.getEntries()));
-				} else {
-					fabricSpawners.put(spawnGroup, new ArrayList<>());
-				}
-			}
-		}
-
-		private void unfreezeSpawnCost() {
-			spawnSettings.spawnCosts = new HashMap<>(spawnSettings.spawnCosts);
-		}
-
-		public void freeze() {
-			freezeSpawners();
-			freezeSpawnCosts();
-		}
-
-		private void freezeSpawners() {
-			Map<SpawnGroup, Pool<SpawnSettings.SpawnEntry>> spawners = new HashMap<>(spawnSettings.spawners);
-
-			for (Map.Entry<SpawnGroup, List<SpawnSettings.SpawnEntry>> entry : fabricSpawners.entrySet()) {
-				if (entry.getValue().isEmpty()) {
-					spawners.put(entry.getKey(), Pool.empty());
-				} else {
-					spawners.put(entry.getKey(), Pool.of(entry.getValue()));
-				}
-			}
-
-			spawnSettings.spawners = ImmutableMap.copyOf(spawners);
-		}
-
-		private void freezeSpawnCosts() {
-			spawnSettings.spawnCosts = ImmutableMap.copyOf(spawnSettings.spawnCosts);
-		}
+		private final MobSpawnSettingsBuilder spawnSettings = builder.getMobSpawnSettings();
 
 		@Override
 		public void setCreatureSpawnProbability(float probability) {
-			spawnSettings.creatureSpawnProbability = probability;
+			spawnSettings.creatureSpawnProbability(probability);
 		}
 
 		@Override
@@ -399,31 +234,30 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 			Objects.requireNonNull(spawnGroup);
 			Objects.requireNonNull(spawnEntry);
 
-			fabricSpawners.get(spawnGroup).add(spawnEntry);
+			spawnSettings.spawn(spawnGroup, spawnEntry);
 		}
 
 		@Override
 		public boolean removeSpawns(BiPredicate<SpawnGroup, SpawnSettings.SpawnEntry> predicate) {
 			boolean anyRemoved = false;
-
-			for (SpawnGroup group : SpawnGroup.values()) {
-				if (fabricSpawners.get(group).removeIf(entry -> predicate.test(group, entry))) {
+			for (SpawnGroup category : spawnSettings.getSpawnerTypes()) {
+				if (spawnSettings.getSpawner(category).removeIf(data -> predicate.test(category, data))) {
 					anyRemoved = true;
 				}
 			}
-
 			return anyRemoved;
 		}
 
 		@Override
 		public void setSpawnCost(EntityType<?> entityType, double mass, double gravityLimit) {
 			Objects.requireNonNull(entityType);
-			spawnSettings.spawnCosts.put(entityType, new SpawnSettings.SpawnDensity(gravityLimit, mass));
+			
+			spawnSettings.spawnCost(entityType, mass, gravityLimit);
 		}
 
 		@Override
 		public void clearSpawnCost(EntityType<?> entityType) {
-			spawnSettings.spawnCosts.remove(entityType);
+			((SpawnSettingsBuilderAccessor) spawnSettings).getSpawnCosts().remove(entityType);
 		}
 	}
 }
