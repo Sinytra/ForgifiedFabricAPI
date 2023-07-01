@@ -236,9 +236,11 @@ allprojects {
 //			sourceSet p.sourceSets.client
 		}
 
-		loom.mods.register(p.name + "-testmod") {
-			sourceSet p.sourceSets.testmod
-//			sourceSet p.sourceSets.testmodClient
+		if (p.file("src/testmod").exists()) {
+			loom.mods.register(p.name + "-testmod") {
+				sourceSet p.sourceSets.testmod
+//			    sourceSet p.sourceSets.testmodClient
+			}	
 		}
 	}
 
