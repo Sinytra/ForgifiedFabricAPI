@@ -4,13 +4,10 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "loot.BlockLootTableGeneratorMixin",
-    "DataProviderMixin",
     "TagProviderMixin",
     "ModelProviderMixin",
-    "TagBuilderMixin"
-  ],
-  "server": [
-    "server.MainMixin"
+    "TagBuilderMixin",
+    "DataGeneratorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

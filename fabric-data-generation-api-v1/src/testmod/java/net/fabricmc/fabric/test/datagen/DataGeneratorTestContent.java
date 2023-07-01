@@ -16,6 +16,13 @@
 
 package net.fabricmc.fabric.test.datagen;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -24,52 +31,46 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 
-public class DataGeneratorTestContent implements ModInitializer {
-	public static final String MOD_ID = "fabric-data-gen-api-v1-testmod";
+@Mod(DataGeneratorTestContent.MOD_ID)
+public class DataGeneratorTestContent {
+	public static final String MOD_ID = "fabric_data_gen_api_v1_testmod";
 
-	public static Block SIMPLE_BLOCK;
-	public static Block BLOCK_WITHOUT_ITEM;
-	public static Block BLOCK_WITHOUT_LOOT_TABLE;
-	public static Block BLOCK_WITH_VANILLA_LOOT_TABLE;
-	public static Block BLOCK_THAT_DROPS_NOTHING;
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+	private static final DeferredRegister<ItemGroup> ITEM_GROUPS = DeferredRegister.create(RegistryKeys.ITEM_GROUP, MOD_ID);
 
-	public static final RegistryKey<ItemGroup> SIMPLE_ITEM_GROUP = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier(MOD_ID, "simple"));
+	public static final RegistryObject<Block> SIMPLE_BLOCK = register("simple_block", true, AbstractBlock.Settings.create());
+	public static final RegistryObject<Block> BLOCK_WITHOUT_ITEM = register("block_without_item", false, AbstractBlock.Settings.create());
+	public static final RegistryObject<Block> BLOCK_WITHOUT_LOOT_TABLE = register("block_without_loot_table", false, AbstractBlock.Settings.create());
+	public static final RegistryObject<Block> BLOCK_WITH_VANILLA_LOOT_TABLE = register("block_with_vanilla_loot_table", false, AbstractBlock.Settings.create().dropsLike(Blocks.STONE));
+	public static final RegistryObject<Block> BLOCK_THAT_DROPS_NOTHING = register("block_that_drops_nothing", false, AbstractBlock.Settings.create().dropsNothing());
 
-	@Override
-	public void onInitialize() {
-		SIMPLE_BLOCK = createBlock("simple_block", true, AbstractBlock.Settings.create());
-		BLOCK_WITHOUT_ITEM = createBlock("block_without_item", false, AbstractBlock.Settings.create());
-		BLOCK_WITHOUT_LOOT_TABLE = createBlock("block_without_loot_table", false, AbstractBlock.Settings.create());
-		BLOCK_WITH_VANILLA_LOOT_TABLE = createBlock("block_with_vanilla_loot_table", false, AbstractBlock.Settings.create().dropsLike(Blocks.STONE));
-		BLOCK_THAT_DROPS_NOTHING = createBlock("block_that_drops_nothing", false, AbstractBlock.Settings.create().dropsNothing());
+	public static final RegistryObject<ItemGroup> SIMPLE_ITEM_GROUP = ITEM_GROUPS.register("simple", () -> FabricItemGroup.builder()
+			.icon(() -> new ItemStack(Items.DIAMOND_PICKAXE))
+			.displayName(Text.translatable("fabric-data-gen-api-v1-testmod.simple_item_group"))
+			.build());
 
-		ItemGroupEvents.modifyEntriesEvent(SIMPLE_ITEM_GROUP).register(entries -> entries.add(SIMPLE_BLOCK));
+	public DataGeneratorTestContent() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
+		ITEM_GROUPS.register(bus);
+		bus.addListener(DataGeneratorTestEntrypoint::onGatherData);
 
-		Registry.register(Registries.ITEM_GROUP, SIMPLE_ITEM_GROUP, FabricItemGroup.builder()
-				.icon(() -> new ItemStack(Items.DIAMOND_PICKAXE))
-				.displayName(Text.translatable("fabric-data-gen-api-v1-testmod.simple_item_group"))
-				.build());
+		ItemGroupEvents.modifyEntriesEvent(SIMPLE_ITEM_GROUP.getKey()).register(entries -> entries.add(SIMPLE_BLOCK.get()));
 	}
 
-	private static Block createBlock(String name, boolean hasItem, AbstractBlock.Settings settings) {
-		Identifier identifier = new Identifier(MOD_ID, name);
-		Block block = Registry.register(Registries.BLOCK, identifier, new Block(settings));
-
+	private static RegistryObject<Block> register(String name, boolean hasItem, AbstractBlock.Settings settings) {
+		RegistryObject<Block> block = BLOCKS.register(name, () -> new Block(settings));
 		if (hasItem) {
-			Registry.register(Registries.ITEM, identifier, new BlockItem(block, new Item.Settings()));
+			ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Settings()));
 		}
-
 		return block;
 	}
 }

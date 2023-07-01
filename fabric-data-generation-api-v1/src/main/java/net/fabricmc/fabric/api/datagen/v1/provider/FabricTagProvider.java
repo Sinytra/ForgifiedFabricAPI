@@ -242,7 +242,7 @@ public abstract class FabricTagProvider<T> extends TagProvider<T> {
 		private final TagProvider.ProvidedTagBuilder<T> parent;
 
 		private FabricTagBuilder(ProvidedTagBuilder<T> parent) {
-			super(parent.builder);
+			super(parent.builder, "fabric");
 			this.parent = parent;
 		}
 

@@ -44,7 +44,7 @@ public class IngredientMixin implements FabricIngredient {
 	@Inject(
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraftforge/common/crafting/CraftingHelper;getIngredient(Lcom/google/gson/JsonElement;)Lnet/minecraft/recipe/Ingredient;",
+					target = "Lnet/minecraftforge/common/crafting/CraftingHelper;getIngredient(Lcom/google/gson/JsonElement;Z)Lnet/minecraft/recipe/Ingredient;",
 					ordinal = 0
 			),
 			method = "fromJson(Lcom/google/gson/JsonElement;Z)Lnet/minecraft/recipe/Ingredient;",

@@ -20,6 +20,9 @@ import java.util.Map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import net.minecraft.resource.ResourceManager;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,8 +41,8 @@ import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
 @Mixin(LootManager.class)
 public class LootManagerMixin {
 	// forEach in load method
-	@Inject(method = "method_51195", at = @At("HEAD"), cancellable = true)
-	private static void applyResourceConditions(LootDataType lootDataType, Map map, Identifier id, JsonElement json, CallbackInfo ci) {
+	@Inject(method = {"method_51195","lambda$scheduleElementParse$4"}, at = @At("HEAD"), require = 1, cancellable = true)
+	private static void applyResourceConditions(LootDataType lootDataType, ResourceManager manager, Map map, Identifier id, JsonElement json, CallbackInfo ci) {
 		if (json.isJsonObject()) {
 			JsonObject obj = json.getAsJsonObject();
 

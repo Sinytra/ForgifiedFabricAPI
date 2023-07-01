@@ -27,16 +27,15 @@ import net.minecraft.client.texture.atlas.DirectoryAtlasSource;
 import net.minecraft.data.DataOutput;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 
 @SuppressWarnings("unused")
-public class DataGeneratorClientTestEntrypoint implements DataGeneratorEntrypoint {
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-		final FabricDataGenerator.Pack pack = dataGenerator.createBuiltinResourcePack(new Identifier(MOD_ID, "example_builtin"));
+public class DataGeneratorClientTestEntrypoint {
+
+	public static void onInitializeDataGenerator(FabricDataGenerator generator) {
+		FabricDataGenerator.Pack pack = generator.createBuiltinResourcePack(new Identifier(MOD_ID, "example_builtin"));
 		pack.addProvider(TestAtlasSourceProvider::new);
 	}
 
