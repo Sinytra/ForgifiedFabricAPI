@@ -199,7 +199,7 @@ public class DataGeneratorTestEntrypoint {
 			translationBuilder.add(EntityAttributes.GENERIC_ARMOR, "Generic Armor");
 
 			try {
-				Path path = dataOutput.getModContainer().getOwningFile().getFile().findResource("assets/testmod/lang/en_us.base.json");
+				Path path = dataOutput.getForgeModContainer().getOwningFile().getFile().findResource("assets/testmod/lang/en_us.base.json");
 
 				translationBuilder.add(path);
 			} catch (IOException e) {

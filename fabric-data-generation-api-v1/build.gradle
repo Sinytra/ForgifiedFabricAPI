@@ -11,6 +11,7 @@ moduleDependencies(project, [
 ])
 
 dependencies {
+	compileOnly "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 }
 
 sourceSets {

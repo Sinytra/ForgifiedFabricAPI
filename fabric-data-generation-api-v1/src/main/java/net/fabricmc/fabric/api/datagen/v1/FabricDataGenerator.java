@@ -24,6 +24,8 @@ import com.mojang.datafixers.util.Pair;
 
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 
+import net.fabricmc.loader.api.ModContainer;
+
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -85,11 +87,20 @@ public final class FabricDataGenerator extends DataGenerator {
 	}
 
 	/**
+	 * Returns the {@link ModContainer} for the mod that this data generator has been created for.
+	 *
+	 * @return a {@link ModContainer} instance
+	 */
+	public ModContainer getModContainer() {
+		throw new UnsupportedOperationException("Unavailable on MinecraftForge, call getForgeModContainer instead");
+	}
+
+	/**
 	 * Returns the {@link IModInfo} for the mod that this data generator has been created for.
 	 *
 	 * @return a {@link IModInfo} instance
 	 */
-	public IModInfo getModContainer() {
+	public IModInfo getForgeModContainer() {
 		return modContainer;
 	}
 
@@ -99,7 +110,7 @@ public final class FabricDataGenerator extends DataGenerator {
 	 * @return a mod ID
 	 */
 	public String getModId() {
-		return getModContainer().getModId();
+		return getForgeModContainer().getModId();
 	}
 
 	/**

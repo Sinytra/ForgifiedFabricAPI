@@ -24,6 +24,7 @@ import com.google.common.collect.Multimap;
 import net.minecraft.entity.LivingEntity;
 
 import net.minecraftforge.common.extensions.IForgeItem;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
@@ -130,6 +131,7 @@ public interface FabricItem extends IForgeItem {
 	 * @param stack the consumed {@link ItemStack}
 	 * @return the leftover item stack
 	 */
+	@ApiStatus.OverrideOnly
 	default ItemStack getRecipeRemainder(ItemStack stack) {
 		return ItemStack.EMPTY;
 	}
@@ -142,7 +144,7 @@ public interface FabricItem extends IForgeItem {
 		if (!fabricRemainder.isEmpty()) {
 			return fabricRemainder;
 		}
-		return IForgeItem.super.hasCraftingRemainingItem(stack) ? IForgeItem.super.getCraftingRemainingItem(stack) : ItemStack.EMPTY;
+		return IForgeItem.super.hasCraftingRemainingItem(stack) ? new ItemStack(((Item) this).getRecipeRemainder()) : ItemStack.EMPTY;
 	}
 
 	@Override
