@@ -55,7 +55,7 @@ Missing -> Added -> Tested
 | fabric-screen-handler-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-sound-api-v1                  |         ✅ Tested         |    Stable    |
 | fabric-transfer-api-v1               |        ⚠️ Missing        | Experimental |
-| fabric-transitive-access-wideners-v1 |        ⚠️ Missing        |    Stable    |
+| fabric-transitive-access-wideners-v1 |         ✅ Tested         |    Stable    |
 | fabric-command-api-v1                |        ⚠️ Missing        |  Deprecated  |
 | fabric-commands-v0                   |        ⚠️ Missing        |  Deprecated  |
 | fabric-containers-v0                 |        ⚠️ Missing        |  Deprecated  |
