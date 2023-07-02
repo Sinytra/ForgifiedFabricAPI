@@ -33,7 +33,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
-import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
@@ -113,7 +112,7 @@ public class PillarBakedModel implements BakedModel {
 
 	private static boolean canConnect(BlockRenderView blockView, BlockPos pos, Direction side, BlockState sourceState, BlockPos sourcePos) {
 		// In this testmod we can't rely on injected interfaces - in normal mods the (FabricBlockState) cast will be unnecessary
-		return ((FabricBlockState) blockView.getBlockState(pos)).getAppearance(blockView, pos, side, sourceState, sourcePos).isOf(RendererTest.PILLAR);
+		return blockView.getBlockState(pos).getAppearance(blockView, pos, side, sourceState, sourcePos).isOf(RendererTest.PILLAR.get());
 	}
 
 	@Override
