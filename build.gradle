@@ -1122,6 +1122,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 	def run() {
 		def output = outputDir.get().asFile.toPath()
 		output.deleteDir()
+		def containsCode = sourceRoots.any { new File(it.parentFile, "java").exists() }
 		for (def sourceRoot in sourceRoots) {
 			if (!sourceRoot.isDirectory()) {
 				continue
@@ -1151,7 +1152,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 			}
 			def normalModid = normalizeModid(json.id)
 			toml {
-				modLoader project == project.rootProject ? "lowcodefml" : "javafml"
+				modLoader containsCode ? "javafml" : "lowcodefml"
 				loaderVersion "[${loaderVersionString.get()},)"
 				license json.license ?: "All Rights Reserved"
 				if (json.environment == "client") {

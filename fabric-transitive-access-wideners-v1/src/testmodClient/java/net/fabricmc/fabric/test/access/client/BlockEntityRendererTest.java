@@ -19,12 +19,13 @@ package net.fabricmc.fabric.test.access.client;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.test.access.SignBlockEntityTest;
 
-public class BlockEntityRendererTest implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		BlockEntityRendererFactories.register(SignBlockEntityTest.TEST_SIGN_BLOCK_ENTITY, SignBlockEntityRenderer::new);
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+public class BlockEntityRendererTest {
+
+	public static void onInitializeClient(FMLClientSetupEvent event) {
+		BlockEntityRendererFactories.register(SignBlockEntityTest.TEST_SIGN_BLOCK_ENTITY.get(), SignBlockEntityRenderer::new);
 	}
 }
