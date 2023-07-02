@@ -50,7 +50,7 @@ Missing -> Added -> Tested
 | fabric-rendering-fluids-v1           |         ✅ Tested         |    Stable    |
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
 | fabric-resource-conditions-api-v1    |         ✅ Tested         | Experimental |
-| fabric-resource-loader-v0            |        ⚠️ Missing        |    Stable    |
+| fabric-resource-loader-v0            |         ✅ Tested         |    Stable    |
 | fabric-screen-api-v1                 |         ✅ Tested         |    Stable    |
 | fabric-screen-handler-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-sound-api-v1                  |         ✅ Tested         |    Stable    |

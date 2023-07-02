@@ -5,6 +5,10 @@ loom {
 	accessWidenerPath = file("src/main/resources/fabric-resource-loader-v0.accesswidener")
 }
 
+dependencies {
+	compileOnly "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+}
+
 testDependencies(project, [
 	':fabric-lifecycle-events-v1',
 	':fabric-api-base',

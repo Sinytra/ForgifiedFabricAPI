@@ -19,36 +19,33 @@ package net.fabricmc.fabric.test.resource.loader;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil;
-import net.fabricmc.loader.api.FabricLoader;
 
-public class BuiltinResourcePackTestMod implements ModInitializer {
-	public static final String MODID = "fabric-resource-loader-v0-testmod";
-
+public class BuiltinResourcePackTestMod {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BuiltinResourcePackTestMod.class);
 
 	private static final Gson GSON = new Gson();
 
-	@Override
-	public void onInitialize() {
-		// Should always be present as it's **this** mod.
-		FabricLoader.getInstance().getModContainer(MODID)
-				.map(container -> ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(MODID, "test"),
-						container, Text.literal("Fabric Resource Loader Test Pack"), ResourcePackActivationType.DEFAULT_ENABLED))
-				.filter(success -> !success).ifPresent(success -> LOGGER.warn("Could not register built-in resource pack with custom name."));
-		FabricLoader.getInstance().getModContainer(MODID)
-				.map(container -> ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(MODID, "test2"),
-						container, ResourcePackActivationType.NORMAL))
-				.filter(success -> !success).ifPresent(success -> LOGGER.warn("Could not register built-in resource pack."));
+	public static void onInitialize() {
+		IModInfo modInfo = ModList.get().getModContainerById(ResourceLoaderTestImpl.MODID).orElseThrow().getModInfo();
+
+		if (!ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(ResourceLoaderTestImpl.MODID, "test"), modInfo, Text.literal("Fabric Resource Loader Test Pack"), ResourcePackActivationType.DEFAULT_ENABLED)) {
+			LOGGER.warn("Could not register built-in resource pack with custom name.");
+		}
+
+		if (!ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(ResourceLoaderTestImpl.MODID, "test2"), modInfo, ResourcePackActivationType.NORMAL)) {
+			LOGGER.warn("Could not register built-in resource pack.");
+		}
 
 		// Test various metadata serialization issues (#2407)
 		testMetadataSerialization("");
@@ -56,7 +53,7 @@ public class BuiltinResourcePackTestMod implements ModInitializer {
 		testMetadataSerialization("Backslash: \\ \\\\");
 	}
 
-	private void testMetadataSerialization(String description) {
+	private static void testMetadataSerialization(String description) {
 		String metadata = ModResourcePackUtil.serializeMetadata(1, description);
 		JsonObject json;
 
