@@ -22,6 +22,7 @@ plugins {
 def ENV = System.getenv()
 def signingEnabled = ENV.SIGNING_SERVER
 
+def configuredVersion = project.version
 version = project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()
 logger.lifecycle("Building Fabric: " + version)
 
@@ -858,6 +859,7 @@ import org.gradle.build.event.BuildEventsListenerRegistry
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
 import net.fabricmc.loom.util.FileSystemUtil
 import net.fabricmc.loom.build.nesting.IncludedJarFactory
+import net.fabricmc.loom.task.RemapJarTask
 
 import org.cadixdev.at.AccessTransformSet
 import org.cadixdev.at.io.AccessTransformFormats
@@ -923,7 +925,7 @@ allprojects {
 		from(zipTree(jar.archiveFile))
 		rename "accesstransformer_dev.cfg", "accesstransformer.cfg"
 		archiveClassifier = "local"
-		destinationDirectory = new File(project.buildDir, "devlibs")
+		destinationDirectory = project.layout.buildDirectory.dir("devlibs")
 		manifest.from(jar.manifest)
 	}
 	remapJar {
@@ -1002,6 +1004,74 @@ subprojects {
 				property "forge.gameTestServer", "true"
 			}
 		}
+	}
+}
+
+configurations {
+	referenceApi
+	baseLib
+	jarCompatChecker
+}
+repositories {
+	maven { url = "https://maven.su5ed.dev/releases" }
+}
+dependencies {
+	referenceApi "net.fabricmc.fabric-api:fabric-api:$configuredVersion+${rootProject.minecraft_version}"
+	baseLib "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+	jarCompatChecker "dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all"
+}
+
+subprojects {
+	def deps = rootProject.configurations.referenceApi.resolvedConfiguration
+	def referenceDep = deps.lenientConfiguration.allModuleDependencies.find { it.moduleGroup == "net.fabricmc.fabric-api" && it.moduleName == project.name }
+
+	configurations {
+		apiLibs {
+			extendsFrom api
+			canBeResolved = true
+		}
+	}
+	def compareJar = tasks.register("compareJar", Jar) {
+		from zipTree(jar.archiveFile)
+		archiveClassifier = "compare"
+		destinationDirectory = project.layout.buildDirectory.dir("devlibs")
+	}
+	def remapReferenceApi = tasks.register("remapReferenceApi", RemapJarTask) {
+		group = "loom"
+		inputFile = referenceDep.allModuleArtifacts.first().file
+		sourceNamespace = MappingsNamespace.INTERMEDIARY.toString()
+		targetNamespace = MappingsNamespace.NAMED.toString()
+		destinationDirectory = project.layout.buildDirectory.dir(name)
+		classpath.from(loom.getMinecraftJarsCollection(MappingsNamespace.INTERMEDIARY))
+	}
+	tasks.register("checkReferenceCompatibility", JavaExec) {
+		group = "verification"
+
+		classpath(rootProject.configurations.jarCompatChecker)
+		mainClass = "net.minecraftforge.jarcompatibilitychecker.ConsoleTool"
+		args "--api", "--annotation-check-mode", "warn_added", "--internal-ann-mode", "skip"
+		outputs.upToDateWhen { true }
+	}
+	afterEvaluate {
+		tasks.configureEach {
+			if (name == "prepareRemapReferenceApi") {
+				doFirst {
+					loom.mixin.useLegacyMixinAp = false
+				}
+				doLast {
+					loom.mixin.useLegacyMixinAp = true
+				}
+			}
+		}
+		checkReferenceCompatibility.configure {
+			dependsOn compareJar, remapReferenceApi
+			args "--base-jar", remapReferenceApi.get().archiveFile.get().asFile.absolutePath, "--input-jar", compareJar.get().archiveFile.get().asFile.absolutePath
+			(configurations.minecraftNamedCompile + configurations.apiLibs).each { args "--lib", it.absolutePath }
+			rootProject.configurations.baseLib.resolve().each { args "--base-lib", it.absolutePath }
+		}
+	}
+	check {
+		dependsOn checkReferenceCompatibility
 	}
 }
 

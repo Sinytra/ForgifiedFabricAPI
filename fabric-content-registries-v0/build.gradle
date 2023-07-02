@@ -10,3 +10,11 @@ moduleDependencies(project, [
 	'fabric-lifecycle-events-v1',
 //	'fabric-resource-loader-v0'
 ])
+
+afterEvaluate {
+	compareJar {
+	    from(zipTree(project(":fabric-api-base").tasks.jar.archiveFile)) {
+	        include("net/fabricmc/fabric/api/util/**")
+	    }
+	}
+}

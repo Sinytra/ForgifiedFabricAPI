@@ -25,7 +25,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.world.chunk.WorldChunk;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;

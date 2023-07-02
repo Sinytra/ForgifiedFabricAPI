@@ -18,6 +18,8 @@ package net.fabricmc.fabric.api.datagen.v1;
 
 import java.nio.file.Path;
 
+import net.fabricmc.loader.api.ModContainer;
+
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -38,11 +40,20 @@ public final class FabricDataOutput extends DataOutput {
 	}
 
 	/**
+	 * Returns the {@link ModContainer} for the mod that this data generator has been created for.
+	 *
+	 * @return a {@link ModContainer} instance
+	 */
+	public ModContainer getModContainer() {
+		throw new UnsupportedOperationException("Unavailable on MinecraftForge, call getForgeModContainer instead");
+	}
+
+	/**
 	 * Returns the {@link IModInfo} for the mod that this data generator has been created for.
 	 *
 	 * @return a {@link IModInfo} instance
 	 */
-	public IModInfo getModContainer() {
+	public IModInfo getForgeModContainer() {
 		return modContainer;
 	}
 
@@ -52,7 +63,7 @@ public final class FabricDataOutput extends DataOutput {
 	 * @return a mod ID
 	 */
 	public String getModId() {
-		return getModContainer().getModId();
+		return getForgeModContainer().getModId();
 	}
 
 	/**

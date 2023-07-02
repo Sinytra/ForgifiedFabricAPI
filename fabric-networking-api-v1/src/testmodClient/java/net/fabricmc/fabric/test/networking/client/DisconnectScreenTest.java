@@ -18,7 +18,6 @@ package net.fabricmc.fabric.test.networking.client;
 
 import net.minecraft.text.Text;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 

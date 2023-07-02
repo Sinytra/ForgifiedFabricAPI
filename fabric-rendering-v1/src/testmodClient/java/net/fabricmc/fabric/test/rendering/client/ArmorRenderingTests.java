@@ -24,7 +24,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
 
 public class ArmorRenderingTests {
