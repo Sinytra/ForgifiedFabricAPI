@@ -3,11 +3,8 @@
   "package": "net.fabricmc.fabric.mixin.resource.loader.client",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "VanillaResourcePackProviderMixin",
     "DefaultClientResourcePackProviderMixin",
-    "CreateWorldScreenMixin",
     "FontManagerMixin",
-    "GameOptionsMixin",
     "KeyedResourceReloadListenerClientMixin"
   ],
   "injectors": {

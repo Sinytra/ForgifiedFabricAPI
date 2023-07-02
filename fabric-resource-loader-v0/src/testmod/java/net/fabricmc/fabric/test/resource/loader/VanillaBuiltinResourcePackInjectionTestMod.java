@@ -16,27 +16,28 @@
 
 package net.fabricmc.fabric.test.resource.loader;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
-
-public class VanillaBuiltinResourcePackInjectionTestMod implements ModInitializer {
+public class VanillaBuiltinResourcePackInjectionTestMod {
 	public static final String MODID = "fabric-resource-loader-v0-testmod";
 
-	public static final Block TEST_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.STONE));
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
 
-	@Override
-	public void onInitialize() {
-		Identifier id = new Identifier(MODID, "testblock");
+	public static final RegistryObject<Block> TEST_BLOCK = BLOCKS.register("testblock", () -> new Block(AbstractBlock.Settings.copy(Blocks.STONE)));
+	public static final RegistryObject<Item> TEST_BLOCK_ITEM = ITEMS.register("testblock", () -> new BlockItem(TEST_BLOCK.get(), new Item.Settings()));
 
-		Registry.register(Registries.BLOCK, id, TEST_BLOCK);
-		Registry.register(Registries.ITEM, id, new BlockItem(TEST_BLOCK, new Item.Settings()));
+	public static void onInitialize(IEventBus bus) {
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
 	}
 }

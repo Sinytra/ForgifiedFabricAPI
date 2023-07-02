@@ -4,19 +4,8 @@
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "KeyedResourceReloadListenerMixin",
-    "LifecycledResourceManagerImplMixin",
-    "MinecraftServerMixin",
     "NamespaceResourceManagerMixin",
-    "ReloadableResourceManagerImplMixin",
-    "ResourceMixin",
-    "ResourcePackManagerMixin",
-    "ResourcePackProfileMixin",
-    "ServerPropertiesHandlerMixin",
-    "SimpleResourceReloadMixin",
-    "TestServerMixin"
-  ],
-  "server": [
-    "server.LanguageMixin"
+    "ReloadableResourceManagerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1

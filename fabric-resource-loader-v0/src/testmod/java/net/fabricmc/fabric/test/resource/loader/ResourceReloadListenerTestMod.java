@@ -19,30 +19,29 @@ package net.fabricmc.fabric.test.resource.loader;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLLoader;
+
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 
-public class ResourceReloadListenerTestMod implements ModInitializer {
+public class ResourceReloadListenerTestMod {
 	public static final String MODID = "fabric-resource-loader-v0-testmod";
 
 	private static boolean clientResources = false;
 	private static boolean serverResources = false;
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		setupClientReloadListeners();
 		setupServerReloadListeners();
 
 		ServerTickEvents.START_WORLD_TICK.register(world -> {
-			if (!clientResources && FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+			if (!clientResources && FMLLoader.getDist() == Dist.CLIENT) {
 				throw new AssertionError("Client reload listener was not called.");
 			}
 
@@ -52,7 +51,7 @@ public class ResourceReloadListenerTestMod implements ModInitializer {
 		});
 	}
 
-	private void setupClientReloadListeners() {
+	private static void setupClientReloadListeners() {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public Identifier getFabricId() {
@@ -85,7 +84,7 @@ public class ResourceReloadListenerTestMod implements ModInitializer {
 		});
 	}
 
-	private void setupServerReloadListeners() {
+	private static void setupServerReloadListeners() {
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public Identifier getFabricId() {
