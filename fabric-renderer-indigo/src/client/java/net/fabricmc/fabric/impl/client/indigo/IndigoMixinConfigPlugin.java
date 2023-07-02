@@ -17,15 +17,14 @@
 package net.fabricmc.fabric.impl.client.indigo;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import net.minecraftforge.fml.loading.LoadingModList;
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.ModMetadata;
 
 public class IndigoMixinConfigPlugin implements IMixinConfigPlugin {
 	/** Set by other renderers to disable loading of Indigo. */
@@ -42,12 +41,12 @@ public class IndigoMixinConfigPlugin implements IMixinConfigPlugin {
 
 	private static void loadIfNeeded() {
 		if (needsLoad) {
-			for (ModContainer container : FabricLoader.getInstance().getAllMods()) {
-				final ModMetadata meta = container.getMetadata();
-
-				if (meta.containsCustomValue(JSON_KEY_DISABLE_INDIGO)) {
+			for (IModInfo container : LoadingModList.get().getMods()) {
+				Map<String, Object> properties = container.getModProperties();
+				if (properties.containsKey(JSON_KEY_DISABLE_INDIGO)) {
 					indigoApplicable = false;
-				} else if (meta.containsCustomValue(JSON_KEY_FORCE_COMPATIBILITY)) {
+				}
+				else if (properties.containsKey(JSON_KEY_FORCE_COMPATIBILITY)) {
 					forceCompatibility = true;
 				}
 			}
