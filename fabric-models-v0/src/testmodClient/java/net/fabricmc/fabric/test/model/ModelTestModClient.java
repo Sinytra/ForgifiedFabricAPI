@@ -20,18 +20,19 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
-public class ModelTestModClient implements ClientModInitializer {
+import net.minecraftforge.fml.common.Mod;
+
+@Mod("fabric_models_v0_testmod")
+public class ModelTestModClient {
 	public static final String ID = "fabric-models-v0-testmod";
 
 	public static final Identifier MODEL_ID = new Identifier(ID, "half_red_sand");
 
-	@Override
-	public void onInitializeClient() {
+	public ModelTestModClient() {
 		ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
 			out.accept(MODEL_ID);
 		});

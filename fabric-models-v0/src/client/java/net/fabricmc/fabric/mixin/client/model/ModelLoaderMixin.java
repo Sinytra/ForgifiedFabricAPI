@@ -82,12 +82,8 @@ public abstract class ModelLoaderMixin implements ModelLoaderHooks {
 	@Inject(at = @At("HEAD"), method = "addModel")
 	private void addModelHook(ModelIdentifier id, CallbackInfo info) {
 		if (id == MISSING_ID) {
-			//noinspection RedundantCast
-			ModelLoaderHooks hooks = this;
-
 			ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
 			fabric_mlrLoaderInstance = ModelLoadingRegistryImpl.begin((ModelLoader) (Object) this, resourceManager);
-			fabric_mlrLoaderInstance.onModelPopulation(hooks::fabric_addModel);
 		}
 	}
 
