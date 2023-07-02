@@ -47,7 +47,7 @@ public class BakedModelFeatureRenderer<T extends LivingEntity, M extends EntityM
 		//matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(headYaw));
 		//matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(headPitch));
 		matrices.multiply(new Quaternionf(new AxisAngle4f(animationProgress * 0.07F, 0, 1, 0)));
-		matrices.scale(-0.75F, -0.75F, 0.75F);
+//		matrices.scale(-0.75F, -0.75F, 0.75F);
 		float aboveHead = (float) (Math.sin(animationProgress * 0.08F)) * 0.5F + 0.5F;
 		matrices.translate(-0.5F, 0.75F + aboveHead, -0.5F);
 		BakedModelRenderer.renderBakedModel(model, vertices, matrices.peek(), light);

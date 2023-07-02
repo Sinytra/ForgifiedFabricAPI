@@ -20,15 +20,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.util.ModelIdentifier;
@@ -42,10 +44,9 @@ import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelProviderException;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
 import net.fabricmc.fabric.api.client.model.ModelVariantProvider;
-import net.fabricmc.loader.api.FabricLoader;
 
 public class ModelLoadingRegistryImpl implements ModelLoadingRegistry {
-	private static final boolean DEBUG_MODEL_LOADING = FabricLoader.getInstance().isDevelopmentEnvironment()
+	private static final boolean DEBUG_MODEL_LOADING = !FMLEnvironment.production
 			|| Boolean.valueOf(System.getProperty("fabric.debugModelLoading", "false"));
 
 	@FunctionalInterface
@@ -77,12 +78,6 @@ public class ModelLoadingRegistryImpl implements ModelLoadingRegistry {
 			}
 
 			return ((ModelLoaderHooks) loader).fabric_loadModel(id);
-		}
-
-		public void onModelPopulation(Consumer<Identifier> addModel) {
-			for (ExtraModelProvider appender : modelAppenders) {
-				appender.provideExtraModels(manager, addModel);
-			}
 		}
 
 		private <T> UnbakedModel loadCustomModel(CustomModelItf<T> function, Collection<T> loaders, String debugName) {
@@ -205,5 +200,12 @@ public class ModelLoadingRegistryImpl implements ModelLoadingRegistry {
 
 	public static LoaderInstance begin(ModelLoader loader, ResourceManager manager) {
 		return new LoaderInstance((ModelLoadingRegistryImpl) INSTANCE, loader, manager);
+	}
+
+	public void onRegisterAdditionalModels(ModelEvent.RegisterAdditional event) {
+		ResourceManager manager = MinecraftClient.getInstance().getResourceManager();
+		for (ExtraModelProvider appender : appenders) {
+			appender.provideExtraModels(manager, event::register);
+		}
 	}
 }

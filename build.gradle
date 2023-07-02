@@ -1066,7 +1066,7 @@ subprojects {
 		checkReferenceCompatibility.configure {
 			dependsOn compareJar, remapReferenceApi
 			args "--base-jar", remapReferenceApi.get().archiveFile.get().asFile.absolutePath, "--input-jar", compareJar.get().archiveFile.get().asFile.absolutePath
-			(configurations.minecraftNamedCompile + configurations.apiLibs).each { args "--lib", it.absolutePath }
+			(rootProject.configurations.minecraftNamedCompile + configurations.apiLibs).each { args "--lib", it.absolutePath }
 			rootProject.configurations.baseLib.resolve().each { args "--base-lib", it.absolutePath }
 		}
 	}
