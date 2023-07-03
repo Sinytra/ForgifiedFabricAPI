@@ -99,7 +99,7 @@ public abstract class SimpleRegistryMixin<T> implements MutableRegistry<T>, Rema
 	private static final Logger FABRIC_LOGGER = LoggerFactory.getLogger(SimpleRegistryMixin.class);
 
 	@Unique
-	private final Event<RegistryEntryAddedCallback<T>> fabric_addObjectEvent = EventFactory.createArrayBacked(RegistryEntryAddedCallback.class,
+	protected final Event<RegistryEntryAddedCallback<T>> fabric_addObjectEvent = EventFactory.createArrayBacked(RegistryEntryAddedCallback.class,
 			(callbacks) -> (rawId, id, object) -> {
 				for (RegistryEntryAddedCallback<T> callback : callbacks) {
 					callback.onEntryAdded(rawId, id, object);
@@ -108,7 +108,7 @@ public abstract class SimpleRegistryMixin<T> implements MutableRegistry<T>, Rema
 	);
 
 	@Unique
-	private final Event<RegistryEntryRemovedCallback<T>> fabric_removeObjectEvent = EventFactory.createArrayBacked(RegistryEntryRemovedCallback.class,
+	protected final Event<RegistryEntryRemovedCallback<T>> fabric_removeObjectEvent = EventFactory.createArrayBacked(RegistryEntryRemovedCallback.class,
 			(callbacks) -> (rawId, id, object) -> {
 				for (RegistryEntryRemovedCallback<T> callback : callbacks) {
 					callback.onEntryRemoved(rawId, id, object);
@@ -117,7 +117,7 @@ public abstract class SimpleRegistryMixin<T> implements MutableRegistry<T>, Rema
 	);
 
 	@Unique
-	private final Event<RegistryIdRemapCallback<T>> fabric_postRemapEvent = EventFactory.createArrayBacked(RegistryIdRemapCallback.class,
+	protected final Event<RegistryIdRemapCallback<T>> fabric_postRemapEvent = EventFactory.createArrayBacked(RegistryIdRemapCallback.class,
 			(callbacks) -> (a) -> {
 				for (RegistryIdRemapCallback<T> callback : callbacks) {
 					callback.onRemap(a);
@@ -208,7 +208,7 @@ public abstract class SimpleRegistryMixin<T> implements MutableRegistry<T>, Rema
 	}
 
 	@Inject(method = "set", at = @At("RETURN"))
-	public void setPost(int id, RegistryKey<T> registryId, T object, Lifecycle lifecycle, CallbackInfoReturnable<RegistryEntry<T>> info) {
+	public void setPost(int id, RegistryKey<T> registryId, T object, Lifecycle lifecycle, CallbackInfoReturnable<RegistryEntry.Reference<T>> info) {
 		if (fabric_isObjectNew) {
 			fabric_addObjectEvent.invoker().onEntryAdded(id, registryId.getValue(), object);
 		}

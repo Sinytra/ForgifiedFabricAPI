@@ -27,16 +27,14 @@ import org.slf4j.LoggerFactory;
 
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.impl.registry.sync.packet.RegistryPacketHandler;
 import net.fabricmc.fabric.test.registry.sync.RegistrySyncTest;
 
-public class RegistrySyncTestClient implements ClientModInitializer {
+public class RegistrySyncTestClient {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RegistrySyncTestClient.class);
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		ClientPlayNetworking.registerGlobalReceiver(RegistrySyncTest.PACKET_CHECK_DIRECT, (client, handler, buf, responseSender) ->
 				RegistrySyncTest.DIRECT_PACKET_HANDLER.receivePacket(buf));
 
@@ -63,7 +61,7 @@ public class RegistrySyncTestClient implements ClientModInitializer {
 		});
 	}
 
-	private void logBufferSize(RegistryPacketHandler handler) {
+	private static void logBufferSize(RegistryPacketHandler handler) {
 		String handlerName = handler.getClass().getSuperclass().getSimpleName();
 		LOGGER.info("{} total packet: {}", handlerName, handler.getTotalPacketReceived());
 		LOGGER.info("{} raw size: {}", handlerName, handler.getRawBufSize());

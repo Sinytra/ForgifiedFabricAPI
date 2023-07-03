@@ -16,15 +16,24 @@
 
 package net.fabricmc.fabric.test.registry.sync;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
+
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.impl.registry.sync.RegistrySyncManager;
+import net.fabricmc.fabric.impl.registry.sync.RemapException;
+import net.fabricmc.fabric.impl.registry.sync.packet.DirectRegistryPacketHandler;
+import net.fabricmc.fabric.impl.registry.sync.packet.NbtRegistryPacketHandler;
+import net.fabricmc.fabric.impl.registry.sync.packet.RegistryPacketHandler;
+import net.fabricmc.fabric.test.registry.sync.client.RegistrySyncTestClient;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -40,22 +49,27 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
-import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.impl.registry.sync.RegistrySyncManager;
-import net.fabricmc.fabric.impl.registry.sync.RemapException;
-import net.fabricmc.fabric.impl.registry.sync.packet.DirectRegistryPacketHandler;
-import net.fabricmc.fabric.impl.registry.sync.packet.NbtRegistryPacketHandler;
-import net.fabricmc.fabric.impl.registry.sync.packet.RegistryPacketHandler;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
+import net.minecraftforge.registries.RegistryObject;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
 
-public class RegistrySyncTest implements ModInitializer {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+@Mod("fabric_registry_sync_v0_v1_testmod")
+public class RegistrySyncTest {
 	private static final Logger LOGGER = LogUtils.getLogger();
 
 	/**
@@ -82,34 +96,52 @@ public class RegistrySyncTest implements ModInitializer {
 
 	public static final Identifier PACKET_CHECK_COMPARE = new Identifier("fabric-registry-sync-v0-v1-testmod:packet_check/compare");
 
-	@Override
-	public void onInitialize() {
+	private static final List<DeferredRegister<?>> REGISTERS = new ArrayList<>();
+	private static final RegistryKey<Registry<String>> FABRIC_REGISTRY_KEY = RegistryKey.ofRegistry(new Identifier("registry_sync", "fabric_registry"));
+	private static SimpleRegistry<String> fabricRegistry;
+
+	static {
+		if (REGISTER_BLOCKS) {
+			// For checking raw id bulk in direct registry packet, make registry_sync namespace have two bulks.
+			registerBlocks("registry_sync", 5, 0);
+			registerBlocks("registry_sync2", 50, 0);
+			registerBlocks("registry_sync", 2, 5);
+		}
+	}
+
+	public RegistrySyncTest() {
+		if (FMLLoader.getDist() == Dist.CLIENT) {
+			RegistrySyncTestClient.onInitializeClient();
+		}
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			Map<Identifier, Object2IntMap<Identifier>> map = RegistrySyncManager.createAndPopulateRegistryMap(true, null);
 			NBT_PACKET_HANDLER.sendPacket(handler.player, map);
 			DIRECT_PACKET_HANDLER.sendPacket(handler.player, map);
 			sender.sendPacket(PACKET_CHECK_COMPARE, PacketByteBufs.empty());
 		});
-
-		if (REGISTER_BLOCKS) {
-			// For checking raw id bulk in direct registry packet, make registry_sync namespace have two bulks.
-			registerBlocks("registry_sync", 5, 0);
-			registerBlocks("registry_sync2", 50, 0);
-			registerBlocks("registry_sync", 2, 5);
-
-			Validate.isTrue(RegistryAttributeHolder.get(Registries.BLOCK).hasAttribute(RegistryAttribute.MODDED), "Modded block was registered but registry not marked as modded");
-
-			if (REGISTER_ITEMS) {
-				Validate.isTrue(RegistryAttributeHolder.get(Registries.ITEM).hasAttribute(RegistryAttribute.MODDED), "Modded item was registered but registry not marked as modded");
-			}
-		}
-
-		RegistryKey<Registry<String>> fabricRegistryKey = RegistryKey.ofRegistry(new Identifier("registry_sync", "fabric_registry"));
-		SimpleRegistry<String> fabricRegistry = FabricRegistryBuilder.createSimple(fabricRegistryKey)
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		REGISTERS.forEach(r -> r.register(bus));
+		bus.addListener(RegistrySyncTest::onCommonSetup);
+		bus.addListener(RegistrySyncTest::onRegister);
+		fabricRegistry = FabricRegistryBuilder.createSimple(FABRIC_REGISTRY_KEY)
 				.attribute(RegistryAttribute.SYNCED)
 				.buildAndRegister();
+	}
 
-		Registry.register(fabricRegistry, new Identifier("registry_sync", "test"), "test");
+	private static void onRegister(RegisterEvent event) {
+		event.register(FABRIC_REGISTRY_KEY, helper -> {
+			helper.register(new Identifier("registry_sync", "test"), "test");
+		});
+	}
+
+	public static void onCommonSetup(FMLCommonSetupEvent event) {
+		if (REGISTER_BLOCKS) {
+			Validate.isTrue(!RegistryAttributeHolder.get(Registries.BLOCK).hasAttribute(RegistryAttribute.MODDED), "Modded block was registered but registry marked as modded");
+
+			if (REGISTER_ITEMS) {
+				Validate.isTrue(!RegistryAttributeHolder.get(Registries.ITEM).hasAttribute(RegistryAttribute.MODDED), "Modded item was registered but registry marked as modded");
+			}
+		}
 
 		Validate.isTrue(Registries.REGISTRIES.getIds().contains(new Identifier("registry_sync", "fabric_registry")));
 
@@ -159,13 +191,16 @@ public class RegistrySyncTest implements ModInitializer {
 	}
 
 	private static void registerBlocks(String namespace, int amount, int startingId) {
+		DeferredRegister<Block> blocks = DeferredRegister.create(ForgeRegistries.BLOCKS, namespace);
+		DeferredRegister<Item> items = DeferredRegister.create(ForgeRegistries.ITEMS, namespace);
+		REGISTERS.add(blocks);
+		REGISTERS.add(items);
+
 		for (int i = 0; i < amount; i++) {
-			Block block = new Block(AbstractBlock.Settings.of(Material.STONE));
-			Registry.register(Registries.BLOCK, new Identifier(namespace, "block_" + (i + startingId)), block);
+			RegistryObject<Block> block = blocks.register("block_" + (i + startingId), () -> new Block(AbstractBlock.Settings.of(Material.STONE)));
 
 			if (REGISTER_ITEMS) {
-				BlockItem blockItem = new BlockItem(block, new Item.Settings());
-				Registry.register(Registries.ITEM, new Identifier(namespace, "block_" + (i + startingId)), blockItem);
+				items.register("block_" + (i + startingId), () -> new BlockItem(block.get(), new Item.Settings()));
 			}
 		}
 	}

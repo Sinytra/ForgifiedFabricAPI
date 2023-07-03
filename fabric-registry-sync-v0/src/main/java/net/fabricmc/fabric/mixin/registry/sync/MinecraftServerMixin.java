@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.mixin.registry.sync;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.GameData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,12 +27,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.registry.Registries;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.impl.registry.sync.trackers.vanilla.BlockInitTracker;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
@@ -38,12 +37,12 @@ public class MinecraftServerMixin {
 
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;setupServer()Z"), method = "runServer")
 	private void beforeSetupServer(CallbackInfo info) {
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+		if (FMLLoader.getDist() == Dist.DEDICATED_SERVER) {
 			// Freeze the registries on the server
 			FABRIC_LOGGER.debug("Freezing registries");
 
 			Registries.bootstrap();
-			BlockInitTracker.postFreeze();
+			GameData.vanillaSnapshot();
 		}
 	}
 }

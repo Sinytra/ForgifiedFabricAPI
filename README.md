@@ -43,7 +43,7 @@ Missing -> Added -> Tested
 | fabric-object-builder-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-particles-v1                  |         ✅ Tested         |    Stable    |
 | fabric-recipe-api-v1                 |         ✅ Tested         |    Stable    |
-| fabric-registry-sync-v0              |        ⚠️ Missing        |    Stable    |
+| fabric-registry-sync-v0              |         ✅ Tested         |    Stable    |
 | fabric-renderer-api-v1               |         ✅ Tested         |    Stable    |
 | fabric-renderer-indigo               |         ✅ Tested         |    Stable    |
 | fabric-rendering-data-attachment-v1  |         ✅ Tested         |    Stable    |
