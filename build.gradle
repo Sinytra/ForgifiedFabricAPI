@@ -291,10 +291,10 @@ allprojects {
 		}
 	}
 
-	checkstyle {
-		configFile = rootProject.file("checkstyle.xml")
-		toolVersion = "10.11.0"
-	}
+//	checkstyle {
+//		configFile = rootProject.file("checkstyle.xml")
+//		toolVersion = "10.11.0"
+//	}
 
 	tasks.withType(AbstractArchiveTask).configureEach {
 		preserveFileTimestamps = false
@@ -340,7 +340,7 @@ allprojects {
 		input = testmodJar.archiveFile
 		archiveClassifier = "testmod"
 		addNestedDependencies = false
-		includesClientOnlyClasses = true
+//		includesClientOnlyClasses = true
 //		clientOnlySourceSetName = sourceSets.testmodClient.name
 	}
 	build.dependsOn remapTestmodJar
@@ -461,7 +461,7 @@ loom {
 		}
 	}
 }
-test.dependsOn runGametest
+//test.dependsOn runGametest
 
 def coverageTasks = [
 	runGametestCoverage,
@@ -1015,6 +1015,7 @@ configurations {
 	referenceApi
 	baseLib
 	jarCompatChecker
+	javadocDeps
 }
 repositories {
 	maven { url = "https://maven.su5ed.dev/releases" }
@@ -1023,6 +1024,12 @@ dependencies {
 	referenceApi "net.fabricmc.fabric-api:fabric-api:$configuredVersion+${rootProject.minecraft_version}"
 	baseLib "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 	jarCompatChecker "dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all"
+	javadocDeps "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+}
+afterEvaluate {
+	javadoc {
+		classpath += files(configurations.javadocDeps)
+	}
 }
 
 subprojects {

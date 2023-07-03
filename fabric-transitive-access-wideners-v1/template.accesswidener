@@ -20,7 +20,7 @@ transitive-accessible field net/minecraft/loot/LootPool conditions [Lnet/minecra
 transitive-accessible field net/minecraft/loot/LootPool functions [Lnet/minecraft/loot/function/LootFunction;
 transitive-accessible field net/minecraft/loot/LootPool rolls Lnet/minecraft/loot/provider/number/LootNumberProvider;
 transitive-accessible field net/minecraft/loot/LootPool bonusRolls Lnet/minecraft/loot/provider/number/LootNumberProvider;
-transitive-accessible field net/minecraft/loot/LootTable pools [Lnet/minecraft/loot/LootPool;
+transitive-accessible field net/minecraft/loot/LootTable f_79109_ Ljava/util/List;
 transitive-accessible field net/minecraft/loot/LootTable functions [Lnet/minecraft/loot/function/LootFunction;
 
 # Villager trade factories

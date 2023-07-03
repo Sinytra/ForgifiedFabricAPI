@@ -23,7 +23,6 @@
   "mixins": [
     "fabric-item-group-api-v1.mixins.json"
   ],
-  "accessWidener": "fabric-item-group-api-v1.accesswidener",
   "custom": {
     "fabric-api:module-lifecycle": "stable",
     "loom:injected_interfaces": {
