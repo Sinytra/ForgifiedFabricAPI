@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +28,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -101,7 +101,7 @@ public final class FluidVariantRendering {
 
 		// If advanced tooltips are enabled, render the fluid id
 		if (context.isAdvanced()) {
-			tooltip.add(Text.literal(Registries.FLUID.getId(fluidVariant.getFluid()).toString()).formatted(Formatting.DARK_GRAY));
+			tooltip.add(Text.literal(ForgeRegistries.FLUIDS.getKey(fluidVariant.getFluid()).toString()).formatted(Formatting.DARK_GRAY));
 		}
 
 		// TODO: consider adding an event to append to tooltips?

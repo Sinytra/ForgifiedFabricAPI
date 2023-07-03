@@ -46,6 +46,7 @@ public class BucketItemMixin {
 			index = 4
 	)
 	private SoundEvent hookEmptyingSound(SoundEvent previous) {
+		// TODO FFAPI: Leverage forge fluid types
 		return FluidVariantAttributes.getHandlerOrDefault(fluid).getEmptySound(FluidVariant.of(fluid)).orElse(previous);
 	}
 }

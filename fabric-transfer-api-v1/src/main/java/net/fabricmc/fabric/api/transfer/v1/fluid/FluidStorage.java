@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.api.transfer.v1.fluid;
 
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +24,8 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.util.Identifier;
@@ -33,16 +34,17 @@ import net.minecraft.util.math.Direction;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.EmptyItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.FullItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.impl.transfer.fluid.EmptyBucketStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
+import net.fabricmc.fabric.impl.transfer.compat.ForgeFluidStorage;
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiForgeCompat;
 import net.fabricmc.fabric.impl.transfer.fluid.CombinedProvidersImpl;
+import net.fabricmc.fabric.impl.transfer.fluid.EmptyBucketStorage;
 import net.fabricmc.fabric.impl.transfer.fluid.WaterPotionStorage;
-import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 
 /**
  * Access to {@link Storage Storage&lt;FluidVariant&gt;} instances.
@@ -152,7 +154,7 @@ public final class FluidStorage {
 		// Register full bucket storage
 		GENERAL_COMBINED_PROVIDER.register(context -> {
 			if (context.getItemVariant().getItem() instanceof BucketItem bucketItem) {
-				Fluid bucketFluid = ((BucketItemAccessor) bucketItem).fabric_getFluid();
+				Fluid bucketFluid = bucketItem.getFluid();
 
 				// Make sure the mapping is bidirectional.
 				if (bucketFluid != null && bucketFluid.getBucketItem() == bucketItem) {
@@ -172,5 +174,29 @@ public final class FluidStorage {
 		});
 		// Register water potion storage
 		combinedItemApiProvider(Items.POTION).register(WaterPotionStorage::find);
+
+		// FFAPI: Forge Capabilities fallback bridge
+		FluidStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
+			if (blockEntity != null && !TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.get()) {
+				TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.set(true);
+				Storage<FluidVariant> storage = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, direction)
+						.map(ForgeFluidStorage::new)
+						.orElse(null);
+				TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.set(false);
+				return storage;
+			}
+			return null;
+		});
+		FluidStorage.ITEM.registerFallback((stack, context) -> {
+			if (stack != null && !TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.get()) {
+				TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.set(true);
+				Storage<FluidVariant> storage = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null)
+						.map(ForgeFluidStorage::new)
+						.orElse(null);
+				TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.set(false);
+				return storage;
+			}
+			return null;
+		});
 	}
 }

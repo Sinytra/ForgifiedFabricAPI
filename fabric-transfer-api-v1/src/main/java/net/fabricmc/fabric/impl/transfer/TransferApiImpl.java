@@ -23,8 +23,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiForgeCompat;
+
+import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -32,7 +35,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
+@Mod(TransferApiImpl.MODID)
 public class TransferApiImpl {
+	public static final String MODID = "fabric_transfer_api_v1";
 	public static final Logger LOGGER = LoggerFactory.getLogger("fabric-transfer-api-v1");
 	public static final AtomicLong version = new AtomicLong();
 	@SuppressWarnings("rawtypes")
@@ -144,5 +149,9 @@ public class TransferApiImpl {
 				return storage.getSlotCount();
 			}
 		};
+	}
+
+	public TransferApiImpl() {
+		TransferApiForgeCompat.init();
 	}
 }
