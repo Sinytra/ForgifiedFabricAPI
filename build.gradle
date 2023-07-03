@@ -960,6 +960,10 @@ allprojects {
 	artifacts {
 		remappedJars(signingEnabled ? tasks.named("signRemapJar") : remapJar)
 	}
+	// Because it dies on try-with-resources statements
+	spotlessGroovyGradle {
+		enabled = false
+	}
 }
 
 configurations {
