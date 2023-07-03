@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.mixin.registry.sync.client;
 
+import net.minecraftforge.registries.GameData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +32,6 @@ import net.minecraft.registry.Registries;
 
 import net.fabricmc.fabric.impl.registry.sync.RegistrySyncManager;
 import net.fabricmc.fabric.impl.registry.sync.RemapException;
-import net.fabricmc.fabric.impl.registry.sync.trackers.vanilla.BlockInitTracker;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
@@ -53,7 +53,7 @@ public class MinecraftClientMixin {
 		// Freeze the registries on the client
 		FABRIC_LOGGER.debug("Freezing registries");
 		Registries.bootstrap();
-		BlockInitTracker.postFreeze();
+		GameData.vanillaSnapshot();
 		ItemGroups.collect();
 	}
 }

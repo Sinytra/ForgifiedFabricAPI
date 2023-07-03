@@ -5,15 +5,14 @@
   "mixins": [
     "BootstrapMixin",
     "ChunkSerializerMixin",
-    "DebugChunkGeneratorAccessor",
-    "IdListMixin",
     "LevelStorageSessionMixin",
     "MinecraftServerMixin",
     "RegistriesAccessor",
     "RegistriesMixin",
     "RegistryLoaderMixin",
     "SimpleRegistryMixin",
-    "StructuresToConfiguredStructuresFixMixin"
+    "NamespacedWrapperMixin",
+    "RegistryManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

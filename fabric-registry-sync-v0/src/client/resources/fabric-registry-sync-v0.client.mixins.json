@@ -3,11 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.registry.sync.client",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "BlockColorsMixin",
-    "ItemColorsMixin",
-    "ItemModelsMixin",
-    "MinecraftClientMixin",
-    "ParticleManagerMixin"
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
