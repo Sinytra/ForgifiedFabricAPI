@@ -18,6 +18,12 @@ package net.fabricmc.fabric.api.transfer.v1.item;
 
 import java.util.List;
 
+import net.fabricmc.fabric.impl.transfer.TransferApiImpl;
+import net.fabricmc.fabric.impl.transfer.compat.ForgeItemStorage;
+
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiForgeCompat;
+
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -132,6 +138,19 @@ public final class ItemStorage {
 			}
 
 			return inventoryToWrap != null ? InventoryStorage.of(inventoryToWrap, direction) : null;
+		});
+
+		// FFAPI: Forge Capabilities fallback bridge
+		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
+			if (blockEntity != null && !TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.get()) {
+				TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.set(true);
+				Storage<ItemVariant> storage = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction)
+						.map(ForgeItemStorage::new)
+						.orElse(null);
+				TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.set(false);
+				return storage;
+			}
+			return null;
 		});
 	}
 }

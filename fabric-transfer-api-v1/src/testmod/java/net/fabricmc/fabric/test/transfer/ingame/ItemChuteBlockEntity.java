@@ -20,40 +20,31 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleItemStorage;
 
-public class FluidChuteBlockEntity extends BlockEntity {
-	final SingleFluidStorage storage = SingleFluidStorage.withFixedCapacity(FluidConstants.BUCKET * 4, this::markDirty);
+public class ItemChuteBlockEntity extends BlockEntity {
+	final SingleItemStorage storage = new SingleItemStorage() {
+		@Override
+		protected long getCapacity(ItemVariant variant) {
+			return 1;
+		}
 
-	private int tickCounter = 0;
+		@Override
+		protected void onFinalCommit() {
+			super.onFinalCommit();
+			markDirty();
+		}
+	};
 
-	public FluidChuteBlockEntity(BlockPos pos, BlockState state) {
-		super(TransferTestInitializer.FLUID_CHUTE_TYPE.get(), pos, state);
+	public ItemChuteBlockEntity(BlockPos pos, BlockState state) {
+		super(TransferTestInitializer.ITEM_CHUTE_TYPE.get(), pos, state);
 	}
 
 	@SuppressWarnings("ConstantConditions")
 	public void tick() {
-		if (!world.isClient() && tickCounter++ % 20 == 0) {
-			StorageUtil.move(
-					FluidStorage.SIDED.find(world, pos.offset(Direction.UP), Direction.DOWN),
-					storage,
-					fluid -> true,
-					FluidConstants.BUCKET,
-					null
-			);
-			StorageUtil.move(
-					storage,
-					FluidStorage.SIDED.find(world, pos.offset(Direction.DOWN), Direction.UP),
-					fluid -> true,
-					FluidConstants.BUCKET,
-					null
-			);
-		}
+		
 	}
 
 	@Override

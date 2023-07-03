@@ -16,42 +16,51 @@
 
 package net.fabricmc.fabric.test.transfer.ingame;
 
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.test.transfer.TransferApiTests;
 
-public class TransferTestInitializer implements ModInitializer {
-	public static final String MOD_ID = "fabric-transfer-api-v1-testmod";
+public class TransferTestInitializer {
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, TransferApiTests.NAMESPACE);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, TransferApiTests.NAMESPACE);
+	private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, TransferApiTests.NAMESPACE);
 
-	private static final Block INFINITE_WATER_SOURCE = new Block(AbstractBlock.Settings.create());
-	private static final Block INFINITE_LAVA_SOURCE = new Block(AbstractBlock.Settings.create());
-	private static final Block FLUID_CHUTE = new FluidChuteBlock();
-	private static final Item EXTRACT_STICK = new ExtractStickItem();
-	public static BlockEntityType<FluidChuteBlockEntity> FLUID_CHUTE_TYPE;
+	private static final RegistryObject<Block> INFINITE_WATER_SOURCE = BLOCKS.register("infinite_water_source", () -> new Block(AbstractBlock.Settings.create()));
+	private static final RegistryObject<Item> INFINITE_WATER_SOURCE_ITEM = ITEMS.register("infinite_water_source", () -> new BlockItem(INFINITE_WATER_SOURCE.get(), new Item.Settings()));
 
-	@Override
-	public void onInitialize() {
-		registerBlock(INFINITE_WATER_SOURCE, "infinite_water_source");
-		registerBlock(INFINITE_LAVA_SOURCE, "infinite_lava_source");
-		registerBlock(FLUID_CHUTE, "fluid_chute");
-		Registry.register(Registries.ITEM, new Identifier(MOD_ID, "extract_stick"), EXTRACT_STICK);
+	private static final RegistryObject<Block> INFINITE_LAVA_SOURCE = BLOCKS.register("infinite_lava_source", () -> new Block(AbstractBlock.Settings.create()));
+	private static final RegistryObject<Item> INFINITE_LAVA_SOURCE_ITEM = ITEMS.register("infinite_lava_source", () -> new BlockItem(INFINITE_LAVA_SOURCE.get(), new Item.Settings()));
 
-		FLUID_CHUTE_TYPE = FabricBlockEntityTypeBuilder.create(FluidChuteBlockEntity::new, FLUID_CHUTE).build();
-		Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "fluid_chute"), FLUID_CHUTE_TYPE);
+	private static final RegistryObject<Block> FLUID_CHUTE = BLOCKS.register("fluid_chute", FluidChuteBlock::new);
+	private static final RegistryObject<Item> FLUID_CHUTE_ITEM = ITEMS.register("fluid_chute", () -> new BlockItem(FLUID_CHUTE.get(), new Item.Settings()));
 
-		FluidStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.WATER, INFINITE_WATER_SOURCE);
-		FluidStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.LAVA, INFINITE_LAVA_SOURCE);
+	private static final RegistryObject<Block> ITEM_CHUTE = BLOCKS.register("item_chute", ItemChuteBlock::new);
+	private static final RegistryObject<Item> ITEM_CHUTE_ITEM = ITEMS.register("item_chute", () -> new BlockItem(ITEM_CHUTE.get(), new Item.Settings()));
+
+	private static final RegistryObject<Item> EXTRACT_STICK = ITEMS.register("extract_stick", ExtractStickItem::new);
+
+	public static final RegistryObject<BlockEntityType<FluidChuteBlockEntity>> FLUID_CHUTE_TYPE = BLOCK_ENTITY_TYPES.register("fluid_chute", () -> FabricBlockEntityTypeBuilder.create(FluidChuteBlockEntity::new, FLUID_CHUTE.get()).build());
+	public static final RegistryObject<BlockEntityType<ItemChuteBlockEntity>> ITEM_CHUTE_TYPE = BLOCK_ENTITY_TYPES.register("item_chute", () -> FabricBlockEntityTypeBuilder.create(ItemChuteBlockEntity::new, ITEM_CHUTE.get()).build());
+
+	public static void onInitialize(IEventBus bus) {
+		BLOCKS.register(bus);
+		ITEMS.register(bus);
+		BLOCK_ENTITY_TYPES.register(bus);
+		bus.addListener(TransferTestInitializer::onCommonSetup);
 
 		// Obsidian is now a trash can :-P
 		ItemStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> TrashingStorage.ITEM, Blocks.OBSIDIAN);
@@ -59,9 +68,10 @@ public class TransferTestInitializer implements ModInitializer {
 		ItemStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.DIAMONDS, Blocks.DIAMOND_ORE);
 	}
 
-	private static void registerBlock(Block block, String name) {
-		Identifier id = new Identifier(MOD_ID, name);
-		Registry.register(Registries.BLOCK, id, block);
-		Registry.register(Registries.ITEM, id, new BlockItem(block, new Item.Settings()));
+	private static void onCommonSetup(FMLCommonSetupEvent event) {
+		FluidStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.WATER, INFINITE_WATER_SOURCE.get());
+		FluidStorage.SIDED.registerForBlocks((world, pos, state, be, direction) -> CreativeStorage.LAVA, INFINITE_LAVA_SOURCE.get());
+		FluidStorage.SIDED.registerForBlockEntity((be, side) -> be.storage, FLUID_CHUTE_TYPE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, side) -> be.storage, ITEM_CHUTE_TYPE.get());
 	}
 }

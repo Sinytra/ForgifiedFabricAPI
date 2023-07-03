@@ -18,18 +18,24 @@ package net.fabricmc.fabric.test.transfer.gametests;
 
 import static net.fabricmc.fabric.test.transfer.unittests.TestUtil.assertEquals;
 
+import net.fabricmc.fabric.test.transfer.TransferApiTests;
+
 import net.minecraft.fluid.Fluids;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+@GameTestHolder(TransferApiTests.MODID)
 public class WorldDependentAttributesTest {
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = TransferApiTests.MODID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testViscosity(TestContext context) {
 		ServerWorld overworld = context.getWorld();
 		ServerWorld nether = overworld.getServer().getWorld(ServerWorld.NETHER);

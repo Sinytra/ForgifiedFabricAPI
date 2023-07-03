@@ -36,6 +36,7 @@ import net.fabricmc.fabric.impl.transfer.item.SpecialLogicInventory;
  * This mixin tracks the last interacted slot for transaction support, defers block state updates,
  * and allows setting empty stacks via {@link Inventory#setStack} in a transfer API context (needed for extractions).
  */
+// TODO FFAPI: Handle via capability in 1.20
 @Mixin(ChiseledBookshelfBlockEntity.class)
 public class ChiseledBookshelfBlockEntityMixin implements SpecialLogicInventory {
 	@Shadow

@@ -18,11 +18,9 @@ package net.fabricmc.fabric.test.transfer.unittests;
 
 import org.slf4j.LoggerFactory;
 
-import net.fabricmc.api.ModInitializer;
+public class UnitTestsInitializer {
 
-public class UnitTestsInitializer implements ModInitializer {
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		AttributeTests.run();
 		BaseStorageTests.run();
 		FluidItemTests.run();
