@@ -30,7 +30,7 @@ Missing -> Added -> Tested
 | fabric-entity-events-v1              |         ✅ Tested         |    Stable    |
 | fabric-events-interaction-v0         |         ✅ Tested         |    Stable    |
 | fabric-game-rule-api-v1              |         ✅ Tested         |    Stable    |
-| fabric-gametest-api-v1               |        ⚠️ Missing        |    Stable    |
+| fabric-gametest-api-v1               | 🚧 Not Planned [[2]](#2) |    Stable    |
 | fabric-item-api-v1                   |         ✅ Tested         |    Stable    |
 | fabric-item-group-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-key-binding-api-v1            |         ✅ Tested         |    Stable    |
@@ -66,7 +66,8 @@ Missing -> Added -> Tested
 | fabric-renderer-registries-v1        |        ⚠️ Missing        |  Deprecated  |
 | fabric-rendering-v0                  |        ⚠️ Missing        |  Deprecated  |
 
-<a id="1">[1]</a> Does not provide an API, features already implemented by FML.
+<a id="1">[1]</a> Does not provide an API, features already implemented by FML.<br>
+<a id="2">[2]</a> Forge's <a href="https://forge.gemwire.uk/wiki/Game_Tests">GameTest runner</a> provides the same capabilities.
 
 ## Modules
 
