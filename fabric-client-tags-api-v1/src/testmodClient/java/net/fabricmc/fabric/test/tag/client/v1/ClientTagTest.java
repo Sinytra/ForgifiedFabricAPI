@@ -40,7 +40,7 @@ import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEnchantmentTags;
 @Mod(ClientTagTest.MODID)
 public class ClientTagTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientTagTest.class);
-	private static final String MODID = "fabric_clients_tags_api_v1_testmod";
+	public static final String MODID = "fabric_clients_tags_api_v1_testmod";
 
 	public ClientTagTest() {
 		final IModInfo container = ModList.get().getModContainerById(MODID).orElseThrow().getModInfo();

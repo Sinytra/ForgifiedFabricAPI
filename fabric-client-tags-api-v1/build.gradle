@@ -8,3 +8,7 @@ testDependencies(project, [
 	':fabric-lifecycle-events-v1',
 	':fabric-resource-loader-v0',
 ])
+
+dependencies {
+	compileOnly "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+}
