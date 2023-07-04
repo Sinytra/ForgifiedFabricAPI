@@ -12,5 +12,6 @@
   "mixins": [
     "MouseMixin",
     "ScreenAccessor"
-  ]
+  ],
+  "minVersion": "0.8.5"
 }
