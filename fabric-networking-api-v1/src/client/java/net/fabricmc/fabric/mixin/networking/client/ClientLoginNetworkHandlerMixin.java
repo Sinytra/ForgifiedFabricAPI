@@ -16,12 +16,17 @@
 
 package net.fabricmc.fabric.mixin.networking.client;
 
+import net.minecraft.network.ClientConnection;
+
+import net.minecraftforge.network.ICustomPacket;
+import net.minecraftforge.network.NetworkHooks;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
@@ -46,11 +51,9 @@ abstract class ClientLoginNetworkHandlerMixin implements NetworkHandlerExtension
 		this.addon = new ClientLoginNetworkAddon((ClientLoginNetworkHandler) (Object) this, this.client);
 	}
 
-	@Inject(method = "onQueryRequest", at = @At(value = "INVOKE", target = "Ljava/util/function/Consumer;accept(Ljava/lang/Object;)V", remap = false, shift = At.Shift.AFTER), cancellable = true)
-	private void handleQueryRequest(LoginQueryRequestS2CPacket packet, CallbackInfo ci) {
-		if (this.addon.handlePacket(packet)) {
-			ci.cancel();
-		}
+	@Redirect(method = "onQueryRequest", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/network/NetworkHooks;onCustomPayload(Lnet/minecraftforge/network/ICustomPacket;Lnet/minecraft/network/ClientConnection;)Z"))
+	private boolean handleQueryRequest(ICustomPacket<?> packet, final ClientConnection connection) {
+		return this.addon.handlePacket((LoginQueryRequestS2CPacket) packet) || NetworkHooks.onCustomPayload(packet, connection);
 	}
 
 	@Inject(method = "onDisconnected", at = @At("HEAD"))
