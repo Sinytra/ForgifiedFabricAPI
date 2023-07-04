@@ -39,6 +39,7 @@ loom {
 
 			ideConfigGenerated = true
 			runDir "build/datagen"
+			source sourceSets.testmod
 		}
 	}
 
@@ -48,5 +49,6 @@ loom {
 }
 
 afterEvaluate {
+	runDatagen.dependsOn "datagenClasses"
 	generateResources.dependsOn "runDatagen"
 }

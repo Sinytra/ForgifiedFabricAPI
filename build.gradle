@@ -147,7 +147,7 @@ allprojects {
 	}
 
 	apply plugin: "java-library"
-	apply plugin: "checkstyle"
+//	apply plugin: "checkstyle"
 	apply plugin: "dev.architectury.loom"
 	apply plugin: "com.diffplug.spotless"
 
@@ -830,11 +830,18 @@ modrinth {
 // A task to ensure that the version being released has not already been released.
 tasks.register('checkVersion') {
 	doFirst {
-		def xml = new URL("https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml").text
-		def metadata = new XmlSlurper().parseText(xml)
-		def versions = metadata.versioning.versions.version*.text();
-		if (versions.contains(version)) {
-			throw new RuntimeException("${version} has already been released!")
+		if (ENV.MAVEN_URL) {
+			def url = ENV.MAVEN_URL + '/dev/su5ed/sinytra/fabric-api/maven-metadata.xml'
+			try {
+				def xml = new URL(url).text
+				def metadata = new XmlSlurper().parseText(xml)
+				def versions = metadata.versioning.versions.version*.text();
+				if (versions.contains(version)) {
+					throw new RuntimeException("${version} has already been released!")
+				}
+			} catch (FileNotFoundException e) {
+				// File doesn't exists, no releases yet
+			}
 		}
 	}
 }

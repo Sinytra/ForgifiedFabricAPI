@@ -2,6 +2,7 @@ name: Release
 on: [workflow_dispatch] # Manual trigger
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -21,8 +22,18 @@ jobs:
         with:
           context: changelog
           workflow_id: release.yml
+      - name: Restore gradle.properties
+        env:
+          GRADLE_PROPERTIES: ${{ vars.GRADLE_PROPERTIES }}
+        shell: bash
+        run: |
+          mkdir -p ~/.gradle/
+          echo "GRADLE_USER_HOME=${HOME}/.gradle" >> $GITHUB_ENV
+          echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
+      - name: Create placeholder assets dir
+        run: mkdir -p ${{ env.GRADLE_USER_HOME }}/caches/fabric-loom/assets
       - uses: gradle/wrapper-validation-action@v1
-      - run: ./gradlew checkVersion build publish curseforge github modrinth --stacktrace -Porg.gradle.parallel.threads=4
+      - run: ./gradlew checkVersion build publish github --stacktrace
         env:
           MAVEN_URL: ${{ secrets.MAVEN_URL }}
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
