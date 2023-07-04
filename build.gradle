@@ -116,7 +116,7 @@ def testDependencies(project, List<String> depNames) {
 }
 
 allprojects {
-	group = "net.fabricmc.fabric-api"
+	group = "dev.su5ed.sinytra.fabric-api"
 
 	apply plugin: "maven-publish"
 	apply plugin: "me.modmuss50.remotesign"
@@ -288,6 +288,7 @@ allprojects {
 	spotless {
 		java {
 			licenseHeaderFile(rootProject.file("HEADER"))
+			targetExclude("src/generated/**")
 		}
 	}
 
