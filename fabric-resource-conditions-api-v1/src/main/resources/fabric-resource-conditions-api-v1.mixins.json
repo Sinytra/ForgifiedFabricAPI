@@ -8,5 +8,6 @@
     "LootManagerMixin",
     "SinglePreparationResourceReloaderMixin",
     "TagManagerLoaderMixin"
-  ]
+  ],
+  "minVersion": "0.8.5"
 }

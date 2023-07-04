@@ -11,5 +11,6 @@
     "ItemMixin",
     "LootableContainerBlockEntityMixin",
     "SimpleInventoryMixin"
-  ]
+  ],
+  "minVersion": "0.8.5"
 }
