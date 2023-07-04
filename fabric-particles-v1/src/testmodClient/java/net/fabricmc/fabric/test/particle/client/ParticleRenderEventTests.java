@@ -18,27 +18,28 @@ package net.fabricmc.fabric.test.particle.client;
 
 import net.minecraft.registry.tag.FluidTags;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.test.particle.ParticleTestSetup;
 import net.fabricmc.fabric.test.particle.ParticleTintTestBlock;
 
-public final class ParticleRenderEventTests implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+public final class ParticleRenderEventTests {
+
+	public static void onInitializeClient(FMLClientSetupEvent event) {
 		ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
 			if (tintIndex == 0) {
 				return ((ParticleTintTestBlock) state.getBlock()).color;
 			}
 
 			return -1;
-		}, ParticleTestSetup.ALWAYS_TINTED, ParticleTestSetup.TINTED_OVER_WATER, ParticleTestSetup.NEVER_TINTED);
+		}, ParticleTestSetup.ALWAYS_TINTED.get(), ParticleTestSetup.TINTED_OVER_WATER.get(), ParticleTestSetup.NEVER_TINTED.get());
 
 		ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT.register((state, world, pos) -> {
-			if (state.isOf(ParticleTestSetup.NEVER_TINTED)) {
+			if (state.isOf(ParticleTestSetup.NEVER_TINTED.get())) {
 				return false;
-			} else if (state.isOf(ParticleTestSetup.TINTED_OVER_WATER)) {
+			} else if (state.isOf(ParticleTestSetup.TINTED_OVER_WATER.get())) {
 				return world.getFluidState(pos.down()).isIn(FluidTags.WATER);
 			}
 
