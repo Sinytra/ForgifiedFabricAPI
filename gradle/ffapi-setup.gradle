@@ -2,29 +2,31 @@ buildscript {
     dependencies {
         classpath files(rootProject.buildscript.configurations.classpath) 
     } 
-} 
+}
+
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.toml.TomlBuilder
-import java.nio.file.Files
-import java.nio.charset.StandardCharsets
-import net.fabricmc.loom.util.aw2at.Aw2At
-import net.fabricmc.loom.util.LfWriter
-import net.fabricmc.lorenztiny.TinyMappingsReader
-import net.fabricmc.loom.util.service.UnsafeWorkQueueHelper
-import net.fabricmc.loom.task.service.MappingsService
-import javax.inject.Inject
-import net.fabricmc.loom.util.service.BuildSharedServiceManager
-import org.gradle.build.event.BuildEventsListenerRegistry
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
-import net.fabricmc.loom.util.FileSystemUtil
 import net.fabricmc.loom.build.nesting.IncludedJarFactory
 import net.fabricmc.loom.task.RemapJarTask
-
+import net.fabricmc.loom.task.service.MappingsService
+import net.fabricmc.loom.util.FileSystemUtil
+import net.fabricmc.loom.util.LfWriter
+import net.fabricmc.loom.util.aw2at.Aw2At
+import net.fabricmc.loom.util.service.BuildSharedServiceManager
+import net.fabricmc.loom.util.service.UnsafeWorkQueueHelper
+import net.fabricmc.lorenztiny.TinyMappingsReader
 import org.cadixdev.at.AccessTransformSet
 import org.cadixdev.at.io.AccessTransformFormats
 import org.cadixdev.lorenz.MappingSet
+import org.gradle.build.event.BuildEventsListenerRegistry
+
+import javax.inject.Inject
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 allprojects {
 	sourceSets.configureEach { sourceSet ->
@@ -189,6 +191,32 @@ afterEvaluate {
 	javadoc {
 		classpath += files(configurations.javadocDeps)
 	}
+}
+
+// Mitigate https://github.com/MinecraftForge/InstallerTools/issues/14 in fg.deobf
+def relocateNestedJars = tasks.register("relocateNestedJars") {
+	def archiveFile = remapJar.archiveFile
+	inputs.file(archiveFile)
+	outputs.upToDateWhen { true }
+
+	doLast {
+		try (FileSystemUtil.Delegate fs = FileSystemUtil.getJarFileSystem(archiveFile.get().asFile.toPath(), false)) {
+			def sourceDirectory = fs.getPath("META-INF", "jars")
+			def destinationDirectory = fs.getPath("META-INF", "jarjar")
+			Files.newDirectoryStream(sourceDirectory).forEach { path ->
+				Files.move(path, destinationDirectory.resolve(path.getFileName()), StandardCopyOption.COPY_ATTRIBUTES)
+			}
+			Files.delete(sourceDirectory)
+
+			def metadata = fs.getPath("META-INF", "jarjar", "metadata.json")
+			def text = Files.readString(metadata, StandardCharsets.UTF_8)
+			def replaced = text.replaceAll('META-INF/jars/', 'META-INF/jarjar/')
+			Files.writeString(metadata, replaced, StandardCharsets.UTF_8)
+		}
+	}
+}
+remapJar {
+	finalizedBy relocateNestedJars
 }
 
 subprojects {
