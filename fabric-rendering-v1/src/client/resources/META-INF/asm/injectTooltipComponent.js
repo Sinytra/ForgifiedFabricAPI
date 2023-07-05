@@ -26,7 +26,7 @@ function initializeCoreMod() {
                 list.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/fabricmc/fabric/api/event/Event", "invoker", "()Ljava/lang/Object;"));
                 list.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/fabricmc/fabric/api/client/rendering/v1/TooltipComponentCallback"));
                 list.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                list.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "net/fabricmc/fabric/api/client/rendering/v1/TooltipComponentCallback", "getComponent", "(Lnet/minecraft/client/item/TooltipData;)Lnet/minecraft/client/gui/tooltip/TooltipComponent;"));
+                list.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "net/fabricmc/fabric/api/client/rendering/v1/TooltipComponentCallback", "getComponent", yarn ? "(Lnet/minecraft/client/item/TooltipData;)Lnet/minecraft/client/gui/tooltip/TooltipComponent;" : "(Lnet/minecraft/world/inventory/tooltip/TooltipComponent;)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;"));
                 list.add(new InsnNode(Opcodes.DUP));
                 list.add(new JumpInsnNode(Opcodes.IFNULL, end));
                 list.add(new InsnNode(Opcodes.ARETURN));

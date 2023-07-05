@@ -157,6 +157,7 @@ remapJar {
 		.map { it.left().collect { it.resolve() } }
 }
 remapTestmodJar {
+	mustRunAfter remapJar
 	forgeNestedJars.addAll includedJarFactory.getForgeNestedJars(configurations.includedTestModRemappedJars)
 		.map { it.left().collect { it.resolve() } }
 	addNestedDependencies = true
