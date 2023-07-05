@@ -22,7 +22,12 @@ jobs:
         with:
           context: changelog
           workflow_id: release.yml
-      - name: Restore gradle.properties
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-excludes: |
+            gradle.properties
+      - name: Setup gradle.properties
         env:
           GRADLE_PROPERTIES: ${{ vars.GRADLE_PROPERTIES }}
         shell: bash
