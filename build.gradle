@@ -23,7 +23,7 @@ def ENV = System.getenv()
 def signingEnabled = ENV.SIGNING_SERVER
 
 def configuredVersion = project.version
-version = project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()
+version = project.version + '+' + project.forgified_version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()
 logger.lifecycle("Building Fabric: " + version)
 
 
