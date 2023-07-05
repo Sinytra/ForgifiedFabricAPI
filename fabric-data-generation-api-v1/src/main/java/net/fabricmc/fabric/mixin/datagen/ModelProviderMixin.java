@@ -95,7 +95,7 @@ public class ModelProviderMixin {
 		blockStateMapThreadLocal.remove();
 	}
 
-	@Inject(method = { "method_25738", "m_125115_" }, at = @At("HEAD"), require = 1, cancellable = true)
+	@Inject(method = "method_25738(Ljava/util/Map;Lnet/minecraft/block/Block;)Z", at = @At("HEAD"), cancellable = true)
 	private static void filterBlocksForProcessingMod(Map<Block, BlockStateSupplier> map, Block block, CallbackInfoReturnable<Boolean> cir) {
 		FabricDataOutput dataOutput = fabricDataOutputThreadLocal.get();
 
@@ -112,7 +112,7 @@ public class ModelProviderMixin {
 		}
 	}
 
-	@Inject(method = { "method_25741", "m_125125_" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/data/client/ModelIds;getItemModelId(Lnet/minecraft/item/Item;)Lnet/minecraft/util/Identifier;"), require = 1, cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "method_25741(Ljava/util/Set;Ljava/util/Map;Lnet/minecraft/block/Block;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/data/client/ModelIds;getItemModelId(Lnet/minecraft/item/Item;)Lnet/minecraft/util/Identifier;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
 	private static void filterItemsForProcessingMod(Set<Item> set, Map<Identifier, Supplier<JsonElement>> map, Block block, CallbackInfo ci, Item item) {
 		FabricDataOutput dataOutput = fabricDataOutputThreadLocal.get();
 

@@ -51,7 +51,7 @@ public abstract class MessageHandlerMixin {
 		}
 	}
 
-	@Inject(method = { "method_45745", "m_244709_" }, at = @At("HEAD"), require = 1, remap = false, cancellable = true)
+	@Inject(method = "method_45745(Lnet/minecraft/network/message/MessageType$Parameters;Lnet/minecraft/text/Text;Ljava/time/Instant;)Z", at = @At("HEAD"), cancellable = true)
 	private void fabric_onProfilelessChatMessage(MessageType.Parameters params, Text content, Instant receptionTimestamp, CallbackInfoReturnable<Boolean> cir) {
 		fabric_onChatMessage(params.applyChatDecoration(content), null, null, params, receptionTimestamp, cir);
 	}
