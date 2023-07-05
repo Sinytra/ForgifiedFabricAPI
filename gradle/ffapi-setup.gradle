@@ -127,6 +127,10 @@ allprojects {
 	spotlessGroovyGradle {
 		enabled = false
 	}
+
+	loom.mixin {
+		defaultRefmapName = project.base.archivesName.map { it + "-refmap.json" }
+	}
 }
 
 configurations {

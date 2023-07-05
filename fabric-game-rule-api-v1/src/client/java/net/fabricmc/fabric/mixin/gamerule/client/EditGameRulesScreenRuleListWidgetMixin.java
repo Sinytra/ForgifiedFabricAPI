@@ -56,7 +56,7 @@ public abstract class EditGameRulesScreenRuleListWidgetMixin extends net.minecra
 	}
 
 	// Synthetic method
-	@Inject(method = { "method_27638(Ljava/util/Map$Entry;)V", "m_170228_(Ljava/util/Map$Entry;)V" }, at = @At("HEAD"), require = 1, remap = false, cancellable = true)
+	@Inject(method = "method_27638(Ljava/util/Map$Entry;)V", at = @At("HEAD"), cancellable = true)
 	private void ignoreKeysWithCustomCategories(Map.Entry<GameRules.Key<?>, EditGameRulesScreen.AbstractRuleWidget> entry, CallbackInfo ci) {
 		final GameRules.Key<?> ruleKey = entry.getKey();
 		CustomGameRuleCategory.getCategory(ruleKey).ifPresent(key -> {

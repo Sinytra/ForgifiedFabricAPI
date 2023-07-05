@@ -32,7 +32,7 @@ import net.minecraft.util.profiler.Profiler;
 @Mixin(SinglePreparationResourceReloader.class)
 public class SinglePreparationResourceReloaderMixin {
 	// thenAcceptAsync in reload
-	@Inject(at = @At("HEAD"), method = { "method_18790", "m_10789_" }, require = 1, remap = false)
+	@Inject(at = @At("HEAD"), method = "method_18790(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;Ljava/lang/Object;)V")
 	private void applyResourceConditions(ResourceManager resourceManager, Profiler profiler, Object object, CallbackInfo ci) {
 		fabric_applyResourceConditions(resourceManager, profiler, object);
 	}
