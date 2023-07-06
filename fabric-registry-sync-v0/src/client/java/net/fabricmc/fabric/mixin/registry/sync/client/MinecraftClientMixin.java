@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.registry.sync.client;
 
-import net.minecraftforge.registries.GameData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,14 +45,5 @@ public class MinecraftClientMixin {
 		} catch (RemapException e) {
 			FABRIC_LOGGER.warn("Failed to unmap Fabric registries!", e);
 		}
-	}
-
-	@Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;thread:Ljava/lang/Thread;", shift = At.Shift.AFTER, ordinal = 0), method = "run")
-	private void onStart(CallbackInfo ci) {
-		// Freeze the registries on the client
-		FABRIC_LOGGER.debug("Freezing registries");
-		Registries.bootstrap();
-		GameData.vanillaSnapshot();
-		ItemGroups.collect();
 	}
 }
