@@ -241,7 +241,8 @@ subprojects {
 		destinationDirectory = project.layout.buildDirectory.dir("devlibs")
 	}
 	def remapReferenceApi = tasks.register("remapReferenceApi", RemapJarTask) {
-		group = "loom"
+		group = "fabric"
+		outputs.cacheIf { true }
 		inputFile.fileProvider provider {
 			def deps = rootProject.configurations.referenceApi.resolvedConfiguration
 			def referenceDep = deps.lenientConfiguration.allModuleDependencies.find { it.moduleGroup == "net.fabricmc.fabric-api" && it.moduleName == project.name }
@@ -258,7 +259,16 @@ subprojects {
 		classpath(rootProject.configurations.jarCompatChecker)
 		mainClass = "net.minecraftforge.jarcompatibilitychecker.ConsoleTool"
 		args "--api", "--annotation-check-mode", "warn_added", "--internal-ann-mode", "skip"
-		outputs.upToDateWhen { true }
+		def outputLog = project.layout.buildDirectory.dir(name).map { it.file("output.log") }
+		inputs.file(remapReferenceApi.flatMap { it.inputFile })
+			.withPropertyName("inputFile")
+			.withPathSensitivity(PathSensitivity.RELATIVE)
+		outputs.file(outputLog)
+			.withPropertyName("outputFile")
+		outputs.cacheIf { true }
+		doFirst {
+			standardOutput = new FileOutputStream(outputLog.get().asFile)
+		}
 	}
 	afterEvaluate {
 		tasks.configureEach {
