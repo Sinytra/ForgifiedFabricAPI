@@ -364,6 +364,9 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 				loaderVersion "[${loaderVersionString.get()},)"
 				license json.license ?: "All Rights Reserved"
 				if (json.environment == "client") {
+					displayTest "IGNORE_ALL_VERSION"
+				}
+				if (json.environment == "server") {
 					displayTest "IGNORE_SERVER_VERSION"
 				}
 

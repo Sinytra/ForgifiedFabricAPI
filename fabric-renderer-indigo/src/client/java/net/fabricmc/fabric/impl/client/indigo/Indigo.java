@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
 
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import net.fabricmc.fabric.api.util.TriState;
 import net.fabricmc.fabric.impl.client.indigo.renderer.IndigoRenderer;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoConfig;
 
-@Mod("fabric_renderer_indigo")
 public class Indigo {
 	public static final boolean ALWAYS_TESSELATE_INDIGO;
 	public static final boolean ENSURE_VERTEX_FORMAT_COMPATIBILITY;
@@ -126,7 +124,7 @@ public class Indigo {
 		}
 	}
 
-	public Indigo() {
+	public static void onInitializeClient() {
 		if (IndigoMixinConfigPlugin.shouldApplyIndigo()) {
 			LOGGER.info("[Indigo] Registering Indigo renderer!");
 
