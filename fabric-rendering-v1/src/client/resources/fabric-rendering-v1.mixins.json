@@ -9,6 +9,7 @@
     "EntityModelsMixin",
     "EntityRenderersMixin",
     "DimensionEffectsAccessor",
+    "EntityModelLayersAccessor",
     "shader.ShaderProgramMixin",
     "shader.ShaderProgramMixin$ShaderProgramGlslProcessorMixin"
   ],
