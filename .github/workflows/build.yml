@@ -45,7 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: Maven Local
-          path: /root/.m2/repository
+          path: ~/.m2/repository
 
 #  client_test:
 #    runs-on: ubuntu-22.04
@@ -106,5 +106,5 @@ jobs:
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
       - name: Create placeholder assets dir
         run: mkdir -p ${{ env.GRADLE_USER_HOME }}/caches/fabric-loom/assets
-      - run: ./gradlew build publishToMavenLocal generateResources --stacktrace
+      - run: ./gradlew generateResources --stacktrace
       - run: if [ -n "$(git status --porcelain)" ]; then exit 1; fi
