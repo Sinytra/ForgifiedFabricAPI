@@ -113,7 +113,7 @@ public abstract class ChunkBuilderBuiltChunkRebuildTaskMixin {
 			}
 		}
 
-		renderManager.renderBlock(blockState, blockPos, blockView, matrix, bufferBuilder, checkSides, random);
+		renderManager.renderBatched(blockState, blockPos, blockView, matrix, bufferBuilder, checkSides, random, modelData, renderLayer, queryModelSpecificData);
 	}
 
 	/**

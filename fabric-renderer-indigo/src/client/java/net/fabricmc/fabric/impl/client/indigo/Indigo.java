@@ -110,7 +110,7 @@ public class Indigo {
 		final boolean forceCompatibility = IndigoMixinConfigPlugin.shouldForceCompatibility();
 		ENSURE_VERTEX_FORMAT_COMPATIBILITY = forceCompatibility;
 		// necessary because OF alters the BakedModel vertex format and will confuse the fallback model consumer
-		ALWAYS_TESSELATE_INDIGO = !forceCompatibility && asBoolean((String) properties.computeIfAbsent("always-tesselate-blocks", (a) -> "auto"), true);
+		ALWAYS_TESSELATE_INDIGO = !forceCompatibility && asBoolean((String) properties.computeIfAbsent("always-tesselate-blocks", (a) -> "auto"), false);
 		AMBIENT_OCCLUSION_MODE = asEnum((String) properties.computeIfAbsent("ambient-occlusion-mode", (a) -> "hybrid"), AoConfig.HYBRID);
 		DEBUG_COMPARE_LIGHTING = asBoolean((String) properties.computeIfAbsent("debug-compare-lighting", (a) -> "auto"), false);
 		FIX_SMOOTH_LIGHTING_OFFSET = asBoolean((String) properties.computeIfAbsent("fix-smooth-lighting-offset", (a) -> "auto"), true);

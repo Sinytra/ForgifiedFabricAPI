@@ -76,7 +76,15 @@ public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistr
 
 	@Override
 	public boolean isBlockTransparent(Block block) {
-		return overlayBlocks.computeIfAbsent(block, k -> k instanceof TransparentBlock || k instanceof LeavesBlock);
+		if (overlayBlocks.containsKey(block)) {
+			return overlayBlocks.get(block);
+		}
+		return block instanceof TransparentBlock || block instanceof LeavesBlock;
+	}
+
+	@Override
+	public boolean isBlockTransparent(BlockState state, BlockRenderView level, BlockPos pos, FluidState fluidState) {
+		return overlayBlocks.computeIfAbsent(state.getBlock(), block -> block.shouldDisplayFluidOverlay(state, level, pos, fluidState));
 	}
 
 	public void onFluidRendererReload(FluidRenderer renderer, Sprite[] waterSprites, Sprite[] lavaSprites, Sprite waterOverlay) {
