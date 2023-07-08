@@ -7,7 +7,6 @@
     "ArmorFeatureRendererMixin",
     "BuiltinModelItemRendererMixin",
     "WorldRendererMixin",
-    "EntityModelsMixin",
     "EntityRenderersMixin",
     "DimensionEffectsAccessor",
     "EntityModelLayersAccessor",
