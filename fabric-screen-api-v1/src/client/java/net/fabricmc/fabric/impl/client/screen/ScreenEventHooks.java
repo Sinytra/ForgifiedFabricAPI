@@ -20,13 +20,13 @@ public final class ScreenEventHooks {
     @SubscribeEvent
     public static void beforeScreenDraw(ScreenEvent.Render.Pre event) {
         Screen screen = event.getScreen();
-        ScreenEvents.beforeRender(screen).invoker().beforeRender(screen, event.getPoseStack(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
+        ScreenEvents.beforeRender(screen).invoker().beforeRender(screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
     }
 
     @SubscribeEvent
     public static void afterScreenDraw(ScreenEvent.Render.Post event) {
         Screen screen = event.getScreen();
-        ScreenEvents.afterRender(screen).invoker().afterRender(screen, event.getPoseStack(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
+        ScreenEvents.afterRender(screen).invoker().afterRender(screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
     }
 
     @SubscribeEvent

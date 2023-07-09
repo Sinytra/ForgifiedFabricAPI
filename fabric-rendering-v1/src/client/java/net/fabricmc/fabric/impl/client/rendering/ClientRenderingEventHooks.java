@@ -49,6 +49,6 @@ public final class ClientRenderingEventHooks {
     }
 
     static void onPostRenderHud(RenderGuiEvent.Post event) {
-        HudRenderCallback.EVENT.invoker().onHudRender(event.getPoseStack(), event.getPartialTick());
+        HudRenderCallback.EVENT.invoker().onHudRender(event.getGuiGraphics(), event.getPartialTick());
     }
 }
