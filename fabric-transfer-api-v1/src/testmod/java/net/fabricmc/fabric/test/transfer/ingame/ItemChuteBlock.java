@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -39,7 +38,7 @@ import net.minecraft.world.World;
 
 public class ItemChuteBlock extends Block implements BlockEntityProvider {
 	public ItemChuteBlock() {
-		super(Settings.of(Material.METAL));
+		super(Settings.create());
 	}
 
 	private static final VoxelShape SHAPE = VoxelShapes.cuboid(

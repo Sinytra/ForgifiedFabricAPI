@@ -45,7 +45,6 @@ allprojects {
 			outputDir = file("src/generated/$sourceSetName/resources")
 			loaderVersionString = rootProject.forge_version.tokenize('-')[1].tokenize('.')[0]
 			minecraftVersionString = rootProject.minecraft_version
-			dataPackFormat = rootProject.server_data_pack_format.toInteger()
 			packFormat = rootProject.pack_format.toInteger()
 			addMixinConfigs = sourceSet.name.startsWith("test")
 			accessWidener = loom.accessWidenerPath
@@ -308,9 +307,6 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 	final Property<String> minecraftVersionString = project.objects.property(String)
 
 	@Input
-	final Property<Integer> dataPackFormat = project.objects.property(Integer)
-
-	@Input
 	final Property<Integer> packFormat = project.objects.property(Integer)
 
 	@Input
@@ -446,7 +442,6 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 					description {
 						text "$normalModid resources"
 					}
-					"forge:server_data_pack_format" dataPackFormat.get()
 					pack_format packFormat.get()
 				}
 			}

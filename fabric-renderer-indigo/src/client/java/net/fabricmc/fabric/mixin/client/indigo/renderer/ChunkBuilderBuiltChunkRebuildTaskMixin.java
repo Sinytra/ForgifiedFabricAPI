@@ -102,8 +102,8 @@ public abstract class ChunkBuilderBuiltChunkRebuildTaskMixin {
 	 * driven off of render type. (Not recommended or encouraged, but also not prevented.)
 	 */
 	@Redirect(method = "render", require = 1, at = @At(value = "INVOKE",
-			target = "Lnet/minecraft/client/render/block/BlockRenderManager;renderBatched(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;Lnet/minecraftforge/client/model/data/ModelData;Lnet/minecraft/client/render/RenderLayer;Z)V"))
-	private void hookChunkBuildTesselate(BlockRenderManager renderManager, BlockState blockState, BlockPos blockPos, BlockRenderView blockView, MatrixStack matrix, VertexConsumer bufferBuilder, boolean checkSides, Random random, ModelData modelData, RenderLayer renderLayer, boolean queryModelSpecificData) {
+			target = "Lnet/minecraft/client/render/block/BlockRenderManager;renderBatched(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;Lnet/minecraftforge/client/model/data/ModelData;Lnet/minecraft/client/render/RenderLayer;)V"))
+	private void hookChunkBuildTesselate(BlockRenderManager renderManager, BlockState blockState, BlockPos blockPos, BlockRenderView blockView, MatrixStack matrix, VertexConsumer bufferBuilder, boolean checkSides, Random random, ModelData modelData, RenderLayer renderLayer) {
 		if (blockState.getRenderType() == BlockRenderType.MODEL) {
 			final BakedModel model = renderManager.getModel(blockState);
 
@@ -113,7 +113,7 @@ public abstract class ChunkBuilderBuiltChunkRebuildTaskMixin {
 			}
 		}
 
-		renderManager.renderBatched(blockState, blockPos, blockView, matrix, bufferBuilder, checkSides, random, modelData, renderLayer, queryModelSpecificData);
+		renderManager.renderBatched(blockState, blockPos, blockView, matrix, bufferBuilder, checkSides, random, modelData, renderLayer);
 	}
 
 	/**

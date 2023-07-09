@@ -42,8 +42,8 @@ public abstract class BlockModelRendererMixin {
 	@Unique
 	private final ThreadLocal<BlockRenderContext> fabric_contexts = ThreadLocal.withInitial(BlockRenderContext::new);
 
-	@Inject(at = @At("HEAD"), method = "tesselateBlock(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JILnet/minecraftforge/client/model/data/ModelData;Lnet/minecraft/client/render/RenderLayer;Z)V", cancellable = true)
-	private void hookRender(BlockRenderView blockView, BakedModel model, BlockState state, BlockPos pos, MatrixStack matrix, VertexConsumer buffer, boolean cull, Random rand, long seed, int overlay, ModelData modelData, RenderLayer renderType, boolean queryModelSpecificData, CallbackInfo ci) {
+	@Inject(at = @At("HEAD"), method = "tesselateBlock(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JILnet/minecraftforge/client/model/data/ModelData;Lnet/minecraft/client/render/RenderLayer;)V", cancellable = true)
+	private void hookRender(BlockRenderView blockView, BakedModel model, BlockState state, BlockPos pos, MatrixStack matrix, VertexConsumer buffer, boolean cull, Random rand, long seed, int overlay, ModelData modelData, RenderLayer renderType, CallbackInfo ci) {
 		if (!model.isVanillaAdapter()) {
 			BlockRenderContext context = fabric_contexts.get();
 			context.render(blockView, model, state, pos, matrix, buffer, cull, rand, seed, overlay);

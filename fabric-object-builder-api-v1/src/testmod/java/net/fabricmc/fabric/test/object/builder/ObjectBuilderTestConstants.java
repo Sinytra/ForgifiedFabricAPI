@@ -42,6 +42,7 @@ public final class ObjectBuilderTestConstants {
 		if (FMLLoader.getDist() == Dist.CLIENT) {
 			bus.addListener(TealSignClientTest::onInitializeClient);
 		}
+		FabricBlockSettingsTest.onInitialize();
 		BlockEntityTypeBuilderTest.onInitialize(bus);
 		CriterionRegistryTest.init();
 		TealSignTest.onInitialize(bus);

@@ -24,12 +24,11 @@ import org.objectweb.asm.Opcodes;
 
 import net.minecraft.block.AbstractBlock;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 
-public class FabricBlockSettingsTest implements ModInitializer {
-	@Override
-	public void onInitialize() {
+public class FabricBlockSettingsTest {
+
+	public static void onInitialize() {
 		final List<String> missingMethods = new ArrayList<>();
 
 		for (Method method : FabricBlockSettings.class.getMethods()) {
