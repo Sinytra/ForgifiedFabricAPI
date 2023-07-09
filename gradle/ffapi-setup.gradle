@@ -394,6 +394,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 						if (json.description) {
 							description json.description
 						}
+						provides([json.id])
 					}
 				])
 
