@@ -272,7 +272,7 @@ public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 
 			for (int i = 0; i <= ModelHelper.NULL_FACE_ID; i++) {
 				final Direction cullFace = ModelHelper.faceFromIndex(i);
-				final List<BakedQuad> quads = model.getQuads(state, cullFace, blockInfo.randomSupplier.get());
+				final List<BakedQuad> quads = model.getQuads(state, cullFace, blockInfo.randomSupplier.get(), blockInfo.blockModelData, blockInfo.defaultLayer);
 				final int count = quads.size();
 
 				for (int j = 0; j < count; j++) {

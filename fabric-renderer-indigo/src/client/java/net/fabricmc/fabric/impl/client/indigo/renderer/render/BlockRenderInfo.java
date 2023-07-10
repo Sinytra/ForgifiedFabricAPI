@@ -18,6 +18,7 @@ package net.fabricmc.fabric.impl.client.indigo.renderer.render;
 
 import java.util.function.Supplier;
 
+import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
@@ -25,7 +26,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
@@ -50,6 +50,7 @@ public class BlockRenderInfo {
 
 	boolean useAo;
 	boolean defaultAo;
+	ModelData blockModelData;
 	RenderLayer defaultLayer;
 
 	Random random;
@@ -78,14 +79,15 @@ public class BlockRenderInfo {
 		this.enableCulling = enableCulling;
 	}
 
-	public void prepareForBlock(BlockState blockState, BlockPos blockPos, boolean modelAo) {
+	public void prepareForBlock(BlockState blockState, BlockPos blockPos, boolean modelAo, ModelData modelData, RenderLayer renderLayer) {
 		this.blockPos = blockPos;
 		this.blockState = blockState;
 
 		useAo = MinecraftClient.isAmbientOcclusionEnabled();
 		defaultAo = useAo && modelAo && blockState.getLuminance() == 0;
 
-		defaultLayer = RenderLayers.getBlockLayer(blockState);
+		blockModelData = modelData;
+		defaultLayer = renderLayer;
 
 		cullCompletionFlags = 0;
 		cullResultFlags = 0;

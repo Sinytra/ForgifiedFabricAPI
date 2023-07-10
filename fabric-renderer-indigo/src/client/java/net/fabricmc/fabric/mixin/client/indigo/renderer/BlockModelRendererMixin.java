@@ -46,7 +46,7 @@ public abstract class BlockModelRendererMixin {
 	private void hookRender(BlockRenderView blockView, BakedModel model, BlockState state, BlockPos pos, MatrixStack matrix, VertexConsumer buffer, boolean cull, Random rand, long seed, int overlay, ModelData modelData, RenderLayer renderType, CallbackInfo ci) {
 		if (!model.isVanillaAdapter()) {
 			BlockRenderContext context = fabric_contexts.get();
-			context.render(blockView, model, state, pos, matrix, buffer, cull, rand, seed, overlay);
+			context.render(blockView, model, state, pos, matrix, buffer, cull, rand, seed, overlay, modelData, renderType);
 			ci.cancel();
 		}
 	}

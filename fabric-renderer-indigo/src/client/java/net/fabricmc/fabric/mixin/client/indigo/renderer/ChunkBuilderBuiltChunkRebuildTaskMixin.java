@@ -108,7 +108,7 @@ public abstract class ChunkBuilderBuiltChunkRebuildTaskMixin {
 			final BakedModel model = renderManager.getModel(blockState);
 
 			if (Indigo.ALWAYS_TESSELATE_INDIGO || !model.isVanillaAdapter()) {
-				((AccessChunkRendererRegion) blockView).fabric_getRenderer().tessellateBlock(blockState, blockPos, model, matrix);
+				((AccessChunkRendererRegion) blockView).fabric_getRenderer().tessellateBlock(blockState, blockPos, model, matrix, modelData, renderLayer);
 				return;
 			}
 		}

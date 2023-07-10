@@ -29,6 +29,8 @@ import net.minecraft.world.BlockRenderView;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoLuminanceFix;
 
+import net.minecraftforge.client.model.data.ModelData;
+
 /**
  * Context for non-terrain block rendering.
  */
@@ -55,7 +57,7 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 		return vertexConsumer;
 	}
 
-	public void render(BlockRenderView blockView, BakedModel model, BlockState state, BlockPos pos, MatrixStack matrixStack, VertexConsumer buffer, boolean cull, Random random, long seed, int overlay) {
+	public void render(BlockRenderView blockView, BakedModel model, BlockState state, BlockPos pos, MatrixStack matrixStack, VertexConsumer buffer, boolean cull, Random random, long seed, int overlay, ModelData modelData, RenderLayer renderLayer) {
 		this.vertexConsumer = buffer;
 		this.matrix = matrixStack.peek().getPositionMatrix();
 		this.normalMatrix = matrixStack.peek().getNormalMatrix();
@@ -67,7 +69,7 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 
 		aoCalc.clear();
 		blockInfo.prepareForWorld(blockView, cull);
-		blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion());
+		blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion(), modelData, renderLayer);
 
 		model.emitBlockQuads(blockView, state, pos, blockInfo.randomSupplier, this);
 

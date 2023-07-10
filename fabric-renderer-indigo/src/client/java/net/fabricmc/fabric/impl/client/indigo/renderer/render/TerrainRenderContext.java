@@ -37,6 +37,8 @@ import net.minecraft.util.math.random.Random;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator;
 
+import net.minecraftforge.client.model.data.ModelData;
+
 /**
  * Implementation of {@link RenderContext} used during terrain rendering.
  * Dispatches calls from models during chunk rebuild to the appropriate consumer,
@@ -83,7 +85,7 @@ public class TerrainRenderContext extends AbstractBlockRenderContext {
 	}
 
 	/** Called from chunk renderer hook. */
-	public void tessellateBlock(BlockState blockState, BlockPos blockPos, final BakedModel model, MatrixStack matrixStack) {
+	public void tessellateBlock(BlockState blockState, BlockPos blockPos, final BakedModel model, MatrixStack matrixStack, ModelData modelData, RenderLayer renderLayer) {
 		try {
 			Vec3d vec3d = blockState.getModelOffset(chunkInfo.blockView, blockPos);
 			matrixStack.translate(vec3d.x, vec3d.y, vec3d.z);
@@ -94,7 +96,7 @@ public class TerrainRenderContext extends AbstractBlockRenderContext {
 			blockInfo.recomputeSeed = true;
 
 			aoCalc.clear();
-			blockInfo.prepareForBlock(blockState, blockPos, model.useAmbientOcclusion());
+			blockInfo.prepareForBlock(blockState, blockPos, model.useAmbientOcclusion(), modelData, renderLayer);
 			model.emitBlockQuads(blockInfo.blockView, blockInfo.blockState, blockInfo.blockPos, blockInfo.randomSupplier, this);
 		} catch (Throwable throwable) {
 			CrashReport crashReport = CrashReport.create(throwable, "Tessellating block in world - Indigo Renderer");
