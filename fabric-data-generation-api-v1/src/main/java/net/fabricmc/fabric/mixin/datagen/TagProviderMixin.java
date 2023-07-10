@@ -16,39 +16,17 @@
 
 package net.fabricmc.fabric.mixin.datagen;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
-
-import com.google.gson.JsonElement;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.data.DataWriter;
 import net.minecraft.data.server.tag.TagProvider;
-import net.minecraft.registry.tag.TagBuilder;
-import net.minecraft.registry.tag.TagEntry;
 import net.minecraft.util.Identifier;
-
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 
 @Mixin(TagProvider.class)
 public class TagProviderMixin {
-	@Inject(method = { "m_254781_", "lambda$run$6" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/data/DataProvider;writeToPath(Lnet/minecraft/data/DataWriter;Lcom/google/gson/JsonElement;Ljava/nio/file/Path;)Ljava/util/concurrent/CompletableFuture;"), locals = LocalCapture.CAPTURE_FAILHARD, require = 1)
-	public void addReplaced(Predicate<Identifier> predicate, Predicate<Identifier> predicate2, DataWriter dataWriter, Map.Entry<Identifier, TagBuilder> entry, CallbackInfoReturnable<CompletableFuture<?>> cir, Identifier identifier, TagBuilder builder, List<TagEntry> list, List<TagEntry> list2, JsonElement jsonElement, Path path) {
-		if (builder instanceof FabricTagBuilder fabricTagBuilder) {
-			jsonElement.getAsJsonObject().addProperty("replace", fabricTagBuilder.fabric_isReplaced());
-		}
-	}
-
 	@Redirect(method = "lambda$getOrCreateRawBuilder$9", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/data/ExistingFileHelper;trackGenerated(Lnet/minecraft/util/Identifier;Lnet/minecraftforge/common/data/ExistingFileHelper$IResourceType;)V"))
 	public void fixExistingFileHelperNPE(@Nullable ExistingFileHelper existingFileHelper, Identifier identifier, ExistingFileHelper.IResourceType resourceType) {
 		if (existingFileHelper != null) {

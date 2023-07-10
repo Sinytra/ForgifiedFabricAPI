@@ -6,7 +6,6 @@
     "loot.BlockLootTableGeneratorMixin",
     "TagProviderMixin",
     "ModelProviderMixin",
-    "TagBuilderMixin",
     "DataGeneratorMixin"
   ],
   "injectors": {
