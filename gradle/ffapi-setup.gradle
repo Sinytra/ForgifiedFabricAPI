@@ -43,7 +43,9 @@ allprojects {
 			// sources to the source set.
 			sourceRoots.from(resourceRoots)
 			outputDir = file("src/generated/$sourceSetName/resources")
-			loaderVersionString = rootProject.forge_version.tokenize('-')[1].tokenize('.')[0]
+			def loaderVer = rootProject.forge_version.tokenize('-')[1]
+			loaderVersionString = loaderVer.tokenize('.')[0]
+			forgeVersionString = loaderVer
 			minecraftVersionString = rootProject.minecraft_version
 			packFormat = rootProject.pack_format.toInteger()
 			addMixinConfigs = sourceSet.name.startsWith("test")
@@ -302,6 +304,9 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 
 	@Input
 	final Property<String> loaderVersionString = project.objects.property(String)
+	
+	@Input
+	final Property<String> forgeVersionString = project.objects.property(String)
 
 	@Input
 	final Property<String> minecraftVersionString = project.objects.property(String)
@@ -399,7 +404,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 						{
 							modId "forge"
 							mandatory true
-							versionRange "[${loaderVersionString.get()},)"
+							versionRange "[${forgeVersionString.get()},)"
 							ordering "NONE"
 							side "BOTH"
 						},
