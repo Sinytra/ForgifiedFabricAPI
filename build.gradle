@@ -593,12 +593,12 @@ def addPomMetadataInformation(Project project, MavenPom pom) {
 
 	def modJson = new JsonSlurper().parse(modJsonFile)
 	pom.name = modJson.name
-	pom.url = "https://github.com/FabricMC/fabric/tree/HEAD/${project.rootDir.relativePath(project.projectDir)}"
+	pom.url = "https://github.com/Sinytra/ForgifiedFabricAPI/tree/HEAD/${project.rootDir.relativePath(project.projectDir)}"
 	pom.description = modJson.description
 	pom.licenses {
 		license {
 			name = "Apache-2.0"
-			url = "https://github.com/FabricMC/fabric/blob/HEAD/LICENSE"
+			url = "https://github.com/Sinytra/ForgifiedFabricAPI/blob/HEAD/LICENSE"
 		}
 	}
 	pom.developers {
@@ -606,15 +606,18 @@ def addPomMetadataInformation(Project project, MavenPom pom) {
 			name = "FabricMC"
 			url = "https://fabricmc.net/"
 		}
+		developer {
+			name = "Sinytra"
+		}
 	}
 	pom.scm {
-		connection = "scm:git:https://github.com/FabricMC/fabric.git"
-		url = "https://github.com/FabricMC/fabric"
-		developerConnection = "scm:git:git@github.com:FabricMC/fabric.git"
+		connection = "scm:git:https://github.com/Sinytra/ForgifiedFabricAPI.git"
+		url = "https://github.com/Sinytra/ForgifiedFabricAPI"
+		developerConnection = "scm:git:git@github.com:Sinytra/ForgifiedFabricAPI.git"
 	}
 	pom.issueManagement {
 		system = "GitHub"
-		url = "https://github.com/FabricMC/fabric/issues"
+		url = "https://github.com/Sinytra/ForgifiedFabricAPI/issues"
 	}
 }
 
@@ -766,14 +769,14 @@ curseforge {
 	}
 
 	project {
-		id = "306612"
+		id = "889079"
 		changelog = ENV.CHANGELOG ?: "No changelog provided"
 		releaseType = project.prerelease == "true" ? "beta" : "release"
 		addGameVersion "1.20.1"
-		addGameVersion "Fabric"
+		addGameVersion "Forge"
 
 		mainArtifact(signingEnabled ? signRemapJar.output : remapJar) {
-			displayName = "[$project.minecraft_version] Fabric API $project.version"
+			displayName = "[$project.minecraft_version] Forgified Fabric API $project.version"
 		}
 
 		afterEvaluate {
@@ -808,7 +811,7 @@ tasks.register('github') {
 		def repository = github.getRepository(ENV.GITHUB_REPOSITORY)
 
 		def releaseBuilder = new GHReleaseBuilder(repository, version as String)
-		releaseBuilder.name("[$project.minecraft_version] Fabric API $project.version")
+		releaseBuilder.name("[$project.minecraft_version] Forgified Fabric API $project.version")
 		releaseBuilder.body(ENV.CHANGELOG ?: "No changelog provided")
 		releaseBuilder.commitish(getBranch())
 		releaseBuilder.prerelease(project.prerelease == "true")
@@ -819,10 +822,12 @@ tasks.register('github') {
 }
 
 modrinth {
-	projectId = "fabric-api"
-	versionName = "[$project.minecraft_version] Fabric API $project.version"
+	projectId = "forgified-fabric-api"
+	versionName = "[$project.minecraft_version] Forgified Fabric API $project.version"
 	versionType = project.prerelease == "true" ? "beta" : "release"
 	changelog = ENV.CHANGELOG ?: "No changelog provided"
+	loaders = ["forge"]
+	gameVersions = ["1.20.1"]
 
 	uploadFile = signingEnabled ? signRemapJar.output : remapJar
 }

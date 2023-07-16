@@ -38,7 +38,7 @@ jobs:
       - name: Create placeholder assets dir
         run: mkdir -p ${{ env.GRADLE_USER_HOME }}/caches/fabric-loom/assets
       - uses: gradle/wrapper-validation-action@v1
-      - run: ./gradlew checkVersion build publish github --stacktrace
+      - run: ./gradlew checkVersion build publish curseforge github modrinth --stacktrace
         env:
           MAVEN_URL: ${{ secrets.MAVEN_URL }}
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
