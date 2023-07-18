@@ -8,9 +8,12 @@
     "LevelStorageSessionMixin",
     "RegistriesAccessor",
     "RegistryLoaderMixin",
+    "SaveLoadingMixin",
+    "SerializableRegistriesMixin",
     "SimpleRegistryMixin",
     "NamespacedWrapperMixin",
-    "RegistryManagerMixin"
+    "RegistryManagerMixin",
+    "TagManagerLoaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
