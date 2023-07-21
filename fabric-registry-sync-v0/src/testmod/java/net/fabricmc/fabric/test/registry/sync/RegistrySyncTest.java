@@ -25,10 +25,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+
+import net.fabricmc.fabric.test.registry.sync.client.DynamicRegistryClientTest;
+
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
@@ -89,6 +93,10 @@ public class RegistrySyncTest {
 		fabricRegistry = FabricRegistryBuilder.createSimple(FABRIC_REGISTRY_KEY)
 				.attribute(RegistryAttribute.SYNCED)
 				.buildAndRegister();
+		CustomDynamicRegistryTest.onInitialize();
+		if (FMLLoader.getDist().isClient()) {
+			DynamicRegistryClientTest.onInitializeClient();
+		}
 	}
 
 	private static void onRegister(RegisterEvent event) {

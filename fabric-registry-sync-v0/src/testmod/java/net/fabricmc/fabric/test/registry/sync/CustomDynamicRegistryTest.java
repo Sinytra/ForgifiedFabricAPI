@@ -25,13 +25,12 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistryView;
 
-public final class CustomDynamicRegistryTest implements ModInitializer {
+public final class CustomDynamicRegistryTest {
 	private static final Logger LOGGER = LogUtils.getLogger();
 
 	public static final RegistryKey<Registry<TestDynamicObject>> TEST_DYNAMIC_REGISTRY_KEY =
@@ -50,8 +49,7 @@ public final class CustomDynamicRegistryTest implements ModInitializer {
 	private static final TagKey<TestDynamicObject> TEST_DYNAMIC_OBJECT_TAG =
 			TagKey.of(TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY, new Identifier("fabric-registry-sync-v0-testmod", "test"));
 
-	@Override
-	public void onInitialize() {
+	public static void onInitialize() {
 		DynamicRegistries.register(TEST_DYNAMIC_REGISTRY_KEY, TestDynamicObject.CODEC);
 		DynamicRegistries.registerSynced(TEST_SYNCED_1_DYNAMIC_REGISTRY_KEY, TestDynamicObject.CODEC);
 		DynamicRegistries.registerSynced(TEST_SYNCED_2_DYNAMIC_REGISTRY_KEY, TestDynamicObject.CODEC, TestDynamicObject.NETWORK_CODEC);

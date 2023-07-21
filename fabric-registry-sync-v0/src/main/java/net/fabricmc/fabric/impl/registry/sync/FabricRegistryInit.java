@@ -21,7 +21,9 @@ import java.util.List;
 
 import com.mojang.serialization.Lifecycle;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 import net.minecraft.registry.MutableRegistry;
@@ -41,6 +43,8 @@ public class FabricRegistryInit {
 		if (FMLLoader.getDist() == Dist.CLIENT) {
 			FabricRegistryClientInit.onInitializeClient();
 		}
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		bus.addListener(DynamicRegistriesImpl::onNewDatapackRegistries);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
 				RegistrySyncManager.sendPacket(server, handler.player));
 	}

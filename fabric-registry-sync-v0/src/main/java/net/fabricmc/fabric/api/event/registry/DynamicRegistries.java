@@ -136,8 +136,7 @@ public final class DynamicRegistries {
 	 * @param <T>          the entry type of the registry
 	 */
 	public static <T> void registerSynced(RegistryKey<? extends Registry<T>> key, Codec<T> dataCodec, Codec<T> networkCodec, SyncOption... options) {
-		DynamicRegistriesImpl.register(key, dataCodec);
-		DynamicRegistriesImpl.addSyncedRegistry(key, networkCodec, options);
+		DynamicRegistriesImpl.addSyncedRegistry(key, dataCodec, networkCodec, options);
 	}
 
 	/**

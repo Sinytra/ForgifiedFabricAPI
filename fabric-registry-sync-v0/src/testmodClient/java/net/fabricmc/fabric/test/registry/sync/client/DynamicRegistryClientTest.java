@@ -28,17 +28,15 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.test.registry.sync.TestDynamicObject;
 import net.fabricmc.fabric.test.registry.sync.TestNestedDynamicObject;
 
-public final class DynamicRegistryClientTest implements ClientModInitializer {
+public final class DynamicRegistryClientTest {
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private static final Identifier SYNCED_ID = new Identifier("fabric-registry-sync-v0-testmod", "synced");
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			LOGGER.info("Starting dynamic registry sync tests...");
 
