@@ -192,6 +192,7 @@ repositories {
 }
 dependencies {
 	referenceApi "net.fabricmc.fabric-api:fabric-api:$CONFIGURED_VERSION+${rootProject.minecraft_version}"
+	referenceApi "net.fabricmc.fabric-api:fabric-api-deprecated:$CONFIGURED_VERSION+${rootProject.minecraft_version}"
 	jarCompatChecker "dev.su5ed.sinytra:JarCompatibilityChecker:0.1.+:all"
 	javadocDeps "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 }

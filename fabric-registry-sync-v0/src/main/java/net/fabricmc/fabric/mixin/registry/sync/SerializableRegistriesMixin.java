@@ -38,7 +38,7 @@ abstract class SerializableRegistriesMixin {
 	}
 
 	@Dynamic("method_45961: Codec.xmap in createDynamicRegistryManagerCodec")
-	@Redirect(method = "method_45961", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/SerializableRegistries;stream(Lnet/minecraft/registry/DynamicRegistryManager;)Ljava/util/stream/Stream;"))
+	@Redirect(method = {"method_45961", "m_245617_"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/SerializableRegistries;stream(Lnet/minecraft/registry/DynamicRegistryManager;)Ljava/util/stream/Stream;"), require = 1)
 	private static Stream<DynamicRegistryManager.Entry<?>> filterNonSyncedEntries(DynamicRegistryManager drm) {
 		return stream(drm).filter(entry -> {
 			boolean canSkip = DynamicRegistriesImpl.SKIP_EMPTY_SYNC_REGISTRIES.contains(entry.key());
