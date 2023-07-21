@@ -17,12 +17,13 @@ function initializeCoreMod() {
                 var list = new InsnList();
                 list.add(new VarInsnNode(Opcodes.ALOAD, 0));
                 list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/fabricmc/fabric/impl/datagen/FabricDatagenImpl", "addFabricKeySortOrders", "(Lit/unimi/dsi/fastutil/objects/Object2IntOpenHashMap;)V"))
-                for (var insn in node.instructions) {
+                for (var i = 0; i < node.instructions.size(); i++) {
+                    var insn = node.instructions.get(i);
                     if (insn.opcode === Opcodes.RETURN) {
                         node.instructions.insertBefore(insn, list);
+                        ASMAPI.log('DEBUG', 'Injected fabric key sort orders hook into DataProvider.FIXED_ORDER_FIELDS');
                     }
                 }
-                ASMAPI.log('DEBUG', 'Injected fabric key sort orders hook into DataProvider.FIXED_ORDER_FIELDS');
                 return node;
             }
         }

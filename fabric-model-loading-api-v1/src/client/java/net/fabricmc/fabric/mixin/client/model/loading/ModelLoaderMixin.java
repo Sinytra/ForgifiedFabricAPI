@@ -83,8 +83,9 @@ public abstract class ModelLoaderMixin implements ModelLoaderHooks {
 	@Shadow
 	public abstract JsonUnbakedModel loadModelFromJson(Identifier id);
 
-	@Inject(method = "<init>", at = @At(value = "INVOKE", target = "net/minecraft/util/profiler/Profiler.swap(Ljava/lang/String;)V", ordinal = 0))
-	private void afterMissingModelInit(BlockColors blockColors, Profiler profiler, Map<Identifier, JsonUnbakedModel> jsonUnbakedModels, Map<Identifier, List<ModelLoader.SourceTrackedData>> blockStates, CallbackInfo info) {
+	@SuppressWarnings("unused") // Called from injected coremod hook in afterMissingModelInit.js
+	@Unique
+	private void afterMissingModelInit(BlockColors blockColors, Profiler profiler, Map<Identifier, JsonUnbakedModel> jsonUnbakedModels, Map<Identifier, List<ModelLoader.SourceTrackedData>> blockStates) {
 		// Sanity check
 		if (!unbakedModels.containsKey(MISSING_ID)) {
 			throw new AssertionError("Missing model not initialized. This is likely a Fabric API porting bug.");

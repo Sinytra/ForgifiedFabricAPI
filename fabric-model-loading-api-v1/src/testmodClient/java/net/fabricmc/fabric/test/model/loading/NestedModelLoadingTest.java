@@ -23,13 +23,12 @@ import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 
 /**
  * Tests that deep model resolution resolve each model a single time, depth-first.
  */
-public class NestedModelLoadingTest implements ClientModInitializer {
+public class NestedModelLoadingTest {
 	private static final Logger LOGGER = LogUtils.getLogger();
 
 	private static Identifier id(String path) {
@@ -44,8 +43,7 @@ public class NestedModelLoadingTest implements ClientModInitializer {
 	private static final Identifier NESTED_MODEL_5 = id("nested_5");
 	private static final Identifier TARGET_MODEL = new Identifier("minecraft", "block/stone");
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		ModelLoadingPlugin.register(pluginContext -> {
 			pluginContext.addModels(BASE_MODEL);
 

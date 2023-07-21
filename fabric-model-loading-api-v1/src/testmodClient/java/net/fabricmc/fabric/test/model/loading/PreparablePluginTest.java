@@ -38,7 +38,6 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
-import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 
 /**
@@ -47,12 +46,11 @@ import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlu
  *
  * <p>The visible effect in game is that gold blocks use the diamond texture instead...
  */
-public class PreparablePluginTest implements ClientModInitializer {
+public class PreparablePluginTest {
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private static final ResourceFinder MODEL_REPLACEMENTS_FINDER = ResourceFinder.json("model_replacements");
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		PreparableModelLoadingPlugin.register(PreparablePluginTest::loadModelReplacements, (replacementModels, pluginContext) -> {
 			pluginContext.modifyModelOnLoad().register((model, ctx) -> {
 				@Nullable

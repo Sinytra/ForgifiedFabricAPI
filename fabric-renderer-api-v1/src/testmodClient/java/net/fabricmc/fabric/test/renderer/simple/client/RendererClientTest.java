@@ -57,7 +57,7 @@ public final class RendererClientTest {
 				return null;
 			});
 
-			pluginContext.registerBlockStateResolver(RendererTest.PILLAR, context -> {
+			pluginContext.registerBlockStateResolver(RendererTest.PILLAR.get(), context -> {
 				context.setModel(context.block().getDefaultState(), new PillarUnbakedModel());
 			});
 		});

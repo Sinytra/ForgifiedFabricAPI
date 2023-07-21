@@ -35,16 +35,15 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
-import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.model.loading.v1.DelegatingUnbakedModel;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.fabricmc.fabric.api.client.model.loading.v1.DelegatingUnbakedModel;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
-public class ModelTestModClient implements ClientModInitializer {
+public class ModelTestModClient {
 	public static final String ID = "fabric-model-loading-api-v1-testmod";
 
 	public static final Identifier MODEL_ID = new Identifier(ID, "half_red_sand");
@@ -62,8 +61,7 @@ public class ModelTestModClient implements ClientModInitializer {
 		}
 	}
 
-	@Override
-	public void onInitializeClient() {
+	public static void onInitializeClient() {
 		ModelLoadingPlugin.register(pluginContext -> {
 			pluginContext.addModels(MODEL_ID);
 			// remove bottom face of gold blocks

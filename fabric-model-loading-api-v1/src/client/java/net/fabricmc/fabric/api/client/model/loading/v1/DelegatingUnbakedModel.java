@@ -62,6 +62,6 @@ public final class DelegatingUnbakedModel implements UnbakedModel {
 	@Nullable
 	@Override
 	public BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
-		return baker.bake(delegate, rotationContainer);
+		return baker.bake(delegate, rotationContainer, textureGetter);
 	}
 }

@@ -29,6 +29,8 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 allprojects {
+	if (name == 'deprecated') return
+
 	sourceSets.configureEach { sourceSet ->
 		// We have to capture the source set name for the lazy string literals,
 		// otherwise it'll just be whatever the last source set is in the list.
@@ -226,6 +228,8 @@ remapJar {
 }
 
 subprojects {
+	if (name == 'deprecated') return
+
 	configurations {
 		apiLibs {
 			extendsFrom api
