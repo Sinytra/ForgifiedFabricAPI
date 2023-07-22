@@ -181,10 +181,13 @@ public abstract class SimpleRegistryMixin<T> implements MutableRegistry<T>, Rema
 
 	@Inject(method = "set", at = @At("HEAD"))
 	public void setPre(int id, RegistryKey<T> registryId, T object, Lifecycle lifecycle, CallbackInfoReturnable<RegistryEntry<T>> info) {
-		int indexedEntriesId = entryToRawId.getInt(object);
+		RegistryAttributeHolder holder = RegistryAttributeHolder.get(getKey());
+		if (holder.hasAttribute(RegistryAttribute.CUSTOM)) {
+			int indexedEntriesId = entryToRawId.getInt(object);
 
-		if (indexedEntriesId >= 0) {
-			throw new RuntimeException("Attempted to register object " + object + " twice! (at raw IDs " + indexedEntriesId + " and " + id + " )");
+			if (indexedEntriesId >= 0) {
+				throw new RuntimeException("Attempted to register object " + object + " twice! (at raw IDs " + indexedEntriesId + " and " + id + " )");
+			}
 		}
 
 		if (!idToEntry.containsKey(registryId.getValue())) {
@@ -195,7 +198,7 @@ public abstract class SimpleRegistryMixin<T> implements MutableRegistry<T>, Rema
 			if (oldObject != null && oldObject.value() != null && oldObject.value() != object) {
 				int oldId = entryToRawId.getInt(oldObject.value());
 
-				if (oldId != id) {
+				if (holder.hasAttribute(RegistryAttribute.CUSTOM) && oldId != id) {
 					throw new RuntimeException("Attempted to register ID " + registryId + " at different raw IDs (" + oldId + ", " + id + ")! If you're trying to override an item, use .set(), not .register()!");
 				}
 

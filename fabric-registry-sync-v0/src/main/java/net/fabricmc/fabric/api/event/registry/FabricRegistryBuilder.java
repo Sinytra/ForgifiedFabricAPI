@@ -116,6 +116,7 @@ public final class FabricRegistryBuilder<T, R extends MutableRegistry<T>> {
 	private FabricRegistryBuilder(R registry) {
 		this.registry = registry;
 		attribute(RegistryAttribute.MODDED);
+		attribute(RegistryAttribute.CUSTOM);
 	}
 
 	/**

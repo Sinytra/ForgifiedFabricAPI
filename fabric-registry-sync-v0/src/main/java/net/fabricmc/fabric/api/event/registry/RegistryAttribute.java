@@ -30,5 +30,10 @@ public enum RegistryAttribute {
 	/**
 	 * Registry has been modded.
 	 */
-	MODDED
+	MODDED,
+
+	/**
+	 * Custom registry
+	 */
+	CUSTOM
 }
