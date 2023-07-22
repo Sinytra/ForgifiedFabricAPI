@@ -28,12 +28,6 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 public final class ScreenEventHooks {
 
     @SubscribeEvent
-    public static void afterScreenInit(ScreenEvent.Init.Post event) {
-        Screen screen = event.getScreen();
-        ScreenEvents.AFTER_INIT.invoker().afterInit(screen.getMinecraft(), screen, screen.width, screen.height);
-    }
-
-    @SubscribeEvent
     public static void beforeScreenDraw(ScreenEvent.Render.Pre event) {
         Screen screen = event.getScreen();
         ScreenEvents.beforeRender(screen).invoker().beforeRender(screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY(), event.getPartialTick());
