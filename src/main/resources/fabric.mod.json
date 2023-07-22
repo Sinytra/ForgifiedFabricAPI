@@ -4,19 +4,19 @@
   "provides": [
     "fabric"
   ],
-  "name": "Fabric API",
+  "name": "Forgified Fabric API",
   "version": "${version}",
   "environment": "*",
   "license": "Apache-2.0",
   "icon": "assets/fabric/icon.png",
   "contact": {
-    "homepage": "https://fabricmc.net",
-    "irc": "irc://irc.esper.net:6667/fabric",
-    "issues": "https://github.com/FabricMC/fabric/issues",
-    "sources": "https://github.com/FabricMC/fabric"
+    "homepage": "https://github.com/Sinytra",
+    "issues": "https://github.com/Sinytra/ForgifiedFabricAPI/issues",
+    "sources": "https://github.com/Sinytra/ForgifiedFabricAPI"
   },
   "authors": [
-    "FabricMC"
+    "FabricMC",
+    "Sinytra"
   ],
   "depends": {
     "fabricloader": ">=0.14.21",
