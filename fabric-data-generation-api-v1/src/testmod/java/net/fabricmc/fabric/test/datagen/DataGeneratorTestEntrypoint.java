@@ -20,11 +20,13 @@ import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 
@@ -48,6 +50,8 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.registry.Registerable;
+import net.minecraft.registry.RegistryBuilder;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
@@ -62,6 +66,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
@@ -88,6 +93,10 @@ public class DataGeneratorTestEntrypoint {
 		pack.addProvider(ExistingEnglishLangProvider::new);
 		pack.addProvider(JapaneseLangProvider::new);
 
+		final RegistryBuilder builder = new RegistryBuilder().addRegistry(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, DataGeneratorTestEntrypoint::bootstrapTestDatagenRegistry);
+		DatapackBuiltinEntriesProvider builtinEntries = pack.addProvider((output, registries) -> new DatapackBuiltinEntriesProvider(event.getGenerator().output, registries, builder, Set.of(MOD_ID)));
+		pack.addProvider((output, registries) -> new TestDynamicRegistryProvider(output, builtinEntries.getRegistryProvider()));
+
 		TestBlockTagProvider blockTagProvider = pack.addProvider(TestBlockTagProvider::new);
 		pack.addProvider((output, registries) -> new TestItemTagProvider(output, registries, blockTagProvider));
 		pack.addProvider(TestBiomeTagProvider::new);
@@ -96,6 +105,10 @@ public class DataGeneratorTestEntrypoint {
 		if (FMLLoader.getDist() == Dist.CLIENT) {
 			DataGeneratorClientTestEntrypoint.onInitializeDataGenerator(fabricDataGenerator);
 		}
+	}
+
+	private static void bootstrapTestDatagenRegistry(Registerable<DataGeneratorTestContent.TestDatagenObject> registerable) {
+		registerable.register(TEST_DYNAMIC_REGISTRY_ITEM_KEY, new DataGeneratorTestContent.TestDatagenObject(":tiny_potato:"));
 	}
 
 	private static class TestRecipeProvider extends FabricRecipeProvider {
@@ -342,6 +355,26 @@ public class DataGeneratorTestEntrypoint {
 							LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F)).with(ItemEntry.builder(SIMPLE_BLOCK.get()))
 					)
 			);
+		}
+	}
+
+	/**
+	 * Tests generating files for a custom dynamic registry.
+	 * Note that Biome API testmod provides the test for vanilla dynamic registries.
+	 */
+	private static class TestDynamicRegistryProvider extends FabricDynamicRegistryProvider {
+		TestDynamicRegistryProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+			super(output, registriesFuture);
+		}
+
+		@Override
+		protected void configure(RegistryWrapper.WrapperLookup registries, Entries entries) {
+			entries.add(registries.getWrapperOrThrow(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY), TEST_DYNAMIC_REGISTRY_ITEM_KEY);
+		}
+
+		@Override
+		public String getName() {
+			return "Test Dynamic Registry";
 		}
 	}
 }
