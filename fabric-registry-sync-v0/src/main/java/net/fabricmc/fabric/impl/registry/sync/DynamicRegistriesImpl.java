@@ -36,6 +36,7 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 
 public final class DynamicRegistriesImpl {
 	private static final List<DataPackRegistryData<?>> DYNAMIC_REGISTRIES = new ArrayList<>();
+	public static final Set<RegistryKey<?>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Set<RegistryKey<? extends Registry<?>>> SKIP_EMPTY_SYNC_REGISTRIES = new HashSet<>();
 
 	private DynamicRegistriesImpl() {
@@ -50,6 +51,7 @@ public final class DynamicRegistriesImpl {
 		Objects.requireNonNull(codec, "Codec cannot be null");
 
 		DYNAMIC_REGISTRIES.add(new DataPackRegistryData<>(key, codec, null));
+		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
 	}
 
 	public static <T> void addSyncedRegistry(RegistryKey<? extends Registry<T>> registryKey, Codec<T> dataCodec, Codec<T> networkCodec, DynamicRegistries.SyncOption... options) {
@@ -65,6 +67,7 @@ public final class DynamicRegistriesImpl {
 		}
 
 		DYNAMIC_REGISTRIES.add(new DataPackRegistryData<>(registryKey, dataCodec, networkCodec));
+		FABRIC_DYNAMIC_REGISTRY_KEYS.add(registryKey);
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
