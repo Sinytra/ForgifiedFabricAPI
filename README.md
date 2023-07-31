@@ -1,5 +1,10 @@
 # Forgified Fabric API
 
+[![Build](https://github.com/Sinytra/ForgifiedFabricAPI/actions/workflows/build.yml/badge.svg)](https://github.com/Sinytra/ForgifiedFabricAPI/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/Sinytra/ForgifiedFabricAPI?style=flat&label=Release)](https://github.com/Sinytra/ForgifiedFabricAPI/releases/latest)
+[![CurseForge](https://cf.way2muchnoise.eu/forgified-fabric-api.svg)](https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api)
+[![Modrinth](https://img.shields.io/modrinth/dt/Aqlf1Shp?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/mod/forgified-fabric-api)
+
 Essential hooks for modding with Fabric ported to MinecraftForge.
 
 Fabric API is the library for essential hooks and interoperability mechanisms for mods. Examples include:
@@ -47,7 +52,12 @@ using Forge API doesn't come at the expense of preserving intended behavior.
 Make sure you have installed MinecraftForge first. More information about installing Forge can be
 found [here](https://github.com/minecraftforge/minecraftforge/#installing-forge).
 
-To use Forgified Fabric API, download it from [GitHub Releases](https://github.com/Sinytra/ForgifiedFabricAPI/releases).
+The Forgified Fabric API is available for download on the following platforms:
+- [GitHub Releases](https://github.com/Sinytra/ForgifiedFabricAPI/releases)
+- [CurseForge](https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api)
+- [Modrinth](https://modrinth.com/mod/forgified-fabric-api)
+
+To use Forgified Fabric API, download it from .
 Standalone CurseForge and Modrinth distributions will be available soon.
 
 The downloaded jar file should be placed in your `mods` folder.

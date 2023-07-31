@@ -18,6 +18,7 @@ import net.fabricmc.loom.util.aw2at.Aw2At
 import net.fabricmc.loom.util.service.BuildSharedServiceManager
 import net.fabricmc.loom.util.service.UnsafeWorkQueueHelper
 import net.fabricmc.lorenztiny.TinyMappingsReader
+import net.fabricmc.loom.util.GroovyXmlUtil
 import org.cadixdev.at.AccessTransformSet
 import org.cadixdev.at.io.AccessTransformFormats
 import org.cadixdev.lorenz.MappingSet
@@ -199,6 +200,32 @@ dependencies {
 afterEvaluate {
 	javadoc {
 		classpath += files(configurations.javadocDeps)
+	}
+}
+
+// Include Forgified Fabric Loader
+repositories {
+	maven { url = "https://maven.su5ed.dev/releases" }
+}
+dependencies {
+	include "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}"
+}
+afterEvaluate {
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				pom.withXml {
+					def depsNode = GroovyXmlUtil.getOrCreateNode(asNode(), "dependencies")
+					rootProject.configurations.include.dependencies.each {
+						def depNode = depsNode.appendNode("dependency")
+						depNode.appendNode("groupId", it.group)
+						depNode.appendNode("artifactId", it.name)
+						depNode.appendNode("version", it.version)
+						depNode.appendNode("scope", "compile")
+					}
+				}
+			}
+		}
 	}
 }
 
