@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.impl.item;
 
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
 
 public final class FabricItemInternals {
+	public static final ThreadLocal<Boolean> FORGE_CALL = ThreadLocal.withInitial(() -> false);
 	private static final WeakHashMap<Item.Settings, ExtraData> extraData = new WeakHashMap<>();
 
 	private FabricItemInternals() {
@@ -42,6 +44,17 @@ public final class FabricItemInternals {
 			((ItemExtensions) item).fabric_setEquipmentSlotProvider(data.equipmentSlotProvider);
 			((ItemExtensions) item).fabric_setCustomDamageHandler(data.customDamageHandler);
 		}
+	}
+
+	public static <T> T nonRecursiveApiCall(Supplier<T> supplier) {
+		FORGE_CALL.set(true);
+		T result = supplier.get();
+		FORGE_CALL.set(false);
+		return result;
+	}
+
+	public static boolean allowForgeCall() {
+		return !FORGE_CALL.get();
 	}
 
 	public static final class ExtraData {
