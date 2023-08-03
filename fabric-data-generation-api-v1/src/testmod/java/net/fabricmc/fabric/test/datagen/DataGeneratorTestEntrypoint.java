@@ -20,13 +20,11 @@ import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 
@@ -82,7 +80,8 @@ public class DataGeneratorTestEntrypoint {
 	private static final ConditionJsonProvider ALWAYS_LOADED = DefaultResourceConditions.not(NEVER_LOADED);
 
 	public static void onGatherData(GatherDataEvent event) {
-		final FabricDataGenerator fabricDataGenerator = FabricDataGenerator.create(MOD_ID, event);
+		final RegistryBuilder builder = new RegistryBuilder().addRegistry(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, DataGeneratorTestEntrypoint::bootstrapTestDatagenRegistry);
+		final FabricDataGenerator fabricDataGenerator = FabricDataGenerator.create(MOD_ID, event, builder);
 		final FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
 		pack.addProvider(TestRecipeProvider::new);
@@ -92,10 +91,7 @@ public class DataGeneratorTestEntrypoint {
 		pack.addProvider(TestBarterLootTableProvider::new);
 		pack.addProvider(ExistingEnglishLangProvider::new);
 		pack.addProvider(JapaneseLangProvider::new);
-
-		final RegistryBuilder builder = new RegistryBuilder().addRegistry(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, DataGeneratorTestEntrypoint::bootstrapTestDatagenRegistry);
-		DatapackBuiltinEntriesProvider builtinEntries = pack.addProvider((output, registries) -> new DatapackBuiltinEntriesProvider(event.getGenerator().output, registries, builder, Set.of(MOD_ID)));
-		pack.addProvider((output, registries) -> new TestDynamicRegistryProvider(output, builtinEntries.getRegistryProvider()));
+		pack.addProvider(TestDynamicRegistryProvider::new);
 
 		TestBlockTagProvider blockTagProvider = pack.addProvider(TestBlockTagProvider::new);
 		pack.addProvider((output, registries) -> new TestItemTagProvider(output, registries, blockTagProvider));

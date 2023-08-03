@@ -26,6 +26,10 @@ import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 
 import net.fabricmc.loader.api.ModContainer;
 
+import net.minecraft.registry.RegistryBuilder;
+
+import net.minecraft.util.Util;
+
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -50,11 +54,20 @@ public final class FabricDataGenerator extends DataGenerator {
 	private final DataGenerator parent;
 
 	public static FabricDataGenerator create(String modid, GatherDataEvent event) {
+		return create(modid, event, event.getLookupProvider());
+	}
+
+	public static FabricDataGenerator create(String modid, GatherDataEvent event, RegistryBuilder registryBuilder) {
+		CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture = event.getLookupProvider().thenApply(r -> FabricDataGenHelper.createRegistryWrapper(r, registryBuilder));
+		return create(modid, event, registriesFuture);
+	}
+
+	private static FabricDataGenerator create(String modid, GatherDataEvent event, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
 		final DataGenerator dataGenerator = event.getGenerator();
 		final IModInfo modInfo = ModList.get().getModContainerById(modid).orElseThrow().getModInfo();
-		return new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, event.getLookupProvider());
+		return new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, registries);
 	}
-	
+
 	@ApiStatus.Internal
 	public FabricDataGenerator(DataGenerator parent, Path output, IModInfo mod, boolean strictValidation, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
 		super(output, SharedConstants.getGameVersion(), true);
