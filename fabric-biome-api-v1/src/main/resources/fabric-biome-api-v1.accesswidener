@@ -2,8 +2,9 @@ accessWidener	v1	named
 accessible  class   net/minecraft/world/biome/Biome$Weather
 
 # Top-Level Biome Fields Access
-accessible field net/minecraft/world/biome/Biome weather Lnet/minecraft/world/biome/Biome$Weather;
-mutable field net/minecraft/world/biome/Biome weather Lnet/minecraft/world/biome/Biome$Weather;
+#Disabled, this field should be accessed via forge's accessor method. Publicizing it will breaks the field-to-method coremod.
+#accessible field net/minecraft/world/biome/Biome weather Lnet/minecraft/world/biome/Biome$Weather;
+#mutable field net/minecraft/world/biome/Biome weather Lnet/minecraft/world/biome/Biome$Weather;
 accessible field net/minecraft/world/biome/Biome generationSettings Lnet/minecraft/world/biome/GenerationSettings;
 accessible field net/minecraft/world/biome/Biome spawnSettings Lnet/minecraft/world/biome/SpawnSettings;
 
