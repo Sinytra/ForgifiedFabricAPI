@@ -21,7 +21,6 @@
   },
   "description": "An API for adding custom item groups.",
   "mixins": [
-    "fabric-item-group-api-v1.mixins.json"
   ],
   "accessWidener": "fabric-item-group-api-v1.accesswidener",
   "custom": {
