@@ -50,7 +50,9 @@ abstract class BlockDustParticleMixin extends SpriteBillboardParticle {
 					from = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/BlockDustParticle;blue:F", ordinal = 0),
 					to = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;isOf(Lnet/minecraft/block/Block;)Z")
 			),
-			allow = 1
+			allow = 1,
+			// Prevent crash on never Forge versions, allowing FML to show the mod error screen
+			require = 0
 	)
 	private BlockState removeUntintableParticles(BlockState state) {
 		if (!ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT.invoker().allowBlockDustTint(state, world, blockPos)) {
