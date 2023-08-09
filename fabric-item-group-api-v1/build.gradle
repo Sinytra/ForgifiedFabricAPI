@@ -7,5 +7,5 @@ moduleDependencies(project, [
 ])
 
 loom {
-//	accessWidenerPath = file('src/main/resources/fabric-item-group-api-v1.accesswidener')
+	accessWidenerPath = file('src/main/resources/fabric-item-group-api-v1.accesswidener')
 }
