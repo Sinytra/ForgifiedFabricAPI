@@ -42,7 +42,8 @@ public class CustomIngredientImpl extends Ingredient {
 	// Static helpers used by the API
 
 	public static final String TYPE_KEY = "fabric:type";
-	public static final int PACKET_MARKER = -1;
+	// Use a random constant number instead of -1 to avoid conflicts with Forge's own custom ingredient deserializer
+	public static final int PACKET_MARKER = -22;
 
 	static final Map<Identifier, CustomIngredientSerializer<?>> REGISTERED_SERIALIZERS = new ConcurrentHashMap<>();
 

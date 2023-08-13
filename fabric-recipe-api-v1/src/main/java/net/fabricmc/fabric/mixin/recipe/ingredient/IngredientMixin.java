@@ -101,7 +101,7 @@ public class IngredientMixin implements FabricIngredient {
 		}
 	}
 
-	@Inject(method = "write", at = @At("HEAD"))
+	@Inject(method = "write", at = @At("HEAD"), cancellable = true)
 	private void injectToNetwork(PacketByteBuf buf, CallbackInfo ci) {
 		if ((Ingredient) (Object) this instanceof CustomIngredientImpl customIngredient) {
 			customIngredient.fabric_toNetwork(buf);
