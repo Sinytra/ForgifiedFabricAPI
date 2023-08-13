@@ -31,6 +31,6 @@ import net.fabricmc.fabric.api.client.sound.v1.FabricSoundInstance;
 public interface SoundInstanceMixin extends FabricSoundInstance {
 	// Override forge method in SoundInstance
 	default CompletableFuture<AudioStream> getStream(SoundLoader soundBuffers, Sound sound, boolean looping) {
-		return getAudioStream(soundBuffers, sound.getIdentifier(), looping);
+		return getAudioStream(soundBuffers, sound.getLocation(), looping);
 	}
 }
