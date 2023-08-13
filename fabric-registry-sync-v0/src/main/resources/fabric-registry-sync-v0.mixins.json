@@ -11,7 +11,8 @@
     "SerializableRegistriesMixin",
     "SimpleRegistryMixin",
     "NamespacedWrapperMixin",
-    "RegistryManagerMixin"
+    "RegistryManagerMixin",
+    "DebugChunkGeneratorAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.transfer;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,10 +34,9 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
  * fluid attributes handlers overriding {@link FluidVariantAttributeHandler#getEmptySound}.
  */
 @Mixin(BucketItem.class)
-public class BucketItemMixin {
-	@Shadow
-	@Final
-	private Fluid fluid;
+public abstract class BucketItemMixin {
+	@Shadow(remap = false)
+	public abstract Fluid getFluid();
 
 	@ModifyVariable(
 			method = "playEmptyingSound",
@@ -46,6 +44,7 @@ public class BucketItemMixin {
 			index = 4
 	)
 	private SoundEvent hookEmptyingSound(SoundEvent previous) {
+		Fluid fluid = getFluid();
 		return FluidVariantAttributes.getHandlerOrDefault(fluid).getEmptySound(FluidVariant.of(fluid)).orElse(previous);
 	}
 }
