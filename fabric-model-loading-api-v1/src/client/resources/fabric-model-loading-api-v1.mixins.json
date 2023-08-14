@@ -10,6 +10,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "minVersion": "0.8.5",
-  "plugin": "net.fabricmc.fabric.impl.client.model.loading.ModelLoadingMixinPlugin"
+  "minVersion": "0.8.5"
 }
