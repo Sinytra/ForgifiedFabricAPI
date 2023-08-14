@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.impl.resource.loader;
 
+import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -24,11 +25,11 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.datafixers.util.Either;
 import cpw.mods.niofs.union.UnionFileSystemProvider;
-import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.resource.PathPackResources;
+import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourceType;
 
 import net.fabricmc.fabric.api.resource.ModResourcePack;
@@ -38,13 +39,14 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 
 public class ModNioResourcePack extends PathPackResources implements ModResourcePack {
 	private static final FileSystem DEFAULT_FS = FileSystems.getDefault();
-	private static final UnionFileSystemProvider UFSP = (UnionFileSystemProvider) FileSystemProvider.installedProviders().stream().filter(fsp->fsp.getScheme().equals("union")).findFirst().orElseThrow(()->new IllegalStateException("Couldn't find UnionFileSystemProvider"));
+	private static final UnionFileSystemProvider UFSP = (UnionFileSystemProvider) FileSystemProvider.installedProviders().stream().filter(fsp -> fsp.getScheme().equals("union")).findFirst().orElseThrow(() -> new IllegalStateException("Couldn't find UnionFileSystemProvider"));
 
-	private final Either<ModMetadata, IModInfo> modMetadata;
+	private final ModMetadata modInfo;
 	private final ResourcePackActivationType activationType;
+	private final ResourceType type;
 
-	public static ModNioResourcePack create(String id, Either<ModContainer, IModInfo> mod, String subPath, ResourceType type, ResourcePackActivationType activationType) {
-		List<Path> rootPaths = ResourceLoaderImpl.getFabricModContainerPaths(mod);
+	public static ModNioResourcePack create(String id, ModContainer mod, String subPath, ResourceType type, ResourcePackActivationType activationType) {
+		List<Path> rootPaths = mod.getRootPaths();
 		List<Path> paths;
 
 		if (subPath == null) {
@@ -67,29 +69,42 @@ public class ModNioResourcePack extends PathPackResources implements ModResource
 		if (paths.isEmpty()) return null;
 
 		Path union = paths.size() == 1 ? paths.get(0) : UFSP.newFileSystem((a, b) -> true, paths.toArray(Path[]::new)).getRoot();
-		ModNioResourcePack ret = new ModNioResourcePack(id, ResourceLoaderImpl.getFabricModContainerMetadata(mod), union, activationType);
+		ModNioResourcePack ret = new ModNioResourcePack(id, mod.getMetadata(), union, type, activationType);
 
 		return ret.getNamespaces(type).isEmpty() ? null : ret;
 	}
 
-	private ModNioResourcePack(String id, Either<ModMetadata, IModInfo> modInfo, Path path, ResourcePackActivationType activationType) {
+	private ModNioResourcePack(String id, ModMetadata modInfo, Path path, ResourceType type, ResourcePackActivationType activationType) {
 		super(id, false, path);
-		this.modMetadata = modInfo;
+		this.modInfo = modInfo;
+		this.type = type;
 		this.activationType = activationType;
 	}
 
 	@Override
 	public ModMetadata getFabricModMetadata() {
-		return modMetadata.left().orElse(null);
-	}
-
-	@Override
-	public IModInfo getForgeModMetadata() {
-		return modMetadata.right().orElse(null);
+		return modInfo;
 	}
 
 	public ResourcePackActivationType getActivationType() {
 		return this.activationType;
+	}
+
+	private InputSupplier<InputStream> openFile(String filename) {
+		final Path path = resolve(filename);
+        if (Files.exists(path)) {
+			return InputSupplier.create(path);
+        }
+		if (ModResourcePackUtil.containsDefault(this.modInfo, filename)) {
+			return () -> ModResourcePackUtil.openDefault(this.modInfo, this.type, filename);
+		}
+		return null;
+	}
+
+	@Nullable
+	@Override
+	public InputSupplier<InputStream> openRoot(String... pathSegments) {
+		return openFile(String.join("/", pathSegments));
 	}
 
 	private static boolean exists(Path path) {

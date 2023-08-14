@@ -16,9 +16,7 @@
 
 package net.fabricmc.fabric.test.tag.client.v1;
 
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forgespi.language.IModInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +34,8 @@ import net.fabricmc.fabric.api.tag.client.v1.ClientTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBiomeTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEnchantmentTags;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 
 @Mod(ClientTagTest.MODID)
 public class ClientTagTest {
@@ -43,7 +43,7 @@ public class ClientTagTest {
 	public static final String MODID = "fabric_clients_tags_api_v1_testmod";
 
 	public ClientTagTest() {
-		final IModInfo container = ModList.get().getModContainerById(MODID).orElseThrow().getModInfo();
+		final ModContainer container = FabricLoader.getInstance().getModContainer(MODID).get();
 
 		if (!ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(MODID, "test2"),
 				container, ResourcePackActivationType.ALWAYS_ENABLED)) {

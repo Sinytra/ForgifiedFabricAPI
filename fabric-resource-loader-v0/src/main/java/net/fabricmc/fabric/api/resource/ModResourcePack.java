@@ -20,9 +20,6 @@ import net.minecraft.resource.ResourcePack;
 
 import net.fabricmc.loader.api.metadata.ModMetadata;
 
-import net.minecraftforge.forgespi.language.IModInfo;
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Interface implemented by mod-provided resource packs.
  */
@@ -32,15 +29,4 @@ public interface ModResourcePack extends ResourcePack {
 	 * resource pack.
 	 */
 	ModMetadata getFabricModMetadata();
-
-	// FFAPI: Support FML Mod Metadata
-	default String getModName() {
-		IModInfo forgeMetadata = getForgeModMetadata();
-		return forgeMetadata != null ? getForgeModMetadata().getDisplayName() : getFabricModMetadata().getName();
-	}
-
-	@Nullable
-	default IModInfo getForgeModMetadata() {
-		return null;
-	}
 }

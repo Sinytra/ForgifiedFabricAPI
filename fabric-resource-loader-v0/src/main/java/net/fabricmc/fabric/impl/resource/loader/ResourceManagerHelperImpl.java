@@ -29,8 +29,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Either;
-import net.minecraftforge.forgespi.language.IModInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,18 +56,6 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 		return registryMap.computeIfAbsent(type, (t) -> new ResourceManagerHelperImpl());
 	}
 
-	public static boolean registerBuiltinResourcePack(Identifier id, String subPath, ModContainer container, Text displayName, ResourcePackActivationType activationType) {
-		return registerBuiltinResourcePack(id, subPath, Either.left(container), displayName, activationType);
-	}
-
-	public static boolean registerBuiltinResourcePack(Identifier id, String subPath, IModInfo container, Text displayName, ResourcePackActivationType activationType) {
-		return registerBuiltinResourcePack(id, subPath, Either.right(container), displayName, activationType);
-	}
-
-	public static boolean registerBuiltinResourcePack(Identifier id, String subPath, IModInfo container, ResourcePackActivationType activationType) {
-		return registerBuiltinResourcePack(id, subPath, Either.right(container), Text.literal(id.getNamespace() + "/" + id.getPath()), activationType);
-	}
-	
 	/**
 	 * Registers a built-in resource pack. Internal implementation.
 	 *
@@ -82,9 +68,9 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 	 * @see ResourceManagerHelper#registerBuiltinResourcePack(Identifier, ModContainer, Text, ResourcePackActivationType)
 	 * @see ResourceManagerHelper#registerBuiltinResourcePack(Identifier, ModContainer, ResourcePackActivationType)
 	 */
-	private static boolean registerBuiltinResourcePack(Identifier id, String subPath, Either<ModContainer, IModInfo> container, Text displayName, ResourcePackActivationType activationType) {
+	public static boolean registerBuiltinResourcePack(Identifier id, String subPath, ModContainer container, Text displayName, ResourcePackActivationType activationType) {
 		// Assuming the mod has multiple paths, we simply "hope" that the  file separator is *not* different across them
-		List<Path> paths = ResourceLoaderImpl.getFabricModContainerPaths(container);
+		List<Path> paths = container.getRootPaths();
 		String separator = paths.get(0).getFileSystem().getSeparator();
 		subPath = subPath.replace("/", separator);
 		ModNioResourcePack resourcePack = ModNioResourcePack.create(id.toString(), container, subPath, ResourceType.CLIENT_RESOURCES, activationType);
@@ -132,7 +118,7 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 						ignored -> entry.getRight(),
 						resourceType,
 						ResourcePackProfile.InsertionPosition.TOP,
-						new BuiltinModResourcePackSource(pack.getModName())
+						new BuiltinModResourcePackSource(pack.getFabricModMetadata().getName())
 				);
 				consumer.accept(profile);
 			}

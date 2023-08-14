@@ -16,20 +16,24 @@
 
 package net.fabricmc.fabric.impl.resource.loader;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Either;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.IModInfo;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.text.Text;
 
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 
 /**
@@ -49,14 +53,31 @@ public final class ModResourcePackUtil {
 	 * @param subPath the resource pack sub path directory in mods, may be {@code null}
 	 */
 	public static void appendModResourcePacks(List<ModResourcePack> packs, ResourceType type, @Nullable String subPath) {
-		for (IModInfo container : ModList.get().getMods()) {
-			ModResourcePack pack = ModNioResourcePack.create(container.getModId(), Either.right(container), subPath, type, ResourcePackActivationType.ALWAYS_ENABLED);
+		for (ModContainer container : FabricLoader.getInstance().getAllMods()) {
+			if (container.getMetadata().getType().equals("builtin")) {
+				continue;
+			}
+
+			ModResourcePack pack = ModNioResourcePack.create(container.getMetadata().getId(), container, subPath, type, ResourcePackActivationType.ALWAYS_ENABLED);
 
 			if (pack != null) {
 				packs.add(pack);
 			}
 		}
 	}
+
+	public static boolean containsDefault(ModMetadata info, String filename) {
+		return "pack.mcmeta".equals(filename);
+	}
+
+	public static InputStream openDefault(ModMetadata info, ResourceType type, String filename) {
+        if (filename.equals("pack.mcmeta")) {
+            String description = Objects.requireNonNullElse(info.getName(), "");
+            String metadata = serializeMetadata(SharedConstants.getGameVersion().getResourceVersion(type), description);
+            return IOUtils.toInputStream(metadata, Charsets.UTF_8);
+        }
+        return null;
+    }
 
 	public static String serializeMetadata(int packVersion, String description) {
 		JsonObject pack = new JsonObject();
