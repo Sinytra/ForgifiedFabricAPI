@@ -409,6 +409,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 					displayTest "IGNORE_SERVER_VERSION"
 				}
 
+				def providedMods = []
 				mods([
 					{
 						modId normalModid
@@ -423,7 +424,15 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 						if (json.description) {
 							description json.description
 						}
-						provides([json.id])
+						if (json.provides) {
+							providedMods += json.provides
+						}
+						if (json.id != normalModid) {
+							providedMods += json.id
+						}
+						if (!providedMods.empty) {
+							provides providedMods
+						}
 					}
 				])
 
