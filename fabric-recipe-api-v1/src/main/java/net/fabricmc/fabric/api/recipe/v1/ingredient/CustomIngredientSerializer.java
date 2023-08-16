@@ -18,6 +18,10 @@ package net.fabricmc.fabric.api.recipe.v1.ingredient;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+
+import net.fabricmc.fabric.impl.recipe.ingredient.ForgeCustomIngredientSerializer;
+
+import net.minecraftforge.common.crafting.CraftingHelper;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.PacketByteBuf;
@@ -39,7 +43,7 @@ public interface CustomIngredientSerializer<T extends CustomIngredient> {
 	 * @throws IllegalArgumentException if the serializer is already registered
 	 */
 	static void register(CustomIngredientSerializer<?> serializer) {
-		CustomIngredientImpl.registerSerializer(serializer);
+		CraftingHelper.register(serializer.getIdentifier(), new ForgeCustomIngredientSerializer(serializer));
 	}
 
 	/**

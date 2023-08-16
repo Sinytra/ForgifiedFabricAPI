@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.recipe.ingredient;
+package net.fabricmc.fabric.mixin.recipe.ingredient;
 
-import java.util.Set;
-
-import net.minecraft.network.PacketEncoder;
+import com.google.common.collect.BiMap;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.IIngredientSerializer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-/**
- * Implemented on {@link PacketEncoder} to store which custom ingredients the client supports.
- */
-public interface SupportedIngredientsPacketEncoder {
-	void fabric_setSupportedCustomIngredients(Set<Identifier> supportedCustomIngredients);
+@Mixin(CraftingHelper.class)
+public interface CraftingHelperAccessor {
+
+    @Accessor
+    static BiMap<Identifier, IIngredientSerializer<?>> getIngredients() {
+        throw new UnsupportedOperationException();
+    }
 }

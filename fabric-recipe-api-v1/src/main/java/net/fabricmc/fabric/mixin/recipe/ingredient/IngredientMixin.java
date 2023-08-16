@@ -16,96 +16,11 @@
 
 package net.fabricmc.fabric.mixin.recipe.ingredient;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-
-import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
-import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
-import net.fabricmc.fabric.impl.recipe.ingredient.builtin.AnyIngredient;
+import net.minecraft.recipe.Ingredient;
+import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Ingredient.class)
 public class IngredientMixin implements FabricIngredient {
-	/**
-	 * Inject right when vanilla detected a json object and check for our custom key.
-	 * 
-	 * @implNote FFAPI: Inject before forge checks for its ingredient serializers.
-	 */
-	@Inject(
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraftforge/common/crafting/CraftingHelper;getIngredient(Lcom/google/gson/JsonElement;Z)Lnet/minecraft/recipe/Ingredient;",
-					ordinal = 0
-			),
-			method = "fromJson(Lcom/google/gson/JsonElement;Z)Lnet/minecraft/recipe/Ingredient;",
-			cancellable = true
-	)
-	private static void injectFromJson(JsonElement json, boolean requireNotEmpty, CallbackInfoReturnable<Ingredient> cir) {
-		if (!json.isJsonObject()) return;
-
-		JsonObject obj = json.getAsJsonObject();
-
-		if (obj.has(CustomIngredientImpl.TYPE_KEY)) {
-			Identifier id = new Identifier(JsonHelper.getString(obj, CustomIngredientImpl.TYPE_KEY));
-			CustomIngredientSerializer<?> serializer = CustomIngredientSerializer.get(id);
-
-			if (serializer != null) {
-				cir.setReturnValue(serializer.read(obj).toVanilla());
-			} else {
-				throw new IllegalArgumentException("Unknown custom ingredient type: " + id);
-			}
-		}
-	}
-
-	/**
-	 * Throw exception when someone attempts to use our custom key inside an array ingredient.
-	 * The {@link AnyIngredient} should be used instead.
-	 */
-	@Inject(at = @At("HEAD"), method = "entryFromJson")
-	private static void injectEntryFromJson(JsonObject obj, CallbackInfoReturnable<?> cir) {
-		if (obj.has(CustomIngredientImpl.TYPE_KEY)) {
-			throw new IllegalArgumentException("Custom ingredient cannot be used inside an array ingredient. You can replace the array by a fabric:any ingredient.");
-		}
-	}
-
-	@Inject(
-			at = @At("HEAD"),
-			method = "fromPacket",
-			cancellable = true
-	)
-	private static void injectFromPacket(PacketByteBuf buf, CallbackInfoReturnable<Ingredient> cir) {
-		int index = buf.readerIndex();
-
-		if (buf.readVarInt() == CustomIngredientImpl.PACKET_MARKER) {
-			Identifier type = buf.readIdentifier();
-			CustomIngredientSerializer<?> serializer = CustomIngredientSerializer.get(type);
-
-			if (serializer == null) {
-				throw new IllegalArgumentException("Cannot deserialize custom ingredient of unknown type " + type);
-			}
-
-			cir.setReturnValue(serializer.read(buf).toVanilla());
-		} else {
-			// Reset index for vanilla's normal deserialization logic.
-			buf.readerIndex(index);
-		}
-	}
-
-	@Inject(method = "write", at = @At("HEAD"), cancellable = true)
-	private void injectToNetwork(PacketByteBuf buf, CallbackInfo ci) {
-		if ((Ingredient) (Object) this instanceof CustomIngredientImpl customIngredient) {
-			customIngredient.fabric_toNetwork(buf);
-			ci.cancel();
-		}
-	}
+	
 }

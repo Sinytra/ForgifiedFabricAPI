@@ -3,8 +3,9 @@
   "package": "net.fabricmc.fabric.mixin.recipe",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ingredient.CraftingHelperAccessor",
+    "ingredient.CraftingHelperMixin",
     "ingredient.IngredientMixin",
-    "ingredient.PacketEncoderMixin",
     "ingredient.ShapelessRecipeMixin"
   ],
   "injectors": {
