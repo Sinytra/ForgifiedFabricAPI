@@ -46,7 +46,7 @@ public class CraftingHelperMixin {
         FABRIC_JSON_ARRAY_DESERIALIZATION.set(false);
     }
 
-    @Redirect(method = "getIngredient(Lcom/google/gson/JsonElement;Z)Lnet/minecraft/recipe/Ingredient;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"), remap = false)
+    @Redirect(method = "getIngredient(Lcom/google/gson/JsonElement;Z)Lnet/minecraft/recipe/Ingredient;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/JsonHelper;getString(Lcom/google/gson/JsonObject;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"))
     private static String modifyIngredientTypeValue(JsonObject object, String element, String defaultStr) {
         if (object.has(CustomIngredientImpl.TYPE_KEY)) {
             // Throw exception when someone attempts to use our custom key inside an array ingredient.
