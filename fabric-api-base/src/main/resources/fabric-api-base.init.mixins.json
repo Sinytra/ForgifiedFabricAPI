@@ -1,0 +1,4 @@
+{
+  "minVersion": "0.8.5",
+  "plugin": "net.fabricmc.fabric.impl.base.helper.FabricApiBaseMixinPlugin"
+}

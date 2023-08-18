@@ -1,6 +1,10 @@
 archivesBaseName = "fabric-model-loading-api-v1"
 version = getSubprojectVersion(project)
 
+dependencies {
+	testmodImplementation "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}"
+}
+
 moduleDependencies(project, ['fabric-api-base'])
 
 testDependencies(project, [
