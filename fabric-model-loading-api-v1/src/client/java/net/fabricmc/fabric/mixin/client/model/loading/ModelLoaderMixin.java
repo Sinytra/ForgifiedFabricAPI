@@ -42,7 +42,7 @@ import net.fabricmc.fabric.impl.client.model.loading.ModelLoaderHooks;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingEventDispatcher;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
 
-@Mixin(ModelLoader.class)
+@Mixin(value = ModelLoader.class, priority = 2000)
 public abstract class ModelLoaderMixin implements ModelLoaderHooks {
 	// The missing model is always loaded and added first.
 	@Final
