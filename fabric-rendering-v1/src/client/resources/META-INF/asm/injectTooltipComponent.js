@@ -16,7 +16,7 @@ function initializeCoreMod() {
             'target': {
                 'type': 'METHOD',
                 'class': yarn ? 'net.minecraft.client.gui.tooltip.TooltipComponent' : 'net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent',
-                'methodName': 'm_169948_',
+                'methodName': 'm_169950_',
                 'methodDesc': yarn ? '(Lnet/minecraft/client/item/TooltipData;)Lnet/minecraft/client/gui/tooltip/TooltipComponent;' : '(Lnet/minecraft/world/inventory/tooltip/TooltipComponent;)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;'
             },
             'transformer': function (node) {
