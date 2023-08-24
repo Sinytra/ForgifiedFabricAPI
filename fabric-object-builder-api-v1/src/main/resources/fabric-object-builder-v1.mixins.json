@@ -5,6 +5,7 @@
   "mixins": [
     "AbstractBlockAccessor",
     "AbstractBlockSettingsAccessor",
+    "CriteriaAccessor",
     "DetectorRailBlockMixin",
     "TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin"
   ],
