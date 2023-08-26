@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_16",
   "client": [
     "ArmorFeatureRendererMixin",
+    "BlockColorsMixin",
+    "ItemColorsMixin",
     "BuiltinModelItemRendererMixin",
     "WorldRendererMixin",
     "EntityRenderersMixin",
