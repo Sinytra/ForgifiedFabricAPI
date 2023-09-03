@@ -4,6 +4,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/Sinytra/ForgifiedFabricAPI?style=flat&label=Release)](https://github.com/Sinytra/ForgifiedFabricAPI/releases/latest)
 [![CurseForge](https://cf.way2muchnoise.eu/forgified-fabric-api.svg)](https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api)
 [![Modrinth](https://img.shields.io/modrinth/dt/Aqlf1Shp?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/mod/forgified-fabric-api)
+[![Discord](https://discordapp.com/api/guilds/1141048834177388746/widget.png?style=shield)](https://discord.gg/mamk7z3TKZ)
 
 Essential hooks for modding with Fabric ported to MinecraftForge.
 
