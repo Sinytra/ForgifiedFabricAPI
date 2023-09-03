@@ -57,7 +57,6 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 	private final QueryIdFactory queryIdFactory;
 	private final Collection<Future<?>> waits = new ConcurrentLinkedQueue<>();
 	private final Map<Integer, Identifier> channels = new ConcurrentHashMap<>();
-	private final Map<Integer, Identifier> ignoredChannels = new ConcurrentHashMap<>();
 	private boolean firstQueryTick = true;
 
 	public ServerLoginNetworkAddon(ServerLoginNetworkHandler handler) {
@@ -141,9 +140,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 		Identifier channel = this.channels.remove(queryId);
 
 		if (channel == null) {
-			if (this.ignoredChannels.remove(queryId) == null) {
-				this.logger.warn("Query ID {} was received but no query has been associated in {}!", queryId, this.connection);
-			}
+			this.logger.warn("Query ID {} was received but no query has been associated in {}!", queryId, this.connection);
 			return false;
 		}
 
@@ -194,9 +191,8 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 	}
 
 	public void registerOutgoingPacket(LoginQueryRequestS2CPacket packet) {
-		// Ignore packets sent by FML
-		if (LoginWrapper.WRAPPER.equals(packet.getChannel())) {
-			this.ignoredChannels.put(packet.getQueryId(), packet.getChannel());
+		// Ignore packets sent by FML mods
+		if (ServerNetworkingImpl.LOGIN.getHandler(packet.getChannel()) == null) {
 			return;
 		}
 		this.channels.put(packet.getQueryId(), packet.getChannel());
