@@ -40,12 +40,14 @@ public final class Registration {
     public static final RegistryObject<FrameBlock> FRAME_VARIANT_BLOCK = registerBlock("frame_variant", () -> new FrameBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque()));
     public static final RegistryObject<Block> PILLAR_BLOCK = registerBlock("pillar", () -> new Block(FabricBlockSettings.create()));
     public static final RegistryObject<Block> OCTAGONAL_COLUMN_BLOCK = registerBlock("octagonal_column", () -> new Block(FabricBlockSettings.create().nonOpaque().strength(1.8F)));
+	public static final RegistryObject<Block> RIVERSTONE_BLOCK = registerBlock("riverstone", () -> new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
 
     public static final RegistryObject<Item> FRAME_ITEM = registerItem("frame", () -> new BlockItem(FRAME_BLOCK.get(), new Item.Settings()));
     public static final RegistryObject<Item> FRAME_MULTIPART_ITEM = registerItem("frame_multipart", () -> new BlockItem(FRAME_MULTIPART_BLOCK.get(), new Item.Settings()));
     public static final RegistryObject<Item> FRAME_VARIANT_ITEM = registerItem("frame_variant", () -> new BlockItem(FRAME_VARIANT_BLOCK.get(), new Item.Settings()));
     public static final RegistryObject<Item> PILLAR_ITEM = registerItem("pillar", () -> new BlockItem(PILLAR_BLOCK.get(), new Item.Settings()));
     public static final RegistryObject<Item> OCTAGONAL_COLUMN_ITEM = registerItem("octagonal_column", () -> new BlockItem(OCTAGONAL_COLUMN_BLOCK.get(), new Item.Settings()));
+	public static final RegistryObject<Item> RIVERSTONE_ITEM = registerItem("riverstone", () -> new BlockItem(RIVERSTONE_BLOCK.get(), new Item.Settings()));
 
     public static final RegistryObject<BlockEntityType<FrameBlockEntity>> FRAME_BLOCK_ENTITY_TYPE = registerBlockEntity("frame", () -> FabricBlockEntityTypeBuilder.create(FrameBlockEntity::new, getFrameBlocks()).build(null));
 

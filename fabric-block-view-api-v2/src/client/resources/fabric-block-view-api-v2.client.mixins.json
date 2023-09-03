@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.fabricmc.fabric.mixin.blockview.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ChunkRendererRegionMixin",
+    "ChunkRendererRegionBuilderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8.5"
+}
