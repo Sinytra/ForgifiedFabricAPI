@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.advancement.criterion.Criterion;
 
-// FFAPI: We don't use this accessor ourselved, but certain mods may depend on it.
+// FFAPI: We don't use this accessor ourselves, but certain mods may depend on it.
 @Mixin(Criteria.class)
 public interface CriteriaAccessor {
 	@Invoker

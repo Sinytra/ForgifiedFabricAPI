@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.world.gen.chunk.DebugChunkGenerator;
 
-// FFAPI: We don't use this accessor ourselved, but certain mods may depend on it.
+// FFAPI: We don't use this accessor ourselves, but certain mods may depend on it.
 @Mixin(DebugChunkGenerator.class)
 public interface DebugChunkGeneratorAccessor {
 	@Accessor
