@@ -134,15 +134,14 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 
 		if (instance != null) {
 			List<ResourceReloader> mutable = new ArrayList<>(listeners);
-			return Collections.unmodifiableList(instance.sort(mutable));
+			instance.sort(mutable);
+			return Collections.unmodifiableList(mutable);
 		}
 
 		return listeners;
 	}
 
-	protected List<ResourceReloader> sort(List<ResourceReloader> listeners) {
-		List<ResourceReloader> fabricListeners = new ArrayList<>();
-
+	protected void sort(List<ResourceReloader> listeners) {
 		listeners.removeAll(addedListeners);
 
 		// General rules:
@@ -162,8 +161,8 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 
 		int lastSize = -1;
 
-		while (fabricListeners.size() != lastSize) {
-			lastSize = fabricListeners.size();
+		while (listeners.size() != lastSize) {
+			lastSize = listeners.size();
 
 			Iterator<IdentifiableResourceReloadListener> it = listenersToAdd.iterator();
 
@@ -172,7 +171,7 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 
 				if (resolvedIds.containsAll(listener.getFabricDependencies())) {
 					resolvedIds.add(listener.getFabricId());
-					fabricListeners.add(listener);
+					listeners.add(listener);
 					it.remove();
 				}
 			}
@@ -181,8 +180,6 @@ public class ResourceManagerHelperImpl implements ResourceManagerHelper {
 		for (IdentifiableResourceReloadListener listener : listenersToAdd) {
 			LOGGER.warn("Could not resolve dependencies for listener: " + listener.getFabricId() + "!");
 		}
-
-		return fabricListeners;
 	}
 
 	@Override

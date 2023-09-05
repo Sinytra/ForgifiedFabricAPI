@@ -5,7 +5,9 @@
   "mixins": [
     "KeyedResourceReloadListenerMixin",
     "NamespaceResourceManagerMixin",
-    "ReloadableResourceManagerImplMixin"
+    "ReloadableResourceManagerImplMixin",
+    "LifecycledResourceManagerImplMixin",
+    "SimpleResourceReloadMixin"
   ],
   "injectors": {
     "defaultRequire": 1
