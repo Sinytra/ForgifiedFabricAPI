@@ -54,6 +54,7 @@ Make sure you have installed MinecraftForge first. More information about instal
 found [here](https://github.com/minecraftforge/minecraftforge/#installing-forge).
 
 The Forgified Fabric API is available for download on the following platforms:
+
 - [GitHub Releases](https://github.com/Sinytra/ForgifiedFabricAPI/releases)
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/forgified-fabric-api)
 - [Modrinth](https://modrinth.com/mod/forgified-fabric-api)
@@ -92,7 +93,7 @@ repositories {
     maven("https://maven.su5ed.dev/releases")
 }
 dependencies {
-    implementation fg.deobf("dev.sinytra.fabric-api:fabric-api:FABRIC_API_VERSION")
+    implementation fg . deobf ("dev.sinytra.fabric-api:fabric-api:FABRIC_API_VERSION")
 }
 ```
 
@@ -118,6 +119,7 @@ Each module contains its own `README.md`* explaining the module's purpose and ad
 | fabric-api-lookup-api-v1             |         ✅ Tested         |    Stable    |
 | fabric-biome-api-v1                  |         ✅ Tested         | Experimental |
 | fabric-block-api-v1                  |         ✅ Tested         |    Stable    |
+| fabric-block-view-api-v2             |         ✅ Tested         |    Stable    |
 | fabric-blockrenderlayer-v1           |         ✅ Tested         |    Stable    |
 | fabric-client-tags-api-v1            |         ✅ Tested         |    Stable    |
 | fabric-command-api-v2                |         ✅ Tested         |    Stable    |
@@ -145,7 +147,6 @@ Each module contains its own `README.md`* explaining the module's purpose and ad
 | fabric-registry-sync-v0              |         ✅ Tested         |    Stable    |
 | fabric-renderer-api-v1               |         ✅ Tested         |    Stable    |
 | fabric-renderer-indigo               |         ✅ Tested         |    Stable    |
-| fabric-rendering-data-attachment-v1  |         ✅ Tested         |    Stable    |
 | fabric-rendering-fluids-v1           |         ✅ Tested         |    Stable    |
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
 | fabric-resource-conditions-api-v1    |         ✅ Tested         | Experimental |
@@ -164,4 +165,5 @@ Each module contains its own `README.md`* explaining the module's purpose and ad
 | fabric-models-v0                     |         ✅ Tested         |    Stable    |
 | fabric-networking-v0                 |        ⚠️ Missing        |  Deprecated  |
 | fabric-renderer-registries-v1        |        ⚠️ Missing        |  Deprecated  |
+| fabric-rendering-data-attachment-v1  |         ✅ Tested         |  Deprecated  |
 | fabric-rendering-v0                  |        ⚠️ Missing        |  Deprecated  |
