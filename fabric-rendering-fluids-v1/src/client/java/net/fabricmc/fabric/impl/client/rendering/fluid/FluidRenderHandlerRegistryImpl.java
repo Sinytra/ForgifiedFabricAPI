@@ -54,6 +54,10 @@ public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistr
 	public FluidRenderHandlerRegistryImpl() {
 	}
 
+	public void registerHandlerOnly(Fluid fluid, FluidRenderHandler renderer) {
+		handlers.put(fluid, renderer);
+	}
+
 	@Override
 	public FluidRenderHandler get(Fluid fluid) {
 		return handlers.get(fluid);

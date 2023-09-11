@@ -16,11 +16,17 @@
 
 package net.fabricmc.fabric.impl.client.rendering.fluid;
 
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 @Mod("fabric_rendering_fluids_v1")
 public class FluidRenderingImpl {
     public FluidRenderingImpl() {
-
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		if (FMLLoader.getDist().isClient()) {
+			bus.addListener(FluidRendererCompat::onClientSetup);
+		}
     }
 }
