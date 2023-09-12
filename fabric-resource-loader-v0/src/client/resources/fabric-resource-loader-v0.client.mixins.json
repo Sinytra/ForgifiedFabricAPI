@@ -5,7 +5,8 @@
   "client": [
     "DefaultClientResourcePackProviderMixin",
     "FontManagerMixin",
-    "KeyedResourceReloadListenerClientMixin"
+    "KeyedResourceReloadListenerClientMixin",
+    "GameOptionsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
