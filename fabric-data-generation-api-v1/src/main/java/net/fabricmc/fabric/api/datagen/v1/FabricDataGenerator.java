@@ -57,14 +57,18 @@ public final class FabricDataGenerator extends DataGenerator {
 		return create(modid, event, event.getLookupProvider());
 	}
 
-	public static FabricDataGenerator create(String modid, GatherDataEvent event, RegistryBuilder registryBuilder) {
-		CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture = event.getLookupProvider().thenApply(r -> FabricDataGenHelper.createRegistryWrapper(r, registryBuilder));
-		return create(modid, event, registriesFuture);
+	public static FabricDataGenerator create(String modid, GatherDataEvent event, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
+		IModInfo modInfo = ModList.get().getModContainerById(modid).orElseThrow().getModInfo();
+		return create(modInfo, event, registries);
 	}
 
-	private static FabricDataGenerator create(String modid, GatherDataEvent event, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
+	public static FabricDataGenerator create(IModInfo modInfo, GatherDataEvent event, RegistryBuilder registryBuilder) {
+		CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture = event.getLookupProvider().thenApply(r -> FabricDataGenHelper.createRegistryWrapper(r, registryBuilder));
+		return create(modInfo, event, registriesFuture);
+	}
+
+	private static FabricDataGenerator create(IModInfo modInfo, GatherDataEvent event, CompletableFuture<RegistryWrapper.WrapperLookup> registries) {
 		final DataGenerator dataGenerator = event.getGenerator();
-		final IModInfo modInfo = ModList.get().getModContainerById(modid).orElseThrow().getModInfo();
 		return new FabricDataGenerator(dataGenerator, dataGenerator.getPackOutput().getPath(), modInfo, FabricDataGenHelper.STRICT_VALIDATION, registries);
 	}
 

@@ -30,7 +30,7 @@ loom {
 			data()
 			name "Data Generation"
 
-			programArgs "--mod", "fabric_data_gen_api_v1_testmod", "--all", "--output", file("src/testmod/generated").absolutePath
+			programArgs "--mod", "fabric_data_generation_api_v1", "--all", "--output", file("src/testmod/generated").absolutePath
 
 			ideConfigGenerated = true
 			runDir "build/datagen"

@@ -19,14 +19,17 @@ package net.fabricmc.fabric.test.datagen;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.*;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementFrame;
@@ -60,8 +63,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.JsonKeySortOrderCallback;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
@@ -73,16 +78,20 @@ import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
-import net.fabricmc.fabric.test.datagen.client.DataGeneratorClientTestEntrypoint;
 
-public class DataGeneratorTestEntrypoint {
+public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
+	private static final Logger LOGGER = LoggerFactory.getLogger(DataGeneratorTestEntrypoint.class);
 	private static final ConditionJsonProvider NEVER_LOADED = DefaultResourceConditions.allModsLoaded("a");
 	private static final ConditionJsonProvider ALWAYS_LOADED = DefaultResourceConditions.not(NEVER_LOADED);
 
-	public static void onGatherData(GatherDataEvent event) {
-		final RegistryBuilder builder = new RegistryBuilder().addRegistry(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, DataGeneratorTestEntrypoint::bootstrapTestDatagenRegistry);
-		final FabricDataGenerator fabricDataGenerator = FabricDataGenerator.create(MOD_ID, event, builder);
-		final FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
+	@Override
+	public void addJsonKeySortOrders(JsonKeySortOrderCallback callback) {
+		callback.add("trigger", 0);
+	}
+
+	@Override
+	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
+		final FabricDataGenerator.Pack pack = dataGenerator.createPack();
 
 		pack.addProvider(TestRecipeProvider::new);
 		pack.addProvider(TestModelProvider::new);
@@ -99,11 +108,25 @@ public class DataGeneratorTestEntrypoint {
 
 		// TODO replace with a client only entrypoint with FMJ 2
 		if (FMLLoader.getDist() == Dist.CLIENT) {
-			DataGeneratorClientTestEntrypoint.onInitializeDataGenerator(fabricDataGenerator);
+			try {
+				Class<?> clientEntrypointClass = Class.forName("net.fabricmc.fabric.test.datagen.client.DataGeneratorClientTestEntrypoint");
+				DataGeneratorEntrypoint entrypoint = (DataGeneratorEntrypoint) clientEntrypointClass.getConstructor().newInstance();
+				entrypoint.onInitializeDataGenerator(dataGenerator);
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
-	private static void bootstrapTestDatagenRegistry(Registerable<DataGeneratorTestContent.TestDatagenObject> registerable) {
+	@Override
+	public void buildRegistry(RegistryBuilder registryBuilder) {
+		registryBuilder.addRegistry(
+				TEST_DATAGEN_DYNAMIC_REGISTRY_KEY,
+				this::bootstrapTestDatagenRegistry
+		);
+	}
+
+	private void bootstrapTestDatagenRegistry(Registerable<DataGeneratorTestContent.TestDatagenObject> registerable) {
 		registerable.register(TEST_DYNAMIC_REGISTRY_ITEM_KEY, new DataGeneratorTestContent.TestDatagenObject(":tiny_potato:"));
 	}
 

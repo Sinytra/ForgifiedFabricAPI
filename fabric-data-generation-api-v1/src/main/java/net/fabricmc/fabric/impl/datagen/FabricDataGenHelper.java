@@ -16,22 +16,91 @@
 
 package net.fabricmc.fabric.impl.datagen;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import com.mojang.serialization.Lifecycle;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
-import net.minecraft.registry.*;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import net.minecraft.data.DataProvider;
+import net.minecraft.registry.BuiltinRegistries;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registerable;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryBuilder;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
+
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 
 public final class FabricDataGenHelper {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FabricDataGenHelper.class);
+
 	/**
 	 * When enabled providers can enable extra validation, such as ensuring all registry entries have data generated for them.
 	 */
 	public static final boolean STRICT_VALIDATION = System.getProperty("fabric-api.datagen.strict-validation") != null;
 
+	private static final Map<ModContainer, DataGeneratorEntrypoint> DATAGEN_ENTRYPOINTS = new HashMap<>();
+
+	public static void registerDatagenEntrypoint(DataGeneratorEntrypoint entrypoint) {
+		ModContainer modid = ModLoadingContext.get().getActiveContainer();
+		DATAGEN_ENTRYPOINTS.put(modid, entrypoint);
+	}
+	
 	private FabricDataGenHelper() {
+	}
+
+	static void onGatherData(GatherDataEvent event) {
+		Object2IntOpenHashMap<String> jsonKeySortOrders = (Object2IntOpenHashMap<String>) DataProvider.JSON_KEY_SORT_ORDER;
+		Object2IntOpenHashMap<String> defaultJsonKeySortOrders = new Object2IntOpenHashMap<>(jsonKeySortOrders);
+
+		DATAGEN_ENTRYPOINTS.forEach((modContainer, entrypoint) -> {
+			LOGGER.info("Running data generator for {}", modContainer.getModId());
+
+			try {
+				final String effectiveModId = entrypoint.getEffectiveModId();
+				IModInfo modInfo = modContainer.getModInfo();
+				HashSet<String> keys = new HashSet<>();
+				entrypoint.addJsonKeySortOrders((key, value) -> {
+					Objects.requireNonNull(key, "Tried to register a priority for a null key");
+					jsonKeySortOrders.put(key, value);
+					keys.add(key);
+				});
+
+				if (effectiveModId != null) {
+					modInfo = ModList.get().getModContainerById(effectiveModId).map(ModContainer::getModInfo).orElseThrow(() -> new RuntimeException("Failed to find effective mod container for mod id (%s)".formatted(effectiveModId)));
+				}
+
+				final RegistryBuilder builder = new RegistryBuilder();
+				entrypoint.buildRegistry(builder);
+
+				FabricDataGenerator dataGenerator = FabricDataGenerator.create(modInfo, event, builder);
+				entrypoint.onInitializeDataGenerator(dataGenerator);
+
+				jsonKeySortOrders.keySet().removeAll(keys);
+				jsonKeySortOrders.putAll(defaultJsonKeySortOrders);
+			} catch (Throwable t) {
+				throw new RuntimeException("Failed to run data generator from mod (%s)".formatted(modContainer.getModId()), t);
+			}
+		});
 	}
 
 	public static RegistryWrapper.WrapperLookup createRegistryWrapper(RegistryWrapper.WrapperLookup original, RegistryBuilder registryBuilder) {

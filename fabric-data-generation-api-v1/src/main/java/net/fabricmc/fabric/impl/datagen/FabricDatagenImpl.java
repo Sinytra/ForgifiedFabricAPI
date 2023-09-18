@@ -17,14 +17,19 @@
 package net.fabricmc.fabric.impl.datagen;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
-import net.minecraftforge.fml.common.Mod;
 
 @Mod("fabric_data_generation_api_v1")
 public class FabricDatagenImpl {
 
     public FabricDatagenImpl() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		bus.addListener(FabricDataGenHelper::onGatherData);
     }
 
     /**

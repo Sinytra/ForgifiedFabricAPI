@@ -19,6 +19,8 @@ package net.fabricmc.fabric.test.datagen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
+
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
@@ -76,7 +78,7 @@ public class DataGeneratorTestContent {
 		BLOCKS.register(bus);
 		ITEMS.register(bus);
 		ITEM_GROUPS.register(bus);
-		bus.addListener(DataGeneratorTestEntrypoint::onGatherData);
+		FabricDataGenHelper.registerDatagenEntrypoint(new DataGeneratorTestEntrypoint());
 
 		ItemGroupEvents.modifyEntriesEvent(SIMPLE_ITEM_GROUP.getKey()).register(entries -> entries.add(SIMPLE_BLOCK.get()));
 
