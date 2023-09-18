@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.test.renderer;
 
+import net.fabricmc.fabric.test.renderer.client.RandomSupplierTest;
 import net.fabricmc.fabric.test.renderer.client.RendererClientTest;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -54,6 +55,7 @@ public final class RendererTest {
 		Registration.init(bus);
 		if (FMLLoader.getDist().isClient()) {
 			RendererClientTest.onInitializeClient();
+			RandomSupplierTest.onInitializeClient();
 			bus.addListener(RendererClientTest::onClientSetup);
 		}
 	}
