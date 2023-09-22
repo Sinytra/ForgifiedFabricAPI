@@ -16,19 +16,9 @@
 
 package net.fabricmc.fabric.api.item.v1;
 
-import java.util.function.Consumer;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-
 import net.fabricmc.fabric.impl.item.FabricItemInternals;
-
-import net.minecraft.entity.LivingEntity;
-
-import net.minecraftforge.common.extensions.IForgeItem;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -37,9 +27,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-
-import net.fabricmc.fabric.impl.client.item.ItemApiClientEventHooks;
-import net.fabricmc.fabric.impl.item.ItemExtensions;
+import net.minecraftforge.common.extensions.IForgeItem;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * General-purpose Fabric-provided extensions for {@link Item} subclasses.
@@ -49,7 +38,7 @@ import net.fabricmc.fabric.impl.item.ItemExtensions;
  * <p>Note to maintainers: Functions should only be added to this interface if they are general-purpose enough,
  * to be evaluated on a case-by-case basis. Otherwise, they are better suited for more specialized APIs.
  */
-public interface FabricItem extends IForgeItem {
+public interface FabricItem {
 	/**
 	 * When the NBT of an item stack in the main hand or off hand changes, vanilla runs an "update animation".
 	 * This function is called on the client side when the NBT or count of the stack has changed, but not the item,
@@ -62,7 +51,7 @@ public interface FabricItem extends IForgeItem {
 	 * @return true to run the vanilla animation, false to cancel it.
 	 */
 	default boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-		return !FabricItemInternals.allowForgeCall() || shouldCauseReequipAnimation(oldStack, newStack, false);
+		return !FabricItemInternals.allowForgeCall() || ((IForgeItem) this).shouldCauseReequipAnimation(oldStack, newStack, false);
 	}
 
 	/**
@@ -76,7 +65,7 @@ public interface FabricItem extends IForgeItem {
 	 * @return true to allow continuing block breaking, false to reset the progress.
 	 */
 	default boolean allowContinuingBlockBreaking(PlayerEntity player, ItemStack oldStack, ItemStack newStack) {
-		return FabricItemInternals.allowForgeCall() && !shouldCauseBlockBreakReset(oldStack, newStack);
+		return FabricItemInternals.allowForgeCall() && !((IForgeItem) this).shouldCauseBlockBreakReset(oldStack, newStack);
 	}
 
 	/**
@@ -91,7 +80,7 @@ public interface FabricItem extends IForgeItem {
 	 */
 	default Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
 		if (FabricItemInternals.allowForgeCall()) {
-			return getAttributeModifiers(slot, stack);
+			return ((IForgeItem) this).getAttributeModifiers(slot, stack);
 		}
 		return HashMultimap.create();
 	}
@@ -105,7 +94,7 @@ public interface FabricItem extends IForgeItem {
 	 * @return true if drops can be harvested
 	 */
 	default boolean isSuitableFor(ItemStack stack, BlockState state) {
-		return FabricItemInternals.allowForgeCall() && isCorrectToolForDrops(stack, state);
+		return FabricItemInternals.allowForgeCall() && ((IForgeItem) this).isCorrectToolForDrops(stack, state);
 	}
 
 	/**
@@ -139,69 +128,8 @@ public interface FabricItem extends IForgeItem {
 	@ApiStatus.OverrideOnly
 	default ItemStack getRecipeRemainder(ItemStack stack) {
 		if (FabricItemInternals.allowForgeCall()) {
-			return getCraftingRemainingItem(stack);
+			return ((IForgeItem) this).getCraftingRemainingItem(stack);
 		}
 		return ItemStack.EMPTY;
-	}
-
-	// FFAPI: Forge default implementation
-
-	@Override
-	default ItemStack getCraftingRemainingItem(ItemStack stack) {
-		ItemStack fabricRemainder = FabricItemInternals.nonRecursiveApiCall(() -> getRecipeRemainder(stack));
-		if (!fabricRemainder.isEmpty()) {
-			return fabricRemainder;
-		}
-		return IForgeItem.super.hasCraftingRemainingItem(stack) ? new ItemStack(((Item) this).getRecipeRemainder()) : ItemStack.EMPTY;
-	}
-
-	@Override
-	default boolean hasCraftingRemainingItem(ItemStack stack) {
-		return !FabricItemInternals.nonRecursiveApiCall(() -> getRecipeRemainder(stack)).isEmpty() || IForgeItem.super.hasCraftingRemainingItem(stack);
-	}
-
-	@Override
-	default Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-		// Fetch forge attribute modifiers first
-		Multimap<EntityAttribute, EntityAttributeModifier> modifiers = HashMultimap.create(IForgeItem.super.getAttributeModifiers(slot, stack));
-		// Add all fabric attribute modifiers
-		modifiers.putAll(FabricItemInternals.nonRecursiveApiCall(() -> getAttributeModifiers(stack, slot)));
-		return modifiers;
-	}
-
-	@Override
-	default boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
-		return FabricItemInternals.nonRecursiveApiCall(() -> isSuitableFor(stack, state)) || IForgeItem.super.isCorrectToolForDrops(stack, state);
-	}
-
-	@Override
-	default boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-		if (IForgeItem.super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged)) {
-			PlayerEntity player = ItemApiClientEventHooks.getClientPlayerSafely();
-			Hand hand = oldStack == player.getMainHandStack() ? Hand.MAIN_HAND : Hand.OFF_HAND;
-			return FabricItemInternals.nonRecursiveApiCall(() -> allowNbtUpdateAnimation(player, hand, oldStack, newStack));
-		}
-		return false;
-	}
-
-	@Override
-	default boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
-		return IForgeItem.super.shouldCauseBlockBreakReset(oldStack, newStack) && FabricItemInternals.nonRecursiveApiCall(() -> !allowContinuingBlockBreaking(ItemApiClientEventHooks.getClientPlayerSafely(), oldStack, newStack));
-	}
-
-	@Override
-	@Nullable
-	default EquipmentSlot getEquipmentSlot(ItemStack stack) {
-		EquipmentSlotProvider equipmentSlotProvider = ((ItemExtensions) stack.getItem()).fabric_getEquipmentSlotProvider();
-		return equipmentSlotProvider != null ? equipmentSlotProvider.getPreferredEquipmentSlot(stack) : IForgeItem.super.getEquipmentSlot(stack);
-	}
-
-	@Override
-	default <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<T> onBroken) {
-		CustomDamageHandler handler = ((ItemExtensions) this).fabric_getCustomDamageHandler();
-		if (handler != null) {
-			return handler.damage(stack, amount, entity, (Consumer<LivingEntity>) onBroken);
-		}
-		return IForgeItem.super.damageItem(stack, amount, entity, onBroken);
 	}
 }
