@@ -26,11 +26,11 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 public final class ForgeCompatUtil {
 
     public static int toForgeBucket(int amount) {
-        return (int) (amount / FluidConstants.BUCKET * FluidType.BUCKET_VOLUME);
+        return (int) (amount / (double) FluidConstants.BUCKET * FluidType.BUCKET_VOLUME);
     }
 
     public static int toFabricBucket(int amount) {
-        return (int) (amount / FluidType.BUCKET_VOLUME * FluidConstants.BUCKET);
+        return (int) (amount / (double) FluidType.BUCKET_VOLUME * FluidConstants.BUCKET);
     }
 
     public static FluidStack toForgeFluidStack(StorageView<FluidVariant> view) {
