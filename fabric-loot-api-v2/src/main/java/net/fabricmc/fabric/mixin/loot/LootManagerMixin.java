@@ -91,7 +91,9 @@ abstract class LootManagerMixin {
 			LootTableEvents.MODIFY.invoker().modifyLootTable(resourceManager, lootManager, dataKey.id(), builder, source);
 
 			// Turn the builder back into a loot table and store it in the new table.
-			newTables.put(dataKey, builder.build());
+			LootTable newTable = builder.build();
+			newTable.setLootTableId(table.getLootTableId());
+			newTables.put(dataKey, newTable);
 		});
 
 		this.keyToValue = newTables.build();
