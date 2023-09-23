@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -92,7 +93,10 @@ abstract class LootManagerMixin {
 
 			// Turn the builder back into a loot table and store it in the new table.
 			LootTable newTable = builder.build();
-			newTable.setLootTableId(table.getLootTableId());
+			Identifier id = table.getLootTableId();
+			if (id != null) {
+				newTable.setLootTableId(id);
+			}
 			newTables.put(dataKey, newTable);
 		});
 
