@@ -1,0 +1,4 @@
+{
+  "implementFabricBlock": "META-INF/asm/implementFabricBlock.js",
+  "implementFabricBlockState": "META-INF/asm/implementFabricBlockState.js"
+}

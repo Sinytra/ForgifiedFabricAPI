@@ -22,7 +22,6 @@
   },
   "description": "Hooks for blocks",
   "mixins": [
-    "fabric-block-api-v1.mixins.json"
   ],
   "custom": {
     "fabric-api:module-lifecycle": "stable",

@@ -16,15 +16,13 @@
 
 package net.fabricmc.fabric.api.block.v1;
 
-import net.minecraftforge.common.extensions.IForgeBlock;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * General-purpose Fabric-provided extensions for {@link Block} subclasses.
@@ -33,7 +31,7 @@ import net.minecraft.world.World;
  */
 // Note to maintainers: Functions should only be added to this interface if they are general-purpose enough,
 // to be evaluated on a case-by-case basis. Otherwise, they are better suited for more specialized APIs.
-public interface FabricBlock extends IForgeBlock {
+public interface FabricBlock {
 	/**
 	 * Return the current appearance of the block, i.e. which block state this block reports to look like on a given side.
 	 *
@@ -100,6 +98,6 @@ public interface FabricBlock extends IForgeBlock {
 	 * @return the appearance of the block on the given side; the original {@code state} can be returned if there is no better option
 	 */
 	default BlockState getAppearance(BlockState state, BlockRenderView renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
-		return IForgeBlock.super.getAppearance(state, renderView, pos, side, sourceState, sourcePos);
+		return state;
 	}
 }
