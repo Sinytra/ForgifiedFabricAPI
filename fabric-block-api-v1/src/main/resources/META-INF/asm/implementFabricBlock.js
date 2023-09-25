@@ -36,7 +36,7 @@ function initializeCoreMod() {
                     new VarInsnNode(Opcodes.ALOAD, 4),
                     new VarInsnNode(Opcodes.ALOAD, 5),
                     new VarInsnNode(Opcodes.ALOAD, 6),
-                    new MethodInsnNode(Opcodes.INVOKESPECIAL, 'net/fabricmc/fabric/api/block/v1/FabricBlock', 'getAppearance', getAppearanceDesc),
+                    new MethodInsnNode(Opcodes.INVOKESPECIAL, 'net/fabricmc/fabric/api/block/v1/FabricBlock', 'getAppearance', getAppearanceDesc, true),
                     new InsnNode(Opcodes.ARETURN)
                 );
                 node.instructions.insert(list);
