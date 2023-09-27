@@ -47,7 +47,7 @@ public final class FluidRendererCompat {
 		Map<FluidType, FluidRenderHandler> forgeHandlers = new HashMap<>();
 		for (Map.Entry<RegistryKey<Fluid>, Fluid> entry : ForgeRegistries.FLUIDS.getEntries()) {
 			Fluid fluid = entry.getValue();
-			if (fluid != Fluids.EMPTY && IClientFluidTypeExtensions.of(fluid) == IClientFluidTypeExtensions.DEFAULT) {
+			if (fluid != Fluids.EMPTY && FluidRenderHandlerRegistry.INSTANCE.get(fluid) == null) {
 				FluidRenderHandler handler = forgeHandlers.computeIfAbsent(fluid.getFluidType(), ForgeFluidRenderHandler::new);
 				((FluidRenderHandlerRegistryImpl) FluidRenderHandlerRegistry.INSTANCE).registerHandlerOnly(fluid, handler);
 			}
