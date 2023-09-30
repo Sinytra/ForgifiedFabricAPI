@@ -56,10 +56,10 @@ public class TransferApiForgeCompat {
 		event.addCapability(new Identifier(TransferApiImpl.MODID, "forge_bridge"), new ICapabilityProvider() {
 			@Override
 			public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-				if (!COMPUTING_CAPABILITY_LOCK.get()) {
+				if (!COMPUTING_CAPABILITY_LOCK.get() && be.hasWorld()) {
 					if (cap == ForgeCapabilities.ITEM_HANDLER) {
 						COMPUTING_CAPABILITY_LOCK.set(true);
-						Storage<ItemVariant> storage = ItemStorage.SIDED.find(be.getWorld(), be.getPos(), side);
+						Storage<ItemVariant> storage = ItemStorage.SIDED.find(be.getWorld(), be.getPos(), be.getCachedState(), be, side);
 						COMPUTING_CAPABILITY_LOCK.set(false);
 						if (storage != null) {
 							return CAPS.computeIfAbsent(storage, s -> LazyOptional.of(() -> storage instanceof SlottedStorage<ItemVariant> slotted ? new SlottedItemStorageItemHandler(slotted) : new ItemStorageItemHandler(storage))).cast();
@@ -67,7 +67,7 @@ public class TransferApiForgeCompat {
 					}
 					if (cap == ForgeCapabilities.FLUID_HANDLER) {
 						COMPUTING_CAPABILITY_LOCK.set(true);
-						Storage<FluidVariant> storage = FluidStorage.SIDED.find(be.getWorld(), be.getPos(), side);
+						Storage<FluidVariant> storage = FluidStorage.SIDED.find(be.getWorld(), be.getPos(), be.getCachedState(), be, side);
 						COMPUTING_CAPABILITY_LOCK.set(false);
 						if (storage != null) {
 							return CAPS.computeIfAbsent(storage, s -> LazyOptional.of(() -> new FluidStorageFluidHandler(storage))).cast();
@@ -87,7 +87,6 @@ public class TransferApiForgeCompat {
 				if (!COMPUTING_CAPABILITY_LOCK.get()) {
 					if (cap == ForgeCapabilities.FLUID_HANDLER_ITEM) {
 						COMPUTING_CAPABILITY_LOCK.set(true);
-						// TODO Context
 						Storage<FluidVariant> storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
 						COMPUTING_CAPABILITY_LOCK.set(false);
 						if (storage != null) {
