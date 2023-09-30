@@ -80,22 +80,26 @@ public class TransferApiForgeCompat {
 	}
 
 	private static void onAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-		ItemStack stack = event.getObject();
-		event.addCapability(new Identifier(TransferApiImpl.MODID, "forge_bridge"), new ICapabilityProvider() {
-			@Override
-			public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-				if (!COMPUTING_CAPABILITY_LOCK.get()) {
-					if (cap == ForgeCapabilities.FLUID_HANDLER_ITEM) {
-						COMPUTING_CAPABILITY_LOCK.set(true);
-						Storage<FluidVariant> storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
-						COMPUTING_CAPABILITY_LOCK.set(false);
-						if (storage != null) {
-							return CAPS.computeIfAbsent(storage, b -> LazyOptional.of(() -> new FluidStorageFluidHandlerItem(storage, stack))).cast();
-						}
-					}
-				}
-				return LazyOptional.empty();
-			}
-		});
+		// TODO Find a way to pass interaction context
+		// This is currently broken; when interacting forge blocks with fabric fluid containers, there is no way for
+		// the container to access the player's inventory and empty itself. As a result, the fabric item provides an
+		// infinite source of fluid.
+//		ItemStack stack = event.getObject();
+//		event.addCapability(new Identifier(TransferApiImpl.MODID, "forge_bridge"), new ICapabilityProvider() {
+//			@Override
+//			public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+//				if (!COMPUTING_CAPABILITY_LOCK.get()) {
+//					if (cap == ForgeCapabilities.FLUID_HANDLER_ITEM) {
+//						COMPUTING_CAPABILITY_LOCK.set(true);
+//						Storage<FluidVariant> storage = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
+//						COMPUTING_CAPABILITY_LOCK.set(false);
+//						if (storage != null) {
+//							return CAPS.computeIfAbsent(storage, b -> LazyOptional.of(() -> new FluidStorageFluidHandlerItem(storage, stack))).cast();
+//						}
+//					}
+//				}
+//				return LazyOptional.empty();
+//			}
+//		});
 	}
 }
