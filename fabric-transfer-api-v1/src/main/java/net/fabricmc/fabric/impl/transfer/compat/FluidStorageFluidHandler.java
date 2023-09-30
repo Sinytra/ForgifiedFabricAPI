@@ -93,7 +93,7 @@ public class FluidStorageFluidHandler implements IFluidHandler {
         for (StorageView<FluidVariant> view : storage.nonEmptyViews()) {
             try (Transaction transaction = Transaction.openOuter()) {
                 FluidVariant resource = view.getResource();
-                int drained = (int) storage.extract(resource, maxDrain, transaction);
+                int drained = (int) storage.extract(resource, ForgeCompatUtil.toFabricBucket(maxDrain), transaction);
                 if (action.execute()) {
                     transaction.commit();
                 }
