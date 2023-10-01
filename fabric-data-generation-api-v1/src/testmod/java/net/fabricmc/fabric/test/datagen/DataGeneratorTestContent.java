@@ -72,6 +72,9 @@ public class DataGeneratorTestContent {
 			TEST_DATAGEN_DYNAMIC_REGISTRY_KEY,
 			new Identifier(MOD_ID, "tiny_potato")
 	);
+	// Empty registry
+	public static final RegistryKey<Registry<TestDatagenObject>> TEST_DATAGEN_DYNAMIC_EMPTY_REGISTRY_KEY =
+			RegistryKey.ofRegistry(new Identifier("fabric", "test_datagen_dynamic_empty"));
 
 	public DataGeneratorTestContent() {
 		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -83,6 +86,7 @@ public class DataGeneratorTestContent {
 		ItemGroupEvents.modifyEntriesEvent(SIMPLE_ITEM_GROUP.getKey()).register(entries -> entries.add(SIMPLE_BLOCK.get()));
 
 		DynamicRegistries.register(TEST_DATAGEN_DYNAMIC_REGISTRY_KEY, TestDatagenObject.CODEC);
+		DynamicRegistries.register(TEST_DATAGEN_DYNAMIC_EMPTY_REGISTRY_KEY, TestDatagenObject.CODEC);
 	}
 
 	private static RegistryObject<Block> register(String name, boolean hasItem, AbstractBlock.Settings settings) {
