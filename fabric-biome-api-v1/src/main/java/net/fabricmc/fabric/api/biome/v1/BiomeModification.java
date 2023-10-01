@@ -27,7 +27,10 @@ import org.jetbrains.annotations.ApiStatus;
 import net.minecraft.util.Identifier;
 
 /**
- * <b>Experimental feature</b>, may be removed or changed without further notice.
+ * Provides methods for modifying biomes. To create an instance, call
+ * {@link BiomeModifications#create(Identifier)}.
+ *
+ * <p><b>Experimental feature</b>, may be removed or changed without further notice.
  *
  * @see BiomeModifications
  */
