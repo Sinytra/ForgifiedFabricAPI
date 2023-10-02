@@ -16,14 +16,15 @@
 
 package net.fabricmc.fabric.impl.gamerule;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraftforge.coremod.api.ASMAPI;
-
+import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraft.client.gui.screen.world.EditGameRulesScreen;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraftforge.coremod.api.ASMAPI;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 
 // Provides access to instance fields of anonymous classes via reflection
 // as a replacement for Shadow fields due to an ongoing mixin issue https://github.com/SpongePowered/Mixin/issues/560
@@ -33,11 +34,11 @@ public final class GameRuleReflectionUtils {
 
     static {
         try {
-            Class<?> cls = Class.forName("net.minecraft.client.gui.screen.world.EditGameRulesScreen$RuleListWidget$1");
+            Class<?> cls = Class.forName(ObfuscationReflectionHelper.remapName(INameMappingService.Domain.CLASS, "net.minecraft.client.gui.screens.worldselection.EditGameRulesScreen$RuleList$1"));
             MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(cls, MethodHandles.lookup());
             OWN_GAME_RULES_SCREEN = lookup.findVarHandle(cls, ASMAPI.mapField("f_101213_"), EditGameRulesScreen.class);
 
-            Class<?> gameRuleCommandsCls = Class.forName("net.minecraft.server.command.GameRuleCommand$1");
+            Class<?> gameRuleCommandsCls = Class.forName(ObfuscationReflectionHelper.remapName(INameMappingService.Domain.CLASS, "net.minecraft.server.commands.GameRuleCommand$1"));
             MethodHandles.Lookup gameRuleCommandLookup = MethodHandles.privateLookupIn(gameRuleCommandsCls, MethodHandles.lookup());
             OWN_ARGUMENT_BUILDER = gameRuleCommandLookup.findVarHandle(gameRuleCommandsCls, ASMAPI.mapField("f_137760_"), LiteralArgumentBuilder.class);
         } catch (Throwable t) {
