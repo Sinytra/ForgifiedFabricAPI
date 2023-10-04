@@ -60,7 +60,8 @@ public class ItemStorageItemHandler implements IItemHandler {
             if (!simulate) {
                 transaction.commit();
             }
-            return resource.toStack(inserted);
+            int remainder = stack.getCount() - inserted;
+            return resource.toStack(remainder);
         }
     }
 

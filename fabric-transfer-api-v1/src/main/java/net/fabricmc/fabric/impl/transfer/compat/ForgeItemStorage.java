@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.primitives.Ints;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -40,21 +41,23 @@ public class ForgeItemStorage implements Storage<ItemVariant> {
 
     @Override
     public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-        int inserted = ItemHandlerHelper.insertItem(this.handler, resource.toStack((int) maxAmount), true).getCount();
+        int normalMaxAmount = Ints.saturatedCast(maxAmount);
+        int inserted = ItemHandlerHelper.insertItem(this.handler, resource.toStack(normalMaxAmount), true).getCount();
         transaction.addCloseCallback((context, result) -> {
             if (result.wasCommitted()) {
-                ItemHandlerHelper.insertItem(this.handler, resource.toStack((int) maxAmount), false);
+                ItemHandlerHelper.insertItem(this.handler, resource.toStack(normalMaxAmount), false);
             }
         });
-        return inserted;
+        return normalMaxAmount - inserted;
     }
 
     @Override
     public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-        int extracted = extractItem(this.handler, resource, (int) maxAmount, true).getCount();
+        int normalMaxAmount = Ints.saturatedCast(maxAmount);
+        int extracted = extractItem(this.handler, resource, normalMaxAmount, true).getCount();
         transaction.addCloseCallback((context, result) -> {
             if (result.wasCommitted()) {
-                extractItem(this.handler, resource, (int) maxAmount, false);
+                extractItem(this.handler, resource, normalMaxAmount, false);
             }
         });
         return extracted;
@@ -63,8 +66,8 @@ public class ForgeItemStorage implements Storage<ItemVariant> {
     @Override
     public Iterator<StorageView<ItemVariant>> iterator() {
         List<StorageView<ItemVariant>> views = new ArrayList<>();
-        for (int i = 0; i < handler.getSlots(); i++) {
-            views.add(new ForgeItemView(handler, i));
+        for (int i = 0; i < this.handler.getSlots(); i++) {
+            views.add(new ForgeItemView(this.handler, i));
         }
         return views.iterator();
     }

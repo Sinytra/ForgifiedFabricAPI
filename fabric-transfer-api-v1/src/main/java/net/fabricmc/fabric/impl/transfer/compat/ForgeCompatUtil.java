@@ -49,6 +49,5 @@ public final class ForgeCompatUtil {
         return !stack.isEmpty() ? FluidVariant.of(stack.getFluid(), stack.getTag()) : FluidVariant.blank();
     }
 
-    private ForgeCompatUtil() {
-    }
+    private ForgeCompatUtil() {}
 }
