@@ -77,17 +77,15 @@ function initializeCoreMod() {
                 'methodDesc': yarn ? '(Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/item/ItemStack;)Lcom/google/common/collect/Multimap;' : '(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)Lcom/google/common/collect/Multimap;'
             },
             'transformer': function (node) {
-                var insn = ASMAPI.findFirstInstruction(node, Opcodes.ARETURN);
-                if (insn != null) {
-                    var callDesc = yarn ? '(Lcom/google/common/collect/Multimap;Lnet/fabricmc/fabric/api/item/v1/FabricItem;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/item/ItemStack;)Lcom/google/common/collect/Multimap;' : '(Lcom/google/common/collect/Multimap;Lnet/fabricmc/fabric/api/item/v1/FabricItem;Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)Lcom/google/common/collect/Multimap;';
-                    var list = ASMAPI.listOf(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new VarInsnNode(Opcodes.ALOAD, 1),
-                        new VarInsnNode(Opcodes.ALOAD, 2),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, 'net/fabricmc/fabric/impl/item/FabricItemImplHooks', 'getAttributeModifiers', callDesc)
-                    );
-                    node.instructions.insertBefore(insn, list);
-                }
+                var callDesc = yarn ? '(Lnet/fabricmc/fabric/api/item/v1/FabricItem;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/item/ItemStack;)Lcom/google/common/collect/Multimap;' : '(Lnet/fabricmc/fabric/api/item/v1/FabricItem;Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)Lcom/google/common/collect/Multimap;';
+                var list = ASMAPI.listOf(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new VarInsnNode(Opcodes.ALOAD, 2),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, 'net/fabricmc/fabric/impl/item/FabricItemImplHooks', 'getAttributeModifiers', callDesc),
+                    new InsnNode(Opcodes.ARETURN)
+                );
+                node.instructions.insert(list);
                 return node;
             }
         },

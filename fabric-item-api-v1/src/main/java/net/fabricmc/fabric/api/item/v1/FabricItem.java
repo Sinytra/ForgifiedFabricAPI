@@ -82,7 +82,7 @@ public interface FabricItem {
 		if (FabricItemInternals.allowForgeCall()) {
 			return ((IForgeItem) this).getAttributeModifiers(slot, stack);
 		}
-		return HashMultimap.create();
+		return ((Item) this).getAttributeModifiers(slot);
 	}
 
 	/**

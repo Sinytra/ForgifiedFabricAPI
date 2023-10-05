@@ -43,12 +43,8 @@ public final class FabricItemImplHooks {
         return !FabricItemInternals.nonRecursiveApiCall(() -> item.getRecipeRemainder(stack)).isEmpty();
     }
 
-    public static Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(Multimap<EntityAttribute, EntityAttributeModifier> existing, FabricItem item, EquipmentSlot slot, ItemStack stack) {
-        // Fetch forge attribute modifiers first
-        Multimap<EntityAttribute, EntityAttributeModifier> modifiers = HashMultimap.create(existing);
-        // Add all fabric attribute modifiers
-        modifiers.putAll(FabricItemInternals.nonRecursiveApiCall(() -> item.getAttributeModifiers(stack, slot)));
-        return modifiers;
+    public static Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(FabricItem item, EquipmentSlot slot, ItemStack stack) {
+        return FabricItemInternals.nonRecursiveApiCall(() -> item.getAttributeModifiers(stack, slot));
     }
 
     public static boolean isCorrectToolForDrops(FabricItem item, ItemStack stack, BlockState state) {
