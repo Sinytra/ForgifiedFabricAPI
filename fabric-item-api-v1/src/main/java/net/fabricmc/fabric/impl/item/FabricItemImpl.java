@@ -16,18 +16,21 @@
 
 package net.fabricmc.fabric.impl.item;
 
+import com.google.common.collect.Multimap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLLoader;
 
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+
 import net.fabricmc.fabric.api.item.v1.ModifyItemAttributeModifiersCallback;
 import net.fabricmc.fabric.impl.client.item.ItemApiClientEventHooks;
 
 @Mod("fabric_item_api_v1")
 public class FabricItemImpl {
-
 	public FabricItemImpl() {
 		if (FMLLoader.getDist() == Dist.CLIENT) {
 			MinecraftForge.EVENT_BUS.register(ItemApiClientEventHooks.class);
@@ -36,6 +39,7 @@ public class FabricItemImpl {
 	}
 
 	private static void modifyItemAttributeModifiers(ItemAttributeModifierEvent event) {
-		ModifyItemAttributeModifiersCallback.EVENT.invoker().modifyAttributeModifiers(event.getItemStack(), event.getSlotType(), event.getModifiers());
+		Multimap<EntityAttribute, EntityAttributeModifier> modifiers = FabricItemInternals.getModifiableAttributesMap(event);
+		ModifyItemAttributeModifiersCallback.EVENT.invoker().modifyAttributeModifiers(event.getItemStack(), event.getSlotType(), modifiers);
 	}
 }

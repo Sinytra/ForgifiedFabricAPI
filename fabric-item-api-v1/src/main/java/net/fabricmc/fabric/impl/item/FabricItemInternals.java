@@ -16,9 +16,19 @@
 
 package net.fabricmc.fabric.impl.item;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
 
+import com.google.common.collect.Multimap;
+import cpw.mods.modlauncher.api.LamdbaExceptionUtils;
+
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+
+import net.minecraftforge.event.ItemAttributeModifierEvent;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
@@ -29,6 +39,7 @@ import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
 public final class FabricItemInternals {
 	public static final ThreadLocal<Boolean> FORGE_CALL = ThreadLocal.withInitial(() -> false);
 	private static final WeakHashMap<Item.Settings, ExtraData> extraData = new WeakHashMap<>();
+	private static final MethodHandle MODIFIABLE_ATTRIBUTES = LamdbaExceptionUtils.uncheck(() -> MethodHandles.privateLookupIn(ItemAttributeModifierEvent.class, MethodHandles.lookup()).findVirtual(ItemAttributeModifierEvent.class, "getModifiableMap", MethodType.methodType(Multimap.class)));
 
 	private FabricItemInternals() {
 	}
@@ -55,6 +66,14 @@ public final class FabricItemInternals {
 
 	public static boolean allowForgeCall() {
 		return !FORGE_CALL.get();
+	}
+
+	public static Multimap<EntityAttribute, EntityAttributeModifier> getModifiableAttributesMap(ItemAttributeModifierEvent event) {
+		try {
+			return (Multimap<EntityAttribute, EntityAttributeModifier>) MODIFIABLE_ATTRIBUTES.invokeExact(event);
+		} catch (Throwable e) {
+			throw new RuntimeException("Error invoking getModifiableMap", e);
+		}
 	}
 
 	public static final class ExtraData {
