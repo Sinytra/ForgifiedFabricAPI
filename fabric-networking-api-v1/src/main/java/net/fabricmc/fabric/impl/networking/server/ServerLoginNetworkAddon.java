@@ -27,13 +27,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.netty.util.concurrent.GenericFutureListener;
-import net.minecraftforge.network.LoginWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.login.LoginQueryResponseC2SPacket;
 import net.minecraft.network.packet.s2c.login.LoginCompressionS2CPacket;
 import net.minecraft.network.packet.s2c.login.LoginQueryRequestS2CPacket;
@@ -57,6 +56,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 	private final QueryIdFactory queryIdFactory;
 	private final Collection<Future<?>> waits = new ConcurrentLinkedQueue<>();
 	private final Map<Integer, Identifier> channels = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap.KeySetView<Integer, Boolean> ignoredQueries = ConcurrentHashMap.newKeySet();
 	private boolean firstQueryTick = true;
 
 	public ServerLoginNetworkAddon(ServerLoginNetworkHandler handler) {
@@ -137,6 +137,9 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 
 	private boolean handle(int queryId, @Nullable PacketByteBuf originalBuf) {
 		this.logger.debug("Handling inbound login query with id {}", queryId);
+		if (this.ignoredQueries.remove(queryId)) {
+			return false;
+		}
 		Identifier channel = this.channels.remove(queryId);
 
 		if (channel == null) {
@@ -193,6 +196,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 	public void registerOutgoingPacket(LoginQueryRequestS2CPacket packet) {
 		// Ignore packets sent by FML mods
 		if (ServerNetworkingImpl.LOGIN.getHandler(packet.getChannel()) == null) {
+			this.ignoredQueries.add(packet.getQueryId());
 			return;
 		}
 		this.channels.put(packet.getQueryId(), packet.getChannel());
