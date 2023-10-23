@@ -119,7 +119,7 @@ Each module contains its own `README.md`* explaining the module's purpose and ad
 |:-------------------------------------|:------------------------:|:------------:|
 | fabric-api-base                      |         ✅ Tested         |    Stable    |
 | fabric-api-lookup-api-v1             |         ✅ Tested         |    Stable    |
-| fabric-biome-api-v1                  |         ✅ Tested         | Experimental |
+| fabric-biome-api-v1                  |         ✅ Tested         |    Stable    |
 | fabric-block-api-v1                  |         ✅ Tested         |    Stable    |
 | fabric-block-view-api-v2             |         ✅ Tested         |    Stable    |
 | fabric-blockrenderlayer-v1           |         ✅ Tested         |    Stable    |
@@ -139,7 +139,7 @@ Each module contains its own `README.md`* explaining the module's purpose and ad
 | fabric-key-binding-api-v1            |         ✅ Tested         |    Stable    |
 | fabric-lifecycle-events-v1           |         ✅ Tested         |    Stable    |
 | fabric-loot-api-v2                   |         ✅ Tested         |    Stable    |
-| fabric-message-api-v1                |         ✅ Tested         | Experimental |
+| fabric-message-api-v1                |         ✅ Tested         |    Stable    |
 | fabric-mining-level-api-v1           |         ✅ Tested         |    Stable    |
 | fabric-model-loading-api-v1          |         ✅ Tested         |    Stable    |
 | fabric-networking-api-v1             |         ✅ Tested         |    Stable    |
@@ -151,20 +151,20 @@ Each module contains its own `README.md`* explaining the module's purpose and ad
 | fabric-renderer-indigo               |         ✅ Tested         |    Stable    |
 | fabric-rendering-fluids-v1           |         ✅ Tested         |    Stable    |
 | fabric-rendering-v1                  |         ✅ Tested         |    Stable    |
-| fabric-resource-conditions-api-v1    |         ✅ Tested         | Experimental |
+| fabric-resource-conditions-api-v1    |         ✅ Tested         |    Stable    |
 | fabric-resource-loader-v0            |         ✅ Tested         |    Stable    |
 | fabric-screen-api-v1                 |         ✅ Tested         |    Stable    |
 | fabric-screen-handler-api-v1         |         ✅ Tested         |    Stable    |
 | fabric-sound-api-v1                  |         ✅ Tested         |    Stable    |
 | fabric-transfer-api-v1               |         ✅ Tested         | Experimental |
 | fabric-transitive-access-wideners-v1 |         ✅ Tested         |    Stable    |
-| fabric-command-api-v1                |        ⚠️ Missing        |  Deprecated  |
+| fabric-command-api-v1                |         ✅ Tested         |  Deprecated  |
 | fabric-commands-v0                   |        ⚠️ Missing        |  Deprecated  |
 | fabric-containers-v0                 |        ⚠️ Missing        |  Deprecated  |
 | fabric-events-lifecycle-v0           |        ⚠️ Missing        |  Deprecated  |
 | fabric-keybindings-v0                |        ⚠️ Missing        |  Deprecated  |
 | fabric-loot-tables-v1                |        ⚠️ Missing        |  Deprecated  |
-| fabric-models-v0                     |         ✅ Tested         |    Stable    |
+| fabric-models-v0                     |         ✅ Tested         |  Deprecated  |
 | fabric-networking-v0                 |        ⚠️ Missing        |  Deprecated  |
 | fabric-renderer-registries-v1        |        ⚠️ Missing        |  Deprecated  |
 | fabric-rendering-data-attachment-v1  |         ✅ Tested         |  Deprecated  |

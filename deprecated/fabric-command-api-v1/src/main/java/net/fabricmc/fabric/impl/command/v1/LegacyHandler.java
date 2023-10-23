@@ -18,13 +18,14 @@ package net.fabricmc.fabric.impl.command.v1;
 
 import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
-public final class LegacyHandler implements ModInitializer {
-	@Override
+import net.minecraftforge.fml.common.Mod;
+
+@Mod("fabric_command_api_v1")
+public final class LegacyHandler {
 	@SuppressWarnings("deprecation")
-	public void onInitialize() {
+	public LegacyHandler() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback.EVENT.invoker().register(dispatcher, environment == RegistrationEnvironment.DEDICATED));
 	}
 }
