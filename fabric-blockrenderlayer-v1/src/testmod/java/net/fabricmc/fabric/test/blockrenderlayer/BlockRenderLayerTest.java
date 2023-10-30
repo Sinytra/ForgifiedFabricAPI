@@ -60,6 +60,9 @@ public class BlockRenderLayerTest {
             if (RenderLayers.getFluidLayer(EXAMPLE_FLUID.get().getDefaultState()) != RenderLayer.getTranslucent()) {
                 throw new AssertionError("Expected render type of EXAMPLE_FLUID to be RenderType.translucent");
             }
+            if (RenderLayers.getBlockLayer(EXAMPLE_BLOCK.get().getDefaultState()) != RenderLayer.getCutout()) {
+				throw new AssertionError("Expected EXAMPLE_BLOCK to be RenderType.cutout");
+            }
 
             // Success!
             LOGGER.info("The tests for block render type layers passed!");
