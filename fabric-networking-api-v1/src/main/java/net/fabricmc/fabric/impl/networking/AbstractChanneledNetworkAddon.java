@@ -76,7 +76,7 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 
 	// always supposed to handle async!
 	protected boolean handle(Identifier channelName, PacketByteBuf originalBuf) {
-		this.logger.debug("Handling inbound packet from channel with name \"{}\"", channelName);
+		this.logger.debug(ClientConnection.PACKET_RECEIVED_MARKER, "Handling inbound packet from channel with name \"{}\"", channelName);
 
 		// Handle reserved packets
 		if (NetworkingImpl.REGISTER_CHANNEL.equals(channelName)) {
