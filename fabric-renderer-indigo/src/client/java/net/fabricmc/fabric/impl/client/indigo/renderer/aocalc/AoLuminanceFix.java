@@ -37,6 +37,6 @@ public interface AoLuminanceFix {
 	}
 
 	static float fixed(BlockView view, BlockPos pos, BlockState state) {
-		return state.getLuminance() == 0 ? state.getAmbientOcclusionLightLevel(view, pos) : 1f;
+		return state.getLightEmission(view, pos) == 0 ? state.getAmbientOcclusionLightLevel(view, pos) : 1f;
 	}
 }

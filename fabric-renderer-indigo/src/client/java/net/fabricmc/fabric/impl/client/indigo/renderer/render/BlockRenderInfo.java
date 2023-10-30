@@ -84,7 +84,7 @@ public class BlockRenderInfo {
 		this.blockState = blockState;
 
 		useAo = MinecraftClient.isAmbientOcclusionEnabled();
-		defaultAo = useAo && modelAo && blockState.getLuminance() == 0;
+		defaultAo = useAo && modelAo && blockState.getLightEmission(this.blockView, blockPos) == 0;
 
 		blockModelData = modelData;
 		defaultLayer = renderLayer;

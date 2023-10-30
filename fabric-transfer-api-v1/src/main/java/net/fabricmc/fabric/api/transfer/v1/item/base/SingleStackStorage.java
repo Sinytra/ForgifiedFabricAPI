@@ -80,7 +80,7 @@ public abstract class SingleStackStorage extends SnapshotParticipant<ItemStack> 
 	 * @return The maximum capacity of this storage for the passed item variant.
 	 */
 	protected int getCapacity(ItemVariant itemVariant) {
-		return itemVariant.getItem().getMaxCount();
+		return itemVariant.toStack().getMaxCount();
 	}
 
 	@Override

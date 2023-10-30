@@ -528,7 +528,7 @@ public abstract class AoCalculator {
 			// See AoCalculator#meanBrightness.
 			int i = world.getLightLevel(LightType.SKY, pos);
 			int j = world.getLightLevel(LightType.BLOCK, pos);
-			int k = state.getLuminance();
+			int k = state.getLightEmission(world, pos);
 
 			if (j < k) {
 				j = k;
