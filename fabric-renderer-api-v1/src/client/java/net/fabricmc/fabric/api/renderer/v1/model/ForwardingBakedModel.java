@@ -20,11 +20,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelOverrideList;
 import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -32,6 +35,11 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+
+import net.minecraftforge.client.ChunkRenderTypeSet;
+import net.minecraftforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base class for specialized model implementations that need to wrap other baked models.
@@ -99,5 +107,51 @@ public abstract class ForwardingBakedModel implements BakedModel, WrapperBakedMo
 	@Override
 	public BakedModel getWrappedModel() {
 		return wrapped;
+	}
+
+	@Override
+	@NotNull
+	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull Random rand, @NotNull ModelData data, @Nullable RenderLayer renderType) {
+		return wrapped.getQuads(state, side, rand, data, renderType);
+	}
+
+	@Override
+	public boolean useAmbientOcclusion(BlockState state) {
+		return wrapped.useAmbientOcclusion(state);
+	}
+
+	@Override
+	public boolean useAmbientOcclusion(BlockState state, RenderLayer renderType) {
+		return wrapped.useAmbientOcclusion(state, renderType);
+	}
+
+	@Override
+	public BakedModel applyTransform(ModelTransformationMode transformType, MatrixStack poseStack, boolean applyLeftHandTransform) {
+		return wrapped.applyTransform(transformType, poseStack, applyLeftHandTransform);
+	}
+
+	@Override
+	public @NotNull ModelData getModelData(@NotNull BlockRenderView level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData modelData) {
+		return wrapped.getModelData(level, pos, state, modelData);
+	}
+
+	@Override
+	public Sprite getParticleIcon(@NotNull ModelData data) {
+		return wrapped.getParticleIcon(data);
+	}
+
+	@Override
+	public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull Random rand, @NotNull ModelData data) {
+		return wrapped.getRenderTypes(state, rand, data);
+	}
+
+	@Override
+	public List<RenderLayer> getRenderTypes(ItemStack itemStack, boolean fabulous) {
+		return wrapped.getRenderTypes(itemStack, fabulous);
+	}
+
+	@Override
+	public List<BakedModel> getRenderPasses(ItemStack itemStack, boolean fabulous) {
+		return wrapped.getRenderPasses(itemStack, fabulous);
 	}
 }
