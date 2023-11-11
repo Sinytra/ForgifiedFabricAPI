@@ -199,7 +199,7 @@ dependencies {
 	javadocDeps "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 	
 	// Include Forgified Fabric Loader
-	include "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}"
+	include "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}:full"
 }
 afterEvaluate {
 	javadoc {

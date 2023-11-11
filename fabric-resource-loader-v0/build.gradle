@@ -6,7 +6,7 @@ loom {
 }
 
 dependencies {
-	implementation "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}"
+	compileOnly "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 }
 
 testDependencies(project, [
