@@ -69,11 +69,14 @@ public class ItemStorageItemHandler implements IItemHandler {
     public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
         try (Transaction transaction = Transaction.openOuter()) {
             ItemVariant resource = slots.get(slot).getResource();
-            int extracted = (int) storage.extract(resource, amount, transaction);
-            if (!simulate) {
-                transaction.commit();
-            }
-            return resource.toStack(extracted);
+			if (!resource.isBlank()) {
+				int extracted = (int) storage.extract(resource, amount, transaction);
+				if (!simulate && extracted > 0) {
+					transaction.commit();
+				}
+				return resource.toStack(extracted);
+			}
+			return ItemStack.EMPTY;
         }
     }
 
