@@ -16,10 +16,27 @@
 
 package net.fabricmc.fabric.impl.message;
 
+import net.fabricmc.fabric.api.message.v1.ServerMessageDecoratorEvent;
+
+import net.minecraft.text.Text;
+
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import net.minecraft.server.network.ServerPlayerEntity;
 
 @Mod("fabric_message_api_v1")
 public class MessagesImpl {
-    public MessagesImpl() {
+
+	public MessagesImpl() {
+		MinecraftForge.EVENT_BUS.addListener(MessagesImpl::onServerChatSubmitted);
     }
+
+	private static void onServerChatSubmitted(ServerChatEvent event) {
+		ServerPlayerEntity sender = event.getPlayer();
+		Text message = event.getMessage();
+		Text processed =  ServerMessageDecoratorEvent.EVENT.invoker().decorate(sender, message).join();
+		event.setMessage(processed);
+	}
 }
