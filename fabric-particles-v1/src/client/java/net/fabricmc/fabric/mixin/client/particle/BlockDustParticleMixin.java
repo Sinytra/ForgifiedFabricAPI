@@ -19,7 +19,9 @@ package net.fabricmc.fabric.mixin.client.particle;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Group;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Slice;
 
@@ -38,6 +40,9 @@ abstract class BlockDustParticleMixin extends SpriteBillboardParticle {
 	@Final
 	private BlockPos blockPos;
 
+	@Unique
+	private boolean fabric_disableTintCheck;	
+
 	private BlockDustParticleMixin() {
 		super(null, 0, 0, 0);
 	}
@@ -50,9 +55,12 @@ abstract class BlockDustParticleMixin extends SpriteBillboardParticle {
 					from = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/BlockDustParticle;blue:F", ordinal = 0),
 					to = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;isOf(Lnet/minecraft/block/Block;)Z")
 			),
-			allow = 1,
-			// Prevent crash on never Forge versions, allowing FML to show the mod error screen
-			require = 0
+			allow = 1
+	)
+	@Group(
+			name = "unintable_particles",
+			min = 1,
+			max = 1
 	)
 	private BlockState removeUntintableParticles(BlockState state) {
 		if (!ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT.invoker().allowBlockDustTint(state, world, blockPos)) {
@@ -61,5 +69,45 @@ abstract class BlockDustParticleMixin extends SpriteBillboardParticle {
 		}
 
 		return state;
+	}
+
+	@ModifyVariable(
+			method = "<init>(Lnet/minecraft/client/world/ClientWorld;DDDDDDLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V",
+			at = @At("LOAD"),
+			argsOnly = true,
+			slice = @Slice(
+					from = @At(value = "FIELD", target = "Lnet/minecraft/client/particle/BlockDustParticle;blue:F", ordinal = 0),
+					to = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/extensions/common/IClientBlockExtensions;of(Lnet/minecraft/block/BlockState;)Lnet/minecraftforge/client/extensions/common/IClientBlockExtensions;")
+			),
+			allow = 1
+	)
+	@Group(
+			name = "unintable_particles",
+			min = 1,
+			max = 1
+	)
+	private BlockState removeUntintableParticlesNewForge(BlockState state) {
+		if (!ParticleRenderEvents.ALLOW_BLOCK_DUST_TINT.invoker().allowBlockDustTint(state, world, blockPos)) {
+			// As of 1.20.1, vanilla hardcodes grass block particles to not get tinted.
+			fabric_disableTintCheck = true;
+			return Blocks.GRASS_BLOCK.getDefaultState();
+		}
+		fabric_disableTintCheck = false;
+		return state;
+	}
+
+	@ModifyVariable(
+			method = "<init>(Lnet/minecraft/client/world/ClientWorld;DDDDDDLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V",
+			at = @At("LOAD"),
+			argsOnly = true,
+			slice = @Slice(
+					from = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/extensions/common/IClientBlockExtensions;of(Lnet/minecraft/block/BlockState;)Lnet/minecraftforge/client/extensions/common/IClientBlockExtensions;"),
+					to = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/extensions/common/IClientBlockExtensions;areBreakingParticlesTinted(Lnet/minecraft/block/BlockState;Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/util/math/BlockPos;)Z")
+			),
+			allow = 1,
+			require = 0
+	)
+	private BlockState removeUntintableParticlesNewForgeSecondary(BlockState state) {
+		return fabric_disableTintCheck ? Blocks.GRASS_BLOCK.getDefaultState() : state;
 	}
 }
