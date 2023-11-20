@@ -41,7 +41,7 @@ import net.fabricmc.fabric.impl.client.screen.ButtonList;
 import net.fabricmc.fabric.impl.client.screen.ScreenEventFactory;
 import net.fabricmc.fabric.impl.client.screen.ScreenExtensions;
 
-@Mixin(Screen.class)
+@Mixin(value = Screen.class, priority = 500)
 abstract class ScreenMixin implements ScreenExtensions {
 	@Shadow
 	@Final
