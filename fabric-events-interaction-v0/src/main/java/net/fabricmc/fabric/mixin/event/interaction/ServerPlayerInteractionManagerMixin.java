@@ -42,7 +42,7 @@ import net.minecraft.util.math.Direction;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 
-@Mixin(ServerPlayerInteractionManager.class)
+@Mixin(value = ServerPlayerInteractionManager.class, priority = 2000)
 public class ServerPlayerInteractionManagerMixin {
 	@Shadow
 	protected ServerWorld world;
