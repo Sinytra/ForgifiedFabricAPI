@@ -96,7 +96,13 @@ public final class ItemStorage {
 
 	static {
 		// Composter support.
-		ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> ComposterWrapper.get(world, pos, direction), Blocks.COMPOSTER);
+		ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> {
+			// FFAPI: do not provide composter compat if queried from our capability provider
+			if (TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.get()) {
+				return null;
+			}
+			return ComposterWrapper.get(world, pos, direction);
+		}, Blocks.COMPOSTER);
 
 		// Support for SidedStorageBlockEntity.
 		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
@@ -109,6 +115,7 @@ public final class ItemStorage {
 
 		// Register Inventory fallback.
 		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
+			// FFAPI: do not provide Inventory instace compat if queried from our capability provider
 			if (TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.get()) {
 				return null;
 			}
