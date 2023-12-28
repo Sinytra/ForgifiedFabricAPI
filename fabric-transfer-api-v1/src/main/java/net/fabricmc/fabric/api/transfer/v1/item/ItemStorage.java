@@ -109,6 +109,10 @@ public final class ItemStorage {
 
 		// Register Inventory fallback.
 		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
+			if (TransferApiForgeCompat.COMPUTING_CAPABILITY_LOCK.get()) {
+				return null;
+			}
+
 			Inventory inventoryToWrap = null;
 
 			if (state.getBlock() instanceof InventoryProvider provider) {
