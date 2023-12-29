@@ -60,7 +60,7 @@ public class LootManagerMixin {
 	}
 
 	// runAsync Runnable in load method
-	@Inject(method = "method_51189", at = @At("HEAD"))
+	@Inject(method = {"method_51189", "m_278660_"}, at = @At("HEAD"), require = 1)
 	private static void runAsync(ResourceManager resourceManager, LootDataType lootDataType, Map map, CallbackInfo ci) {
 		assert ResourceConditionsImpl.CURRENT_REGISTRIES.get() == null;
 		ResourceConditionsImpl.CURRENT_REGISTRIES.set(Objects.requireNonNull(dynamicRegistryManagerMap.remove(map)));
@@ -88,7 +88,7 @@ public class LootManagerMixin {
 	}
 
 	// runAsync Runnable in load method
-	@Inject(method = "method_51189", at = @At("RETURN"))
+	@Inject(method = {"method_51189", "m_278660_"}, at = @At("RETURN"), require = 1)
 	private static void runAsyncEnd(ResourceManager resourceManager, LootDataType lootDataType, Map map, CallbackInfo ci) {
 		ResourceConditionsImpl.CURRENT_REGISTRIES.remove();
 	}
