@@ -1,10 +1,17 @@
+buildscript {
+	dependencies {
+		classpath 'org.kohsuke:github-api:1.135'
+		classpath 'org.apache.groovy:groovy-toml:4.0.12'
+	}
+}
+
 plugins {
 	id "java-library"
 	id "eclipse"
 	id "idea"
 	id "maven-publish"
 	id 'jacoco'
-	id "fabric-loom" version "1.4.4" apply false
+	id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
 	id "com.diffplug.spotless" version "6.20.0"
 	id "org.ajoberstar.grgit" version "3.1.0"
 	id "me.modmuss50.remotesign" version "0.4.0" apply false
@@ -12,8 +19,10 @@ plugins {
 }
 
 def ENV = System.getenv()
+def signingEnabled = ENV.SIGNING_SERVER != null
+def configuredVersion = project.version
 
-version = project.version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()
+version = project.version + '+' + project.forgified_version + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()
 logger.lifecycle("Building Fabric: " + version)
 
 
@@ -59,7 +68,7 @@ def getBranch() {
 
 def moduleDependencies(project, List<String> depNames) {
 	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-	def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+	def clientOutputs = /*depNames.iterator().collect { findProject(":$it").sourceSets.client.output }*/ []
 
 	project.dependencies {
 		deps.each {
@@ -92,7 +101,7 @@ def moduleDependencies(project, List<String> depNames) {
 
 def testDependencies(project, List<String> depNames) {
 	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-	def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+	def clientOutputs = /*depNames.iterator().collect { findProject(":$it").sourceSets.client.output }*/ []
 
 	project.dependencies {
 		deps.each {
@@ -100,13 +109,13 @@ def testDependencies(project, List<String> depNames) {
 		}
 
 		clientOutputs.each {
-			testmodClientImplementation it
+			testmodImplementation it
 		}
 	}
 }
 
 allprojects {
-	group = "net.fabricmc.fabric-api"
+	group = "dev.su5ed.sinytra.fabric-api"
 
 	apply plugin: "maven-publish"
 	apply plugin: "me.modmuss50.remotesign"
@@ -115,16 +124,18 @@ allprojects {
 		enabled = false
 	}
 
-	remoteSign {
-		requestUrl = ENV.SIGNING_SERVER
-		pgpAuthKey = ENV.SIGNING_PGP_KEY
-		jarAuthKey = ENV.SIGNING_JAR_KEY
+	if (signingEnabled) {
+		remoteSign {
+			requestUrl = ENV.SIGNING_SERVER
+			pgpAuthKey = ENV.SIGNING_PGP_KEY
+			jarAuthKey = ENV.SIGNING_JAR_KEY
 
-		useDummyForTesting = ENV.SIGNING_SERVER == null
+			useDummyForTesting = ENV.SIGNING_SERVER == null
 
-		afterEvaluate {
-			// PGP sign all maven publications.
-			sign publishing.publications.mavenJava
+			afterEvaluate {
+				// PGP sign all maven publications.
+				sign publishing.publications.mavenJava
+			}
 		}
 	}
 
@@ -137,8 +148,8 @@ allprojects {
 	}
 
 	apply plugin: "java-library"
-	apply plugin: "checkstyle"
-	apply plugin: "fabric-loom"
+//	apply plugin: "checkstyle"
+	apply plugin: "dev.architectury.loom"
 	apply plugin: "com.diffplug.spotless"
 
 	tasks.withType(JavaCompile).configureEach {
@@ -151,28 +162,34 @@ allprojects {
 	}
 
 	loom {
-		splitEnvironmentSourceSets()
+//		splitEnvironmentSourceSets()
 	}
 
 	sourceSets {
+		main {
+			java {
+				srcDir "src/client/java"
+			}
+			resources {
+				srcDir "src/client/resources"
+			}
+		}
+		
 		testmod {
 			compileClasspath += main.compileClasspath
 			runtimeClasspath += main.runtimeClasspath
-		}
 
-		testmodClient {
-			compileClasspath += main.compileClasspath
-			runtimeClasspath += main.runtimeClasspath
-			compileClasspath += client.compileClasspath
-			runtimeClasspath += client.runtimeClasspath
-
-			compileClasspath += testmod.compileClasspath
-			runtimeClasspath += testmod.runtimeClasspath
+			java {
+				srcDir "src/testmodClient/java"
+			}
+			resources {
+				srcDir "src/testmodClient/resources"
+			}
 		}
 
 		test {
-			compileClasspath += testmodClient.compileClasspath
-			runtimeClasspath += testmodClient.runtimeClasspath
+			compileClasspath += testmod.compileClasspath
+			runtimeClasspath += testmod.runtimeClasspath
 		}
 	}
 
@@ -180,11 +197,15 @@ allprojects {
 		runtimeOnlyLog4j = true
 
 		runs {
+			configureEach {
+				property "mixin.debug", "true"
+			}
+			
 			testmodClient {
 				client()
 				ideConfigGenerated project.rootProject == project
 				name = "Testmod Client"
-				source sourceSets.testmodClient
+				source sourceSets.testmod
 			}
 			testmodServer {
 				server()
@@ -206,27 +227,33 @@ allprojects {
 
 		loom.mods.register(p.name) {
 			sourceSet p.sourceSets.main
-			sourceSet p.sourceSets.client
+//			sourceSet p.sourceSets.client
 		}
 
-		loom.mods.register(p.name + "-testmod") {
-			sourceSet p.sourceSets.testmod
-			sourceSet p.sourceSets.testmodClient
+		if (p.file("src/testmod").exists() || p.file("src/testmodClient").exists()) {
+			loom.mods.register(p.name + "-testmod") {
+				sourceSet p.sourceSets.testmod
+//			    sourceSet p.sourceSets.testmodClient
+			}	
 		}
+	}
+
+	repositories {
+		maven { url "https://maven.neoforged.net/releases/" }
 	}
 
 	dependencies {
 		minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
 		mappings "net.fabricmc:yarn:${rootProject.minecraft_version}${project.yarn_version}:v2"
-		modApi "net.fabricmc:fabric-loader:${project.loader_version}"
+		neoForge "net.neoforged:neoforge:${rootProject.forge_version}"
 
 		testmodImplementation sourceSets.main.output
-		testmodClientImplementation sourceSets.main.output
-		testmodClientImplementation sourceSets.client.output
-		testmodClientImplementation sourceSets.testmod.output
+//		testmodClientImplementation sourceSets.main.output
+//		testmodClientImplementation sourceSets.client.output
+//		testmodClientImplementation sourceSets.testmod.output
 
 		testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-		testImplementation sourceSets.testmodClient.output
+		testImplementation sourceSets.testmod.output
 		testImplementation 'org.mockito:mockito-core:5.4.0'
 	}
 
@@ -265,18 +292,20 @@ allprojects {
 		}
 	}
 
-	checkstyle {
-		configFile = rootProject.file("checkstyle.xml")
-		toolVersion = "10.12.1"
-	}
+//	checkstyle {
+//		configFile = rootProject.file("checkstyle.xml")
+//		toolVersion = "10.12.1"
+//	}
 
 	tasks.withType(AbstractArchiveTask).configureEach {
 		preserveFileTimestamps = false
 		reproducibleFileOrder = true
 	}
 
-	remoteSign {
-		sign remapJar
+	if (signingEnabled) {
+		remoteSign {
+			sign remapJar
+		}
 	}
 
 	// Run this task after updating minecraft to regenerate any required resources
@@ -286,7 +315,7 @@ allprojects {
 
 	tasks.register('testmodJar', Jar) {
 		from sourceSets.testmod.output
-		from sourceSets.testmodClient.output
+//		from sourceSets.testmodClient.output
 		destinationDirectory = new File(project.buildDir, "devlibs")
 		archiveClassifier = "testmod"
 	}
@@ -312,14 +341,14 @@ allprojects {
 		input = testmodJar.archiveFile
 		archiveClassifier = "testmod"
 		addNestedDependencies = false
-		includesClientOnlyClasses = true
-		clientOnlySourceSetName = sourceSets.testmodClient.name
+//		includesClientOnlyClasses = true
+//		clientOnlySourceSetName = sourceSets.testmodClient.name
 	}
 	build.dependsOn remapTestmodJar
 
 	tasks.register('validateMixinNames', net.fabricmc.loom.task.ValidateMixinNameTask) {
 		source(sourceSets.main.output)
-		source(sourceSets.client.output)
+//		source(sourceSets.client.output)
 		source(sourceSets.testmod.output)
 	}
 
@@ -328,21 +357,21 @@ allprojects {
 	apply from: rootProject.file('gradle/validate-annotations.gradle')
 }
 
-remapTestmodJar {
-	def testModJarTasks = []
-
-	subprojects {
-		if (it.name == "deprecated" || !(it.file("src/testmod").exists() || it.file("src/testmodClient").exists())) {
-			return
-		}
-
-		testModJarTasks += it.tasks.remapTestmodJar
-	}
-
-	nestedJars.setFrom(testModJarTasks)
-	addNestedDependencies = true
-	clientOnlySourceSetName = sourceSets.testmodClient.name
-}
+//remapTestmodJar {
+//	def testModJarTasks = []
+//
+//	subprojects {
+//		if (it.name == "deprecated" || !(it.file("src/testmod").exists() || it.file("src/testmodClient").exists())) {
+//			return
+//		}
+//
+//		testModJarTasks += it.tasks.remapTestmodJar
+//	}
+//
+//	nestedJars.setFrom(testModJarTasks)
+//	addNestedDependencies = true
+//	clientOnlySourceSetName = sourceSets.testmodClient.name
+//}
 
 // Apply auxiliary buildscripts to submodules
 // This must be done after all plugins are applied to subprojects
@@ -351,7 +380,7 @@ apply from: "gradle/module-versioning.gradle"
 
 loom {
 	// Required as the item-group API uses access widened classes in its API, without this the javadoc generation fails.
-	accessWidenerPath = file("fabric-item-group-api-v1/src/main/resources/fabric-item-group-api-v1.accesswidener")
+//	accessWidenerPath = file("fabric-item-group-api-v1/src/main/resources/fabric-item-group-api-v1.accesswidener")
 }
 
 javadoc {
@@ -379,10 +408,10 @@ javadoc {
 		}
 
 		source(it.sourceSets.main.allJava)
-		source(it.sourceSets.client.allJava)
+//		source(it.sourceSets.client.allJava)
 	}
 
-	classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
+	classpath = files(sourceSets.main.compileClasspath/*, sourceSets.client.compileClasspath*/)
 	include("**/api/**")
 	failOnError true
 }
@@ -433,7 +462,7 @@ loom {
 		}
 	}
 }
-test.dependsOn runGametest
+//test.dependsOn runGametest
 
 def coverageTasks = [
 	runGametestCoverage,
@@ -457,7 +486,7 @@ tasks.register('coverage', JacocoReport) {
 		if (p.path.startsWith(":deprecated")) {
 			return
 		}
-		sourceSets p.sourceSets.main, p.sourceSets.client, p.sourceSets.testmod, p.sourceSets.testmodClient
+		sourceSets p.sourceSets.main, p.sourceSets.client, p.sourceSets.testmod/*, p.sourceSets.testmodClient*/
 	}
 
 	// Exclude mixins
@@ -566,12 +595,12 @@ def addPomMetadataInformation(Project project, MavenPom pom) {
 
 	def modJson = new JsonSlurper().parse(modJsonFile)
 	pom.name = modJson.name
-	pom.url = "https://github.com/FabricMC/fabric/tree/HEAD/${project.rootDir.relativePath(project.projectDir)}"
+	pom.url = "https://github.com/Sinytra/ForgifiedFabricAPI/tree/HEAD/${project.rootDir.relativePath(project.projectDir)}"
 	pom.description = modJson.description
 	pom.licenses {
 		license {
 			name = "Apache-2.0"
-			url = "https://github.com/FabricMC/fabric/blob/HEAD/LICENSE"
+			url = "https://github.com/Sinytra/ForgifiedFabricAPI/blob/HEAD/LICENSE"
 		}
 	}
 	pom.developers {
@@ -579,15 +608,18 @@ def addPomMetadataInformation(Project project, MavenPom pom) {
 			name = "FabricMC"
 			url = "https://fabricmc.net/"
 		}
+		developer {
+			name = "Sinytra"
+		}
 	}
 	pom.scm {
-		connection = "scm:git:https://github.com/FabricMC/fabric.git"
-		url = "https://github.com/FabricMC/fabric"
-		developerConnection = "scm:git:git@github.com:FabricMC/fabric.git"
+		connection = "scm:git:https://github.com/Sinytra/ForgifiedFabricAPI.git"
+		url = "https://github.com/Sinytra/ForgifiedFabricAPI"
+		developerConnection = "scm:git:git@github.com:Sinytra/ForgifiedFabricAPI.git"
 	}
 	pom.issueManagement {
 		system = "GitHub"
-		url = "https://github.com/FabricMC/fabric/issues"
+		url = "https://github.com/Sinytra/ForgifiedFabricAPI/issues"
 	}
 }
 
@@ -596,26 +628,22 @@ subprojects {
 		return
 	}
 
-	base {
-		archivesName = project.name
-	}
-
 	dependencies {
 		testmodImplementation sourceSets.main.output
 
 		// Make all modules depend on the gametest api (and thus res loader) to try and promote its usage.
-		if (project.name != "fabric-gametest-api-v1") {
-			testmodImplementation project(path: ':fabric-gametest-api-v1', configuration: 'namedElements')
-			testmodClientImplementation project(":fabric-gametest-api-v1").sourceSets.client.output
-			testmodImplementation project(path: ':fabric-resource-loader-v0', configuration: 'namedElements')
-			testmodClientImplementation project(":fabric-resource-loader-v0").sourceSets.client.output
-		}
+//		if (project.name != "fabric-gametest-api-v1") { TODO ENABLE
+//			testmodImplementation project(path: ':fabric-gametest-api-v1', configuration: 'namedElements')
+//			testmodClientImplementation project(":fabric-gametest-api-v1").sourceSets.client.output
+//			testmodImplementation project(path: ':fabric-resource-loader-v0', configuration: 'namedElements')
+//			testmodClientImplementation project(":fabric-resource-loader-v0").sourceSets.client.output
+//		}
 
 		// Make all testmods run with registry-sync-v0 as it is required to register new objects.
-		if (project.name != "fabric-registry-sync-v0") {
-			testmodRuntimeOnly project(path: ':fabric-registry-sync-v0', configuration: 'namedElements')
-			testmodClientImplementation project(":fabric-registry-sync-v0").sourceSets.client.output
-		}
+//		if (project.name != "fabric-registry-sync-v0") { TODO ENABLE
+//			testmodRuntimeOnly project(path: ':fabric-registry-sync-v0', configuration: 'namedElements')
+//			testmodClientImplementation project(":fabric-registry-sync-v0").sourceSets.client.output
+//		}
 	}
 
 	publishing {
@@ -624,8 +652,8 @@ subprojects {
 				pom {
 					addPomMetadataInformation(project, pom)
 				}
-				artifact(signRemapJar.output) {
-					builtBy(signRemapJar)
+				artifact(signingEnabled ? signRemapJar.output : remapJar) {
+					builtBy(signingEnabled ? signRemapJar : remapJar)
 				}
 
 				artifact(remapSourcesJar) {
@@ -644,8 +672,8 @@ subprojects {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifact(signRemapJar.output) {
-				builtBy(signRemapJar)
+			artifact(signingEnabled ? signRemapJar.output : remapJar) {
+				builtBy(signingEnabled ? signRemapJar : remapJar)
 			}
 
 			artifact(sourcesJar) {
@@ -723,29 +751,29 @@ dependencies {
 			}
 
 			api project(path: "${it.path}", configuration: "namedElements")
-			clientImplementation project("${it.path}:").sourceSets.client.output
+//			clientImplementation project("${it.path}:").sourceSets.client.output
 
 			testmodImplementation project("${it.path}:").sourceSets.testmod.output
-			testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
+//			testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
 		}
 	}
 }
 
-remapJar {
-	afterEvaluate {
-		subprojects.each {
-			if (it.name in devOnlyModules || it.name == "deprecated") {
-				return
-			}
-
-			// Include the signed or none signed jar from the sub project.
-			nestedJars.from project("${it.path}").tasks.getByName("signRemapJar")
-		}
-	}
-}
+//remapJar {
+//	afterEvaluate {
+//		subprojects.each {
+//			if (it.name in devOnlyModules || it.name == "deprecated") {
+//				return
+//			}
+//
+//			// Include the signed or none signed jar from the sub project.
+//			nestedJars.from project("${it.path}").tasks.getByName("signRemapJar")
+//		}
+//	}
+//}
 
 publishMods {
-	file = signRemapJar.output
+	file = signingEnabled ? signRemapJar.output : remapJar.archiveFile
 	changelog = providers.environmentVariable("CHANGELOG").getOrElse("No changelog provided")
 	type = project.prerelease == "true" ? BETA : STABLE
 	displayName = "[${project.minecraft_version}] Fabric API $project.version"
@@ -769,7 +797,9 @@ publishMods {
 	}
 }
 
-assemble.dependsOn signRemapJar
+if (signingEnabled) {
+	assemble.dependsOn signRemapJar
+}
 
 import java.util.stream.Collectors
 
@@ -787,3 +817,10 @@ tasks.register('checkVersion') {
 
 tasks.publishMods.dependsOn checkVersion
 publish.mustRunAfter checkVersion
+
+ext {
+	DEV_ONLY_MODULES = devOnlyModules
+	SIGNING_ENABLED = signingEnabled
+	CONFIGURED_VERSION = configuredVersion
+}
+apply from: rootProject.file('gradle/ffapi-setup.gradle')

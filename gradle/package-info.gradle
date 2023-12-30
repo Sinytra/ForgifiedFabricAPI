@@ -1,9 +1,8 @@
 import java.nio.file.Files
 
 for (def sourceSet in [
-			sourceSets.main,
-			sourceSets.client
-		]) {
+	sourceSets.main
+]) {
 	// We have to capture the source set name for the lazy string literals,
 	// otherwise it'll just be whatever the last source set is in the list.
 	def sourceSetName = sourceSet.name
@@ -14,15 +13,15 @@ for (def sourceSet in [
 
 		// Only apply to default source directory since we also add the generated
 		// sources to the source set.
-		sourceRoot = file("src/$sourceSetName/java")
+		sourceRoots.from(sourceSet.java.srcDirs)
 		header = rootProject.file('HEADER')
-		outputDir = file("src/generated/$sourceSetName")
+		outputDir = file("src/generated/$sourceSetName/java")
 	}
 	sourceSet.java.srcDir task
 
 	def cleanTask = tasks.register(sourceSet.getTaskName('clean', 'ImplPackageInfos'), Delete) {
 		group = 'fabric'
-		delete file("src/generated/$sourceSetName")
+		delete file("src/generated/$sourceSetName/java")
 	}
 	clean.dependsOn cleanTask
 }
@@ -32,8 +31,8 @@ class GenerateImplPackageInfos extends DefaultTask {
 	File header
 
 	@SkipWhenEmpty
-	@InputDirectory
-	final DirectoryProperty sourceRoot = project.objects.directoryProperty()
+	@InputFiles
+	final ConfigurableFileCollection sourceRoots = project.objects.fileCollection()
 
 	@OutputDirectory
 	final DirectoryProperty outputDir = project.objects.directoryProperty()
@@ -43,36 +42,41 @@ class GenerateImplPackageInfos extends DefaultTask {
 		def output = outputDir.get().asFile.toPath()
 		output.deleteDir()
 		def headerText = header.readLines().join("\n") // normalize line endings
-		def root = sourceRoot.get().asFile.toPath()
 
-		for (def dir in ['impl', 'mixin']) {
-			def implDir = root.resolve("net/fabricmc/fabric/$dir")
+		for (def srcDir in sourceRoots) {
+			if (srcDir.isDirectory()) {
+				def root = srcDir.toPath()
 
-			if (Files.notExists(implDir)) {
-				continue
-			}
+				for (def dir in ['impl', 'mixin']) {
+					def implDir = root.resolve("net/fabricmc/fabric/$dir")
 
-			implDir.eachDirRecurse {
-				def containsJava = Files.list(it).any {
-					Files.isRegularFile(it) && it.fileName.toString().endsWith('.java')
-				}
+					if (Files.notExists(implDir)) {
+						continue
+					}
 
-				if (containsJava && Files.notExists(it.resolve('package-info.java'))) {
-					def relativePath = root.relativize(it)
-					def target = output.resolve(relativePath)
-					Files.createDirectories(target)
+					implDir.eachDirRecurse {
+						def containsJava = Files.list(it).any {
+							Files.isRegularFile(it) && it.fileName.toString().endsWith('.java')
+						}
 
-					target.resolve('package-info.java').withWriter {
-						def packageName = relativePath.toString().replace(File.separator, '.')
-						it.write("""$headerText
-						|/**
-						| * Implementation code for ${project.name}.
-						| */
-						|@ApiStatus.Internal
-						|package $packageName;
-						|
-						|import org.jetbrains.annotations.ApiStatus;
-						|""".stripMargin())
+						if (containsJava && Files.notExists(it.resolve('package-info.java'))) {
+							def relativePath = root.relativize(it)
+							def target = output.resolve(relativePath)
+							Files.createDirectories(target)
+
+							target.resolve('package-info.java').withWriter {
+								def packageName = relativePath.toString().replace(File.separator, '.')
+								it.write("""$headerText
+										|/**
+										| * Implementation code for ${project.name}.
+										| */
+										|@ApiStatus.Internal
+										|package $packageName;
+										|
+										|import org.jetbrains.annotations.ApiStatus;
+										|""".stripMargin())
+							}
+						}
 					}
 				}
 			}
