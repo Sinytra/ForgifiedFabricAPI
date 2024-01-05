@@ -24,7 +24,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.network.ClientConfigurationNetworkHandler;
 import net.minecraft.client.network.ClientLoginNetworkHandler;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkState;
 import net.minecraft.network.PacketByteBuf;
@@ -34,19 +33,11 @@ import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.impl.networking.CommonPacketsImpl;
-import net.fabricmc.fabric.impl.networking.CommonRegisterPayload;
-import net.fabricmc.fabric.impl.networking.CommonVersionPayload;
 import net.fabricmc.fabric.impl.networking.GlobalReceiverRegistry;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.NetworkingImpl;
-import net.fabricmc.fabric.impl.networking.payload.ResolvablePayload;
 import net.fabricmc.fabric.impl.networking.payload.ResolvedPayload;
 import net.fabricmc.fabric.impl.networking.payload.TypedPayload;
 import net.fabricmc.fabric.impl.networking.payload.UntypedPayload;
@@ -55,19 +46,8 @@ import net.fabricmc.fabric.mixin.networking.client.accessor.MinecraftClientAcces
 
 public final class ClientNetworkingImpl {
 	public static final GlobalReceiverRegistry<ClientLoginNetworking.LoginQueryRequestHandler> LOGIN = new GlobalReceiverRegistry<>(NetworkState.LOGIN);
-	public static final GlobalReceiverRegistry<ResolvablePayload.Handler<ClientConfigurationNetworkAddon.Handler>> CONFIGURATION = new GlobalReceiverRegistry<>(NetworkState.CONFIGURATION);
-	public static final GlobalReceiverRegistry<ResolvablePayload.Handler<ClientPlayNetworkAddon.Handler>> PLAY = new GlobalReceiverRegistry<>(NetworkState.PLAY);
 
-	private static ClientPlayNetworkAddon currentPlayAddon;
-	private static ClientConfigurationNetworkAddon currentConfigurationAddon;
-
-	public static ClientPlayNetworkAddon getAddon(ClientPlayNetworkHandler handler) {
-		return (ClientPlayNetworkAddon) ((NetworkHandlerExtensions) handler).getAddon();
-	}
-
-	public static ClientConfigurationNetworkAddon getAddon(ClientConfigurationNetworkHandler handler) {
-		return (ClientConfigurationNetworkAddon) ((NetworkHandlerExtensions) handler).getAddon();
-	}
+	private static ClientConfigurationNetworkHandler currentConfigurationAddon;
 
 	public static ClientLoginNetworkAddon getAddon(ClientLoginNetworkHandler handler) {
 		return (ClientLoginNetworkAddon) ((NetworkHandlerExtensions) handler).getAddon();
@@ -110,86 +90,18 @@ public final class ClientNetworkingImpl {
 	}
 
 	@Nullable
-	public static ClientConfigurationNetworkAddon getClientConfigurationAddon() {
+	public static ClientConfigurationNetworkHandler getClientConfigurationAddon() {
 		return currentConfigurationAddon;
 	}
 
-	@Nullable
-	public static ClientPlayNetworkAddon getClientPlayAddon() {
-		// Since Minecraft can be a bit weird, we need to check for the play addon in a few ways:
-		// If the client's player is set this will work
-		if (MinecraftClient.getInstance().getNetworkHandler() != null) {
-			currentPlayAddon = null; // Shouldn't need this anymore
-			return getAddon(MinecraftClient.getInstance().getNetworkHandler());
-		}
-
-		// We haven't hit the end of onGameJoin yet, use our backing field here to access the network handler
-		if (currentPlayAddon != null) {
-			return currentPlayAddon;
-		}
-
-		// We are not in play stage
-		return null;
-	}
-
-	public static void setClientPlayAddon(ClientPlayNetworkAddon addon) {
-		assert addon == null || currentConfigurationAddon == null;
-		currentPlayAddon = addon;
-	}
-
-	public static void setClientConfigurationAddon(ClientConfigurationNetworkAddon addon) {
-		assert addon == null || currentPlayAddon == null;
+	public static void setClientConfigurationAddon(ClientConfigurationNetworkHandler addon) {
+		assert addon == null;
 		currentConfigurationAddon = addon;
 	}
 
 	public static void clientInit() {
-		// Reference cleanup for the locally stored addon if we are disconnected
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			currentPlayAddon = null;
-		});
-
 		ClientConfigurationConnectionEvents.DISCONNECT.register((handler, client) -> {
 			currentConfigurationAddon = null;
 		});
-
-		// Version packet
-		ClientConfigurationNetworking.registerGlobalReceiver(CommonVersionPayload.PACKET_ID, (client, handler, buf, responseSender) -> {
-			var payload = new CommonVersionPayload(buf);
-			int negotiatedVersion = handleVersionPacket(payload, responseSender);
-			ClientNetworkingImpl.getAddon(handler).onCommonVersionPacket(negotiatedVersion);
-		});
-
-		// Register packet
-		ClientConfigurationNetworking.registerGlobalReceiver(CommonRegisterPayload.PACKET_ID, (client, handler, buf, responseSender) -> {
-			var payload = new CommonRegisterPayload(buf);
-			ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getAddon(handler);
-
-			if (CommonRegisterPayload.PLAY_PHASE.equals(payload.phase())) {
-				if (payload.version() != addon.getNegotiatedVersion()) {
-					throw new IllegalStateException("Negotiated common packet version: %d but received packet with version: %d".formatted(addon.getNegotiatedVersion(), payload.version()));
-				}
-
-				addon.getChannelInfoHolder().getPendingChannelsNames(NetworkState.PLAY).addAll(payload.channels());
-				NetworkingImpl.LOGGER.debug("Received accepted channels from the server");
-				responseSender.sendPacket(new CommonRegisterPayload(addon.getNegotiatedVersion(), CommonRegisterPayload.PLAY_PHASE, ClientPlayNetworking.getGlobalReceivers()));
-			} else {
-				addon.onCommonRegisterPacket(payload);
-				responseSender.sendPacket(addon.createRegisterPayload());
-			}
-		});
-	}
-
-	// Disconnect if there are no commonly supported versions.
-	// Client responds with the intersection of supported versions.
-	// Return the highest supported version
-	private static int handleVersionPacket(CommonVersionPayload payload, PacketSender packetSender) {
-		int version = CommonPacketsImpl.getHighestCommonVersion(payload.versions(), CommonPacketsImpl.SUPPORTED_COMMON_PACKET_VERSIONS);
-
-		if (version <= 0) {
-			throw new UnsupportedOperationException("Client does not support any requested versions from server");
-		}
-
-		packetSender.sendPacket(new CommonVersionPayload(new int[]{ version }));
-		return version;
 	}
 }

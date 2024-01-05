@@ -19,6 +19,8 @@ package net.fabricmc.fabric.api.networking.v1;
 import java.util.Objects;
 import java.util.Set;
 
+import net.fabricmc.fabric.impl.networking.neo.ServerNeoNetworking;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.PacketByteBuf;
@@ -72,7 +74,7 @@ public final class ServerConfigurationNetworking {
 	 * @see ServerConfigurationNetworking#registerReceiver(ServerConfigurationNetworkHandler, Identifier, ConfigurationChannelHandler)
 	 */
 	public static boolean registerGlobalReceiver(Identifier channelName, ConfigurationChannelHandler channelHandler) {
-		return ServerNetworkingImpl.CONFIGURATION.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
+		return ServerNeoNetworking.CONFIGURATION.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
 	}
 
 	/**
@@ -89,7 +91,7 @@ public final class ServerConfigurationNetworking {
 	 * @see ServerConfigurationNetworking#registerReceiver(ServerConfigurationNetworkHandler, PacketType, ConfigurationPacketHandler)
 	 */
 	public static <T extends FabricPacket> boolean registerGlobalReceiver(PacketType<T> type, ConfigurationPacketHandler<T> handler) {
-		return ServerNetworkingImpl.CONFIGURATION.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
+		return ServerNeoNetworking.CONFIGURATION.registerGlobalReceiver(type, wrapTyped(type, handler));
 	}
 
 	/**
@@ -105,7 +107,7 @@ public final class ServerConfigurationNetworking {
 	 */
 	@Nullable
 	public static ServerConfigurationNetworking.ConfigurationChannelHandler unregisterGlobalReceiver(Identifier channelName) {
-		return unwrapUntyped(ServerNetworkingImpl.CONFIGURATION.unregisterGlobalReceiver(channelName));
+		return unwrapUntyped(ServerNeoNetworking.CONFIGURATION.unregisterGlobalReceiver(channelName));
 	}
 
 	/**
@@ -122,7 +124,7 @@ public final class ServerConfigurationNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> ServerConfigurationNetworking.ConfigurationPacketHandler<T> unregisterGlobalReceiver(PacketType<T> type) {
-		return unwrapTyped(ServerNetworkingImpl.CONFIGURATION.unregisterGlobalReceiver(type.getId()));
+		return unwrapTyped(ServerNeoNetworking.CONFIGURATION.unregisterGlobalReceiver(type.getId()));
 	}
 
 	/**
@@ -132,7 +134,7 @@ public final class ServerConfigurationNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<Identifier> getGlobalReceivers() {
-		return ServerNetworkingImpl.CONFIGURATION.getChannels();
+		return ServerNeoNetworking.CONFIGURATION.getChannels();
 	}
 
 	/**
@@ -161,7 +163,7 @@ public final class ServerConfigurationNetworking {
 	public static boolean registerReceiver(ServerConfigurationNetworkHandler networkHandler, Identifier channelName, ConfigurationChannelHandler channelHandler) {
 		Objects.requireNonNull(networkHandler, "Network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(networkHandler).registerChannel(channelName, wrapUntyped(channelHandler));
+		return ServerNeoNetworking.CONFIGURATION.registerReceiver(networkHandler, channelName, wrapUntyped(channelHandler));
 	}
 
 	/**
@@ -182,7 +184,7 @@ public final class ServerConfigurationNetworking {
 	 * @see ServerPlayConnectionEvents#INIT
 	 */
 	public static <T extends FabricPacket> boolean registerReceiver(ServerConfigurationNetworkHandler networkHandler, PacketType<T> type, ConfigurationPacketHandler<T> handler) {
-		return ServerNetworkingImpl.getAddon(networkHandler).registerChannel(type.getId(), wrapTyped(type, handler));
+		return ServerNeoNetworking.CONFIGURATION.registerReceiver(networkHandler, type.getId(), wrapTyped(type, handler));
 	}
 
 	/**
@@ -197,7 +199,7 @@ public final class ServerConfigurationNetworking {
 	public static ServerConfigurationNetworking.ConfigurationChannelHandler unregisterReceiver(ServerConfigurationNetworkHandler networkHandler, Identifier channelName) {
 		Objects.requireNonNull(networkHandler, "Network handler cannot be null");
 
-		return unwrapUntyped(ServerNetworkingImpl.getAddon(networkHandler).unregisterChannel(channelName));
+		return unwrapUntyped(ServerNeoNetworking.CONFIGURATION.unregisterReceiver(networkHandler, channelName));
 	}
 
 	/**
@@ -211,7 +213,7 @@ public final class ServerConfigurationNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> ServerConfigurationNetworking.ConfigurationPacketHandler<T> unregisterReceiver(ServerConfigurationNetworkHandler networkHandler, PacketType<T> type) {
-		return unwrapTyped(ServerNetworkingImpl.getAddon(networkHandler).unregisterChannel(type.getId()));
+		return unwrapTyped(ServerNeoNetworking.CONFIGURATION.unregisterReceiver(networkHandler, type));
 	}
 
 	/**
@@ -223,7 +225,7 @@ public final class ServerConfigurationNetworking {
 	public static Set<Identifier> getReceived(ServerConfigurationNetworkHandler handler) {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getReceivableChannels();
+		return ServerNeoNetworking.CONFIGURATION.getReceived(handler);
 	}
 
 	/**
@@ -235,7 +237,7 @@ public final class ServerConfigurationNetworking {
 	public static Set<Identifier> getSendable(ServerConfigurationNetworkHandler handler) {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels();
+		return ServerNeoNetworking.CONFIGURATION.getSendable(handler);
 	}
 
 	/**
@@ -249,7 +251,7 @@ public final class ServerConfigurationNetworking {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 		Objects.requireNonNull(channelName, "Channel name cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(channelName);
+		return getSendable(handler).contains(channelName);
 	}
 
 	/**
@@ -263,7 +265,7 @@ public final class ServerConfigurationNetworking {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 		Objects.requireNonNull(type, "Packet type cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(type.getId());
+		return getSendable(handler).contains(type.getId());
 	}
 
 	/**
@@ -302,7 +304,7 @@ public final class ServerConfigurationNetworking {
 	public static PacketSender getSender(ServerConfigurationNetworkHandler handler) {
 		Objects.requireNonNull(handler, "Server configuration network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler);
+		return ServerNeoNetworking.CONFIGURATION.getSender(handler);
 	}
 
 	/**

@@ -23,9 +23,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientCommonPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerConfigurationNetworkHandler;
 import net.minecraft.server.network.ServerLoginNetworkHandler;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
@@ -40,19 +38,9 @@ import net.fabricmc.fabric.impl.networking.payload.UntypedPayload;
 
 public final class ServerNetworkingImpl {
 	public static final GlobalReceiverRegistry<ServerLoginNetworking.LoginQueryResponseHandler> LOGIN = new GlobalReceiverRegistry<>(NetworkState.LOGIN);
-	public static final GlobalReceiverRegistry<ResolvablePayload.Handler<ServerConfigurationNetworkAddon.Handler>> CONFIGURATION = new GlobalReceiverRegistry<>(NetworkState.CONFIGURATION);
-	public static final GlobalReceiverRegistry<ResolvablePayload.Handler<ServerPlayNetworkAddon.Handler>> PLAY = new GlobalReceiverRegistry<>(NetworkState.PLAY);
-
-	public static ServerPlayNetworkAddon getAddon(ServerPlayNetworkHandler handler) {
-		return (ServerPlayNetworkAddon) ((NetworkHandlerExtensions) handler).getAddon();
-	}
 
 	public static ServerLoginNetworkAddon getAddon(ServerLoginNetworkHandler handler) {
 		return (ServerLoginNetworkAddon) ((NetworkHandlerExtensions) handler).getAddon();
-	}
-
-	public static ServerConfigurationNetworkAddon getAddon(ServerConfigurationNetworkHandler handler) {
-		return (ServerConfigurationNetworkAddon) ((NetworkHandlerExtensions) handler).getAddon();
 	}
 
 	public static Packet<ClientCommonPacketListener> createS2CPacket(Identifier channel, PacketByteBuf buf) {

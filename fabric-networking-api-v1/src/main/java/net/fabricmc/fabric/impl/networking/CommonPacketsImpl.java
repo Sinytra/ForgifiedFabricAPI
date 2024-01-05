@@ -39,39 +39,6 @@ public class CommonPacketsImpl {
 			addon.onCommonVersionPacket(getNegotiatedVersion(payload));
 			handler.completeTask(CommonVersionConfigurationTask.KEY);
 		});
-
-		ServerConfigurationNetworking.registerGlobalReceiver(CommonRegisterPayload.PACKET_ID, (server, handler, buf, responseSender) -> {
-			var payload = new CommonRegisterPayload(buf);
-			ServerConfigurationNetworkAddon addon = ServerNetworkingImpl.getAddon(handler);
-
-			if (CommonRegisterPayload.PLAY_PHASE.equals(payload.phase())) {
-				if (payload.version() != addon.getNegotiatedVersion()) {
-					throw new IllegalStateException("Negotiated common packet version: %d but received packet with version: %d".formatted(addon.getNegotiatedVersion(), payload.version()));
-				}
-
-				// Play phase hasnt started yet, add them to the pending names.
-				addon.getChannelInfoHolder().getPendingChannelsNames(NetworkState.PLAY).addAll(payload.channels());
-				NetworkingImpl.LOGGER.debug("Received accepted channels from the client for play phase");
-			} else {
-				addon.onCommonRegisterPacket(payload);
-			}
-
-			handler.completeTask(CommonRegisterConfigurationTask.KEY);
-		});
-
-		// Create a configuration task to send and receive the common packets
-		ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
-			final ServerConfigurationNetworkAddon addon = ServerNetworkingImpl.getAddon(handler);
-
-			if (ServerConfigurationNetworking.canSend(handler, CommonVersionPayload.PACKET_ID)) {
-				// Tasks are processed in order.
-				handler.addTask(new CommonVersionConfigurationTask(addon));
-
-				if (ServerConfigurationNetworking.canSend(handler, CommonRegisterPayload.PACKET_ID)) {
-					handler.addTask(new CommonRegisterConfigurationTask(addon));
-				}
-			}
-		});
 	}
 
 	// A configuration phase task to send and receive the version packets.
@@ -81,21 +48,6 @@ public class CommonPacketsImpl {
 		@Override
 		public void sendPacket(Consumer<Packet<?>> sender) {
 			addon.sendPacket(new CommonVersionPayload(SUPPORTED_COMMON_PACKET_VERSIONS));
-		}
-
-		@Override
-		public Key getKey() {
-			return KEY;
-		}
-	}
-
-	// A configuration phase task to send and receive the registration packets.
-	private record CommonRegisterConfigurationTask(ServerConfigurationNetworkAddon addon) implements ServerPlayerConfigurationTask {
-		public static final Key KEY = new Key(CommonRegisterPayload.PACKET_ID.toString());
-
-		@Override
-		public void sendPacket(Consumer<Packet<?>> sender) {
-			addon.sendPacket(addon.createRegisterPayload());
 		}
 
 		@Override

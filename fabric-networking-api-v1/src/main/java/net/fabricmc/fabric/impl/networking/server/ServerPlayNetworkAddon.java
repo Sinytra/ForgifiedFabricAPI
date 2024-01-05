@@ -16,12 +16,17 @@
 
 package net.fabricmc.fabric.impl.networking.server;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
+
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.NetworkState;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -30,50 +35,15 @@ import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.S2CPlayChannelEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.impl.networking.AbstractChanneledNetworkAddon;
-import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
-import net.fabricmc.fabric.impl.networking.NetworkingImpl;
+import net.fabricmc.fabric.impl.networking.GenericFutureListenerHolder;
 import net.fabricmc.fabric.impl.networking.payload.ResolvedPayload;
 
-public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<ServerPlayNetworkAddon.Handler> {
-	private final ServerPlayNetworkHandler handler;
-	private final MinecraftServer server;
-	private boolean sentInitialRegisterPacket;
+public final class ServerPlayNetworkAddon implements PacketSender {
+	private final ClientConnection connection;
 
-	public ServerPlayNetworkAddon(ServerPlayNetworkHandler handler, ClientConnection connection, MinecraftServer server) {
-		super(ServerNetworkingImpl.PLAY, connection, "ServerPlayNetworkAddon for " + handler.player.getDisplayName());
-		this.handler = handler;
-		this.server = server;
-
-		// Must register pending channels via lateinit
-		this.registerPendingChannels((ChannelInfoHolder) this.connection, NetworkState.PLAY);
-	}
-
-	@Override
-	protected void invokeInitEvent() {
-		ServerPlayConnectionEvents.INIT.invoker().onPlayInit(this.handler, this.server);
-	}
-
-	public void onClientReady() {
-		ServerPlayConnectionEvents.JOIN.invoker().onPlayReady(this.handler, this, this.server);
-
-		this.sendInitialChannelRegistrationPacket();
-		this.sentInitialRegisterPacket = true;
-	}
-
-	@Override
-	protected void receive(Handler handler, ResolvedPayload payload) {
-		handler.receive(this.server, this.handler.player, this.handler, payload, this);
-	}
-
-	// impl details
-
-	@Override
-	protected void schedule(Runnable task) {
-		this.handler.player.server.execute(task);
+	public ServerPlayNetworkAddon(ClientConnection connection) {
+		this.connection = connection;
 	}
 
 	@Override
@@ -87,47 +57,15 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 	}
 
 	@Override
-	protected void invokeRegisterEvent(List<Identifier> ids) {
-		S2CPlayChannelEvents.REGISTER.invoker().onChannelRegister(this.handler, this, this.server, ids);
+	public void sendPacket(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+		sendPacket(packet, GenericFutureListenerHolder.create(callback));
 	}
 
 	@Override
-	protected void invokeUnregisterEvent(List<Identifier> ids) {
-		S2CPlayChannelEvents.UNREGISTER.invoker().onChannelUnregister(this.handler, this, this.server, ids);
-	}
+	public void sendPacket(Packet<?> packet, PacketCallbacks callback) {
+		Objects.requireNonNull(packet, "Packet cannot be null");
 
-	@Override
-	protected void handleRegistration(Identifier channelName) {
-		// If we can already send packets, immediately send the register packet for this channel
-		if (this.sentInitialRegisterPacket) {
-			final PacketByteBuf buf = this.createRegistrationPacket(Collections.singleton(channelName));
-
-			if (buf != null) {
-				this.sendPacket(NetworkingImpl.REGISTER_CHANNEL, buf);
-			}
-		}
-	}
-
-	@Override
-	protected void handleUnregistration(Identifier channelName) {
-		// If we can already send packets, immediately send the unregister packet for this channel
-		if (this.sentInitialRegisterPacket) {
-			final PacketByteBuf buf = this.createRegistrationPacket(Collections.singleton(channelName));
-
-			if (buf != null) {
-				this.sendPacket(NetworkingImpl.UNREGISTER_CHANNEL, buf);
-			}
-		}
-	}
-
-	@Override
-	protected void invokeDisconnectEvent() {
-		ServerPlayConnectionEvents.DISCONNECT.invoker().onPlayDisconnect(this.handler, this.server);
-	}
-
-	@Override
-	protected boolean isReservedChannel(Identifier channelName) {
-		return NetworkingImpl.isReservedCommonChannel(channelName);
+		this.connection.send(packet, callback);
 	}
 
 	public interface Handler {

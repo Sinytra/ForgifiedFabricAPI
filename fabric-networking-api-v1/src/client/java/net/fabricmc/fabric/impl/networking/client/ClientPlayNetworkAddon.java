@@ -16,72 +16,30 @@
 
 package net.fabricmc.fabric.impl.networking.client;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
 
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.NetworkState;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.impl.networking.AbstractChanneledNetworkAddon;
-import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
-import net.fabricmc.fabric.impl.networking.NetworkingImpl;
+import net.fabricmc.fabric.impl.networking.GenericFutureListenerHolder;
 import net.fabricmc.fabric.impl.networking.payload.ResolvedPayload;
 
-public final class ClientPlayNetworkAddon extends AbstractChanneledNetworkAddon<ClientPlayNetworkAddon.Handler> {
+public final class ClientPlayNetworkAddon implements PacketSender {
 	private final ClientPlayNetworkHandler handler;
-	private final MinecraftClient client;
-	private boolean sentInitialRegisterPacket;
 
-	private static final Logger LOGGER = LogUtils.getLogger();
-
-	public ClientPlayNetworkAddon(ClientPlayNetworkHandler handler, MinecraftClient client) {
-		super(ClientNetworkingImpl.PLAY, handler.getConnection(), "ClientPlayNetworkAddon for " + handler.getProfile().getName());
+	public ClientPlayNetworkAddon(ClientPlayNetworkHandler handler) {
 		this.handler = handler;
-		this.client = client;
-
-		// Must register pending channels via lateinit
-		this.registerPendingChannels((ChannelInfoHolder) this.connection, NetworkState.PLAY);
-	}
-
-	@Override
-	protected void invokeInitEvent() {
-		ClientPlayConnectionEvents.INIT.invoker().onPlayInit(this.handler, this.client);
-	}
-
-	public void onServerReady() {
-		try {
-			ClientPlayConnectionEvents.JOIN.invoker().onPlayReady(this.handler, this, this.client);
-		} catch (RuntimeException e) {
-			LOGGER.error("Exception thrown while invoking ClientPlayConnectionEvents.JOIN", e);
-		}
-
-		// The client cannot send any packets, including `minecraft:register` until after GameJoinS2CPacket is received.
-		this.sendInitialChannelRegistrationPacket();
-		this.sentInitialRegisterPacket = true;
-	}
-
-	@Override
-	protected void receive(Handler handler, ResolvedPayload payload) {
-		handler.receive(this.client, this.handler, payload, this);
-	}
-
-	// impl details
-
-	@Override
-	protected void schedule(Runnable task) {
-		MinecraftClient.getInstance().execute(task);
 	}
 
 	@Override
@@ -95,47 +53,15 @@ public final class ClientPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 	}
 
 	@Override
-	protected void invokeRegisterEvent(List<Identifier> ids) {
-		C2SPlayChannelEvents.REGISTER.invoker().onChannelRegister(this.handler, this, this.client, ids);
+	public void sendPacket(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+		sendPacket(packet, GenericFutureListenerHolder.create(callback));
 	}
 
 	@Override
-	protected void invokeUnregisterEvent(List<Identifier> ids) {
-		C2SPlayChannelEvents.UNREGISTER.invoker().onChannelUnregister(this.handler, this, this.client, ids);
-	}
+	public void sendPacket(Packet<?> packet, PacketCallbacks callback) {
+		Objects.requireNonNull(packet, "Packet cannot be null");
 
-	@Override
-	protected void handleRegistration(Identifier channelName) {
-		// If we can already send packets, immediately send the register packet for this channel
-		if (this.sentInitialRegisterPacket) {
-			final PacketByteBuf buf = this.createRegistrationPacket(Collections.singleton(channelName));
-
-			if (buf != null) {
-				this.sendPacket(NetworkingImpl.REGISTER_CHANNEL, buf);
-			}
-		}
-	}
-
-	@Override
-	protected void handleUnregistration(Identifier channelName) {
-		// If we can already send packets, immediately send the unregister packet for this channel
-		if (this.sentInitialRegisterPacket) {
-			final PacketByteBuf buf = this.createRegistrationPacket(Collections.singleton(channelName));
-
-			if (buf != null) {
-				this.sendPacket(NetworkingImpl.UNREGISTER_CHANNEL, buf);
-			}
-		}
-	}
-
-	@Override
-	protected void invokeDisconnectEvent() {
-		ClientPlayConnectionEvents.DISCONNECT.invoker().onPlayDisconnect(this.handler, this.client);
-	}
-
-	@Override
-	protected boolean isReservedChannel(Identifier channelName) {
-		return NetworkingImpl.isReservedCommonChannel(channelName);
+		this.handler.connection.send(packet, callback);
 	}
 
 	public interface Handler {

@@ -4,14 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "accessor.ClientCommonNetworkHandlerAccessor",
-    "accessor.ClientConfigurationNetworkHandlerAccessor",
     "accessor.ClientLoginNetworkHandlerAccessor",
+    "accessor.ClientPacketHandlerAccessor",
     "accessor.ConnectScreenAccessor",
     "accessor.MinecraftClientAccessor",
-    "ClientCommonNetworkHandlerMixin",
     "ClientConfigurationNetworkHandlerMixin",
-    "ClientLoginNetworkHandlerMixin",
-    "ClientPlayNetworkHandlerMixin"
+    "ClientLoginNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

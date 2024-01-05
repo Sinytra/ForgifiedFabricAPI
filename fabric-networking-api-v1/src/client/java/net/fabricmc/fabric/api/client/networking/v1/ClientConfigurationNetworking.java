@@ -19,6 +19,8 @@ package net.fabricmc.fabric.api.client.networking.v1;
 import java.util.Objects;
 import java.util.Set;
 
+import net.fabricmc.fabric.impl.networking.client.ClientNeoNetworking;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
@@ -73,7 +75,7 @@ public final class ClientConfigurationNetworking {
 	 * @see ClientConfigurationNetworking#registerReceiver(Identifier, ConfigurationChannelHandler)
 	 */
 	public static boolean registerGlobalReceiver(Identifier channelName, ConfigurationChannelHandler channelHandler) {
-		return ClientNetworkingImpl.CONFIGURATION.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
+		return ClientNeoNetworking.CONFIGURATION.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
 	}
 
 	/**
@@ -90,7 +92,7 @@ public final class ClientConfigurationNetworking {
 	 * @see ClientConfigurationNetworking#registerReceiver(PacketType, ConfigurationPacketHandler)
 	 */
 	public static <T extends FabricPacket> boolean registerGlobalReceiver(PacketType<T> type, ConfigurationPacketHandler<T> handler) {
-		return ClientNetworkingImpl.CONFIGURATION.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
+		return ClientNeoNetworking.CONFIGURATION.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
 	}
 
 	/**
@@ -106,7 +108,7 @@ public final class ClientConfigurationNetworking {
 	 */
 	@Nullable
 	public static ClientConfigurationNetworking.ConfigurationChannelHandler unregisterGlobalReceiver(Identifier channelName) {
-		return unwrapUntyped(ClientNetworkingImpl.CONFIGURATION.unregisterGlobalReceiver(channelName));
+		return unwrapUntyped(ClientNeoNetworking.CONFIGURATION.unregisterGlobalReceiver(channelName));
 	}
 
 	/**
@@ -123,7 +125,7 @@ public final class ClientConfigurationNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> ClientConfigurationNetworking.ConfigurationPacketHandler<T> unregisterGlobalReceiver(PacketType<T> type) {
-		return unwrapTyped(ClientNetworkingImpl.CONFIGURATION.unregisterGlobalReceiver(type.getId()));
+		return unwrapTyped(ClientNeoNetworking.CONFIGURATION.unregisterGlobalReceiver(type.getId()));
 	}
 
 	/**
@@ -133,7 +135,7 @@ public final class ClientConfigurationNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<Identifier> getGlobalReceivers() {
-		return ClientNetworkingImpl.CONFIGURATION.getChannels();
+		return ClientNeoNetworking.CONFIGURATION.getChannels();
 	}
 
 	/**
@@ -154,10 +156,10 @@ public final class ClientConfigurationNetworking {
 	 * @see ClientPlayConnectionEvents#INIT
 	 */
 	public static boolean registerReceiver(Identifier channelName, ConfigurationChannelHandler channelHandler) {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return addon.registerChannel(channelName, wrapUntyped(channelHandler));
+			return ClientNeoNetworking.CONFIGURATION.registerReceiver(addon, channelName, wrapUntyped(channelHandler));
 		}
 
 		throw new IllegalStateException("Cannot register receiver while not configuring!");
@@ -179,10 +181,10 @@ public final class ClientConfigurationNetworking {
 	 * @see ClientPlayConnectionEvents#INIT
 	 */
 	public static <T extends FabricPacket> boolean registerReceiver(PacketType<T> type, ConfigurationPacketHandler<T> handler) {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return addon.registerChannel(type.getId(), wrapTyped(type, handler));
+			return ClientNeoNetworking.CONFIGURATION.registerReceiver(addon, type.getId(), wrapTyped(type, handler));
 		}
 
 		throw new IllegalStateException("Cannot register receiver while not configuring!");
@@ -199,10 +201,10 @@ public final class ClientConfigurationNetworking {
 	 */
 	@Nullable
 	public static ClientConfigurationNetworking.ConfigurationChannelHandler unregisterReceiver(Identifier channelName) throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return unwrapUntyped(addon.unregisterChannel(channelName));
+			return unwrapUntyped(ClientNeoNetworking.CONFIGURATION.unregisterReceiver(addon, channelName));
 		}
 
 		throw new IllegalStateException("Cannot unregister receiver while not configuring!");
@@ -220,10 +222,10 @@ public final class ClientConfigurationNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> ClientConfigurationNetworking.ConfigurationPacketHandler<T> unregisterReceiver(PacketType<T> type) {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return unwrapTyped(addon.unregisterChannel(type.getId()));
+			return unwrapTyped(ClientNeoNetworking.CONFIGURATION.unregisterReceiver(addon, type.getId()));
 		}
 
 		throw new IllegalStateException("Cannot unregister receiver while not configuring!");
@@ -236,10 +238,10 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<Identifier> getReceived() throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return addon.getReceivableChannels();
+			return ClientNeoNetworking.CONFIGURATION.getReceived(addon);
 		}
 
 		throw new IllegalStateException("Cannot get a list of channels the client can receive packets on while not configuring!");
@@ -252,10 +254,10 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<Identifier> getSendable() throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return addon.getSendableChannels();
+			return ClientNeoNetworking.CONFIGURATION.getSendable(addon);
 		}
 
 		throw new IllegalStateException("Cannot get a list of channels the server can receive packets on while not configuring!");
@@ -269,13 +271,7 @@ public final class ClientConfigurationNetworking {
 	 * False if the client is not in game.
 	 */
 	public static boolean canSend(Identifier channelName) throws IllegalArgumentException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-		if (addon != null) {
-			return addon.getSendableChannels().contains(channelName);
-		}
-
-		throw new IllegalStateException("Cannot get a list of channels the server can receive packets on while not configuring!");
+		return getSendable().contains(channelName);
 	}
 
 	/**
@@ -310,10 +306,10 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static PacketSender getSender() throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			return addon;
+			return new ClientConfigurationNetworkAddon(addon);
 		}
 
 		throw new IllegalStateException("Cannot get PacketSender while not configuring!");
@@ -327,7 +323,7 @@ public final class ClientConfigurationNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static void send(Identifier channelName, PacketByteBuf buf) throws IllegalStateException {
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
 			addon.sendPacket(createC2SPacket(channelName, buf));
@@ -347,10 +343,10 @@ public final class ClientConfigurationNetworking {
 		Objects.requireNonNull(packet, "Packet cannot be null");
 		Objects.requireNonNull(packet.getType(), "Packet#getType cannot return null");
 
-		final ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
+		final ClientConfigurationNetworkHandler addon = ClientNetworkingImpl.getClientConfigurationAddon();
 
 		if (addon != null) {
-			addon.sendPacket(packet);
+			new ClientConfigurationNetworkAddon(addon).sendPacket(packet);
 			return;
 		}
 

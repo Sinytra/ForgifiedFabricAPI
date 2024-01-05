@@ -33,14 +33,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginNetworkHandler;
 import net.minecraft.text.Text;
 
-import net.fabricmc.fabric.impl.networking.DisconnectPacketSource;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.PacketCallbackListener;
 import net.fabricmc.fabric.impl.networking.payload.PacketByteBufLoginQueryResponse;
 import net.fabricmc.fabric.impl.networking.server.ServerLoginNetworkAddon;
 
 @Mixin(ServerLoginNetworkHandler.class)
-abstract class ServerLoginNetworkHandlerMixin implements NetworkHandlerExtensions, DisconnectPacketSource, PacketCallbackListener {
+abstract class ServerLoginNetworkHandlerMixin implements NetworkHandlerExtensions, PacketCallbackListener {
 	@Shadow
 	protected abstract void tickVerify(GameProfile profile);
 
@@ -87,10 +86,5 @@ abstract class ServerLoginNetworkHandlerMixin implements NetworkHandlerExtension
 	@Override
 	public ServerLoginNetworkAddon getAddon() {
 		return this.addon;
-	}
-
-	@Override
-	public Packet<?> createDisconnectPacket(Text message) {
-		return new LoginDisconnectS2CPacket(message);
 	}
 }

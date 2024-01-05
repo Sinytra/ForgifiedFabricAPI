@@ -19,6 +19,10 @@ package net.fabricmc.fabric.api.client.networking.v1;
 import java.util.Objects;
 import java.util.Set;
 
+import net.fabricmc.fabric.impl.networking.client.ClientNeoNetworking;
+
+import net.fabricmc.fabric.impl.networking.client.ClientPlayNetworkAddon;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
@@ -35,7 +39,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl;
-import net.fabricmc.fabric.impl.networking.client.ClientPlayNetworkAddon;
 import net.fabricmc.fabric.impl.networking.payload.ResolvablePayload;
 import net.fabricmc.fabric.impl.networking.payload.TypedPayload;
 import net.fabricmc.fabric.impl.networking.payload.UntypedPayload;
@@ -76,7 +79,7 @@ public final class ClientPlayNetworking {
 	 * @see ClientPlayNetworking#registerReceiver(Identifier, PlayChannelHandler)
 	 */
 	public static boolean registerGlobalReceiver(Identifier channelName, PlayChannelHandler channelHandler) {
-		return ClientNetworkingImpl.PLAY.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
+		return ClientNeoNetworking.PLAY.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
 	}
 
 	/**
@@ -93,7 +96,7 @@ public final class ClientPlayNetworking {
 	 * @see ClientPlayNetworking#registerReceiver(PacketType, PlayPacketHandler)
 	 */
 	public static <T extends FabricPacket> boolean registerGlobalReceiver(PacketType<T> type, PlayPacketHandler<T> handler) {
-		return ClientNetworkingImpl.PLAY.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
+		return ClientNeoNetworking.PLAY.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
 	}
 
 	/**
@@ -109,7 +112,7 @@ public final class ClientPlayNetworking {
 	 */
 	@Nullable
 	public static PlayChannelHandler unregisterGlobalReceiver(Identifier channelName) {
-		return unwrapUntyped(ClientNetworkingImpl.PLAY.unregisterGlobalReceiver(channelName));
+		return unwrapUntyped(ClientNeoNetworking.PLAY.unregisterGlobalReceiver(channelName));
 	}
 
 	/**
@@ -126,7 +129,7 @@ public final class ClientPlayNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> PlayPacketHandler<T> unregisterGlobalReceiver(PacketType<T> type) {
-		return unwrapTyped(ClientNetworkingImpl.PLAY.unregisterGlobalReceiver(type.getId()));
+		return unwrapTyped(ClientNeoNetworking.PLAY.unregisterGlobalReceiver(type.getId()));
 	}
 
 	/**
@@ -136,7 +139,7 @@ public final class ClientPlayNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<Identifier> getGlobalReceivers() {
-		return ClientNetworkingImpl.PLAY.getChannels();
+		return ClientNeoNetworking.PLAY.getChannels();
 	}
 
 	/**
@@ -157,10 +160,10 @@ public final class ClientPlayNetworking {
 	 * @see ClientPlayConnectionEvents#INIT
 	 */
 	public static boolean registerReceiver(Identifier channelName, PlayChannelHandler channelHandler) {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
+		final ClientPlayNetworkHandler addon = MinecraftClient.getInstance().getNetworkHandler();
 
 		if (addon != null) {
-			return addon.registerChannel(channelName, wrapUntyped(channelHandler));
+			return ClientNeoNetworking.PLAY.registerReceiver(addon, channelName, wrapUntyped(channelHandler));
 		}
 
 		throw new IllegalStateException("Cannot register receiver while not in game!");
@@ -182,10 +185,10 @@ public final class ClientPlayNetworking {
 	 * @see ClientPlayConnectionEvents#INIT
 	 */
 	public static <T extends FabricPacket> boolean registerReceiver(PacketType<T> type, PlayPacketHandler<T> handler) {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
+		final ClientPlayNetworkHandler addon = MinecraftClient.getInstance().getNetworkHandler();
 
 		if (addon != null) {
-			return addon.registerChannel(type.getId(), wrapTyped(type, handler));
+			return ClientNeoNetworking.PLAY.registerReceiver(addon, type.getId(), wrapTyped(type, handler));
 		}
 
 		throw new IllegalStateException("Cannot register receiver while not in game!");
@@ -202,10 +205,10 @@ public final class ClientPlayNetworking {
 	 */
 	@Nullable
 	public static PlayChannelHandler unregisterReceiver(Identifier channelName) throws IllegalStateException {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
+		final ClientPlayNetworkHandler addon = MinecraftClient.getInstance().getNetworkHandler();
 
 		if (addon != null) {
-			return unwrapUntyped(addon.unregisterChannel(channelName));
+			return unwrapUntyped(ClientNeoNetworking.PLAY.unregisterReceiver(addon, channelName));
 		}
 
 		throw new IllegalStateException("Cannot unregister receiver while not in game!");
@@ -223,10 +226,10 @@ public final class ClientPlayNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> PlayPacketHandler<T> unregisterReceiver(PacketType<T> type) {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
+		final ClientPlayNetworkHandler addon = MinecraftClient.getInstance().getNetworkHandler();
 
 		if (addon != null) {
-			return unwrapTyped(addon.unregisterChannel(type.getId()));
+			return unwrapTyped(ClientNeoNetworking.PLAY.unregisterReceiver(addon, type.getId()));
 		}
 
 		throw new IllegalStateException("Cannot unregister receiver while not in game!");
@@ -239,10 +242,10 @@ public final class ClientPlayNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<Identifier> getReceived() throws IllegalStateException {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
+		final ClientPlayNetworkHandler addon = MinecraftClient.getInstance().getNetworkHandler();
 
 		if (addon != null) {
-			return addon.getReceivableChannels();
+			return ClientNeoNetworking.PLAY.getReceived(addon);
 		}
 
 		throw new IllegalStateException("Cannot get a list of channels the client can receive packets on while not in game!");
@@ -255,10 +258,10 @@ public final class ClientPlayNetworking {
 	 * @throws IllegalStateException if the client is not connected to a server
 	 */
 	public static Set<Identifier> getSendable() throws IllegalStateException {
-		final ClientPlayNetworkAddon addon = ClientNetworkingImpl.getClientPlayAddon();
+		final ClientPlayNetworkHandler addon = MinecraftClient.getInstance().getNetworkHandler();
 
 		if (addon != null) {
-			return addon.getSendableChannels();
+			return ClientNeoNetworking.PLAY.getSendable(addon);
 		}
 
 		throw new IllegalStateException("Cannot get a list of channels the server can receive packets on while not in game!");
@@ -274,7 +277,7 @@ public final class ClientPlayNetworking {
 	public static boolean canSend(Identifier channelName) throws IllegalArgumentException {
 		// You cant send without a client player, so this is fine
 		if (MinecraftClient.getInstance().getNetworkHandler() != null) {
-			return ClientNetworkingImpl.getAddon(MinecraftClient.getInstance().getNetworkHandler()).getSendableChannels().contains(channelName);
+			return getSendable().contains(channelName);
 		}
 
 		return false;
@@ -324,7 +327,7 @@ public final class ClientPlayNetworking {
 	public static PacketSender getSender() throws IllegalStateException {
 		// You cant send without a client player, so this is fine
 		if (MinecraftClient.getInstance().getNetworkHandler() != null) {
-			return ClientNetworkingImpl.getAddon(MinecraftClient.getInstance().getNetworkHandler());
+			return new ClientPlayNetworkAddon(MinecraftClient.getInstance().getNetworkHandler());
 		}
 
 		throw new IllegalStateException("Cannot get packet sender when not in game!");

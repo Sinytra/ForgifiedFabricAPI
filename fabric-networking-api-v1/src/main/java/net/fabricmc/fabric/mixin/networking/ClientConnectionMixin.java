@@ -16,18 +16,12 @@
 
 package net.fabricmc.fabric.mixin.networking;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -35,22 +29,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.NetworkState;
 import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
+import net.minecraft.network.packet.s2c.login.LoginDisconnectS2CPacket;
+import net.minecraft.server.network.ServerLoginNetworkHandler;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
-import net.fabricmc.fabric.impl.networking.DisconnectPacketSource;
 import net.fabricmc.fabric.impl.networking.GenericFutureListenerHolder;
 import net.fabricmc.fabric.impl.networking.NetworkHandlerExtensions;
 import net.fabricmc.fabric.impl.networking.PacketCallbackListener;
 
 @Mixin(ClientConnection.class)
-abstract class ClientConnectionMixin implements ChannelInfoHolder {
+abstract class ClientConnectionMixin {
 	@Shadow
 	private PacketListener packetListener;
 
@@ -60,25 +52,13 @@ abstract class ClientConnectionMixin implements ChannelInfoHolder {
 	@Shadow
 	public abstract void send(Packet<?> packet, @Nullable PacketCallbacks arg);
 
-	@Unique
-	private Map<NetworkState, Collection<Identifier>> playChannels;
-
-	@Inject(method = "<init>", at = @At("RETURN"))
-	private void initAddedFields(NetworkSide side, CallbackInfo ci) {
-		this.playChannels = new ConcurrentHashMap<>();
-	}
-
 	// Must be fully qualified due to mixin not working in production without it
 	@Redirect(method = "exceptionCaught", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V"))
 	private void resendOnExceptionCaught(ClientConnection self, Packet<?> packet, PacketCallbacks listener, ChannelHandlerContext context, Throwable ex) {
 		PacketListener handler = this.packetListener;
 		Text disconnectMessage = Text.translatable("disconnect.genericReason", "Internal Exception: " + ex);
 
-		if (handler instanceof DisconnectPacketSource) {
-			this.send(((DisconnectPacketSource) handler).createDisconnectPacket(disconnectMessage), listener);
-		} else {
-			this.disconnect(disconnectMessage); // Don't send packet if we cannot send proper packets
-		}
+		this.send(handler instanceof ServerLoginNetworkHandler ? new LoginDisconnectS2CPacket(disconnectMessage) : new DisconnectS2CPacket(disconnectMessage), listener);
 	}
 
 	@Inject(method = "sendImmediately", at = @At(value = "FIELD", target = "Lnet/minecraft/network/ClientConnection;packetsSentCounter:I"))
@@ -116,10 +96,5 @@ abstract class ClientConnectionMixin implements ChannelInfoHolder {
 			channelFuture.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 			ci.cancel();
 		}
-	}
-
-	@Override
-	public Collection<Identifier> getPendingChannelsNames(NetworkState state) {
-		return this.playChannels.computeIfAbsent(state, (key) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
 	}
 }

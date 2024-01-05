@@ -72,7 +72,7 @@ def moduleDependencies(project, List<String> depNames) {
 
 	project.dependencies {
 		deps.each {
-			api it
+			implementation it
 		}
 
 		clientOutputs.each {
@@ -240,6 +240,13 @@ allprojects {
 
 	repositories {
 		maven { url "https://maven.neoforged.net/releases/" }
+		maven {
+			name 'Maven for PR #277' // https://github.com/neoforged/NeoForge/pull/277
+			url 'https://prmaven.neoforged.net/NeoForge/pr277'
+			content {
+				includeModule('net.neoforged', 'neoforge')
+			}
+		}
 	}
 
 	dependencies {

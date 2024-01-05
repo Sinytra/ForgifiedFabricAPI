@@ -16,72 +16,31 @@
 
 package net.fabricmc.fabric.impl.networking.client;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Objects;
+
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientConfigurationNetworkHandler;
-import net.minecraft.network.NetworkState;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.client.networking.v1.C2SConfigurationChannelEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.impl.networking.AbstractChanneledNetworkAddon;
-import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
-import net.fabricmc.fabric.impl.networking.NetworkingImpl;
-import net.fabricmc.fabric.impl.networking.payload.ResolvablePayload;
+import net.fabricmc.fabric.impl.networking.GenericFutureListenerHolder;
 import net.fabricmc.fabric.impl.networking.payload.ResolvedPayload;
-import net.fabricmc.fabric.mixin.networking.client.accessor.ClientCommonNetworkHandlerAccessor;
-import net.fabricmc.fabric.mixin.networking.client.accessor.ClientConfigurationNetworkHandlerAccessor;
 
-public final class ClientConfigurationNetworkAddon extends AbstractChanneledNetworkAddon<ClientConfigurationNetworkAddon.Handler> {
+public final class ClientConfigurationNetworkAddon implements PacketSender {
 	private final ClientConfigurationNetworkHandler handler;
-	private final MinecraftClient client;
-	private boolean sentInitialRegisterPacket;
 
-	public ClientConfigurationNetworkAddon(ClientConfigurationNetworkHandler handler, MinecraftClient client) {
-		super(ClientNetworkingImpl.CONFIGURATION, ((ClientCommonNetworkHandlerAccessor) handler).getConnection(), "ClientPlayNetworkAddon for " + ((ClientConfigurationNetworkHandlerAccessor) handler).getProfile().getName());
+	public ClientConfigurationNetworkAddon(ClientConfigurationNetworkHandler handler) {
 		this.handler = handler;
-		this.client = client;
-
-		// Must register pending channels via lateinit
-		this.registerPendingChannels((ChannelInfoHolder) this.connection, NetworkState.CONFIGURATION);
-	}
-
-	@Override
-	protected void invokeInitEvent() {
-		ClientConfigurationConnectionEvents.INIT.invoker().onConfigurationInit(this.handler, this.client);
-	}
-
-	public void onServerReady() {
-		// Do nothing for now
-	}
-
-	@Override
-	protected void receiveRegistration(boolean register, ResolvablePayload resolvable) {
-		super.receiveRegistration(register, resolvable);
-
-		if (register && !this.sentInitialRegisterPacket) {
-			this.sendInitialChannelRegistrationPacket();
-			this.sentInitialRegisterPacket = true;
-		}
-	}
-
-	@Override
-	protected void receive(Handler handler, ResolvedPayload payload) {
-		handler.receive(this.client, this.handler, payload, this);
-	}
-
-	// impl details
-
-	@Override
-	protected void schedule(Runnable task) {
-		MinecraftClient.getInstance().execute(task);
 	}
 
 	@Override
@@ -95,56 +54,20 @@ public final class ClientConfigurationNetworkAddon extends AbstractChanneledNetw
 	}
 
 	@Override
-	protected void invokeRegisterEvent(List<Identifier> ids) {
-		C2SConfigurationChannelEvents.REGISTER.invoker().onChannelRegister(this.handler, this, this.client, ids);
+	public void sendPacket(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+		sendPacket(packet, GenericFutureListenerHolder.create(callback));
 	}
 
 	@Override
-	protected void invokeUnregisterEvent(List<Identifier> ids) {
-		C2SConfigurationChannelEvents.UNREGISTER.invoker().onChannelUnregister(this.handler, this, this.client, ids);
-	}
+	public void sendPacket(Packet<?> packet, PacketCallbacks callback) {
+		Objects.requireNonNull(packet, "Packet cannot be null");
 
-	@Override
-	protected void handleRegistration(Identifier channelName) {
-		// If we can already send packets, immediately send the register packet for this channel
-		if (this.sentInitialRegisterPacket) {
-			final PacketByteBuf buf = this.createRegistrationPacket(Collections.singleton(channelName));
-
-			if (buf != null) {
-				this.sendPacket(NetworkingImpl.REGISTER_CHANNEL, buf);
-			}
-		}
-	}
-
-	@Override
-	protected void handleUnregistration(Identifier channelName) {
-		// If we can already send packets, immediately send the unregister packet for this channel
-		if (this.sentInitialRegisterPacket) {
-			final PacketByteBuf buf = this.createRegistrationPacket(Collections.singleton(channelName));
-
-			if (buf != null) {
-				this.sendPacket(NetworkingImpl.UNREGISTER_CHANNEL, buf);
-			}
-		}
+		this.handler.connection.send(packet, callback);
 	}
 
 	public void handleReady() {
-		ClientConfigurationConnectionEvents.READY.invoker().onConfigurationReady(this.handler, this.client);
+		ClientConfigurationConnectionEvents.READY.invoker().onConfigurationReady(this.handler, MinecraftClient.getInstance());
 		ClientNetworkingImpl.setClientConfigurationAddon(null);
-	}
-
-	@Override
-	protected void invokeDisconnectEvent() {
-		ClientConfigurationConnectionEvents.DISCONNECT.invoker().onConfigurationDisconnect(this.handler, this.client);
-	}
-
-	@Override
-	protected boolean isReservedChannel(Identifier channelName) {
-		return NetworkingImpl.isReservedCommonChannel(channelName);
-	}
-
-	public ChannelInfoHolder getChannelInfoHolder() {
-		return (ChannelInfoHolder) ((ClientCommonNetworkHandlerAccessor) handler).getConnection();
 	}
 
 	public interface Handler {

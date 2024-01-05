@@ -58,7 +58,6 @@ allprojects {
 	def localDevJar = tasks.register("localDevJar", Jar) {
 		dependsOn jar
 		from(zipTree(jar.archiveFile))
-		rename "accesstransformer_dev.cfg", "accesstransformer.cfg"
 		archiveClassifier = "local"
 		destinationDirectory = project.layout.buildDirectory.dir("devlibs")
 		manifest.from(jar.manifest)

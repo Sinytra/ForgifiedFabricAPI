@@ -4,21 +4,16 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ClientConnectionMixin",
-    "CommandManagerMixin",
-    "CustomPayloadC2SPacketMixin",
-    "CustomPayloadS2CPacketMixin",
     "EntityTrackerEntryMixin",
     "LoginQueryRequestS2CPacketMixin",
     "LoginQueryResponseC2SPacketMixin",
-    "NetworkStateInternalPacketHandlerMixin",
     "PlayerManagerMixin",
-    "ServerCommonNetworkHandlerMixin",
     "ServerConfigurationNetworkHandlerMixin",
     "ServerLoginNetworkHandlerMixin",
-    "ServerPlayNetworkHandlerMixin",
     "accessor.EntityTrackerAccessor",
     "accessor.ServerCommonNetworkHandlerAccessor",
     "accessor.ServerLoginNetworkHandlerAccessor",
+    "accessor.ServerPacketHandlerAccessor",
     "accessor.ThreadedAnvilChunkStorageAccessor"
   ],
   "injectors": {

@@ -19,6 +19,8 @@ package net.fabricmc.fabric.api.networking.v1;
 import java.util.Objects;
 import java.util.Set;
 
+import net.fabricmc.fabric.impl.networking.neo.ServerNeoNetworking;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.PacketByteBuf;
@@ -87,7 +89,7 @@ public final class ServerPlayNetworking {
 	 * @see ServerPlayNetworking#registerReceiver(ServerPlayNetworkHandler, Identifier, PlayChannelHandler)
 	 */
 	public static boolean registerGlobalReceiver(Identifier channelName, PlayChannelHandler channelHandler) {
-		return ServerNetworkingImpl.PLAY.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
+		return ServerNeoNetworking.PLAY.registerGlobalReceiver(channelName, wrapUntyped(channelHandler));
 	}
 
 	/**
@@ -104,7 +106,7 @@ public final class ServerPlayNetworking {
 	 * @see ServerPlayNetworking#registerReceiver(ServerPlayNetworkHandler, PacketType, PlayPacketHandler)
 	 */
 	public static <T extends FabricPacket> boolean registerGlobalReceiver(PacketType<T> type, PlayPacketHandler<T> handler) {
-		return ServerNetworkingImpl.PLAY.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
+		return ServerNeoNetworking.PLAY.registerGlobalReceiver(type.getId(), wrapTyped(type, handler));
 	}
 
 	/**
@@ -120,7 +122,7 @@ public final class ServerPlayNetworking {
 	 */
 	@Nullable
 	public static PlayChannelHandler unregisterGlobalReceiver(Identifier channelName) {
-		return unwrapUntyped(ServerNetworkingImpl.PLAY.unregisterGlobalReceiver(channelName));
+		return unwrapUntyped(ServerNeoNetworking.PLAY.unregisterGlobalReceiver(channelName));
 	}
 
 	/**
@@ -137,7 +139,7 @@ public final class ServerPlayNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> PlayPacketHandler<T> unregisterGlobalReceiver(PacketType<T> type) {
-		return unwrapTyped(ServerNetworkingImpl.PLAY.unregisterGlobalReceiver(type.getId()));
+		return unwrapTyped(ServerNeoNetworking.PLAY.unregisterGlobalReceiver(type.getId()));
 	}
 
 	/**
@@ -147,7 +149,7 @@ public final class ServerPlayNetworking {
 	 * @return all channel names which global receivers are registered for.
 	 */
 	public static Set<Identifier> getGlobalReceivers() {
-		return ServerNetworkingImpl.PLAY.getChannels();
+		return ServerNeoNetworking.PLAY.getChannels();
 	}
 
 	/**
@@ -176,7 +178,7 @@ public final class ServerPlayNetworking {
 	public static boolean registerReceiver(ServerPlayNetworkHandler networkHandler, Identifier channelName, PlayChannelHandler channelHandler) {
 		Objects.requireNonNull(networkHandler, "Network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(networkHandler).registerChannel(channelName, wrapUntyped(channelHandler));
+		return ServerNeoNetworking.PLAY.registerReceiver(networkHandler, channelName, wrapUntyped(channelHandler));
 	}
 
 	/**
@@ -197,7 +199,7 @@ public final class ServerPlayNetworking {
 	 * @see ServerPlayConnectionEvents#INIT
 	 */
 	public static <T extends FabricPacket> boolean registerReceiver(ServerPlayNetworkHandler networkHandler, PacketType<T> type, PlayPacketHandler<T> handler) {
-		return ServerNetworkingImpl.getAddon(networkHandler).registerChannel(type.getId(), wrapTyped(type, handler));
+		return ServerNeoNetworking.PLAY.registerReceiver(networkHandler, type.getId(), wrapTyped(type, handler));
 	}
 
 	/**
@@ -212,7 +214,7 @@ public final class ServerPlayNetworking {
 	public static PlayChannelHandler unregisterReceiver(ServerPlayNetworkHandler networkHandler, Identifier channelName) {
 		Objects.requireNonNull(networkHandler, "Network handler cannot be null");
 
-		return unwrapUntyped(ServerNetworkingImpl.getAddon(networkHandler).unregisterChannel(channelName));
+		return unwrapUntyped(ServerNeoNetworking.PLAY.unregisterReceiver(networkHandler, channelName));
 	}
 
 	/**
@@ -226,7 +228,7 @@ public final class ServerPlayNetworking {
 	 */
 	@Nullable
 	public static <T extends FabricPacket> PlayPacketHandler<T> unregisterReceiver(ServerPlayNetworkHandler networkHandler, PacketType<T> type) {
-		return unwrapTyped(ServerNetworkingImpl.getAddon(networkHandler).unregisterChannel(type.getId()));
+		return unwrapTyped(ServerNeoNetworking.PLAY.unregisterReceiver(networkHandler, type.getId()));
 	}
 
 	/**
@@ -238,7 +240,7 @@ public final class ServerPlayNetworking {
 	public static Set<Identifier> getReceived(ServerPlayerEntity player) {
 		Objects.requireNonNull(player, "Server player entity cannot be null");
 
-		return getReceived(player.networkHandler);
+		return ServerNeoNetworking.PLAY.getReceived(player.networkHandler);
 	}
 
 	/**
@@ -250,7 +252,7 @@ public final class ServerPlayNetworking {
 	public static Set<Identifier> getReceived(ServerPlayNetworkHandler handler) {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getReceivableChannels();
+		return ServerNeoNetworking.PLAY.getReceived(handler);
 	}
 
 	/**
@@ -262,7 +264,7 @@ public final class ServerPlayNetworking {
 	public static Set<Identifier> getSendable(ServerPlayerEntity player) {
 		Objects.requireNonNull(player, "Server player entity cannot be null");
 
-		return getSendable(player.networkHandler);
+		return ServerNeoNetworking.PLAY.getSendable(player.networkHandler);
 	}
 
 	/**
@@ -274,7 +276,7 @@ public final class ServerPlayNetworking {
 	public static Set<Identifier> getSendable(ServerPlayNetworkHandler handler) {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels();
+		return ServerNeoNetworking.PLAY.getSendable(handler);
 	}
 
 	/**
@@ -314,7 +316,7 @@ public final class ServerPlayNetworking {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 		Objects.requireNonNull(channelName, "Channel name cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(channelName);
+		return getSendable(handler).contains(channelName);
 	}
 
 	/**
@@ -328,7 +330,7 @@ public final class ServerPlayNetworking {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 		Objects.requireNonNull(type, "Packet type cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler).getSendableChannels().contains(type.getId());
+		return getSendable(handler).contains(type.getId());
 	}
 
 	/**
@@ -376,7 +378,7 @@ public final class ServerPlayNetworking {
 	public static PacketSender getSender(ServerPlayNetworkHandler handler) {
 		Objects.requireNonNull(handler, "Server play network handler cannot be null");
 
-		return ServerNetworkingImpl.getAddon(handler);
+		return ServerNeoNetworking.PLAY.getSender(handler);
 	}
 
 	/**
