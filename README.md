@@ -94,8 +94,8 @@ repositories {
     maven("https://maven.su5ed.dev/releases")
 }
 dependencies {
-    compileOnly("dev.sinytra.fabric-api:fabric-api:FABRIC_API_VERSION")
-    runtimeOnly(fg.deobf("dev.sinytra.fabric-api:fabric-api:FABRIC_API_VERSION"))
+    compileOnly("dev.su5ed.sinytra.fabric-api:fabric-api:FABRIC_API_VERSION")
+    runtimeOnly(fg.deobf("dev.su5ed.sinytra.fabric-api:fabric-api:FABRIC_API_VERSION"))
 }
 ```
 
