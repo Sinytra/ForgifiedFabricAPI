@@ -24,11 +24,9 @@ import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
@@ -44,14 +42,6 @@ import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
 
 @Mixin(BakedModelManager.class)
 public class BakedModelManagerMixin implements FabricBakedModelManager {
-	@Shadow
-	private Map<Identifier, BakedModel> models;
-
-	@Override
-	public BakedModel getModel(Identifier id) {
-		return models.get(id);
-	}
-
 	@Redirect(
 			method = "reload",
 			at = @At(
