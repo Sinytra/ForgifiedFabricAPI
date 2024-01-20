@@ -1,13 +1,13 @@
 buildscript {
     dependencies {
-        classpath files(rootProject.buildscript.configurations.classpath) 
-    } 
+        classpath files(rootProject.buildscript.configurations.classpath)
+    }
 }
 
 
+import com.moandjiezana.toml.TomlWriter
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import groovy.toml.TomlBuilder
 import net.fabricmc.loom.api.mappings.layered.MappingsNamespace
 import net.fabricmc.loom.build.nesting.IncludedJarFactory
 import net.fabricmc.loom.task.RemapJarTask
@@ -365,6 +365,24 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 		return modid.replaceAll('-', '_')
 	}
 
+	class PseudoMap {
+		final map = [:]
+		void propertyMissing(String name, value) {
+			map[name] = value
+		}
+		void put(String name, value) {
+			map[name] = value
+		}
+	}
+
+	Map buildMap(@DelegatesTo(value = PseudoMap, strategy = 1) Closure cls) {
+		final map = new PseudoMap()
+		cls.delegate = map
+		cls.resolveStrategy = 1
+		cls(map)
+		return map.map
+	}
+
 	@TaskAction
 	def run() {
 		def output = outputDir.get().asFile.toPath()
@@ -384,45 +402,45 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 
 			def parser = new JsonSlurper()
 			def json = parser.parse(fabricMetadata)
-			def toml = new TomlBuilder()
 			def nextMajor = (minecraftVersionString.get().tokenize('.')[1].toInteger()) + 1
 			def excludedDeps = ["fabricloader", "java", "minecraft"]
 			def modDependencies = json.depends.findAll { !excludedDeps.contains(it.key) }.collect {
 				def normalModid = normalizeModid(it.key as String)
-				return { _ ->
-					modId normalModid
-					mandatory true
-					versionRange "[0, )"
-					ordering "NONE"
-					side "BOTH"
-				}
+				return [
+					'modId': normalModid,
+					'mandatory': true,
+					'versionRange': '[0, )',
+					'ordering': "NONE",
+					'side': "BOTH",
+				]
 			}
 			def normalModid = normalizeModid(json.id)
-			toml {
-				modLoader containsCode ? "javafml" : "lowcodefml"
-				loaderVersion "[${loaderVersionString.get()},)"
-				license json.license ?: "All Rights Reserved"
+
+			final tomlMap = buildMap {
+				modLoader = containsCode ? "javafml" : "lowcodefml"
+				loaderVersion = "[${loaderVersionString.get()},)" as String
+				license = json.license ?: "All Rights Reserved"
 				if (json.environment == "client") {
-					displayTest "IGNORE_ALL_VERSION"
+					displayTest = "IGNORE_ALL_VERSION"
 				}
 				if (json.environment == "server") {
-					displayTest "IGNORE_SERVER_VERSION"
+					displayTest = "IGNORE_SERVER_VERSION"
 				}
 
 				def providedMods = []
-				mods([
-					{
-						modId normalModid
-						version '${file.jarVersion}'
-						displayName json.name
+				mods = ([
+					buildMap {
+						modId = normalModid
+						version = '${file.jarVersion}'
+						displayName = json.name
 						if (json.icon) {
-							logoFile json.icon
+							logoFile = json.icon
 						}
 						if (json.authors) {
-							authors json.authors.join(', ')
+							authors = json.authors.join(', ')
 						}
 						if (json.description) {
-							description json.description
+							description = json.description
 						}
 						if (json.provides) {
 							providedMods += json.provides
@@ -431,35 +449,39 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 							providedMods += json.id
 						}
 						if (!providedMods.empty) {
-							provides providedMods
+							provides = providedMods
 						}
 					}
 				])
 
-				dependencies {
-					"$normalModid"([
-						{
-							modId "forge"
-							mandatory true
-							versionRange "[47.1.3,)"
-							ordering "NONE"
-							side "BOTH"
+				put 'dependencies', buildMap {
+					propertyMissing("$normalModid", ([
+						buildMap {
+							modId = "forge"
+							mandatory = true
+							versionRange = '[47.1.3,)'
+							ordering = "NONE"
+							side = "BOTH"
 						},
-						{
-							modId "minecraft"
-							mandatory true
-							versionRange "[${minecraftVersionString.get()},1.$nextMajor)"
-							ordering "NONE"
-							side "BOTH"
+						buildMap {
+							modId = "minecraft"
+							mandatory = true
+							versionRange = "[${minecraftVersionString.get()},1.$nextMajor)" as String
+							ordering = "NONE"
+							side = "BOTH"
 						}
-					] + modDependencies)
+					] + modDependencies))
 				}
 			}
 
 			def modsToml = output.resolve("META-INF/mods.toml")
 			Files.deleteIfExists(modsToml)
 			Files.createDirectories(modsToml.parent)
-			modsToml.withWriter { toml.writeTo(it) }
+			final tomlWriter = new TomlWriter.Builder()
+				.indentValuesBy(2)
+				.indentTablesBy(4)
+				.build()
+			modsToml.withWriter { tomlWriter.write(tomlMap, it) }
 
 			if (addMixinConfigs.get() && json.mixins) {
 				def configs = json.mixins.collect {

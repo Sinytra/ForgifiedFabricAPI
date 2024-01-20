@@ -1,7 +1,7 @@
 buildscript {
 	dependencies {
 		classpath 'org.kohsuke:github-api:1.135'
-		classpath 'org.apache.groovy:groovy-toml:4.0.12'
+		classpath 'com.moandjiezana.toml:toml4j:0.7.2'
 	}
 }
 
