@@ -31,6 +31,7 @@ import java.nio.file.StandardCopyOption
 
 allprojects {
 	if (name == 'deprecated') return
+	final selfProject = it
 
 	sourceSets.configureEach { sourceSet ->
 		// We have to capture the source set name for the lazy string literals,
@@ -53,6 +54,7 @@ allprojects {
 			packFormat = rootProject.pack_format.toInteger()
 			addMixinConfigs = sourceSet.name.startsWith("test")
 			accessWidener = loom.accessWidenerPath
+			containsCode = selfProject === rootProject
 		}
 		sourceSet.resources.srcDir task
 	
@@ -337,6 +339,9 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 	final Property<String> forgeVersionString = project.objects.property(String)
 
 	@Input
+	final Property<Boolean> containsCode = project.objects.property(Boolean)
+
+	@Input
 	final Property<String> minecraftVersionString = project.objects.property(String)
 
 	@Input
@@ -387,7 +392,7 @@ abstract class GenerateForgeModMetadata extends DefaultTask {
 	def run() {
 		def output = outputDir.get().asFile.toPath()
 		output.deleteDir()
-		def containsCode = sourceRoots.any { new File(it.parentFile, "java").exists() }
+		def containsCode = sourceRoots.any { new File(it.parentFile, "java").exists() } || this.containsCode.get()
 		for (def sourceRoot in sourceRoots) {
 			if (!sourceRoot.isDirectory()) {
 				continue
