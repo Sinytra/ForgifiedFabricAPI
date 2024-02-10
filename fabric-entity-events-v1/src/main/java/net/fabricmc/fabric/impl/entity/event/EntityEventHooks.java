@@ -16,7 +16,10 @@
 
 package net.fabricmc.fabric.impl.entity.event;
 
+import net.minecraft.entity.mob.MobEntity;
+
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.SleepingLocationCheckEvent;
@@ -83,6 +86,13 @@ public final class EntityEventHooks {
     public static void onPlayerClone(PlayerEvent.Clone event) {
         ServerPlayerEvents.COPY_FROM.invoker().copyFromPlayer((ServerPlayerEntity) event.getOriginal(), (ServerPlayerEntity) event.getEntity(), !event.isWasDeath());
     }
+
+	@SubscribeEvent
+	public static void onLivingConversion(LivingConversionEvent.Post event) {
+		if (event.getEntity() instanceof MobEntity mobEntity && event.getOutcome() instanceof MobEntity converted) {
+			ServerLivingEntityEvents.MOB_CONVERSION.invoker().onConversion(mobEntity, converted, false);
+		}
+	}
 
     private EntityEventHooks() {}
 }

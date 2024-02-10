@@ -2,7 +2,7 @@ archivesBaseName = "fabric-model-loading-api-v1"
 version = getSubprojectVersion(project)
 
 dependencies {
-	testmodCompileOnly "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+	testmodImplementation "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}"
 }
 
 moduleDependencies(project, ['fabric-api-base'])
