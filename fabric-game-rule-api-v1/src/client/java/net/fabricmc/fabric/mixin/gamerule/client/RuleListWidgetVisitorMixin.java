@@ -20,6 +20,8 @@ import java.util.Locale;
 
 import net.fabricmc.fabric.impl.gamerule.GameRuleReflectionUtils;
 
+import net.fabricmc.fabric.impl.gamerule.client.GameRuleReflectionUtilsClient;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,14 +46,14 @@ public abstract class RuleListWidgetVisitorMixin implements GameRules.Visitor, F
 	@Override
 	public void visitDouble(GameRules.Key<DoubleRule> key, GameRules.Type<DoubleRule> type) {
 		this.createRuleWidget(key, (name, description, ruleName, rule) -> {
-			return new DoubleRuleWidget(GameRuleReflectionUtils.getGameRulesScreen(this), name, description, ruleName, rule);
+			return new DoubleRuleWidget(GameRuleReflectionUtilsClient.getGameRulesScreen(this), name, description, ruleName, rule);
 		});
 	}
 
 	@Override
 	public <E extends Enum<E>> void visitEnum(GameRules.Key<EnumRule<E>> key, GameRules.Type<EnumRule<E>> type) {
 		this.createRuleWidget(key, (name, description, ruleName, rule) -> {
-			return new EnumRuleWidget<>(GameRuleReflectionUtils.getGameRulesScreen(this), name, description, ruleName, rule, key.getTranslationKey());
+			return new EnumRuleWidget<>(GameRuleReflectionUtilsClient.getGameRulesScreen(this), name, description, ruleName, rule, key.getTranslationKey());
 		});
 	}
 
