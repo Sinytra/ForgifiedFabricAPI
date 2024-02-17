@@ -32,10 +32,13 @@ import net.minecraft.world.World;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.test.attachment.AttachmentTestMod;
 
-public class AttachmentCopyTests implements FabricGameTest {
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
+
+@GameTestHolder(AttachmentTestMod.MOD_ID)
+public class AttachmentCopyTests {
 	// using a lambda type because serialization shouldn't play a role in this
 	public static AttachmentType<IntSupplier> DUMMY = AttachmentRegistry.create(
 			new Identifier(AttachmentTestMod.MOD_ID, "dummy")
@@ -44,7 +47,8 @@ public class AttachmentCopyTests implements FabricGameTest {
 			.copyOnDeath()
 			.buildAndRegister(new Identifier(AttachmentTestMod.MOD_ID, "copy_test"));
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = AttachmentTestMod.MOD_ID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testCrossWorldTeleport(TestContext context) {
 		MinecraftServer server = context.getWorld().getServer();
 		ServerWorld overworld = server.getOverworld();
@@ -70,7 +74,8 @@ public class AttachmentCopyTests implements FabricGameTest {
 		context.complete();
 	}
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = AttachmentTestMod.MOD_ID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testMobConversion(TestContext context) {
 		MobEntity mob = Objects.requireNonNull(EntityType.ZOMBIE.create(context.getWorld()));
 		mob.setAttached(DUMMY, () -> 42);

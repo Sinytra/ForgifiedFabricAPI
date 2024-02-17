@@ -17,6 +17,8 @@
 package net.fabricmc.fabric.test.attachment.gametest;
 
 import com.mojang.logging.LogUtils;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import org.slf4j.Logger;
 
 import net.minecraft.block.Block;
@@ -34,14 +36,15 @@ import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.fabricmc.fabric.test.attachment.AttachmentTestMod;
 import net.fabricmc.fabric.test.attachment.mixin.BlockEntityTypeAccessor;
 
-public class BlockEntityTests implements FabricGameTest {
+@GameTestHolder(AttachmentTestMod.MOD_ID)
+public class BlockEntityTests {
 	private static final Logger LOGGER = LogUtils.getLogger();
 
-	@GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+	@GameTest(templateNamespace = AttachmentTestMod.MOD_ID, templateName = "empty")
+	@PrefixGameTestTemplate(false)
 	public void testBlockEntitySync(TestContext context) {
 		BlockPos pos = BlockPos.ORIGIN.up();
 

@@ -20,11 +20,14 @@ import java.io.File;
 import java.io.IOException;
 
 import com.mojang.serialization.Codec;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
@@ -39,7 +42,6 @@ import net.minecraft.world.chunk.WrapperProtoChunk;
 import net.minecraft.world.gen.GenerationStep;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -47,7 +49,8 @@ import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-public class AttachmentTestMod implements ModInitializer {
+@Mod("fabric_data_attachment_api_v1_testmod")
+public class AttachmentTestMod {
 	public static final String MOD_ID = "fabric-data-attachment-api-v1-testmod";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final AttachmentType<String> PERSISTENT = AttachmentRegistry.createPersistent(
@@ -63,10 +66,10 @@ public class AttachmentTestMod implements ModInitializer {
 	private boolean serverStarted = false;
 	public static boolean featurePlaced = false;
 
-	@Override
-	public void onInitialize() {
-		Registry.register(Registries.FEATURE, new Identifier(MOD_ID, "set_attachment"), new SetAttachmentFeature(DefaultFeatureConfig.CODEC));
-
+	public AttachmentTestMod() {
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		bus.addListener(AttachmentTestMod::onRegister);
+		
 		BiomeModifications.addFeature(
 				BiomeSelectors.foundInOverworld(),
 				GenerationStep.Feature.VEGETAL_DECORATION,
@@ -140,5 +143,9 @@ public class AttachmentTestMod implements ModInitializer {
 
 			if (!"protochunk_data".equals(chunk.getAttached(PERSISTENT))) throw new AssertionError("ProtoChunk attachment was not transfered to WorldChunk");
 		}));
+	}
+	
+	private static void onRegister(RegisterEvent event) {			
+		event.register(ForgeRegistries.Keys.FEATURES, new Identifier(MOD_ID, "set_attachment"), () -> new SetAttachmentFeature(DefaultFeatureConfig.CODEC));
 	}
 }
