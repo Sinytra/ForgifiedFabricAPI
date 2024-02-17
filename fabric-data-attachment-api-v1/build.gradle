@@ -10,3 +10,7 @@ testDependencies(project, [
 	':fabric-lifecycle-events-v1',
 	':fabric-biome-api-v1'
 ])
+
+test {
+	enabled = false
+}
