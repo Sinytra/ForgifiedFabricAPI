@@ -29,8 +29,9 @@ import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 @Mixin(BlockEntity.class)
 abstract class BlockEntityMixin implements AttachmentTargetImpl {
 	@Inject(
-			method = "method_17897", // lambda body in BlockEntity#createFromNbt
-			at = @At(value = "INVOKE", target = "net/minecraft/block/entity/BlockEntity.readNbt(Lnet/minecraft/nbt/NbtCompound;)V")
+			method = {"method_17897", "m_155246_", "lambda$loadStatic$1"}, // lambda body in BlockEntity#createFromNbt
+			at = @At(value = "INVOKE", target = "net/minecraft/block/entity/BlockEntity.readNbt(Lnet/minecraft/nbt/NbtCompound;)V"),
+			require = 1
 	)
 	private static void readBlockEntityAttachments(NbtCompound nbt, String id, BlockEntity blockEntity, CallbackInfoReturnable<BlockEntity> cir) {
 		((AttachmentTargetImpl) blockEntity).fabric_readAttachmentsFromNbt(nbt);
