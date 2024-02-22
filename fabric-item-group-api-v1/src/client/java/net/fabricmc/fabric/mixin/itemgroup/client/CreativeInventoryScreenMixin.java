@@ -20,6 +20,8 @@ import net.fabricmc.fabric.impl.client.itemgroup.CreativeGuiExtensions;
 
 import net.fabricmc.fabric.impl.client.itemgroup.FabricCreativeGuiComponents;
 
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
+
 import net.minecraft.item.ItemGroups;
 
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
@@ -31,7 +33,12 @@ import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.item.ItemGroup;
 
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,6 +64,11 @@ public abstract class CreativeInventoryScreenMixin implements CreativeGuiExtensi
 
 	private static int fabric_getPage() {
 		return fabric_currentPage;
+	}
+
+	@Inject(method = "init", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
+	private void initPages(CallbackInfo ci, int tabIndex, List<ItemGroup> currentPage, Iterator<?> it, ItemGroup sortedCreativeModeTab) {
+		((FabricItemGroup) sortedCreativeModeTab).setPage(this.pages.size());
 	}
 
 	@Override

@@ -21,6 +21,7 @@
   },
   "description": "An API for adding custom item groups.",
   "mixins": [
+    "fabric-item-group-api-v1.mixins.json",
     {
       "config": "fabric-item-group-api-v1.client.mixins.json",
       "environment": "client"

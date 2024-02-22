@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.itemgroup;
+package net.fabricmc.fabric.mixin.itemgroup;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.item.ItemGroup;
-import net.minecraft.text.Text;
 
-public final class FabricItemGroupBuilderImpl extends ItemGroup.Builder {
-	private boolean hasDisplayName = false;
+import net.fabricmc.fabric.impl.itemgroup.FabricItemGroup;
 
-	public FabricItemGroupBuilderImpl() {
-		// Set when building.
-		super(ItemGroup.Row.TOP, -1);
-	}
+@Mixin(ItemGroup.class)
+abstract class ItemGroupMixin implements FabricItemGroup {
+	@Unique
+	private int fabric_page = -1;
 
 	@Override
-	public ItemGroup.Builder displayName(Text displayName) {
-		hasDisplayName = true;
-		return super.displayName(displayName);
-	}
-
-	@Override
-	public ItemGroup build() {
-		if (!hasDisplayName) {
-			throw new IllegalStateException("No display name set for ItemGroup");
+	public int getPage() {
+		if (fabric_page < 0) {
+			throw new IllegalStateException("Item group has no page");
 		}
 
-		return super.build();
+		return fabric_page;
+	}
+
+	@Override
+	public void setPage(int page) {
+		this.fabric_page = page;
 	}
 }
