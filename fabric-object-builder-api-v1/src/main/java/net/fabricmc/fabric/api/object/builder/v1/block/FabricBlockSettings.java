@@ -95,8 +95,16 @@ public class FabricBlockSettings extends BlockBehaviour.Properties {
 	 * @deprecated replace with {@link BlockBehaviour.Properties#of()}
 	 */
 	@Deprecated
-	public static FabricBlockSettings of() {
+	public static FabricBlockSettings create() {
 		return new FabricBlockSettings();
+	}
+
+	/**
+	 * @deprecated replace with {@link BlockBehaviour.Properties#of()}
+	 */
+	@Deprecated
+	public static FabricBlockSettings of() {
+		return create();
 	}
 
 	/**
