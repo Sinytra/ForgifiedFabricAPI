@@ -100,7 +100,7 @@ public class NeoNetworkRegistrar {
             boolean setup = NetworkRegistryAccessor.getSetup();
 
             NetworkRegistryAccessor.setSetup(false);
-            NetworkRegistry.register(type, (StreamCodec<? super FriendlyByteBuf, PAYLOAD>) DUMMY_CODEC, handler, List.of(protocol), Optional.empty(), "1.0", setup);
+            NetworkRegistry.register(type, (StreamCodec<? super FriendlyByteBuf, PAYLOAD>) DUMMY_CODEC, handler, List.of(protocol), Optional.empty(), "1.0", true);
             NetworkRegistryAccessor.setSetup(setup);
 
             // TODO Send registration message when registering late
