@@ -22,7 +22,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftClientMixin {
@@ -36,5 +38,13 @@ public abstract class MinecraftClientMixin {
 	@Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;gameThread:Ljava/lang/Thread;", shift = At.Shift.AFTER, ordinal = 0), method = "run")
 	private void onStart(CallbackInfo ci) {
 		ClientLifecycleEvents.CLIENT_STARTED.invoker().onClientStarted((Minecraft) (Object) this);
+	}
+
+	@Inject(method = "updateLevelInEngines", at = @At("TAIL"))
+	private void afterClientWorldChange(ClientLevel world, CallbackInfo ci) {
+		if (world != null) {
+			Minecraft client = (Minecraft) (Object) this;
+			ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.invoker().afterWorldChange(client, world);
+		}
 	}
 }
