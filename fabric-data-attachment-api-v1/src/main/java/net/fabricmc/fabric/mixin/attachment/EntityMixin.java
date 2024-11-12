@@ -16,52 +16,51 @@
 
 package net.fabricmc.fabric.mixin.attachment;
 
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
-import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentSync;
+import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.LevelChunk;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Map;
-import java.util.function.Consumer;
-
-@Mixin(LevelChunk.class)
-abstract class WorldChunkMixin extends AttachmentTargetsMixin implements AttachmentTargetImpl {
+@Mixin(Entity.class)
+abstract class EntityMixin implements AttachmentTargetImpl {
 	@Shadow
-	@Final
-	Level level;
+	private int id;
 
 	@Shadow
-	public abstract Map<BlockPos, BlockEntity> getBlockEntities();
+	public abstract Level level();
 
 	@Override
-	public void fabric_computeInitialSyncChanges(ServerPlayer player, Consumer<AttachmentChange> changeOutput) {
-		super.fabric_computeInitialSyncChanges(player, changeOutput);
-
-		for (BlockEntity be : this.getBlockEntities().values()) {
-			((AttachmentTargetImpl) be).fabric_computeInitialSyncChanges(player, changeOutput);
-		}
+	public AttachmentTargetInfo<?> fabric_getSyncTargetInfo() {
+		return new AttachmentTargetInfo.EntityTarget(this.id);
 	}
 
 	@Override
 	public void fabric_syncChange(AttachmentType<?> type, AttachmentSyncPayloadS2C payload) {
-		if (this.level instanceof ServerLevel serverWorld) {
-			// can't shadow from Chunk because this already extends a supermixin
-			PlayerLookup.tracking(serverWorld, ((ChunkAccess) (Object) this).getPos())
+		if (!this.level().isClientSide()) {
+			AttachmentSyncPredicate predicate = ((AttachmentTypeImpl<?>) type).syncPredicate();
+
+			if ((Object) this instanceof ServerPlayer self && predicate.test(this, self)) {
+				// Players do not track themselves
+				AttachmentSync.trySync(payload, self);
+			}
+
+			PlayerLookup.tracking((Entity) (Object) this)
 					.forEach(player -> {
-						if (((AttachmentTypeImpl<?>) type).syncPredicate().test(this, player)) {
+						if (predicate.test(this, player)) {
 							AttachmentSync.trySync(payload, player);
 						}
 					});
@@ -70,6 +69,6 @@ abstract class WorldChunkMixin extends AttachmentTargetsMixin implements Attachm
 
 	@Override
 	public boolean fabric_shouldTryToSync() {
-		return !this.level.isClientSide();
+		return !this.level().isClientSide();
 	}
 }

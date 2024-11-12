@@ -20,46 +20,18 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
-import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentSync;
+import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.LevelChunk;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Map;
-import java.util.function.Consumer;
-
-@Mixin(LevelChunk.class)
-abstract class WorldChunkMixin extends AttachmentTargetsMixin implements AttachmentTargetImpl {
-	@Shadow
-	@Final
-	Level level;
-
-	@Shadow
-	public abstract Map<BlockPos, BlockEntity> getBlockEntities();
-
-	@Override
-	public void fabric_computeInitialSyncChanges(ServerPlayer player, Consumer<AttachmentChange> changeOutput) {
-		super.fabric_computeInitialSyncChanges(player, changeOutput);
-
-		for (BlockEntity be : this.getBlockEntities().values()) {
-			((AttachmentTargetImpl) be).fabric_computeInitialSyncChanges(player, changeOutput);
-		}
-	}
-
+@Mixin(ServerLevel.class)
+abstract class ServerWorldMixin implements AttachmentTargetImpl {
 	@Override
 	public void fabric_syncChange(AttachmentType<?> type, AttachmentSyncPayloadS2C payload) {
-		if (this.level instanceof ServerLevel serverWorld) {
-			// can't shadow from Chunk because this already extends a supermixin
-			PlayerLookup.tracking(serverWorld, ((ChunkAccess) (Object) this).getPos())
+		if ((Object) this instanceof ServerLevel serverWorld) {
+			PlayerLookup.world(serverWorld)
 					.forEach(player -> {
 						if (((AttachmentTypeImpl<?>) type).syncPredicate().test(this, player)) {
 							AttachmentSync.trySync(payload, player);
@@ -69,7 +41,7 @@ abstract class WorldChunkMixin extends AttachmentTargetsMixin implements Attachm
 	}
 
 	@Override
-	public boolean fabric_shouldTryToSync() {
-		return !this.level.isClientSide();
+	public AttachmentTargetInfo<?> fabric_getSyncTargetInfo() {
+		return AttachmentTargetInfo.WorldTarget.INSTANCE;
 	}
 }
