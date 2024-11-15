@@ -7,11 +7,12 @@
     "EnchantCommandMixin",
     "EnchantmentHelperMixin",
     "EnchantRandomlyLootFunctionMixin",
+    "IItemExtensionMixin",
     "ItemAccessor",
     "ItemMixin",
     "ItemSettingsMixin",
     "ItemStackMixin",
-    "IItemExtensionMixin"
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

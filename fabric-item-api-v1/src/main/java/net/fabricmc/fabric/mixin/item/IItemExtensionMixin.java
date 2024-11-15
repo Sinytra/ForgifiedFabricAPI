@@ -3,9 +3,9 @@ package net.fabricmc.fabric.mixin.item;
 import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.fabricmc.fabric.impl.item.ItemExtensions;
+import net.fabricmc.fabric.impl.item.ItemStackExtensions;
 import net.fabricmc.fabric.impl.item.RecursivityHelper;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.extensions.IItemExtension;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,12 +31,12 @@ public interface IItemExtensionMixin extends FabricItem {
         }
     }
 
-    @Inject(method = "getEquipmentSlot", at = @At("HEAD"))
+    @Inject(method = "getEquipmentSlot", at = @At("HEAD"), cancellable = true)
     default void getEquipmentSlot(ItemStack stack, CallbackInfoReturnable<EquipmentSlot> cir) {
         EquipmentSlotProvider equipmentSlotProvider = ((ItemExtensions) this).fabric_getEquipmentSlotProvider();
 
         if (equipmentSlotProvider != null) {
-            cir.setReturnValue(equipmentSlotProvider.getPreferredEquipmentSlot((LivingEntity) this, stack));
+            cir.setReturnValue(equipmentSlotProvider.getPreferredEquipmentSlot(((ItemStackExtensions) (Object) stack).fabric_getLivingEntity(), stack));
         }
     }
 }
