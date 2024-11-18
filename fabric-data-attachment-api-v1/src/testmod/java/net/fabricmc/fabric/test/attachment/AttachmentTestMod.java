@@ -38,6 +38,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -52,6 +53,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ColumnPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -78,28 +82,35 @@ public class AttachmentTestMod implements ModInitializer {
 			builder -> builder
 					.initializer(() -> false)
 					.persistent(Codec.BOOL)
-					.syncWith(ByteBufCodecs.BOOL.cast(), AttachmentSyncPredicate.all())
+					.syncWith(ByteBufCodecs.BOOL, AttachmentSyncPredicate.all())
 	);
 	public static final AttachmentType<Boolean> SYNCED_WITH_TARGET = AttachmentRegistry.create(
 			ResourceLocation.fromNamespaceAndPath(MOD_ID, "synced_target"),
 			builder -> builder
 					.initializer(() -> false)
 					.persistent(Codec.BOOL)
-					.syncWith(ByteBufCodecs.BOOL.cast(), AttachmentSyncPredicate.targetOnly())
+					.syncWith(ByteBufCodecs.BOOL, AttachmentSyncPredicate.targetOnly())
 	);
 	public static final AttachmentType<Boolean> SYNCED_EXCEPT_TARGET = AttachmentRegistry.create(
 			ResourceLocation.fromNamespaceAndPath(MOD_ID, "synced_except_target"),
 			builder -> builder
 					.initializer(() -> false)
 					.persistent(Codec.BOOL)
-					.syncWith(ByteBufCodecs.BOOL.cast(), AttachmentSyncPredicate.allButTarget())
+					.syncWith(ByteBufCodecs.BOOL, AttachmentSyncPredicate.allButTarget())
 	);
 	public static final AttachmentType<Boolean> SYNCED_CREATIVE_ONLY = AttachmentRegistry.create(
 			ResourceLocation.fromNamespaceAndPath(MOD_ID, "synced_custom"),
 			builder -> builder
 					.initializer(() -> false)
 					.persistent(Codec.BOOL)
-					.syncWith(ByteBufCodecs.BOOL.cast(), (target, player) -> player.isCreative())
+					.syncWith(ByteBufCodecs.BOOL, (target, player) -> player.isCreative())
+	);
+	public static final AttachmentType<ItemStack> SYNCED_ITEM = AttachmentRegistry.create(
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "synced_item"),
+			builder -> builder
+					.initializer(() -> ItemStack.EMPTY)
+					.persistent(ItemStack.CODEC)
+					.syncWith(ItemStack.OPTIONAL_STREAM_CODEC, AttachmentSyncPredicate.all())
 	);
 	public static final SimpleCommandExceptionType TARGET_NOT_FOUND = new SimpleCommandExceptionType(Component.literal("Target not found"));
 
@@ -194,6 +205,12 @@ public class AttachmentTestMod implements ModInitializer {
 						.then(buildCommandForKind("others_only", "all but self", SYNCED_EXCEPT_TARGET))
 						.then(buildCommandForKind("creative_only", "creative players only", SYNCED_CREATIVE_ONLY))
 		));
+
+		ServerEntityEvents.EQUIPMENT_CHANGE.register((livingEntity, equipmentSlot, previousStack, currentStack) -> {
+			if (equipmentSlot == EquipmentSlot.HEAD && livingEntity instanceof ServerPlayer player) {
+				player.setAttached(SYNCED_ITEM, currentStack);
+			}
+		});
 	}
 
 	private static LiteralArgumentBuilder<CommandSourceStack> buildCommandForKind(String id, String syncedWith, AttachmentType<Boolean> type) {

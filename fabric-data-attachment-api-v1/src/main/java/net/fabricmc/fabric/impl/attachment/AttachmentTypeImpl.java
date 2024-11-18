@@ -22,7 +22,7 @@ import com.mojang.serialization.Codec;
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
@@ -31,7 +31,7 @@ public record AttachmentTypeImpl<A>(
 		ResourceLocation identifier,
 		@Nullable Supplier<A> initializer,
 		@Nullable Codec<A> persistenceCodec,
-		@Nullable StreamCodec<FriendlyByteBuf, A> packetCodec,
+		@Nullable StreamCodec<? super RegistryFriendlyByteBuf, A> packetCodec,
 		@Nullable AttachmentSyncPredicate syncPredicate,
 		boolean copyOnDeath
 ) implements AttachmentType<A> {

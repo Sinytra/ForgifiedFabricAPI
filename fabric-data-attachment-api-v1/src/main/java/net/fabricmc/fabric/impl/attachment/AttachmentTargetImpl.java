@@ -21,6 +21,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +34,7 @@ public interface AttachmentTargetImpl extends AttachmentTarget {
         A ret = AttachmentTarget.super.setAttached(type, value);
         
         if (this.fabric_shouldTryToSync() && type.isSynced()) {
-            AttachmentChange change = AttachmentChange.create(fabric_getSyncTargetInfo(), type, value);
+			AttachmentChange change = AttachmentChange.create(fabric_getSyncTargetInfo(), type, value, fabric_getDynamicRegistryManager());
             acknowledgeSyncedEntry(type, change);
             this.fabric_syncChange(type, new AttachmentSyncPayloadS2C(List.of(change)));
         }
@@ -61,4 +62,6 @@ public interface AttachmentTargetImpl extends AttachmentTarget {
 	default boolean fabric_shouldTryToSync() {
 		throw new UnsupportedOperationException("Implemented via mixin");
 	}
+
+	RegistryAccess fabric_getDynamicRegistryManager();
 }

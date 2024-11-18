@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 import com.mojang.serialization.Codec;
 import org.jetbrains.annotations.ApiStatus;
 import net.fabricmc.fabric.impl.attachment.AttachmentRegistryImpl;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
@@ -155,7 +155,7 @@ public final class AttachmentRegistry {
 		 * @param syncPredicate an {@link AttachmentSyncPredicate} determining with which clients to synchronize data
 		 * @return the builder
 		 */
-		AttachmentRegistry.Builder<A> syncWith(StreamCodec<FriendlyByteBuf, A> packetCodec, AttachmentSyncPredicate syncPredicate);
+		AttachmentRegistry.Builder<A> syncWith(StreamCodec<? super RegistryFriendlyByteBuf, A> packetCodec, AttachmentSyncPredicate syncPredicate);
 
 		/**
 		 * Builds and registers the {@link AttachmentType}.

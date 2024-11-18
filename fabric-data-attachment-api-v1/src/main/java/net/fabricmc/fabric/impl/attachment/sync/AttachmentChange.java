@@ -26,7 +26,7 @@ import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
 import net.fabricmc.fabric.mixin.attachment.CustomPayloadS2CPacketAccessor;
 import net.fabricmc.fabric.mixin.attachment.VarIntsAccessor;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerCommonNetworkHandlerAccessor;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -55,12 +55,19 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
     private static final int MAX_DATA_SIZE_IN_BYTES = CustomPayloadS2CPacketAccessor.getMaxPayloadSize() - MAX_PADDING_SIZE_IN_BYTES;
 
     @SuppressWarnings("unchecked")
-    public static AttachmentChange create(AttachmentTargetInfo<?> targetInfo, AttachmentType<?> type, @Nullable Object value) {
-        StreamCodec<FriendlyByteBuf, Object> codec = (StreamCodec<FriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).packetCodec();
+    public static AttachmentChange create(AttachmentTargetInfo<?> targetInfo, AttachmentType<?> type, @Nullable Object value, RegistryAccess dynamicRegistryManager) {
+        StreamCodec<? super RegistryFriendlyByteBuf, Object> codec = (StreamCodec<? super RegistryFriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).packetCodec();
         Objects.requireNonNull(codec, "attachment packet codec cannot be null");
+		Objects.requireNonNull(dynamicRegistryManager, "dynamic registry manager cannot be null");
 
-        FriendlyByteBuf buf = PacketByteBufs.create();
-        buf.writeOptional(Optional.ofNullable(value), codec);
+		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(PacketByteBufs.create(), dynamicRegistryManager);
+
+        if (value != null) {
+			buf.writeBoolean(true);
+        codec.encode(buf, value);
+		} else {
+			buf.writeBoolean(false);
+		}
         byte[] encoded = buf.array();
 
         if (encoded.length > MAX_DATA_SIZE_IN_BYTES) {
@@ -107,15 +114,19 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
 
     @SuppressWarnings("unchecked")
     @Nullable
-    public Object decodeValue() {
-        StreamCodec<FriendlyByteBuf, Object> codec = (StreamCodec<FriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).packetCodec();
+    public Object decodeValue(RegistryAccess dynamicRegistryManager) {
+        StreamCodec<? super RegistryFriendlyByteBuf, Object> codec = (StreamCodec<? super RegistryFriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).packetCodec();
         Objects.requireNonNull(codec, "codec was null");
+		Objects.requireNonNull(dynamicRegistryManager, "dynamic registry manager cannot be null");
 
-        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.copiedBuffer(data));
-        return buf.readOptional(codec).orElse(null);
-    }
+		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.copiedBuffer(data), dynamicRegistryManager);
+
+        if (!buf.readBoolean()) {
+        return null;
+    }return codec.decode(buf);
+	}
 
     public void apply(Level world) {
-        targetInfo.getTarget(world).setAttached((AttachmentType<Object>) type, decodeValue());
+        targetInfo.getTarget(world).setAttached((AttachmentType<Object>) type, decodeValue(world.registryAccess()));
     }
 }

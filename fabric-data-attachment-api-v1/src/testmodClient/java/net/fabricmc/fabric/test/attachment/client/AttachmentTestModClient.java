@@ -45,6 +45,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.Vec3;
@@ -96,6 +97,11 @@ public class AttachmentTestModClient implements ClientModInitializer {
 		context.getSource().sendFeedback(
 				Component.literal("Synced-with-creative attachment: %s".formatted(attCustom))
 						.withColor(attCustom ? target instanceof Player p && p.isCreative() ? CommonColors.GREEN : CommonColors.RED : CommonColors.WHITE)
+		);
+		ItemStack stack = target.getAttachedOrCreate(AttachmentTestMod.SYNCED_ITEM);
+		context.getSource().sendFeedback(
+				Component.literal("Synced-item attachment: %s".formatted(stack))
+						.withColor(attOther ? target != Minecraft.getInstance().player ? CommonColors.GREEN : CommonColors.RED : CommonColors.WHITE)
 		);
 	}
 

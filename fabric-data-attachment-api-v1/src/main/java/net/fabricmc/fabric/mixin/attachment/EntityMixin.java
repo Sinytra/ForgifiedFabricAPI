@@ -30,6 +30,7 @@ import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentSync;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -70,5 +71,10 @@ abstract class EntityMixin implements AttachmentTargetImpl {
 	@Override
 	public boolean fabric_shouldTryToSync() {
 		return !this.level().isClientSide();
+	}
+
+	@Override
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		return this.level().registryAccess();
 	}
 }

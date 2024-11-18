@@ -21,10 +21,10 @@ import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.ImposterProtoChunk;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -55,5 +55,10 @@ abstract class WrapperProtoChunkMixin extends AttachmentTargetsMixin {
 	@Override
 	public void fabric_syncChange(AttachmentType<?> type, AttachmentSyncPayloadS2C payload) {
 		((AttachmentTargetImpl) wrapped).fabric_syncChange(type, payload);
+	}
+
+	@Override
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		return ((AttachmentTargetImpl) wrapped).fabric_getDynamicRegistryManager();
 	}
 }

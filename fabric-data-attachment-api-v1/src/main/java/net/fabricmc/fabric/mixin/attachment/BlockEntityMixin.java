@@ -33,6 +33,7 @@ import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -68,5 +69,10 @@ abstract class BlockEntityMixin implements AttachmentTargetImpl {
 	public boolean fabric_shouldTryToSync() {
 		// Persistent attachments are read at a time with no world
 		return !this.hasLevel() || !this.level.isClientSide();
+	}
+
+	@Override
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		return this.level.registryAccess();
 	}
 }

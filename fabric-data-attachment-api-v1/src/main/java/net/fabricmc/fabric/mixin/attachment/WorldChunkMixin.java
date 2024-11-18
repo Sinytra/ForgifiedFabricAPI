@@ -24,6 +24,7 @@ import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentSync;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -71,5 +72,10 @@ abstract class WorldChunkMixin extends AttachmentTargetsMixin implements Attachm
 	@Override
 	public boolean fabric_shouldTryToSync() {
 		return !this.level.isClientSide();
+	}
+
+	@Override
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		return level.registryAccess();
 	}
 }

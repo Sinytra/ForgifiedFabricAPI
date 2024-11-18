@@ -18,6 +18,7 @@ package net.fabricmc.fabric.mixin.attachment;
 
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.spongepowered.asm.mixin.Final;
@@ -39,5 +40,11 @@ abstract class ChunkMixin implements AttachmentTargetImpl {
 	public boolean fabric_shouldTryToSync() {
 		// ProtoChunk or EmptyChunk
 		return false;
+	}
+
+	@Override
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		// Should never happen as this is only used for sync
+		throw new UnsupportedOperationException("Chunk does not have a DynamicRegistryManager.");
 	}
 }

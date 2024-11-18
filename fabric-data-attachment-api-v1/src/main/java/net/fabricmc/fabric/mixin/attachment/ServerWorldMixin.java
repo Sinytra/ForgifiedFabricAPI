@@ -23,7 +23,9 @@ import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentSync;
 import net.fabricmc.fabric.impl.attachment.sync.AttachmentTargetInfo;
 import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ServerLevel.class)
@@ -43,5 +45,10 @@ abstract class ServerWorldMixin implements AttachmentTargetImpl {
 	@Override
 	public AttachmentTargetInfo<?> fabric_getSyncTargetInfo() {
 		return AttachmentTargetInfo.WorldTarget.INSTANCE;
+	}
+
+	@Override
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		return ((Level) (Object) this).registryAccess();
 	}
 }

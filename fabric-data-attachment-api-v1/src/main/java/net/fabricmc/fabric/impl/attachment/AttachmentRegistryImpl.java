@@ -25,7 +25,7 @@ import net.fabricmc.fabric.mixin.attachment.BaseMappedRegistryAccessor;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
@@ -72,7 +72,7 @@ public final class AttachmentRegistryImpl {
         private Codec<A> persistenceCodec = null;
         private boolean copyOnDeath = false;
 		@Nullable
-		private StreamCodec<FriendlyByteBuf, A> packetCodec = null;
+		private StreamCodec<? super RegistryFriendlyByteBuf, A> packetCodec = null;
 		@Nullable
 		private AttachmentSyncPredicate syncPredicate = null;
 
@@ -98,7 +98,8 @@ public final class AttachmentRegistryImpl {
             return this;
         }
 
-		public AttachmentRegistry.Builder<A> syncWith(StreamCodec<FriendlyByteBuf, A> packetCodec, AttachmentSyncPredicate syncPredicate) {
+		@Deprecated
+		public AttachmentRegistry.Builder<A> syncWith(StreamCodec<? super RegistryFriendlyByteBuf, A> packetCodec, AttachmentSyncPredicate syncPredicate) {
 			Objects.requireNonNull(packetCodec, "packet codec cannot be null");				
 			Objects.requireNonNull(syncPredicate, "sync predicate cannot be null");
 
