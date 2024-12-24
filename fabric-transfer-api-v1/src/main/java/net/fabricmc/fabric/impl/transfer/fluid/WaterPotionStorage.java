@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.impl.transfer.fluid;
 
-import java.util.Optional;
-
 import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -27,11 +25,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ExtractionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.material.Fluids;
@@ -50,9 +46,9 @@ public class WaterPotionStorage implements ExtractionOnlyStorage<FluidVariant>, 
 
 	private static boolean isWaterPotion(ContainerItemContext context) {
 		ItemVariant variant = context.getItemVariant();
-		Optional<? extends PotionContents> potionContents = variant.getComponents().get(DataComponents.POTION_CONTENTS);
-		Holder<Potion> potion = potionContents.map(PotionContents::potion).orElse(null).orElse(null);
-		return variant.isOf(Items.POTION) && potion == Potions.WATER;
+		PotionContents potionContents = variant.getComponentMap()
+				.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+		return variant.isOf(Items.POTION) && potionContents.potion().orElse(null) == Potions.WATER;
 	}
 
 	private final ContainerItemContext context;
