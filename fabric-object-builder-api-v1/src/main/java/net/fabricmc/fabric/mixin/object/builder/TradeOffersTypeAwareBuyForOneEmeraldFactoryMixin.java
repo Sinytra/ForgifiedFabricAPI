@@ -16,34 +16,19 @@
 
 package net.fabricmc.fabric.mixin.object.builder;
 
-import java.util.stream.Stream;
-import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.VillagerTrades;
-import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(VillagerTrades.EmeraldsForVillagerTypeItem.class)
 public abstract class TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin {
-	/**
-	 * Vanilla will check the "VillagerType -> Item" map in the stream and throw an exception for villager types not specified in the map.
-	 * This breaks any and all custom villager types.
-	 * We want to prevent this default logic so modded villager types will work.
-	 * So we return an empty stream so an exception is never thrown.
-	 */
-	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/DefaultedRegistry;stream()Ljava/util/stream/Stream;"))
-	private <T> Stream<T> disableVanillaCheck(DefaultedRegistry<VillagerType> instance) {
-		return Stream.empty();
-	}
-
 	/**
 	 * To prevent "item" -> "air" trades, if the result of a type aware trade is air, make sure no offer is created.
 	 */
