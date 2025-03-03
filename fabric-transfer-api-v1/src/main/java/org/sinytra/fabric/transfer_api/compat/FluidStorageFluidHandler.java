@@ -55,7 +55,7 @@ public class FluidStorageFluidHandler implements IFluidHandler {
     private <T> T executeWithTransactionHandling(Supplier<T> operation, T defaultValue) {
         if (Transaction.isOpen()) {
             try {
-                return CompletableFuture.supplyAsync(operation).get(1, TimeUnit.MILLISECONDS);
+                return CompletableFuture.supplyAsync(operation).get(10, TimeUnit.MICROSECONDS);
             } catch (InterruptedException | TimeoutException | ExecutionException e) {
                 return defaultValue;
             }
