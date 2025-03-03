@@ -49,6 +49,7 @@ public class FluidStorageFluidHandler implements IFluidHandler {
     public int fill(FluidStack resource, FluidAction action) {
         try (Transaction transaction = Transaction.openOuter()) {
             FluidVariant variant = NeoCompatUtil.toFluidStorageView(resource);
+            if (variant.isBlank()) return 0;    // because moving blank resources is a thing in neoforge for some reason? (See https://github.com/AztechMC/Modern-Industrialization/issues/1029)
             int filled = (int) storage.insert(variant, NeoCompatUtil.toFabricBucket(resource.getAmount()), transaction);
             if (action.execute()) {
                 transaction.commit();
