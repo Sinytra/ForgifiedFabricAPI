@@ -11,6 +11,12 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
+
 public class FluidStorageFluidHandler implements IFluidHandler {
     private final Storage<FluidVariant> storage;
     private final Int2ObjectMap<StorageView<FluidVariant>> slots;
@@ -44,23 +50,46 @@ public class FluidStorageFluidHandler implements IFluidHandler {
     public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
         return StorageUtil.simulateInsert(storage, NeoCompatUtil.toFluidStorageView(stack), NeoCompatUtil.toFabricBucket(stack.getAmount()), null) > 0;
     }
-
-    @Override
-    public int fill(FluidStack resource, FluidAction action) {
-        try (Transaction transaction = Transaction.openOuter()) {
-            FluidVariant variant = NeoCompatUtil.toFluidStorageView(resource);
-            if (variant.isBlank()) return 0;    // because moving blank resources is a thing in neoforge for some reason? (See https://github.com/AztechMC/Modern-Industrialization/issues/1029)
-            int filled = (int) storage.insert(variant, NeoCompatUtil.toFabricBucket(resource.getAmount()), transaction);
-            if (action.execute()) {
-                transaction.commit();
+    
+    // if a transaction from a fabric context causes a neoforge mod to create a new transaction to a fabric context as part of that first call we need to do so in a new thread
+    private <T> T executeWithTransactionHandling(Supplier<T> operation, T defaultValue) {
+        if (Transaction.isOpen()) {
+            try {
+                return CompletableFuture.supplyAsync(operation).get(1, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException | TimeoutException | ExecutionException e) {
+                return defaultValue;
             }
-            return NeoCompatUtil.toForgeBucket(filled);
+        } else {
+            return operation.get();
         }
     }
 
     @Override
-    public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-        if (!resource.isEmpty()) {
+    public int fill(FluidStack resource, @NotNull FluidAction action) {
+        
+        // because moving blank/empty fluid resources is a thing in neoforge for some reason? (See https://github.com/AztechMC/Modern-Industrialization/issues/1029)
+        if (resource.isEmpty()) return 0;
+        
+        return executeWithTransactionHandling(() -> {
+            try (Transaction transaction = Transaction.openOuter()) {
+                FluidVariant variant = NeoCompatUtil.toFluidStorageView(resource);
+                int filled = (int) storage.insert(variant, NeoCompatUtil.toFabricBucket(resource.getAmount()), transaction);
+                if (action.execute()) {
+                    transaction.commit();
+                }
+                return NeoCompatUtil.toForgeBucket(filled);
+            }
+        }, 0);
+    }
+
+    @Override
+    public @NotNull FluidStack drain(FluidStack resource, @NotNull FluidAction action) {
+        
+        if (resource.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
+        
+        return executeWithTransactionHandling(() -> {
             try (Transaction transaction = Transaction.openOuter()) {
                 FluidVariant variant = NeoCompatUtil.toFluidStorageView(resource);
                 int drained = (int) storage.extract(variant, NeoCompatUtil.toFabricBucket(resource.getAmount()), transaction);
@@ -69,22 +98,23 @@ public class FluidStorageFluidHandler implements IFluidHandler {
                 }
                 return NeoCompatUtil.toForgeFluidStack(variant, drained);
             }
-        }
-        return FluidStack.EMPTY;
+        }, FluidStack.EMPTY);
     }
 
     @Override
-    public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-        for (StorageView<FluidVariant> view : storage.nonEmptyViews()) {
-            try (Transaction transaction = Transaction.openOuter()) {
-                FluidVariant resource = view.getResource();
-                int drained = (int) storage.extract(resource, NeoCompatUtil.toFabricBucket(maxDrain), transaction);
-                if (action.execute()) {
-                    transaction.commit();
+    public @NotNull FluidStack drain(int maxDrain, @NotNull FluidAction action) {
+        return executeWithTransactionHandling(() -> {
+            for (StorageView<FluidVariant> view : storage.nonEmptyViews()) {
+                try (Transaction transaction = Transaction.openOuter()) {
+                    FluidVariant resource = view.getResource();
+                    int drained = (int) storage.extract(resource, NeoCompatUtil.toFabricBucket(maxDrain), transaction);
+                    if (action.execute()) {
+                        transaction.commit();
+                    }
+                    return NeoCompatUtil.toForgeFluidStack(resource, drained);
                 }
-                return NeoCompatUtil.toForgeFluidStack(resource, drained);
             }
-        }
-        return FluidStack.EMPTY;
+            return FluidStack.EMPTY;
+        }, FluidStack.EMPTY);
     }
 }
