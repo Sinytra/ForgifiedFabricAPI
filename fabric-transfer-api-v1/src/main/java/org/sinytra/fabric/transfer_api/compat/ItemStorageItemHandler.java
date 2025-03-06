@@ -44,6 +44,7 @@ public class ItemStorageItemHandler implements IItemHandler {
     public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
         try (Transaction transaction = Transaction.openOuter()) {
             ItemVariant resource = ItemVariant.of(stack);
+            if (resource.isBlank()) return ItemStack.EMPTY;
             int inserted = (int) storage.insert(resource, stack.getCount(), transaction);
             if (!simulate) {
                 transaction.commit();
