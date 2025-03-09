@@ -34,7 +34,7 @@ public class AttachmentEntrypoint implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) ->
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) ->
             transfer(oldPlayer, newPlayer, true, !alive)
         );
         ServerEntityWorldChangeEvents.AFTER_ENTITY_CHANGE_WORLD.register((originalEntity, newEntity, origin, destination) ->
