@@ -122,6 +122,7 @@ public final class ResourceConditions {
 	 * <p>If an exception is thrown during condition testing, it will be caught and logged, and false will be returned.
 	 */
 	public static boolean objectMatchesConditions(JsonObject object) {
+		if (JsonHelper.hasArray(object, "conditions")) return true;
 		try {
 			JsonArray conditions = JsonHelper.getArray(object, CONDITIONS_KEY, null);
 
