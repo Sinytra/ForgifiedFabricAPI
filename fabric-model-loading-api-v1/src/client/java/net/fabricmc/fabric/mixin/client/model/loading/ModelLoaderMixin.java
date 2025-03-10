@@ -26,6 +26,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -119,7 +120,7 @@ abstract class ModelLoaderMixin implements ModelLoaderHooks {
 			} else if (modelLoadingStack.contains(id)) {
 				throw new IllegalStateException("Circular reference while loading model '" + id + "' (" + modelLoadingStack.stream().map(i -> i + "->").collect(Collectors.joining()) + id + ")");
 			} else {
-				UnbakedModel model = loadModel(id);
+				UnbakedModel model = loadModel(id, null);
 				unbakedCache.put(id, model);
 				// These will be loaded at the top-level call.
 				loadingStack.addAll(model.getDependencies());
@@ -128,27 +129,24 @@ abstract class ModelLoaderMixin implements ModelLoaderHooks {
 		}
 	}
 
-	// This is the call that needs to be redirected to support ModelResolvers, but it returns a JsonUnbakedModel.
-	// Redirect it to always return null and handle the logic in a ModifyVariable right after the call.
-	@Redirect(method = "getModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery;loadBlockModel(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BlockModel;"))
-	private BlockModel cancelLoadModelFromJson(ModelBakery self, ResourceLocation id) {
-		return null;
-	}
-
 	@ModifyVariable(method = "getModel", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/resources/model/ModelBakery;loadBlockModel(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BlockModel;"))
 	private UnbakedModel doLoadModel(UnbakedModel model, @Local(ordinal = 1) ResourceLocation id) {
-		return loadModel(id);
+		return loadModel(id, model);
 	}
 
 	@Unique
-	private UnbakedModel loadModel(ResourceLocation id) {
+	private UnbakedModel loadModel(ResourceLocation id, @Nullable UnbakedModel oldModel) {
 		modelLoadingStack.add(id);
 
 		try {
 			UnbakedModel model = fabric_eventDispatcher.resolveModel(id);
 
 			if (model == null) {
-				model = loadBlockModel(id);
+				if (oldModel == null) {
+					model = loadBlockModel(id);
+				} else {
+					model = oldModel;
+				}
 			}
 
 			return fabric_eventDispatcher.modifyModelOnLoad(model, id, null);

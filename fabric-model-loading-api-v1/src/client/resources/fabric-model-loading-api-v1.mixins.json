@@ -6,6 +6,7 @@
     "BakedModelManagerMixin",
     "BlockStatesLoaderMixin",
     "ModelLoaderMixin",
+    "ModelLoaderLateMixin",
     "ModelLoaderBakerImplMixin"
   ],
   "injectors": {
