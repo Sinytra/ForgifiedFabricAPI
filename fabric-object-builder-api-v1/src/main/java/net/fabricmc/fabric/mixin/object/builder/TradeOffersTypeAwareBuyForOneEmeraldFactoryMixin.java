@@ -16,43 +16,30 @@
 
 package net.fabricmc.fabric.mixin.object.builder;
 
-import java.util.stream.Stream;
-
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
-import net.minecraft.village.VillagerType;
 
 @Mixin(TradeOffers.TypeAwareBuyForOneEmeraldFactory.class)
 public abstract class TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin {
 	/**
-	 * Vanilla will check the "VillagerType -> Item" map in the stream and throw an exception for villager types not specified in the map.
-	 * This breaks any and all custom villager types.
-	 * We want to prevent this default logic so modded villager types will work.
-	 * So we return an empty stream so an exception is never thrown.
+	 * To prevent crashes due to passing a {@code null} item to a {@link TradeOffer}, return a {@code null} trade offer
+	 * early before {@code null} is passed to the constructor.
 	 */
-	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;stream()Ljava/util/stream/Stream;"), require = 0)
-	private <T> Stream<T> disableVanillaCheck(DefaultedRegistry<VillagerType> instance) {
-		return Stream.empty();
-	}
-
-	/**
-	 * To prevent "item" -> "air" trades, if the result of a type aware trade is air, make sure no offer is created.
-	 */
-	@Inject(method = "create", at = @At(value = "NEW", target = "net/minecraft/village/TradeOffer"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true, require = 0)
-	private void failOnNullItem(Entity entity, Random random, CallbackInfoReturnable<TradeOffer> cir, ItemStack buyingItem) {
-		if (buyingItem.isEmpty()) { // Will return true for an "empty" item stack that had null passed in the ctor
-			cir.setReturnValue(null); // Return null to prevent creation of empty trades
+	@ModifyExpressionValue(
+			method = "create",
+			at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;")
+	)
+	private Object failOnNullItem(Object item, @Cancellable CallbackInfoReturnable<TradeOffer> cir) {
+		if (item == null) {
+			cir.setReturnValue(null);
 		}
+
+		return item;
 	}
 }

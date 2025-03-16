@@ -202,7 +202,7 @@ dependencies {
 	
 	// Include Forgified Fabric Loader
 	include "dev.su5ed.sinytra:fabric-loader:${rootProject.forge_fabric_loader_version}:full"
-	include implementation("io.github.llamalad7:mixinextras-forge:0.3.5")
+	include implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 }
 afterEvaluate {
 	javadoc {
@@ -265,9 +265,9 @@ subprojects {
 		baseLib
 	}
 	dependencies {
-		compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
-		implementation("io.github.llamalad7:mixinextras-forge:0.3.5")
-		testmodImplementation("io.github.llamalad7:mixinextras-forge:0.3.5")
+		compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+		implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
+		testmodImplementation("io.github.llamalad7:mixinextras-forge:0.4.1")
 		baseLib "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 	}
 	def compareJar = tasks.register("compareJar", Jar) {
