@@ -49,6 +49,10 @@ abstract class ClientPlayNetworkHandlerMixin extends ClientCommonPacketListenerI
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initAddon(CallbackInfo ci) {
+        if (!this.getConnection().isConnected()) {
+            return;
+        }
+
         Set<ResourceLocation> channels = ChannelAttributes.getOrCreateCommonChannels(this.getConnection(), this.protocol());
         NeoClientCommonNetworking.onRegisterPacket((ClientPacketListener) (Object) this, channels);
 
