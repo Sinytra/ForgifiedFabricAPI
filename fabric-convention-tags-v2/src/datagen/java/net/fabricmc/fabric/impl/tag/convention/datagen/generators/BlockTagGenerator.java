@@ -260,6 +260,16 @@ public final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider 
 				.add(Blocks.CHERRY_FENCE_GATE);
 		tag(ConventionalBlockTags.FENCE_GATES)
 				.addOptionalTag(ConventionalBlockTags.WOODEN_FENCE_GATES);
+		tag(ConventionalBlockTags.PUMPKINS)
+				.addTag(ConventionalBlockTags.NORMAL_PUMPKINS)
+				.addTag(ConventionalBlockTags.CARVED_PUMPKINS)
+				.addTag(ConventionalBlockTags.JACK_O_LANTERNS_PUMPKINS);
+		tag(ConventionalBlockTags.NORMAL_PUMPKINS)
+				.add(Blocks.PUMPKIN);
+		tag(ConventionalBlockTags.CARVED_PUMPKINS)
+				.add(Blocks.CARVED_PUMPKIN);
+		tag(ConventionalBlockTags.JACK_O_LANTERNS_PUMPKINS)
+				.add(Blocks.JACK_O_LANTERN);
 	}
 
 	private void generateSandstoneTags() {
