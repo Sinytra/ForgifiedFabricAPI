@@ -79,7 +79,9 @@ public class NeoClientPlayNetworking {
         }
 
         MinecraftRegisterPayload registerPacket = new MinecraftRegisterPayload(NeoCommonNetworking.PLAY_REGISTRY.getGlobalReceivers(PacketFlow.CLIENTBOUND));
-        packetSender.sendPacket(registerPacket);
+        if (!registerPacket.newChannels().isEmpty()) {
+            packetSender.sendPacket(registerPacket);   
+        }
     }
 
     @Nullable
