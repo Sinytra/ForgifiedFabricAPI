@@ -36,7 +36,7 @@ jobs:
         with:
           context: changelog
           workflow_id: release.yml
-      - uses: gradle/wrapper-validation-action@v2
+      - uses: gradle/actions/wrapper-validation@v3
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
