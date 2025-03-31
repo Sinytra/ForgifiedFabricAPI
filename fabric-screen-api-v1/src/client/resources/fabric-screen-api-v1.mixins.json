@@ -3,7 +3,6 @@
   "package": "net.fabricmc.fabric.mixin.screen",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "HandledScreenMixin",
     "MinecraftClientMixin",
     "ScreenMixin"
   ],
