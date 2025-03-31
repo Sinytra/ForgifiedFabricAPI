@@ -31,7 +31,7 @@ import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import net.fabricmc.fabric.api.util.TriState;
 import net.fabricmc.fabric.impl.client.indigo.renderer.IndigoRenderer;
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoConfig;
-import net.fabricmc.loader.api.FabricLoader;
+import net.neoforged.fml.loading.FMLPaths;
 
 public class Indigo implements ClientModInitializer {
 	public static final boolean ALWAYS_TESSELATE_INDIGO;
@@ -95,7 +95,7 @@ public class Indigo implements ClientModInitializer {
 	}
 
 	static {
-		File configDir = FabricLoader.getInstance().getConfigDir().resolve("fabric").toFile();
+		File configDir = FMLPaths.CONFIGDIR.get().resolve("fabric").toFile();
 
 		if (!configDir.exists()) {
 			if (!configDir.mkdir()) {
