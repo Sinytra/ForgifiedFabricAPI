@@ -211,6 +211,14 @@ allprojects {
     }
 }
 
+loom.runs {
+    listOf("client", "server").forEach { run ->
+        named(run) {
+            mods.addAll(loom.mods.filterNot { it.name.contains("test") })
+        }   
+    }
+}
+
 publishMods {
     file.set(tasks.jar.flatMap { it.archiveFile })
     changelog.set(providers.environmentVariable("CHANGELOG").orElse("# ${project.version}"))

@@ -52,7 +52,7 @@ public class JsonDataLoaderMixin extends SinglePreparationResourceReloaderMixin 
 			Map.Entry<ResourceLocation, JsonElement> entry = it.next();
 			JsonElement resourceData = entry.getValue();
 
-			if (resourceData.isJsonObject()) {
+			if (resourceData != null && resourceData.isJsonObject()) {
 				JsonObject obj = resourceData.getAsJsonObject();
 
 				if (!ResourceConditionsImpl.applyResourceConditions(obj, directory, entry.getKey(), fabric_getRegistryLookup())) {
