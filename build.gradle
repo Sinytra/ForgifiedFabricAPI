@@ -249,6 +249,8 @@ allprojects {
 		minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
 		mappings "net.fabricmc:yarn:${rootProject.minecraft_version}${project.yarn_version}:v2"
 		forge "net.minecraftforge:forge:${rootProject.forge_version}"
+		compileOnly annotationProcessor('io.github.llamalad7:mixinextras-common:0.4.1')
+		implementation "io.github.llamalad7:mixinextras-forge:0.4.1"
 
 		testmodImplementation sourceSets.main.output
 //		testmodClientImplementation sourceSets.main.output
