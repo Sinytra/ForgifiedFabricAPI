@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.impl.attachment.sync;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -26,8 +27,12 @@ import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
 import net.fabricmc.fabric.mixin.attachment.CustomPayloadS2CPacketAccessor;
 import net.fabricmc.fabric.mixin.attachment.VarIntsAccessor;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerCommonNetworkHandlerAccessor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -126,7 +131,33 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
     }return codec.decode(buf);
 	}
 
-    public void apply(Level world) {
-        targetInfo.getTarget(world).setAttached((AttachmentType<Object>) type, decodeValue(world.registryAccess()));
-    }
+    public void tryApply(Level world) throws AttachmentSyncException{
+        AttachmentTarget target = targetInfo.getTarget(world);
+		Object value = decodeValue(world.registryAccess());
+    if (target == null) {
+			final MutableComponent errorMessageText = Component.empty();
+			errorMessageText
+					.append(Component.translatable("fabric-data-attachment-api-v1.unknown-target.title").withStyle(ChatFormatting.RED))
+					.append(CommonComponents.NEW_LINE);
+			errorMessageText.append(CommonComponents.NEW_LINE);
+
+			errorMessageText
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.attachment-identifier",
+							Component.literal(String.valueOf(type.identifier())).withStyle(ChatFormatting.YELLOW))
+					)
+					.append(CommonComponents.NEW_LINE);
+			errorMessageText
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.world",
+							Component.literal(String.valueOf(world.dimension().location())).withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
+			targetInfo.appendDebugInformation(errorMessageText);
+
+			throw new AttachmentSyncException(errorMessageText);
+		}
+
+		target.setAttached((AttachmentType<Object>) type, value);
+	}
 }

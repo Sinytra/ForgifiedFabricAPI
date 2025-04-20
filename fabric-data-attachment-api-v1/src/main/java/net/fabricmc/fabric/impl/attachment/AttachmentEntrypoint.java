@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.impl.attachment;
 
+import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -24,10 +25,12 @@ import net.fabricmc.fabric.mixin.attachment.AttachmentHolderAccessor;
 import net.fabricmc.fabric.mixin.attachment.AttachmentTypeAccessor;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import org.slf4j.Logger;
 
 import java.util.Map;
 
 public class AttachmentEntrypoint implements ModInitializer {
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
     public void onInitialize() {

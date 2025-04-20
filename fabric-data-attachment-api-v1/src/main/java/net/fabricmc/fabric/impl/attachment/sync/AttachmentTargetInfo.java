@@ -19,8 +19,13 @@ package net.fabricmc.fabric.impl.attachment.sync;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
@@ -41,7 +46,10 @@ public sealed interface AttachmentTargetInfo<T> {
 		return getType().id;
 	}
 
+	@Nullable
 	AttachmentTarget getTarget(Level world);
+
+	void appendDebugInformation(MutableComponent text);
 
 	record Type<T>(byte id, StreamCodec<ByteBuf, ? extends AttachmentTargetInfo<T>> packetCodec) {
 		static Byte2ObjectMap<Type<?>> TYPES = new Byte2ObjectArrayMap<>();
@@ -74,6 +82,22 @@ public sealed interface AttachmentTargetInfo<T> {
 		public AttachmentTarget getTarget(Level world) {
 			return world.getBlockEntity(pos);
 		}
+
+		@Override
+		public void appendDebugInformation(MutableComponent text) {
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.target-type",
+							Component.translatable("fabric-data-attachment-api-v1.unknown-target.target-type.block-entity").withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.block-entity-position",
+							Component.literal(pos.toShortString()).withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
+		}
 	}
 
 	record EntityTarget(int networkId) implements AttachmentTargetInfo<Entity> {
@@ -91,6 +115,22 @@ public sealed interface AttachmentTargetInfo<T> {
 		public AttachmentTarget getTarget(Level world) {
 			return world.getEntity(networkId);
 		}
+
+		@Override
+		public void appendDebugInformation(MutableComponent text) {
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.target-type",
+							Component.translatable("fabric-data-attachment-api-v1.unknown-target.target-type.entity").withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.entity-network-id",
+							Component.literal(String.valueOf(networkId)).withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
+		}
 	}
 
 	record ChunkTarget(ChunkPos pos) implements AttachmentTargetInfo<ChunkAccess> {
@@ -106,6 +146,22 @@ public sealed interface AttachmentTargetInfo<T> {
 		@Override
 		public AttachmentTarget getTarget(Level world) {
 			return world.getChunk(pos.x, pos.z);
+		}
+
+		@Override
+		public void appendDebugInformation(MutableComponent text) {
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.target-type",
+							Component.translatable("fabric-data-attachment-api-v1.unknown-target.target-type.chunk").withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.chunk-position",
+							Component.literal(pos.x + ", " + pos.z).withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
 		}
 	}
 
@@ -124,6 +180,16 @@ public sealed interface AttachmentTargetInfo<T> {
 		@Override
 		public AttachmentTarget getTarget(Level world) {
 			return world;
+		}
+
+		@Override
+		public void appendDebugInformation(MutableComponent text) {
+			text
+					.append(Component.translatable(
+							"fabric-data-attachment-api-v1.unknown-target.target-type",
+							Component.translatable("fabric-data-attachment-api-v1.unknown-target.target-type.world").withStyle(ChatFormatting.YELLOW)
+					))
+					.append(CommonComponents.NEW_LINE);
 		}
 	}
 }
