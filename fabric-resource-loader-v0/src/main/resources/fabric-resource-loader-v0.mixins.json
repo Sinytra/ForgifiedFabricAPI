@@ -10,6 +10,9 @@
     "SimpleResourceReloadMixin",
     "MinecraftServerMixin"
   ],
+  "server": [
+    "server.LanguageMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

@@ -258,6 +258,10 @@ allprojects {
 		testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 		testImplementation sourceSets.testmod.output
 		testImplementation 'org.mockito:mockito-core:5.4.0'
+
+		//Needed for FFAPI to compile even!
+		compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+		implementation(include("io.github.llamalad7:mixinextras-forge:0.4.1"))
 	}
 
 	test {
