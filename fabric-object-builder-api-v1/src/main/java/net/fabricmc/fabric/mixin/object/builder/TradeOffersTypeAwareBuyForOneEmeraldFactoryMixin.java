@@ -41,7 +41,7 @@ public abstract class TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin {
 	 * We want to prevent this default logic so modded villager types will work.
 	 * So we return an empty stream so an exception is never thrown.
 	 */
-	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;stream()Ljava/util/stream/Stream;"))
+	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;stream()Ljava/util/stream/Stream;"), require = 0)
 	private <T> Stream<T> disableVanillaCheck(DefaultedRegistry<VillagerType> instance) {
 		return Stream.empty();
 	}
@@ -49,7 +49,7 @@ public abstract class TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin {
 	/**
 	 * To prevent "item" -> "air" trades, if the result of a type aware trade is air, make sure no offer is created.
 	 */
-	@Inject(method = "create", at = @At(value = "NEW", target = "net/minecraft/village/TradeOffer"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
+	@Inject(method = "create", at = @At(value = "NEW", target = "net/minecraft/village/TradeOffer"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true, require = 0)
 	private void failOnNullItem(Entity entity, Random random, CallbackInfoReturnable<TradeOffer> cir, ItemStack buyingItem) {
 		if (buyingItem.isEmpty()) { // Will return true for an "empty" item stack that had null passed in the ctor
 			cir.setReturnValue(null); // Return null to prevent creation of empty trades

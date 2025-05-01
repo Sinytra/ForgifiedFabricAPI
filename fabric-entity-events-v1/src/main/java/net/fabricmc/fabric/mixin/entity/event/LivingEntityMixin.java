@@ -128,7 +128,7 @@ abstract class LivingEntityMixin {
 		// when the bed doesn't have the property.
 		BlockState originalState = fabric_originalState != null ? fabric_originalState : state;
 
-		if (!EntitySleepEvents.SET_BED_OCCUPATION_STATE.invoker().setBedOccupationState((LivingEntity) (Object) this, pos, originalState, occupied)) {
+		if (EntitySleepEvents.SET_BED_OCCUPATION_STATE.invoker().setBedOccupationState((LivingEntity) (Object) this, pos, originalState, occupied) || originalState.contains(BedBlock.OCCUPIED)) {
 			originalState.setBedOccupied(world, pos, entity, occupied);
 		}
 
