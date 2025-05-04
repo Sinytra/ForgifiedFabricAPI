@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.architectury:architectury-loom:1.6-SNAPSHOT")
+    implementation("dev.architectury:architectury-loom:1.9-SNAPSHOT")
 
     implementation("net.fabricmc:fabric-loader:0.15.10")
 
