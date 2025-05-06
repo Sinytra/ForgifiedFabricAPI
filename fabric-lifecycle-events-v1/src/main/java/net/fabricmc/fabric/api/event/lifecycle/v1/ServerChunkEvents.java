@@ -18,8 +18,12 @@ package net.fabricmc.fabric.api.event.lifecycle.v1;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.FullChunkStatus;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 public final class ServerChunkEvents {
 	private ServerChunkEvents() {
@@ -29,6 +33,10 @@ public final class ServerChunkEvents {
 	 * Called when a chunk is loaded into a ServerWorld.
 	 *
 	 * <p>When this event is called, the chunk is already in the world.
+	 *
+	 * <p>Note that this event is not called for chunks that become accessible without previously being unloaded.
+	 *
+	 * @see ServerChunkEvents#CHUNK_LEVEL_TYPE_CHANGE
 	 */
 	public static final Event<ServerChunkEvents.Load> CHUNK_LOAD = EventFactory.createArrayBacked(ServerChunkEvents.Load.class, callbacks -> (serverWorld, chunk) -> {
 		for (Load callback : callbacks) {
@@ -51,10 +59,30 @@ public final class ServerChunkEvents {
 	 * Called when a chunk is unloaded from a ServerWorld.
 	 *
 	 * <p>When this event is called, the chunk is still present in the world.
+	 *
+	 * <p>Note that the server typically unloads chunks when the chunk's level goes above 45 (and not immediately when the chunk becomes inaccessible).
+	 * To know when a chunk first becomes inaccessible, see {@link ServerChunkEvents#CHUNK_LEVEL_TYPE_CHANGE}.
 	 */
 	public static final Event<ServerChunkEvents.Unload> CHUNK_UNLOAD = EventFactory.createArrayBacked(ServerChunkEvents.Unload.class, callbacks -> (serverWorld, chunk) -> {
 		for (Unload callback : callbacks) {
 			callback.onChunkUnload(serverWorld, chunk);
+		}
+	});
+
+	/**
+	 * Called when a chunk's actual ticking behavior is about to align with its updated {@link FullChunkStatus}.
+	 *
+	 * <p>When this event is being called:
+	 * <ul>
+	 * <li>The chunk's {@link LevelChunk#getFullStatus()} has already changed.</li>
+	 * <li>Entities within the chunk are not guaranteed to be accessible.</li>
+	 * <li>The chunk's corresponding level type future in {@link ChunkHolder} is not guaranteed to be done.</li>
+	 * <li>When transitioning from {@link FullChunkStatus#INACCESSIBLE} to {@link FullChunkStatus#FULL}, calling {@link ServerChunkCache#getChunkFuture(int, int, ChunkStatus, boolean)} to fetch the current chunk at {@link ChunkStatus#FULL} status results in undefined behavior.</li>
+	 * </ul>
+	 */
+	public static final Event<LevelTypeChange> CHUNK_LEVEL_TYPE_CHANGE = EventFactory.createArrayBacked(LevelTypeChange.class, (world, chunk, oldLevelType, newLevelType) -> { }, callbacks -> (serverWorld, chunk, oldLevelType, newLevelType) -> {
+		for (LevelTypeChange callback : callbacks) {
+			callback.onChunkLevelTypeChange(serverWorld, chunk, oldLevelType, newLevelType);
 		}
 	});
 
@@ -71,5 +99,10 @@ public final class ServerChunkEvents {
 	@FunctionalInterface
 	public interface Unload {
 		void onChunkUnload(ServerLevel world, LevelChunk chunk);
+	}
+
+	@FunctionalInterface
+	public interface LevelTypeChange {
+		void onChunkLevelTypeChange(ServerLevel world, LevelChunk chunk, FullChunkStatus oldLevelType, FullChunkStatus newLevelType);
 	}
 }
