@@ -47,8 +47,8 @@ public abstract class ArmorFeatureRendererMixin extends RenderLayer<LivingEntity
 		super(context);
 	}
 
-	@Inject(method = "renderArmorPiece", at = @At("HEAD"), cancellable = true)
-	private void renderArmor(PoseStack matrices, MultiBufferSource vertexConsumers, LivingEntity entity, EquipmentSlot armorSlot, int light, HumanoidModel<LivingEntity> model, CallbackInfo ci) {
+	@Inject(method = "renderArmorPiece(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;FFFFFF)V", at = @At("HEAD"), cancellable = true)
+	private void renderArmor(PoseStack matrices, MultiBufferSource vertexConsumers, LivingEntity entity, EquipmentSlot armorSlot, int light, HumanoidModel<LivingEntity> model, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
 		ItemStack stack = entity.getItemBySlot(armorSlot);
 		ArmorRenderer renderer = ArmorRendererRegistryImpl.get(stack.getItem());
 
