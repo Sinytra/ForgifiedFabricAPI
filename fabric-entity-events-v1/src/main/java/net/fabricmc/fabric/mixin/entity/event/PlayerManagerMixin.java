@@ -19,10 +19,13 @@ package net.fabricmc.fabric.mixin.entity.event;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
 
@@ -36,5 +39,15 @@ abstract class PlayerManagerMixin {
 		if (oldPlayer.serverLevel() != newPlayer.serverLevel()) {
 			ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.invoker().afterChangeWorld(newPlayer, oldPlayer.serverLevel(), newPlayer.serverLevel());
 		}
+	}
+
+	@Inject(method = "placeNewPlayer", at = @At("RETURN"))
+	private void firePlayerJoinEvent(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo ci) {
+		ServerPlayerEvents.JOIN.invoker().onJoin(player);
+	}
+
+	@Inject(method = "remove", at = @At("HEAD"))
+	private void firePlayerLeaveEvent(ServerPlayer player, CallbackInfo ci) {
+		ServerPlayerEvents.LEAVE.invoker().onLeave(player);
 	}
 }

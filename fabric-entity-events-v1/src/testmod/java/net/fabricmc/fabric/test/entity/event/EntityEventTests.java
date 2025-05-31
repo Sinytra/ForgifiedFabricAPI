@@ -18,14 +18,6 @@ package net.fabricmc.fabric.test.entity.event;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
-import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -33,6 +25,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -46,6 +39,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 
 public final class EntityEventTests implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntityEventTests.class);
@@ -212,6 +213,16 @@ public final class EntityEventTests implements ModInitializer {
 		EntityElytraEvents.ALLOW.register(entity -> {
 			return !entity.getOffhandItem().is(Items.TORCH);
 		});
+
+		ServerPlayerEvents.JOIN.register(player -> {
+			assertOnServerThread(player.getServer());
+			LOGGER.info("Observed player {} joining the game", player.getGameProfile().getName());
+		});
+
+		ServerPlayerEvents.LEAVE.register(player -> {
+			assertOnServerThread(player.getServer());
+			LOGGER.info("Observed player {} leaving the game", player.getGameProfile().getName());
+		});
 	}
 
 	private static void addSleepWools(Player player) {
@@ -224,6 +235,12 @@ public final class EntityEventTests implements ModInitializer {
 		inventory.placeItemBackInInventory(createNamedItem(Items.BLACK_WOOL, "Don't reset time"));
 		inventory.placeItemBackInInventory(createNamedItem(Items.ORANGE_WOOL, "Don't set occupied state"));
 		inventory.placeItemBackInInventory(createNamedItem(Items.CYAN_WOOL, "Wake up high above"));
+	}
+
+	private static void assertOnServerThread(MinecraftServer server) {
+		if (!server.isSameThread()) {
+			throw new AssertionError("Expected the game to be on the server thread, but found " + Thread.currentThread());
+		}
 	}
 
 	private static ItemStack createNamedItem(Item item, String name) {
