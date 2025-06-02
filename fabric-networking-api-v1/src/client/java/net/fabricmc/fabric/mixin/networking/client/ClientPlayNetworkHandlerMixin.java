@@ -49,8 +49,11 @@ abstract class ClientPlayNetworkHandlerMixin extends ClientCommonPacketListenerI
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initAddon(CallbackInfo ci) {
-        Set<ResourceLocation> channels = ChannelAttributes.getOrCreateCommonChannels(this.getConnection(), this.protocol());
-        NeoClientCommonNetworking.onRegisterPacket((ClientPacketListener) (Object) this, channels);
+        Connection connection = this.getConnection();
+        if (connection != null && connection.channel() != null) {
+            Set<ResourceLocation> channels = ChannelAttributes.getOrCreateCommonChannels(connection, this.protocol());
+            NeoClientCommonNetworking.onRegisterPacket((ClientPacketListener) (Object) this, channels);
+        }
 
         NeoClientPlayNetworking.setTempPacketListener((ClientPacketListener) (Object) this);
         ClientPlayConnectionEvents.INIT.invoker().onPlayInit((ClientPacketListener) (Object) this, this.minecraft);
