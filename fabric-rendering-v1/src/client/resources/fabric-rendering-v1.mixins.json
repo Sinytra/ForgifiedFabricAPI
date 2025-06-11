@@ -5,11 +5,13 @@
   "client": [
     "ArmorFeatureRendererMixin",
     "AtlasSourceManagerAccessor",
+    "BlockColorsMixin",
     "BuiltinModelItemRendererMixin",
     "CapeFeatureRendererMixin",
     "DimensionEffectsAccessor",
     "EntityModelLayersAccessor",
     "EntityRenderersMixin",
+    "ItemColorsMixin",
     "LivingEntityRendererAccessor",
     "TooltipComponentMixin",
     "WorldRendererMixin",

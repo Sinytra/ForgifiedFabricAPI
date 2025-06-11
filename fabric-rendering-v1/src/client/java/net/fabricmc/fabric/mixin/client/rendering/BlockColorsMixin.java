@@ -25,15 +25,25 @@ import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Map;
 
 @Mixin(BlockColors.class)
 public class BlockColorsMixin implements ColorProviderRegistryImpl.ColorMapperHolder<Block, BlockColor> {
 	@Shadow
 	@Final
-	private IdMapper<BlockColor> blockColors;
+	private Map<Block, BlockColor> blockColors;
+
+	@Inject(method = "createDefault", at = @At("RETURN"))
+	private static void createDefault(CallbackInfoReturnable<BlockColors> info) {
+		ColorProviderRegistryImpl.BLOCK.initialize(info.getReturnValue());
+	}
 
 	@Override
 	public BlockColor get(Block block) {
-		return blockColors.byId(BuiltInRegistries.BLOCK.getId(block));
+		return blockColors.get(block);
 	}
 }
