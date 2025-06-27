@@ -11,6 +11,7 @@
     "DimensionEffectsAccessor",
     "EntityModelLayersAccessor",
     "EntityRenderersMixin",
+    "HeadFeatureRendererMixin",
     "ItemColorsMixin",
     "LivingEntityRendererAccessor",
     "TooltipComponentMixin",
