@@ -81,6 +81,11 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 			public Advancement.Builder advancement() {
 				return exporter.advancement();
 			}
+
+			@Override
+			public ResourceLocation getRecipeIdentifier(ResourceLocation recipeId) {
+				return exporter.getRecipeIdentifier(recipeId);
+			}
 		};
 	}
 
@@ -91,10 +96,8 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 		buildRecipes(new RecipeOutput() {
 			@Override
 			public void accept(ResourceLocation recipeId, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... recipeConditions) {
-				ResourceLocation identifier = getRecipeIdentifier(recipeId);
-
-				if (!generatedRecipes.add(identifier)) {
-					throw new IllegalStateException("Duplicate recipe " + identifier);
+				if (!generatedRecipes.add(recipeId)) {
+					throw new IllegalStateException("Duplicate recipe " + recipeId);
 				}
 
 				RegistryOps<JsonElement> registryOps = wrapperLookup.createSerializationContext(JsonOps.INSTANCE);
@@ -102,12 +105,12 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 				ResourceCondition[] conditions = FabricDataGenHelper.consumeConditions(recipe);
 				FabricDataGenHelper.addConditions(recipeJson, conditions);
 
-				list.add(DataProvider.saveStable(writer, recipeJson, recipePathProvider.json(identifier)));
+				list.add(DataProvider.saveStable(writer, recipeJson, recipePathProvider.json(recipeId)));
 
 				if (advancement != null) {
 					JsonObject advancementJson = Advancement.CODEC.encodeStart(registryOps, advancement.value()).getOrThrow(IllegalStateException::new).getAsJsonObject();
 					FabricDataGenHelper.addConditions(advancementJson, conditions);
-					list.add(DataProvider.saveStable(writer, advancementJson, advancementPathProvider.json(getRecipeIdentifier(advancement.id()))));
+					list.add(DataProvider.saveStable(writer, advancementJson, advancementPathProvider.json(advancement.id())));
 				}
 			}
 
@@ -115,6 +118,11 @@ public abstract class FabricRecipeProvider extends RecipeProvider {
 			public Advancement.Builder advancement() {
 				//noinspection removal
 				return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
+			}
+
+			@Override
+			public ResourceLocation getRecipeIdentifier(ResourceLocation recipeId) {
+				return FabricRecipeProvider.this.getRecipeIdentifier(recipeId);
 			}
 		});
 		return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));

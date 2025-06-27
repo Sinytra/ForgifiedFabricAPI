@@ -7,7 +7,11 @@
     "DataGeneratorMixin",
     "ModelProviderMixin",
     "loot.BlockLootTableGeneratorAccessor",
-    "loot.BlockLootTableGeneratorMixin"
+    "loot.BlockLootTableGeneratorMixin",
+    "recipe.AllCraftingRecipeJsonBuildersMixin",
+    "recipe.ComplexRecipeJsonBuilderMixin",
+    "recipe.SmithingTransformRecipeJsonBuilderMixin",
+    "recipe.SmithingTrimRecipeJsonBuilderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
