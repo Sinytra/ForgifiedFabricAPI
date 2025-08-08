@@ -51,7 +51,7 @@ public class ModelTestModClient implements ClientModInitializer {
 
 	static class DownQuadRemovingModel extends ForwardingBakedModel {
 		DownQuadRemovingModel(BakedModel model) {
-			wrapped = model;
+			super(model);
 		}
 
 		@Override
