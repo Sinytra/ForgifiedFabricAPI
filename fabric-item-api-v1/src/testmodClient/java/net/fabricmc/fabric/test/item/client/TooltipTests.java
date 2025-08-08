@@ -16,17 +16,27 @@
 
 package net.fabricmc.fabric.test.item.client;
 
+import java.util.Optional;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
 public class TooltipTests implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		// Adds a tooltip to all items so testing can be verified easily.
+		// Adds a tooltip to all items with the name of the mod they come from.
 		ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
-			lines.add(Component.literal("Fancy Tooltips").withStyle(ChatFormatting.LIGHT_PURPLE));
+			String modName = stack.getCreatorNamespace();
+			Optional<ModContainer> modContainer = FabricLoader.getInstance().getModContainer(modName);
+
+			if (modContainer.isPresent()) {
+				modName = modContainer.get().getMetadata().getName();
+			}
+
+			lines.add(Component.literal(modName).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC));
 		});
 	}
 }

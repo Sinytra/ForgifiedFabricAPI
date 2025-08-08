@@ -16,13 +16,20 @@
 
 package net.fabricmc.fabric.api.item.v1;
 
+import java.util.Optional;
+import java.util.Set;
 import net.fabricmc.fabric.impl.item.FabricItemInternals;
 import net.fabricmc.fabric.impl.item.RecursivityHelper;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.TippedArrowItem;
+import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.common.extensions.IItemExtension;
 
@@ -116,6 +123,39 @@ public interface FabricItem {
 		return context == EnchantingContext.PRIMARY
 				? stack.isPrimaryItemFor(enchantment)
 				: enchantment.value().canEnchant(stack);
+	}
+
+	/**
+	 * Gets the namespace of the mod or datapack that created this item.
+	 *
+	 * <p>This can be used if, for example, a library mod registers a generic item that other mods can create new
+	 * variants for, allowing those mods to take credit for those variants if a player wishes to know what mod they
+	 * come from.</p>
+	 *
+	 * <p>Should be used instead of querying the item ID namespace to determine what mod an item is from when displaying
+	 * to the player.</p>
+	 *
+	 * <p>Defaults to the namespace of the item's own registry entry, except in the cases of potions or enchanted books,
+	 * in which it uses the namespace of the potion contents or single enchantment applied.</p>
+	 *
+	 * <p>Note that while it is recommended that this reflect a namespace and/or mod ID, it can technically be any
+	 * arbitrary string.</p>
+	 *
+	 * @param stack the current stack
+	 * @return the namespace of the mod that created the item
+	 */
+	default String getCreatorNamespace(ItemStack stack) {
+		Holder<?> entry = stack.getItemHolder();
+
+		if ((this instanceof PotionItem || this instanceof TippedArrowItem) && stack.has(DataComponents.POTION_CONTENTS)) {
+			Optional<Holder<Potion>> potion = stack.get(DataComponents.POTION_CONTENTS).potion();
+			if (potion.isPresent()) entry = potion.get();
+		} else if (stack.is(Items.ENCHANTED_BOOK) && stack.has(DataComponents.STORED_ENCHANTMENTS)) {
+			Set<Holder<Enchantment>> enchantments = stack.get(DataComponents.STORED_ENCHANTMENTS).keySet();
+			if (enchantments.size() == 1) entry = enchantments.iterator().next();
+		}
+
+		return entry.unwrapKey().orElseThrow().location().getNamespace();
 	}
 
 	/**
