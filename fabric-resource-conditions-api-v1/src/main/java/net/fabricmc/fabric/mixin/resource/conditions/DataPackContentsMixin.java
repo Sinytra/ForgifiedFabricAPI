@@ -19,6 +19,7 @@ package net.fabricmc.fabric.mixin.resource.conditions;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,7 +46,7 @@ public class DataPackContentsMixin {
 	)
 	public void hookRefresh(DynamicRegistryManager dynamicRegistryManager, CallbackInfo ci) {
 		ResourceConditionsImpl.LOADED_TAGS.remove();
-		ResourceConditionsImpl.CURRENT_REGISTRIES.remove();
+		ResourceConditionsImpl.CURRENT_REGISTRIES.remove(EffectiveSide.get());
 	}
 
 	@Inject(
@@ -54,6 +55,6 @@ public class DataPackContentsMixin {
 	)
 	private static void hookReload(ResourceManager manager, DynamicRegistryManager.Immutable dynamicRegistryManager, FeatureSet enabledFeatures, CommandManager.RegistrationEnvironment environment, int functionPermissionLevel, Executor prepareExecutor, Executor applyExecutor, CallbackInfoReturnable<CompletableFuture<DataPackContents>> cir) {
 		ResourceConditionsImpl.CURRENT_FEATURES.set(enabledFeatures);
-		ResourceConditionsImpl.CURRENT_REGISTRIES.set(dynamicRegistryManager);
+		ResourceConditionsImpl.CURRENT_REGISTRIES.put(EffectiveSide.get(), dynamicRegistryManager);
 	}
 }
