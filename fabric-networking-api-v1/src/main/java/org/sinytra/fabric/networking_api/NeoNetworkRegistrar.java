@@ -18,6 +18,7 @@ import org.apache.commons.lang3.function.TriConsumer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class NeoNetworkRegistrar {
 
     private final ConnectionProtocol protocol;
 
-    private final Map<ResourceLocation, NeoPayloadHandler<?>> registeredPayloads = new HashMap<>();
+    private final Map<ResourceLocation, NeoPayloadHandler<?>> registeredPayloads = new ConcurrentHashMap<>();
 
     public NeoNetworkRegistrar(ConnectionProtocol protocol) {
         this.protocol = protocol;
