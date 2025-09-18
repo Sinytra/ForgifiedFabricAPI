@@ -16,16 +16,17 @@
 
 package net.fabricmc.fabric.impl.lookup.custom;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import net.fabricmc.fabric.api.lookup.v1.custom.ApiLookupMap;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 public final class ApiLookupMapImpl<L> implements ApiLookupMap<L> {
-	private final Map<ResourceLocation, StoredLookup<L>> lookups = new HashMap<>();
+	private final Map<ResourceLocation, StoredLookup<L>> lookups = new ConcurrentHashMap<>();
 	private final LookupConstructor<L> lookupConstructor;
 
 	public ApiLookupMapImpl(LookupConstructor<L> lookupConstructor) {

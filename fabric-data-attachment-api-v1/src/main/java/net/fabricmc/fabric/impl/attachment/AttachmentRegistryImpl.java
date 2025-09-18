@@ -34,11 +34,12 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public final class AttachmentRegistryImpl {
-    private static final Map<net.neoforged.neoforge.attachment.AttachmentType<?>, AttachmentType<?>> FABRIC_ATTACHMENT_TYPES = new HashMap<>();
-	private static final Set<ResourceLocation> syncableAttachments = new HashSet<>();
+    private static final Map<net.neoforged.neoforge.attachment.AttachmentType<?>, AttachmentType<?>> FABRIC_ATTACHMENT_TYPES = new ConcurrentHashMap<>();
+	private static final Set<ResourceLocation> syncableAttachments = Collections.synchronizedSet(new HashSet<>());
 	private static final Set<ResourceLocation> syncableView = Collections.unmodifiableSet(syncableAttachments);
 
     public static <A> net.neoforged.neoforge.attachment.AttachmentType<A> register(ResourceLocation id, net.neoforged.neoforge.attachment.AttachmentType<A> attachmentType) {

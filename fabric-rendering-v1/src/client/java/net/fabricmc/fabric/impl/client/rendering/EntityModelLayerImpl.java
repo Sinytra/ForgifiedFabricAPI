@@ -16,13 +16,14 @@
 
 package net.fabricmc.fabric.impl.client.rendering;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public final class EntityModelLayerImpl {
-	public static final Map<ModelLayerLocation, EntityModelLayerRegistry.TexturedModelDataProvider> PROVIDERS = new HashMap<>();
+	public static final Map<ModelLayerLocation, EntityModelLayerRegistry.TexturedModelDataProvider> PROVIDERS = new ConcurrentHashMap<>();
 
 	private EntityModelLayerImpl() {
 	}
