@@ -1,0 +1,51 @@
+modLoader = "lowcodefml"
+loaderVersion = "[1,)"
+license = "Apache-2.0"
+issueTrackerURL = "https://github.com/Sinytra/ForgifiedFabricAPI/issues"
+
+[[mods]]
+modId = "fabric_api"
+version = "${file.jarVersion}"
+displayName = "Forgified Fabric API"
+logoFile = "assets/fabric/icon.png"
+authors = "Sinytra, FabricMC"
+description = "Core API module providing key hooks and intercompatibility features."
+provides = ["fabric", "fabric-api"]
+displayURL = "https://github.com/Sinytra/ForgifiedFabricAPI"
+
+[[dependencies.fabric_api]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.169,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.fabric_api]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
+
+[[mods]]
+modId = "forgified_fabric_api"
+version = "${file.jarVersion}"
+displayName = "Forgified Fabric API (dummy)"
+logoFile = "assets/fabric/icon.png"
+authors = "Sinytra, FabricMC"
+description = "Dependency target for other mods"
+displayURL = "https://github.com/Sinytra/ForgifiedFabricAPI"
+
+[[dependencies.forgified_fabric_api]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.169,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.forgified_fabric_api]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
