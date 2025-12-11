@@ -33,6 +33,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.networking.AbstractChanneledNetworkAddon;
 import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
 import net.fabricmc.fabric.impl.networking.NetworkingImpl;
+import net.fabricmc.fabric.impl.networking.UntrackedNetworkHandler;
 import net.fabricmc.fabric.mixin.networking.accessor.CustomPayloadC2SPacketAccessor;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerPlayNetworkHandlerAccessor;
 
@@ -49,8 +50,10 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 		// Must register pending channels via lateinit
 		this.registerPendingChannels((ChannelInfoHolder) this.connection);
 
-		// Register global receivers and attach to session
-		this.receiver.startSession(this);
+		if (!(handler instanceof UntrackedNetworkHandler)) {
+			// Register global receivers and attach to session
+			this.receiver.startSession(this);
+		}
 	}
 
 	@Override

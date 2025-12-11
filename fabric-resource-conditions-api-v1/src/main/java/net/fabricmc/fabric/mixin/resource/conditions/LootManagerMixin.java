@@ -28,6 +28,7 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.resource.ResourceManager;
 
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -56,14 +57,14 @@ public class LootManagerMixin {
 
 	@Inject(method = "load", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;runAsync(Ljava/lang/Runnable;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"), locals = LocalCapture.CAPTURE_FAILHARD)
 	private static void load(LootDataType type, ResourceManager resourceManager, Executor executor, Map<LootDataType<?>, Map<Identifier, ?>> results, CallbackInfoReturnable<CompletableFuture<?>> cir, Map map) {
-		dynamicRegistryManagerMap.put(map, ResourceConditionsImpl.CURRENT_REGISTRIES.get());
+		dynamicRegistryManagerMap.put(map, ResourceConditionsImpl.CURRENT_REGISTRIES.get(EffectiveSide.get()));
 	}
 
 	// runAsync Runnable in load method
 	@Inject(method = {"method_51189", "m_278660_"}, at = @At("HEAD"), require = 1)
 	private static void runAsync(ResourceManager resourceManager, LootDataType lootDataType, Map map, CallbackInfo ci) {
-		assert ResourceConditionsImpl.CURRENT_REGISTRIES.get() == null;
-		ResourceConditionsImpl.CURRENT_REGISTRIES.set(Objects.requireNonNull(dynamicRegistryManagerMap.remove(map)));
+		assert ResourceConditionsImpl.CURRENT_REGISTRIES.get(EffectiveSide.get()) == null;
+		ResourceConditionsImpl.CURRENT_REGISTRIES.put(EffectiveSide.get(), Objects.requireNonNull(dynamicRegistryManagerMap.remove(map)));
 	}
 
 	// forEach in load method
@@ -90,6 +91,6 @@ public class LootManagerMixin {
 	// runAsync Runnable in load method
 	@Inject(method = {"method_51189", "m_278660_"}, at = @At("RETURN"), require = 1)
 	private static void runAsyncEnd(ResourceManager resourceManager, LootDataType lootDataType, Map map, CallbackInfo ci) {
-		ResourceConditionsImpl.CURRENT_REGISTRIES.remove();
+		ResourceConditionsImpl.CURRENT_REGISTRIES.remove(EffectiveSide.get());
 	}
 }

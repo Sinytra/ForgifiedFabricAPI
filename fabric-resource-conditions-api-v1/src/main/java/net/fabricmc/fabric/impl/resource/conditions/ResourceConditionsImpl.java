@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,7 +269,7 @@ public final class ResourceConditionsImpl {
 		return set.isSubsetOf(CURRENT_FEATURES.get());
 	}
 
-	public static final ThreadLocal<DynamicRegistryManager.Immutable> CURRENT_REGISTRIES = new ThreadLocal<>();
+	public static final Map<LogicalSide, DynamicRegistryManager.Immutable> CURRENT_REGISTRIES = new ConcurrentHashMap<>();
 
 	public static boolean registryContainsMatch(JsonObject object) {
 		String key = JsonHelper.getString(object, "registry", "minecraft:item");
@@ -276,7 +279,7 @@ public final class ResourceConditionsImpl {
 
 	private static <E> boolean registryContainsMatch(JsonObject object, RegistryKey<? extends Registry<? extends E>> registryRef) {
 		JsonArray array = JsonHelper.getArray(object, "values");
-		DynamicRegistryManager.Immutable registries = CURRENT_REGISTRIES.get();
+		DynamicRegistryManager.Immutable registries = CURRENT_REGISTRIES.get(EffectiveSide.get());
 
 		if (registries == null) {
 			LOGGER.warn("Can't retrieve current registries. Failing registry_contains resource condition check.");

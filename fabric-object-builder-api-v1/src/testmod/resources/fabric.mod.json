@@ -32,7 +32,8 @@
       "net.fabricmc.fabric.test.object.builder.client.TealSignClientTest"
     ],
     "fabric-gametest": [
-      "net.fabricmc.fabric.test.object.builder.ObjectBuilderGameTest"
+      "net.fabricmc.fabric.test.object.builder.ObjectBuilderGameTest",
+      "net.fabricmc.fabric.test.object.builder.EmptyTypeAwareBuyForOneEmeraldTradeOfferGameTest"
     ]
   }
 }
