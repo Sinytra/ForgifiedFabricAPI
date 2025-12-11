@@ -16,46 +16,30 @@
 
 package net.fabricmc.fabric.mixin.object.builder;
 
-import java.util.stream.Stream;
-
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
-import net.minecraft.village.VillagerType;
 
 @Mixin(TradeOffers.TypeAwareBuyForOneEmeraldFactory.class)
 public abstract class TradeOffersTypeAwareBuyForOneEmeraldFactoryMixin {
 	/**
-	 * Vanilla will check the "VillagerType -> Item" map in the stream and throw an exception for villager types not specified in the map.
-	 * This breaks any and all custom villager types.
-	 * We want to prevent this default logic so modded villager types will work.
-	 * So we return an empty stream so an exception is never thrown.
-	 */
-	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;stream()Ljava/util/stream/Stream;"), require = 0)
-	private <T> Stream<T> disableVanillaCheck(DefaultedRegistry<VillagerType> instance) {
-		return Stream.empty();
-	}
-
-	/**
- 	 * https://github.com/FabricMC/fabric/commit/e35120df0e113211c3e6928fa446efe6f387b085#diff-3f36fa41b6959de14a21137b631ecff47f27ed73845fa4c15ce77fac6cdad012R50
 	 * To prevent crashes due to passing a {@code null} item to a {@link TradeOffer}, return a {@code null} trade offer
- 	 * early before {@code null} is passed to the constructor.
+	 * early before {@code null} is passed to the constructor.
 	 */
 	@ModifyExpressionValue(
- 			method = "create",
- 			at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;")
- 	)
+			method = "create",
+			at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;")
+	)
 	private Object failOnNullItem(Object item, @Cancellable CallbackInfoReturnable<TradeOffer> cir) {
 		if (item == null) {
- 			cir.setReturnValue(null);
+			cir.setReturnValue(null);
 		}
+
 		return item;
 	}
 }
