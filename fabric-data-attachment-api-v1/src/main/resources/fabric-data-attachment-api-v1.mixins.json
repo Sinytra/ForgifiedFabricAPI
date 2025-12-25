@@ -4,22 +4,9 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AttachmentHolderAccessor",
-    "AttachmentTargetsMixin",
     "AttachmentTypeAccessor",
     "BaseMappedRegistryAccessor",
-    "BlockEntityMixin",
-    "ChunkDataSenderMixin",
-    "ChunkMixin",
-    "ClientConnectionMixin",
-    "CustomPayloadS2CPacketAccessor",
-    "EntityMixin",
-    "EntityTrackerEntryMixin",
-    "IAttachmentHolderMixin",
-    "ServerWorldMixin",
-    "VarIntsAccessor",
-    "WorldChunkMixin",
-    "WorldMixin",
-    "WrapperProtoChunkMixin"
+    "IAttachmentHolderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
