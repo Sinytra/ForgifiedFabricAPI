@@ -19,11 +19,13 @@ package net.fabricmc.fabric.test.block;
 import java.util.function.Function;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LadderBlock;
@@ -32,6 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 
 // Registers two blocks that can be used to test the fabric:can_climb_trapdoor_above tag.
 // - custom_ladder: a custom LadderBlock. You should be able to climb an open trapdoor above this block
@@ -46,7 +49,12 @@ public final class ClimbableTrapdoorTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		customLadderBlock = registerBlock("custom_ladder", settings -> new LadderBlock(settings) { });
+		customLadderBlock = registerBlock("custom_ladder", settings -> new LadderBlock(settings) {
+            @Override
+            public BlockState getAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos) {
+                return super.getAppearance(state, level, pos, side, queryState, queryPos);
+            }
+        });
 		customNonLadderBlock = registerBlock("custom_non_ladder", NonLadderBlock::new);
 	}
 
@@ -63,7 +71,12 @@ public final class ClimbableTrapdoorTest implements ModInitializer {
 			super(settings);
 		}
 
-		@Override
+        @Override
+        public BlockState getAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side, @Nullable BlockState queryState, @Nullable BlockPos queryPos) {
+            return super.getAppearance(state, level, pos, side, queryState, queryPos);
+        }
+
+        @Override
 		protected VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 			return Shapes.empty();
 		}
