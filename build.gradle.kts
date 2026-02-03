@@ -90,6 +90,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
         maven {
             name = "FabricMC"
             url = uri("https://maven.fabricmc.net")
@@ -106,7 +107,6 @@ allprojects {
             name = "Sinytra"
             url = uri("https://maven.su5ed.dev/releases")
         }
-        mavenLocal()
     }
 
     dependencies {

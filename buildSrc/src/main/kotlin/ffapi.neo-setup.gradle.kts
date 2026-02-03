@@ -3,7 +3,6 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 val versionMc: String by rootProject
 val versionForge: String by rootProject
 val versionForgifiedFabricLoader: String by rootProject
-val versionFabricLoader: String by rootProject
 
 val loom = extensions.getByType<LoomGradleExtensionAPI>()
 val sourceSets = extensions.getByType<SourceSetContainer>()
