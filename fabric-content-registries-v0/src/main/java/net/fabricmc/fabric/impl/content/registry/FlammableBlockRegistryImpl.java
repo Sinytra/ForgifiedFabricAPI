@@ -86,6 +86,9 @@ public class FlammableBlockRegistryImpl implements FlammableBlockRegistry {
 
 	@Override
 	public void add(Block block, Entry value) {
+		// FFAPI Impl: ConcurrentHashMap does not allow null keys/values
+		if (block == null || value == null) return;
+
 		registeredEntriesBlock.put(block, value);
 
 		computedEntries = null;
@@ -93,6 +96,9 @@ public class FlammableBlockRegistryImpl implements FlammableBlockRegistry {
 
 	@Override
 	public void add(TagKey<Block> tag, Entry value) {
+		// FFAPI Impl: ConcurrentHashMap does not allow null keys/values
+		if (tag == null || value == null) return;
+
 		registeredEntriesTag.put(tag, value);
 
 		computedEntries = null;
@@ -110,6 +116,9 @@ public class FlammableBlockRegistryImpl implements FlammableBlockRegistry {
 
 	@Override
 	public void clear(Block block) {
+		// FFAPI Impl: ConcurrentHashMap does not allow null keys/values
+		if (block == null) return;
+
 		registeredEntriesBlock.remove(block);
 
 		computedEntries = null;
@@ -117,6 +126,9 @@ public class FlammableBlockRegistryImpl implements FlammableBlockRegistry {
 
 	@Override
 	public void clear(TagKey<Block> tag) {
+		// FFAPI Impl: ConcurrentHashMap does not allow null keys/values
+		if (tag == null) return;
+
 		registeredEntriesTag.remove(tag);
 
 		computedEntries = null;
