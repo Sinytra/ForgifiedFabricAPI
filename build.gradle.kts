@@ -128,7 +128,8 @@ allprojects {
 dependencies {
     // Include Forgified Fabric Loader
     include("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
-    api("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+    compileOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+    runtimeOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 }
 
 val processIncludedJars by tasks.registering(NestableJarGenerationTask::class) {

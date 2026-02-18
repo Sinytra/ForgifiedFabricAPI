@@ -31,7 +31,8 @@ val testmod: SourceSet by sourceSets.creating {
 }
 
 dependencies {
-    "implementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+    "compileOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+    "runtimeOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 
     "testmodImplementation"(mainSourceSet.output)
     "testmodImplementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
