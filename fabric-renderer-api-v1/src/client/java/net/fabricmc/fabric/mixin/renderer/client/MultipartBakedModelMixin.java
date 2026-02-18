@@ -18,6 +18,7 @@ package net.fabricmc.fabric.mixin.renderer.client;
 
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
@@ -106,9 +107,12 @@ public class MultipartBakedModelMixin implements FabricBakedModel {
 				if (renderType != null && !model.getRenderTypes(state, random, context.getModelData()).contains(renderType))
 					continue;
 
+				net.neoforged.neoforge.common.util.TriState usesAO = ((MultiPartBakedModel) (Object) this).useAmbientOcclusion(state, context.getModelData(), renderType);
 				context.pushModelData(data);
+				context.setUsesAmbientOcclusion(usesAO == net.neoforged.neoforge.common.util.TriState.FALSE ? TriState.FALSE : TriState.TRUE);
 				model.emitBlockQuads(blockView, state, pos, subModelRandomSupplier, context);
 				context.popModelData();
+				context.setUsesAmbientOcclusion(TriState.DEFAULT);
 			}
 		}
 	}

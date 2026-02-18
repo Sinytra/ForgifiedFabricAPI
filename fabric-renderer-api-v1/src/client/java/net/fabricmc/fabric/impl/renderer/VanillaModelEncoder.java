@@ -45,7 +45,8 @@ public class VanillaModelEncoder {
 
 	public static void emitBlockQuads(BakedModel model, @Nullable BlockState state, Supplier<RandomSource> randomSupplier, RenderContext context) {
 		QuadEmitter emitter = context.getEmitter();
-		final RenderMaterial defaultMaterial = model.useAmbientOcclusion() ? STANDARD_MATERIAL : NO_AO_MATERIAL;
+		final TriState useAO = context.usesAmbientOcclusion();
+		final RenderMaterial defaultMaterial = useAO == TriState.TRUE || useAO == TriState.DEFAULT && model.useAmbientOcclusion() ? STANDARD_MATERIAL : NO_AO_MATERIAL;
 
 		for (int i = 0; i <= ModelHelper.NULL_FACE_ID; i++) {
 			final Direction cullFace = ModelHelper.faceFromIndex(i);

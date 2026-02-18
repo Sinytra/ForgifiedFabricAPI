@@ -66,6 +66,7 @@ public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 	private final BlockPos.MutableBlockPos lightPos = new BlockPos.MutableBlockPos();
 
 	private final Stack<ModelData> modelDataStack = new Stack<>();
+	private TriState useAO = TriState.DEFAULT;
 
 	protected AbstractBlockRenderContext() {
 		aoCalc = createAoCalc(blockInfo);
@@ -118,7 +119,17 @@ public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 	public void popModelData() {
 		this.modelDataStack.pop();
 	}
-	
+
+	@Override
+	public TriState usesAmbientOcclusion() {
+		return this.useAO;
+	}
+
+	@Override
+	public void setUsesAmbientOcclusion(TriState state) {
+		this.useAO = state;
+	}
+
 	private void renderQuad(MutableQuadViewImpl quad) {
 		if (!transform(quad)) {
 			return;

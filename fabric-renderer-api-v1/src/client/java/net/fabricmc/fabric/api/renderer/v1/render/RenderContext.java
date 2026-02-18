@@ -19,6 +19,7 @@ package net.fabricmc.fabric.api.renderer.v1.render;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.client.renderer.RenderType;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
@@ -191,4 +192,10 @@ public interface RenderContext {
 	default void pushModelData(ModelData modelData) {}
 
 	default void popModelData() {}
+
+	default TriState usesAmbientOcclusion() {
+		return TriState.DEFAULT;
+	}
+
+	default void setUsesAmbientOcclusion(TriState state) {}
 }
