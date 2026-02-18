@@ -43,6 +43,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Stack;
+
 public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 	protected final BlockRenderInfo blockInfo = new BlockRenderInfo();
 	protected final AoCalculator aoCalc;
@@ -62,6 +64,8 @@ public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 	private final BakedModelConsumerImpl vanillaModelConsumer = new BakedModelConsumerImpl();
 
 	private final BlockPos.MutableBlockPos lightPos = new BlockPos.MutableBlockPos();
+
+	private final Stack<ModelData> modelDataStack = new Stack<>();
 
 	protected AbstractBlockRenderContext() {
 		aoCalc = createAoCalc(blockInfo);
@@ -94,12 +98,25 @@ public abstract class AbstractBlockRenderContext extends AbstractRenderContext {
 
 	@Override
 	public ModelData getModelData() {
+		if (!this.modelDataStack.empty()) {
+			return this.modelDataStack.peek();
+		}
 		return blockInfo.blockModelData;
 	}
 
 	@Override
 	public RenderType getRenderType() {
 		return blockInfo.defaultLayer;
+	}
+
+	@Override
+	public void pushModelData(ModelData modelData) {
+		this.modelDataStack.push(modelData);
+	}
+	
+	@Override
+	public void popModelData() {
+		this.modelDataStack.pop();
 	}
 	
 	private void renderQuad(MutableQuadViewImpl quad) {

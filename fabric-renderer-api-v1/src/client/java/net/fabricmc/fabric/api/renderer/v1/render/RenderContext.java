@@ -187,4 +187,8 @@ public interface RenderContext {
 	default RenderType getRenderType() {
 		return null;
 	}
+	
+	default void pushModelData(ModelData modelData) {}
+
+	default void popModelData() {}
 }

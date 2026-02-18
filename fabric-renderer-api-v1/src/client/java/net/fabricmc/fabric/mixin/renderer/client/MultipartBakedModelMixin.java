@@ -16,12 +16,18 @@
 
 package net.fabricmc.fabric.mixin.renderer.client;
 
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.MultiPartBakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.MultipartModelData;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,15 +36,12 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.MultiPartBakedModel;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Mixin(MultiPartBakedModel.class)
 public class MultipartBakedModelMixin implements FabricBakedModel {
@@ -96,7 +99,16 @@ public class MultipartBakedModelMixin implements FabricBakedModel {
 
 		for (int i = 0; i < this.selectors.size(); i++) {
 			if (bitSet.get(i)) {
-				selectors.get(i).getRight().emitBlockQuads(blockView, state, pos, subModelRandomSupplier, context);
+				BakedModel model = selectors.get(i).getRight();
+				ModelData data = MultipartModelData.resolve(context.getModelData(), model);
+
+				RenderType renderType = context.getRenderType();
+				if (renderType != null && !model.getRenderTypes(state, random, context.getModelData()).contains(renderType))
+					continue;
+
+				context.pushModelData(data);
+				model.emitBlockQuads(blockView, state, pos, subModelRandomSupplier, context);
+				context.popModelData();
 			}
 		}
 	}
