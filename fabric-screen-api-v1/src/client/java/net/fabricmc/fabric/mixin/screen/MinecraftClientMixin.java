@@ -56,7 +56,9 @@ abstract class MinecraftClientMixin {
 
 	@Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V", shift = At.Shift.AFTER))
 	private void onScreenRemove(@Nullable Screen screen, CallbackInfo ci) {
-		ScreenEvents.remove(this.screen).invoker().onRemove(this.screen);
+		if (this.screen != null) {
+			ScreenEvents.remove(this.screen).invoker().onRemove(this.screen);
+		}
 	}
 
 	@Inject(method = "destroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V", shift = At.Shift.AFTER))
