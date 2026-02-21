@@ -2,6 +2,7 @@ package net.fabricmc.fabric.impl.client.rendering.fluid;
 
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class FluidRendererCompat {
 
@@ -38,15 +40,22 @@ public final class FluidRendererCompat {
 	}
 
 	private record ForgeFluidRenderHandler(FluidType fluidType) implements FluidRenderHandler {
+		// view and pos are nullable here, but Neo does not allow null values
+		// We take a "best effort" approach and replace them with dummies if necessary
+		// Don't worry, this shouldn't break anything :)
 		@Override
 		public TextureAtlasSprite[] getFluidSprites(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
-            TextureAtlasSprite[] forgeSprites = FluidSpriteCache.getFluidSprites(view, pos, state);
+			BlockAndTintGetter actualView = Objects.requireNonNullElseGet(view, () -> Minecraft.getInstance().level); 
+			BlockPos actualPos = Objects.requireNonNullElse(pos, BlockPos.ZERO);
+            TextureAtlasSprite[] forgeSprites = FluidSpriteCache.getFluidSprites(actualView, actualPos, state);
 			return forgeSprites[2] == null ? Arrays.copyOfRange(forgeSprites, 0, 2) : forgeSprites;
 		}
 
 		@Override
 		public int getFluidColor(@Nullable BlockAndTintGetter view, @Nullable BlockPos pos, FluidState state) {
-			int color = IClientFluidTypeExtensions.of(this.fluidType).getTintColor(state, view, pos);
+			BlockAndTintGetter actualView = Objects.requireNonNullElseGet(view, () -> Minecraft.getInstance().level); 
+			BlockPos actualPos = Objects.requireNonNullElse(pos, BlockPos.ZERO);
+			int color = IClientFluidTypeExtensions.of(this.fluidType).getTintColor(state, actualView, actualPos);
 			return 0x00FFFFFF & color;
 		}
 	}
