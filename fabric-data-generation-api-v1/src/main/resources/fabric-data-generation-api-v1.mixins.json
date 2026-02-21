@@ -8,6 +8,7 @@
     "ModelProviderMixin",
     "loot.BlockLootTableGeneratorAccessor",
     "loot.BlockLootTableGeneratorMixin",
+    "recipe.RecipeOutputMixin",
     "recipe.AllCraftingRecipeJsonBuildersMixin",
     "recipe.ComplexRecipeJsonBuilderMixin",
     "recipe.SmithingTransformRecipeJsonBuilderMixin",
