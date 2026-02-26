@@ -24,6 +24,7 @@ import net.fabricmc.fabric.impl.transfer.TransferApiImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -104,6 +105,14 @@ public class ItemVariantImpl implements ItemVariant {
 	@Override
 	public int hashCode() {
 		return hashCode;
+	}
+
+	/**
+	 * Return the max stack size for this variant, respecting component overrides such as
+	 * {@link DataComponents#MAX_STACK_SIZE}.
+	 */
+	public static int getMaxStackSize(ItemVariant variant) {
+		return variant.getComponentMap().getOrDefault(DataComponents.MAX_STACK_SIZE, variant.getItem().getDefaultMaxStackSize());
 	}
 
 	public ItemStack getCachedStack() {
