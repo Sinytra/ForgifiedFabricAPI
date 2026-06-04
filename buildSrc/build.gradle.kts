@@ -32,6 +32,7 @@ dependencies {
     implementation("net.neoforged:moddev-gradle:2.0.141")
 
     implementation("net.fabricmc:fabric-loader:0.15.10")
+    implementation("net.fabricmc:class-tweaker:0.3.0-beta.2")
 
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")

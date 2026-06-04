@@ -1,23 +1,42 @@
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.moandjiezana.toml.TomlWriter
+import dev.architectury.at.AccessTransformSet
+import dev.architectury.at.io.AccessTransformFormats
+import dev.architectury.loom.util.LfWriter
 import net.neoforged.moddevgradle.dsl.ModDevExtension
+import net.neoforged.moddevgradle.dsl.NeoForgeExtension
+import org.sinytra.ffapi.Aw2At
+import org.sinytra.ffapi.InterfaceInjection
+import org.sinytra.ffapi.LoomExtension
 import kotlin.io.path.*
 
 val versionMc: String by rootProject
 val versionNeoForge: String by rootProject
 
 val modDev = extensions.getByType<ModDevExtension>()
+val loomStub = extensions.create<LoomExtension>("loom")
+
+fun Project.findSourceSet(file: File): SourceSet? =
+    the<SourceSetContainer>().find { sourceSet ->
+        sourceSet.allSource.srcDirs.any { file.startsWith(it) }
+    }
+
+object Constants {
+    const val baseTaskName = "ForgeModMetadata"
+    const val injectedInterfacesPath = "META-INF/interfaces.json"
+}
 
 extensions.getByType<SourceSetContainer>().configureEach {
     // We have to capture the source set name for the lazy string literals,
     // otherwise it'll just be whatever the last source set is in the list.
-    val baseTaskName = "ForgeModMetadata"
     val sourceSetName = name
     val resourceRoots = resources.srcDirs
-    val taskName = getTaskName("generate", baseTaskName)
+    val taskName = getTaskName("generate", Constants.baseTaskName)
     val task = tasks.register(taskName, GenerateForgeModMetadata::class.java) {
         group = "sinytra"
         description = "Generates mods.toml files for $sourceSetName fabric mod."
+        dependsOn("createMinecraftArtifacts")
 
         // Only apply to default source directory since we also add the generated
         // sources to the source set.
@@ -26,11 +45,11 @@ extensions.getByType<SourceSetContainer>().configureEach {
         loaderVersionString = "1"
         forgeVersionString = versionNeoForge
         minecraftVersionString = versionMc
-//        accessWidener = modDev.accessTransformers.files.singleOrNull() TODO AT TRANSFORM
+        accessWidener = provider { loomStub.accessWidenerPath.orNull }
     }
     resources.srcDir(task)
 
-    val cleanTask = tasks.register(getTaskName("clean", baseTaskName), Delete::class.java) {
+    val cleanTask = tasks.register(getTaskName("clean", Constants.baseTaskName), Delete::class.java) {
         group = "sinytra"
         delete(file("src/generated/$sourceSetName/resources"))
     }
@@ -45,13 +64,63 @@ extensions.getByType<SourceSetContainer>().configureEach {
     }
 }
 
-//afterEvaluate { 
-//    if (loom.accessWidenerPath.isPresent) {
-//        tasks.withType<Jar> {
-//            exclude(loom.accessWidenerPath.get().asFile.name)
-//        }
-//    }
-//}
+afterEvaluate {
+    loomStub.accessWidenerPath.orNull?.also { value ->
+        tasks.withType<Jar> {
+            exclude(loomStub.accessWidenerPath.get().asFile.name)
+        }
+
+        val file = value.asFile
+        val targetSrcSet = findSourceSet(file) ?: throw IllegalStateException("Could not determine source set for ${file}")
+        val fileOutputDir = file("src/generated/${targetSrcSet.name}/resources")
+
+        val generateInjectedInterfaces = tasks.register("generateInjectedInterfaces", GenerateInjectedInterfaces::class) {
+            group = "sinytra"
+
+            outputDir = fileOutputDir
+            accessWidener = value
+        }
+
+        val hasInterfaces = file.bufferedReader().use(InterfaceInjection::hasInjectedInterfaces)
+        if (hasInterfaces) {
+            val neoForge = the<NeoForgeExtension>()
+            val generatedFile = fileOutputDir.resolve(Constants.injectedInterfacesPath)
+
+            neoForge.interfaceInjectionData.from(
+                files(generatedFile).builtBy(generateInjectedInterfaces)
+            )
+        }
+    }
+}
+
+abstract class GenerateInjectedInterfaces : DefaultTask() {
+    @get:OutputDirectory
+    val outputDir: DirectoryProperty = project.objects.directoryProperty()
+
+    @get:InputFile
+    @get:Optional
+    val accessWidener: RegularFileProperty = project.objects.fileProperty()
+
+    @TaskAction
+    fun run() {
+        val output = outputDir.get().asFile.toPath()
+        val awPath = accessWidener.get().asFile.toPath()
+
+        if (accessWidener.isPresent) {
+            // Process injected interfaces
+            val interfaces = awPath.bufferedReader().use(InterfaceInjection::toInjectedInterfaces)
+            if (!interfaces.isEmpty()) {
+                val gson = GsonBuilder().setPrettyPrinting().create()
+                val text = gson.toJson(interfaces)
+
+                val interfacesFile = output.resolve(Constants.injectedInterfacesPath)
+                interfacesFile.parent.createDirectories()
+
+                interfacesFile.writeText(text)
+            }
+        }
+    }
+}
 
 abstract class GenerateForgeModMetadata : DefaultTask() {
     @get:SkipWhenEmpty
@@ -135,7 +204,9 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
 
             val originalModid = json.get("id").asString
             val normalModid = normalizeModid(originalModid)
-            val nextMajor = (minecraftVersionString.get().split('.')[1].toInt()) + 1
+            val parts = minecraftVersionString.get().split(".")
+            val currentMajor = parts[0]
+            val nextMinor = (minecraftVersionString.get().split('.')[1].toInt()) + 1
             val excludedDeps = listOf("fabricloader", "java", "minecraft")
             val modDependencies =
                 (json.getAsJsonObject("depends")?.entrySet() ?: emptySet()).filter { !excludedDeps.contains(it.key) }.map {
@@ -159,12 +230,12 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                 ModDependency(
                     "minecraft",
                     "required",
-                    "[${minecraftVersionString.get()},1.$nextMajor)",
+                    "[${minecraftVersionString.get()},$currentMajor.$nextMinor)",
                     "NONE",
                     "BOTH"
                 )
             ) + modDependencies
-            val displayTest = when(json.get("environment")?.asString) {
+            val displayTest = when (json.get("environment")?.asString) {
                 "client" -> "IGNORE_ALL_VERSION"
                 "server" -> "IGNORE_SERVER_VERSION"
                 else -> null
@@ -187,7 +258,7 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                     displayURL = "https://github.com/Sinytra/ForgifiedFabricAPI"
                 )
             )
-            val mixins = json.getAsJsonArray("mixins")?.map { 
+            val mixins = json.getAsJsonArray("mixins")?.map {
                 if (it.isJsonObject) {
                     Mixin(it.asJsonObject.get("config").asString)
                 } else if (it.isJsonPrimitive) {
@@ -197,9 +268,9 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                 }
             }
             val properties =
-                if (json.getAsJsonObject("entrypoints")?.has("fabric-gametest") == true) 
-                    mapOf("forgified-fabric-api:game-test-prefix" to originalModid) 
-                else 
+                if (json.getAsJsonObject("entrypoints")?.has("fabric-gametest") == true)
+                    mapOf("forgified-fabric-api:game-test-prefix" to originalModid)
+                else
                     null
 
             val modsToml = ModsToml(
@@ -220,14 +291,14 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
             TomlWriter().write(modsToml, modsTomlFile.toFile())
         }
 
-//        if (accessWidener.isPresent) {
-//            val awPath = accessWidener.get().asFile.toPath()
-//            val atPath = output.resolve("META-INF/accesstransformer.cfg")
-//
-//            val at = AccessTransformSet.create()
-//            awPath.bufferedReader().use { at.merge(Aw2At.toAccessTransformSet(it)) }
-//
-//            LfWriter(atPath.bufferedWriter()).use {  AccessTransformFormats.FML.write(it, at) }
-//        }
+        if (accessWidener.isPresent) {
+            val awPath = accessWidener.get().asFile.toPath()
+            val atPath = output.resolve("META-INF/accesstransformer.cfg")
+
+            val at = AccessTransformSet.create()
+            awPath.bufferedReader().use { at.merge(Aw2At.toAccessTransformSet(it)) }
+
+            LfWriter(atPath.bufferedWriter()).use { AccessTransformFormats.FML.write(it, at) }
+        }
     }
 }

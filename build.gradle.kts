@@ -133,9 +133,9 @@ allprojects {
 
 dependencies {
     // Include Forgified Fabric Loader
-    jarJar("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
+//    jarJar("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
     compileOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
-    runtimeOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
+//    runtimeOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 }
 
 //val processIncludedJars by tasks.registering(NestableJarGenerationTask::class) {
@@ -216,14 +216,14 @@ allprojects {
                 setExtendsFrom(emptySet())
             }
         }
-    }
-}
 
-neoForge.runs {
-    listOf("client", "server").forEach { run ->
-        named(run) {
-            loadedMods = neoForge.mods.filterNot { it.name.contains("test") } 
-        }   
+        neoForge.runs {
+            listOf("client", "server").forEach { run ->
+                named(run) {
+                    loadedMods = neoForge.mods.filterNot { it.name.contains("test") } 
+                }   
+            }
+        }
     }
 }
 
@@ -259,7 +259,7 @@ dependencies {
 				return@forEach
 			}
 
-			jarJar(api(project(proj.path, "namedElements"))!!)
+			jarJar(api(project(proj.path))!!)
 			"testmodImplementation"(proj.sourceSets.getByName("testmod").output)
 		}
 	}
@@ -285,7 +285,7 @@ fun getSubprojectVersion(project: Project): String {
 }
 
 fun moduleDependencies(project: Project, depNames: List<String>) {
-    val deps = depNames.map { project.dependencies.project(":$it", "namedElements") }
+    val deps = depNames.map { project.dependencies.project(":$it") }
 
     project.dependencies {
         deps.forEach {
@@ -296,7 +296,7 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
 }
 
 fun testDependencies(project: Project, depNames: List<String>) {
-    val deps = depNames.map { project.dependencies.project(":$it", "namedElements") }
+    val deps = depNames.map { project.dependencies.project(":$it") }
 
     project.dependencies {
         deps.forEach {

@@ -1,5 +1,6 @@
 import net.fabricmc.loader.impl.metadata.*
 import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 
 val versionMc: String by rootProject
 val versionNeoForge: String by rootProject
@@ -92,14 +93,14 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
         val clientEntrypointInit = if (clientEntrypoints.isNotEmpty()) {
             """
                     // Initialize client entrypoints
-                    if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {
+                    if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
                         ${clientEntrypoints.joinToString(nestedSeparator)}
                     }"""
         } else ""
         val serverEntrypointInit = if (serverEntrypoints.isNotEmpty()) {
             """
                     // Initialize server entrypoints
-                    if (net.neoforged.fml.loading.FMLEnvironment.dist.isDedicatedServer()) {
+                    if (net.neoforged.fml.loading.FMLEnvironment.getDist().isDedicatedServer()) {
                         ${serverEntrypoints.joinToString(nestedSeparator)}
                     }"""
         } else ""
@@ -127,7 +128,7 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
             }
         """.trimIndent()
 
-//        destFile.writeText(template) FIXME
+        destFile.writeText(template)
     }
 
     private fun addGametests(modMetadata: LoaderModMetadata): String {
