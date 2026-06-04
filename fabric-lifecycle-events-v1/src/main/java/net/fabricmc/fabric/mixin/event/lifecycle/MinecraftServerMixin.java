@@ -82,7 +82,7 @@ public abstract class MinecraftServerMixin {
 	}
 
 	@Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;close()V"))
-	private void onUnloadWorldAtShutdown(CallbackInfo ci, @Local(name = "level") ServerLevel level) {
+	private void onUnloadWorldAtShutdown(CallbackInfo ci, @Local(name = "levelx") ServerLevel level) {
 		ServerLevelEvents.UNLOAD.invoker().onLevelUnload((MinecraftServer) (Object) this, level);
 	}
 
