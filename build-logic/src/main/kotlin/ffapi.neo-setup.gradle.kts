@@ -32,10 +32,10 @@ val testmod: SourceSet by sourceSets.creating {
 
 dependencies {
     "compileOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
-    "runtimeOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
+//    "runtimeOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 
     "testmodImplementation"(mainSourceSet.output)
-    "testmodImplementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+//    "testmodImplementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
 
 //    if (project.name != "fabric-gametest-api-v1") { TODO
 //        "testmodImplementation"(project(":fabric-gametest-api-v1", "namedElements"))
