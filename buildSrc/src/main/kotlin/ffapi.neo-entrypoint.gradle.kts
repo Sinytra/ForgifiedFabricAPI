@@ -131,12 +131,14 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
         destFile.writeText(template)
     }
 
+    // TODO Add gametest support
     private fun addGametests(modMetadata: LoaderModMetadata): String {
-        val entrypoints = modMetadata.getEntrypoints("fabric-gametest").map(EntrypointMetadata::getValue).takeIf { it.isNotEmpty() } ?: return ""
-        val lines = entrypoints.joinToString(separator = "\n                        ") { "event.register(cpw.mods.modlauncher.api.LambdaExceptionUtils.uncheck(() -> Class.forName(\"$it\")));" }
-        return """bus.addListener(net.neoforged.neoforge.event.RegisterGameTestsEvent.class, event -> {
-                        $lines
-                    });"""
+//        val entrypoints = modMetadata.getEntrypoints("fabric-gametest").map(EntrypointMetadata::getValue).takeIf { it.isNotEmpty() } ?: return ""
+//        val lines = entrypoints.joinToString(separator = "\n                        ") { "event.register(cpw.mods.modlauncher.api.LambdaExceptionUtils.uncheck(() -> Class.forName(\"$it\")));" }
+//        return """bus.addListener(net.neoforged.neoforge.event.RegisterGameTestsEvent.class, event -> {
+//                        $lines
+//                    });"""
+        return ""
     }
 
     private fun addDatagen(modMetadata: LoaderModMetadata): String {
