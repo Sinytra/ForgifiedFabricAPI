@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.mixin.resource.conditions;
 
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,8 +31,6 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
@@ -47,7 +46,7 @@ public class SimpleJsonResourceReloadListenerMixin {
 	private static final Object SKIP_DATA_MARKER = new Object();
 
 	@WrapOperation(method = "scanDirectory(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/resources/FileToIdConverter;Lcom/mojang/serialization/DynamicOps;Lcom/mojang/serialization/Codec;Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/DynamicOps;Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;"))
-	private static DataResult<?> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<?>> original,
+	private static DataResult<Optional<?>> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<Optional<?>>> original,
 														@Local(argsOnly = true) FileToIdConverter resourceFinder,
 														@Local(name = "entry") Map.Entry<Identifier, Resource> entry) {
 		final JsonElement resourceData = (JsonElement) object;
@@ -63,18 +62,10 @@ public class SimpleJsonResourceReloadListenerMixin {
 			final String dataType = resourceFinder.prefix();
 
 			if (!ResourceConditionsImpl.applyResourceConditions(obj, dataType, entry.getKey(), registryInfo)) {
-				return DataResult.success(SKIP_DATA_MARKER);
+				return DataResult.success(Optional.empty());
 			}
 		}
 
 		return original.call(instance, dynamicOps, object);
-	}
-
-	// parse.ifSuccess
-	@Inject(method = "lambda$scanDirectory$0", at = @At("HEAD"), cancellable = true)
-	private static void skipData(Map<?, ?> map, Identifier identifier, Object object, CallbackInfo ci) {
-		if (object == SKIP_DATA_MARKER) {
-			ci.cancel();
-		}
 	}
 }

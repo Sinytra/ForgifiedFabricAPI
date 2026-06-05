@@ -208,14 +208,14 @@ allprojects {
     }
 
     if (project != rootProject) {
-        configurations {
-            apiElements {
-                setExtendsFrom(emptySet())
-            }
-            runtimeElements {
-                setExtendsFrom(emptySet())
-            }
-        }
+//        configurations {
+//            apiElements {
+//                setExtendsFrom(emptySet())
+//            }
+//            runtimeElements {
+//                setExtendsFrom(emptySet())
+//            }
+//        }
 
         neoForge.runs {
             listOf("client", "server").forEach { run ->
@@ -290,7 +290,6 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
     project.dependencies {
         deps.forEach {
             api(it)
-            implementation(it)
         }
     }
 }
