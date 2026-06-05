@@ -23,8 +23,6 @@ import net.minecraft.commands.arguments.selector.options.EntitySelectorOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-import net.fabricmc.fabric.mixin.command.EntitySelectorOptionsAccessor;
-
 /**
  * Contains a function to register an entity selector option.
  */
@@ -64,7 +62,7 @@ public final class EntitySelectorOptionRegistry {
 	 * @param canUse the predicate that checks whether the option is syntactically valid
 	 */
 	public static void register(Identifier id, Component description, EntitySelectorOptions.Modifier modifier, Predicate<EntitySelectorParser> canUse) {
-		EntitySelectorOptionsAccessor.callPutOption(id.toDebugFileName(), modifier, canUse, description);
+		EntitySelectorOptions.register(id.toDebugFileName(), modifier, canUse, description);
 	}
 
 	/**

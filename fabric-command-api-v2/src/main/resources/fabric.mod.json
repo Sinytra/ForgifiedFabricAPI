@@ -29,6 +29,14 @@
       "environment": "client"
     }
   ],
+  "entrypoints": {
+      "main": [
+        "net.fabricmc.fabric.impl.command.FabricCommandApiV2"
+      ],
+      "client": [
+        "net.fabricmc.fabric.impl.command.client.FabricCommandApiV2Client"
+      ]
+    },
   "custom": {
     "fabric-api:module-lifecycle": "stable"
   }
