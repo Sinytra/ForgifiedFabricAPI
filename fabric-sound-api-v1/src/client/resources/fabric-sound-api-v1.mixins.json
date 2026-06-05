@@ -3,8 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.client.sound",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "SoundInstanceMixin",
-    "SoundEngineMixin"
+    "SoundInstanceMixin"
   ],
   "injectors": {
     "defaultRequire": 1
