@@ -32,6 +32,6 @@ class SoundButton extends Button.Plain {
 		super(x, y, width, height, net.minecraft.network.chat.Component.nullToEmpty("Sound Button"), ctx -> {
 			final SoundEvent event = BuiltInRegistries.SOUND_EVENT.getRandom(RANDOM).map(Holder::value).orElse(SoundEvents.GENERIC_EXPLODE.value());
 			Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(event, 1.0F, 1.0F));
-		}, null);
+		}, Button.DEFAULT_NARRATION);
 	}
 }
