@@ -44,7 +44,6 @@ include("fabric-api-base")
 //include 'fabric-command-api-v2'
 //include 'fabric-content-registries-v0'
 //include 'fabric-convention-tags-v2'
-//include 'fabric-crash-report-info-v1'
 //include 'fabric-creative-tab-api-v1'
 //include 'fabric-data-attachment-api-v1'
 //include 'fabric-data-generation-api-v1'
