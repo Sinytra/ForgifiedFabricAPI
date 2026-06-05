@@ -34,7 +34,7 @@ public class BlocksMixin {
 		// Ensure that any blocks added after this point have their shape cache initialized.
 		RegistryEntryAddedCallback.event(BuiltInRegistries.BLOCK).register((rawId, id, block) -> {
 			for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-				state.initCache();
+				state.initCache(); // TODO Remove in favor of NEO
 			}
 		});
 	}

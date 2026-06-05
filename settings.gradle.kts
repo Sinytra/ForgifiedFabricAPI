@@ -31,6 +31,9 @@ gradle.beforeProject {
     }
 }
 
+include("fabric-api-bom")
+include("fabric-api-catalog")
+
 include("fabric-api-base")
 
 //include 'fabric-api-lookup-api-v1'
@@ -50,7 +53,7 @@ include("fabric-api-base")
 //include 'fabric-entity-events-v1'
 //include 'fabric-events-interaction-v0'
 //include 'fabric-game-rule-api-v1'
-//include 'fabric-gametest-api-v1'
+include("fabric-gametest-api-v1")
 //include 'fabric-item-api-v1'
 //include 'fabric-key-mapping-api-v1'
 include("fabric-lifecycle-events-v1")
@@ -68,7 +71,7 @@ include("fabric-lifecycle-events-v1")
 //include 'fabric-rendering-fluids-v1'
 //include 'fabric-rendering-v1'
 //include 'fabric-resource-conditions-api-v1'
-//include 'fabric-resource-loader-v1'
+include("fabric-resource-loader-v1")
 //include 'fabric-screen-api-v1'
 //include 'fabric-serialization-api-v1'
 //include 'fabric-sound-api-v1'

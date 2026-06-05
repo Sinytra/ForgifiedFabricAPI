@@ -19,7 +19,6 @@
     "SynchronizeRegistriesTaskMixin"
   ],
   "server": [
-    "server.LanguageMixin"
   ],
   "injectors": {
     "defaultRequire": 1

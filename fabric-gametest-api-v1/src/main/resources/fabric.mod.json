@@ -22,7 +22,6 @@
   },
   "depends": {
     "fabricloader": ">=0.19.3",
-    "fabric-registry-sync-v0": "*",
     "fabric-resource-loader-v1": "*"
   },
   "description": "Allows registration of custom game tests.",

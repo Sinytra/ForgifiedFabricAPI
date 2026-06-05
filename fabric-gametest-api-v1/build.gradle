@@ -1,26 +1,10 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabric-gametest-api-v1.classtweaker")
-
-	runs {
-		testmodClient {
-			client()
-			displayName = "Testmod Client"
-			systemProperties.put("fabric-api.gametest.structures.output-dir", "${file("src/testmod/resources/data/fabric-gametest-api-v1-testmod/gametest/structure")}")
-
-			generateRunConfig = false
-			sourceSet = sourceSets.testmodClient.name
-		}
-	}
 }
 
-fabricApiModule {
-	moduleDependencies(
-		'fabric-api-base',
-		'fabric-registry-sync-v0',
-		'fabric-resource-loader-v1',
-	)
-}
+moduleDependencies(project, [
+	'fabric-api-base',
+	'fabric-resource-loader-v1',
+])
