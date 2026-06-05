@@ -39,19 +39,19 @@ rootProject.allprojects.each { p ->
 		return // Skip over the meta projects
 	}
 
-	p.loom.mods.register("fabric-resource-loader-v0-testmod-a") {
+	p.neoForge.mods.register("fabric-resource-loader-v0-testmod-a") {
 		sourceSet sourceSets.testmodA
 	}
-	p.loom.mods.register("fabric-resource-loader-v0-testmod-b") {
+	p.neoForge.mods.register("fabric-resource-loader-v0-testmod-b") {
 		sourceSet sourceSets.testmodB
 	}
-	p.loom.mods.register("fabric-resource-loader-v0-testmod-c") {
+	p.neoForge.mods.register("fabric-resource-loader-v0-testmod-c") {
 		sourceSet sourceSets.testmodC
 	}
 }
 
-loom.nestJars(tasks.named("testmodJar"), project.files(
-	tasks.testmodAJar,
-	tasks.testmodBJar,
-	tasks.testmodCJar
-))
+//loom.nestJars(tasks.named("testmodJar"), project.files(
+//	tasks.testmodAJar,
+//	tasks.testmodBJar,
+//	tasks.testmodCJar
+//))

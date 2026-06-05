@@ -21,5 +21,8 @@
   "description": "Contains the essentials for Fabric API modules.",
   "custom": {
     "fabric-api:module-lifecycle": "stable"
-  }
+  },
+  "mixins": [
+    "fabric-api-base.mixins.json"
+  ]
 }

@@ -42,7 +42,7 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 	 * enabled or disabled before the client joins. Since the server registry contents aren't reloaded, we don't want
 	 * the client to use the new data pack data.
 	 */
-	@ModifyArg(method = "startConfiguration", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/config/SynchronizeRegistriesTask;<init>(Ljava/util/List;Lnet/minecraft/core/LayeredRegistryAccess;)V", ordinal = 0))
+	@ModifyArg(method = "runConfiguration", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/config/SynchronizeRegistriesTask;<init>(Ljava/util/List;Lnet/minecraft/core/LayeredRegistryAccess;)V", ordinal = 0))
 	public List<KnownPack> filterKnownPacks(List<KnownPack> currentKnownPacks) {
 		return ((FabricOriginalKnownPacksGetter) this.server).fabric$getOriginalKnownPacks().stream().filter(currentKnownPacks::contains).toList();
 	}

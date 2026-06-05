@@ -78,12 +78,12 @@ modDev.apply {
             systemProperty("mixin.debug", "true")
         }
 
-        create("gametest") {
-            server()
+        create("gametestServer") {
+            type = "gameTestServer"
             sourceSet = testmod
 
             // Enable the gametest runner
-            systemProperty("neoforge.gameTestServer", "true")
+            systemProperty("neoforge.enableGameTest", "true")
         }
 
         create("testmodClient") {

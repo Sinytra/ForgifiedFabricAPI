@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.impl.gametest;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -23,7 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import com.google.common.base.Suppliers;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforgespi.language.IModFileInfo;
+import net.neoforged.neoforgespi.language.IModInfo;
+import net.neoforged.neoforgespi.language.ModFileScanData;
+import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,62 +48,56 @@ import net.minecraft.resources.ResourceKey;
 
 import net.fabricmc.fabric.api.gametest.v1.CustomTestMethodInvoker;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 
 final class TestAnnotationLocator {
-	private static final String ENTRYPOINT_KEY = "fabric-gametest";
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestAnnotationLocator.class);
 
-	private final FabricLoader fabricLoader;
-
 	private List<TestMethod> testMethods = null;
-
-	TestAnnotationLocator(FabricLoader fabricLoader) {
-		this.fabricLoader = fabricLoader;
-	}
 
 	public List<TestMethod> getTestMethods() {
 		if (testMethods != null) {
 			return testMethods;
 		}
 
-		List<EntrypointContainer<Object>> entrypointContainers = fabricLoader
-				.getEntrypointContainers(ENTRYPOINT_KEY, Object.class);
-
-		return testMethods = entrypointContainers.stream()
-				.flatMap(entrypoint -> findMagicMethods(entrypoint).stream())
-				.toList();
+		return testMethods = findNeoForgeTestMethods();
 	}
 
-	private List<TestMethod> findMagicMethods(EntrypointContainer<Object> entrypoint) {
-		Class<?> testClass = entrypoint.getEntrypoint().getClass();
-		List<TestMethod> methods = new ArrayList<>();
-		findMagicMethods(entrypoint, testClass, methods);
+	private List<TestMethod> findNeoForgeTestMethods() {
+		List<TestMethod> results = new ArrayList<>();
 
-		if (methods.isEmpty()) {
-			LOGGER.warn("No methods with the GameTest annotation were found in {}", testClass.getName());
-		}
+		for (ModFileScanData data : ModList.get().getAllScanData()) {
+			IModFileInfo modFileInfo = data.getIModInfoData().getFirst();
+			IModInfo modInfo = modFileInfo.getMods().getFirst();
+			String modid = modInfo.getModId();
 
-		return methods;
-	}
+			data.getAnnotatedBy(GameTest.class, ElementType.METHOD).forEach(ann -> {
+				try {
+					Class<?> clazz = Class.forName(ann.clazz().getClassName());
 
-	// Recursively find all methods with the GameTest annotation
-	private void findMagicMethods(EntrypointContainer<Object> entrypoint, Class<?> testClass, List<TestMethod> methods) {
-		for (Method method : testClass.getDeclaredMethods()) {
-			if (method.isAnnotationPresent(GameTest.class)) {
-				if (!CustomTestMethodInvoker.class.isAssignableFrom(testClass)) {
-					// Only validate the test method when using the default reflection invoker
-					validateMethod(method);
+					Method method = getMethod(clazz, ann.memberName());
+					if (method == null)
+						return;
+
+					if (!CustomTestMethodInvoker.class.isAssignableFrom(clazz)) {
+						validateMethod(method);
+					}
+
+					Supplier<Object> instanceSupplier = Suppliers.memoize(() -> {
+						try {
+							return clazz.getConstructor().newInstance();
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					});
+
+					results.add(new TestMethod(clazz, method, method.getAnnotation(GameTest.class), modid, instanceSupplier));
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
-
-				methods.add(new TestMethod(method, method.getAnnotation(GameTest.class), entrypoint));
-			}
+			});
 		}
 
-		if (testClass.getSuperclass() != null) {
-			findMagicMethods(entrypoint, testClass.getSuperclass(), methods);
-		}
+		return results;
 	}
 
 	private void validateMethod(Method method) {
@@ -125,15 +127,16 @@ final class TestAnnotationLocator {
 		throw new UnsupportedOperationException("Test method (%s) has the following issues: %s".formatted(methodName, String.join(", ", issues)));
 	}
 
-	public record TestMethod(Method method, GameTest gameTest, EntrypointContainer<Object> entrypoint) {
+	public record TestMethod(Class<?> clazz, Method method, GameTest gameTest, String modid,
+	                         Supplier<Object> instanceSupplier) {
 		Identifier identifier() {
-			String name = camelToSnake(entrypoint.getEntrypoint().getClass().getSimpleName() + "_" + method.getName());
-			return Identifier.fromNamespaceAndPath(entrypoint.getProvider().getMetadata().getId(), name);
+			String name = camelToSnake(clazz.getSimpleName() + "_" + method.getName());
+			return Identifier.fromNamespaceAndPath(modid, name);
 		}
 
 		Consumer<GameTestHelper> testFunction() {
 			return context -> {
-				Object instance = entrypoint.getEntrypoint();
+				Object instance = instanceSupplier.get();
 
 				try {
 					if (instance instanceof CustomTestMethodInvoker customTestMethodInvoker) {
@@ -186,5 +189,36 @@ final class TestAnnotationLocator {
 		private static String camelToSnake(String input) {
 			return input.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase(Locale.ROOT);
 		}
+	}
+
+	public static Method getMethod(Class<?> owner, String nameAndDescriptor) throws Exception {
+		int parenIndex = nameAndDescriptor.indexOf('(');
+		String methodName = nameAndDescriptor.substring(0, parenIndex);
+		String descriptor = nameAndDescriptor.substring(parenIndex);
+
+		Type[] argTypes = Type.getArgumentTypes(descriptor);
+		Class<?>[] paramClasses = new Class<?>[argTypes.length];
+		for (int i = 0; i < argTypes.length; i++) {
+			paramClasses[i] = typeToClass(argTypes[i]);
+		}
+
+		return owner.getDeclaredMethod(methodName, paramClasses);
+	}
+
+	private static Class<?> typeToClass(Type type) throws ClassNotFoundException {
+		return switch (type.getSort()) {
+			case Type.VOID -> void.class;
+			case Type.BOOLEAN -> boolean.class;
+			case Type.BYTE -> byte.class;
+			case Type.CHAR -> char.class;
+			case Type.SHORT -> short.class;
+			case Type.INT -> int.class;
+			case Type.LONG -> long.class;
+			case Type.FLOAT -> float.class;
+			case Type.DOUBLE -> double.class;
+			case Type.ARRAY -> Class.forName(type.getDescriptor().replace('/', '.'));
+			case Type.OBJECT -> Class.forName(type.getInternalName().replace('/', '.'));
+			default -> throw new IllegalArgumentException("Unknown type: " + type);
+		};
 	}
 }
