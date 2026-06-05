@@ -6,7 +6,8 @@
     "TagValueInputMixin",
     "TagValueOutputMixin",
     "ValueInputMixin",
-    "ValueOutputMixin"
+    "ValueOutputMixin",
+    "ValueInputExtensionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
