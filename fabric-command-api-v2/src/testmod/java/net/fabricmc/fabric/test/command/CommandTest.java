@@ -23,6 +23,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import net.neoforged.neoforge.gametest.GameTestHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public final class CommandTest implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			// Verify the commands actually exist in the command dispatcher.
-			final boolean dedicated = server.isDedicatedServer();
+			final boolean dedicated = server.isDedicatedServer() || GameTestHooks.isGametestEnabled();
 			final RootCommandNode<CommandSourceStack> rootNode = server.getCommands().getDispatcher().getRoot();
 
 			// Now we climb the tree

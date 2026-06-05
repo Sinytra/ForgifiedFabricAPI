@@ -3,11 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.command",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ArgumentTypeInfosAccessor",
-    "CommandsMixin",
-    "EntitySelectorOptionsAccessor",
-    "EntitySelectorParserMixin",
-    "HelpCommandAccessor"
+    "EntitySelectorParserMixin"
   ],
   "injectors": {
     "defaultRequire": 1
