@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.test.serialization;
 
 import java.util.Optional;
+import java.util.Set;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -131,5 +132,10 @@ public record DelegateValueInput(ValueInput input) implements ValueInput {
 	@Override
 	public HolderLookup.Provider lookup() {
 		return input.lookup();
+	}
+
+	@Override
+	public Set<String> keySet() {
+		return ValueInput.super.keySet();
 	}
 }
