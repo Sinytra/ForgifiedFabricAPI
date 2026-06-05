@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.mixin.resource.conditions;
 
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,8 +33,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
@@ -53,7 +52,7 @@ public class SimpleJsonResourceReloadListenerMixin {
 	private FileToIdConverter lister;
 
 	@WrapOperation(method = "prepare", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/DynamicOps;Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;"))
-	private DataResult<?> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<?>> original,
+	private DataResult<Optional<?>> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<Optional<?>>> original,
 													@Local(name = "entry") Map.Entry<Identifier, Resource> entry) {
 		final JsonElement resourceData = (JsonElement) object;
 		RegistryOps.@Nullable RegistryInfoLookup registryInfo = null;
@@ -68,18 +67,10 @@ public class SimpleJsonResourceReloadListenerMixin {
 			final String dataType = this.lister.prefix();
 
 			if (!ResourceConditionsImpl.applyResourceConditions(obj, dataType, entry.getKey(), registryInfo)) {
-				return DataResult.success(SKIP_DATA_MARKER);
+				return DataResult.success(Optional.empty());
 			}
 		}
 
 		return original.call(instance, dynamicOps, object);
-	}
-
-	// parse.ifSuccess
-	@Inject(method = "lambda$prepare$0", at = @At("HEAD"), cancellable = true)
-	private static void skipData(Map<?, ?> map, Identifier identifier, Object object, CallbackInfo ci) {
-		if (object == SKIP_DATA_MARKER) {
-			ci.cancel();
-		}
 	}
 }

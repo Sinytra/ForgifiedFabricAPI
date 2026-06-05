@@ -3,14 +3,15 @@
   "package": "net.fabricmc.fabric.mixin.resource.conditions",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ReloadableServerResourcesMixin",
     "DataProviderMixin",
-    "SimpleJsonResourceReloadListenerMixin",
-    "RegistryLoadTaskPendingRegistrationMixin",
-    "ResourceManagerRegistryLoadTaskMixin",
-    "RegistryOpsAccessor",
     "FileToIdConverterAccessor",
-    "PackMixin"
+    "PackMixin",
+    "RegistryLoadTaskPendingRegistrationMixin",
+    "RegistryOpsAccessor",
+    "ReloadableServerResourcesMixin",
+    "ResourceManagerRegistryLoadTaskMixin",
+    "ResourcePackLoaderMixin",
+    "SimpleJsonResourceReloadListenerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
