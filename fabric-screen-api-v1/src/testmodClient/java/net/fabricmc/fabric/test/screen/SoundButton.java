@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.test.screen;
 
-import java.util.function.Supplier;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -35,6 +33,6 @@ class SoundButton extends Button.Plain {
 		super(x, y, width, height, Component.nullToEmpty("Sound Button"), _ -> {
 			final SoundEvent event = BuiltInRegistries.SOUND_EVENT.getRandom(RANDOM).map(Holder::value).orElse(SoundEvents.GENERIC_EXPLODE.value());
 			Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(event, 1.0F, 1.0F));
-		}, Supplier::get);
+		}, Button.DEFAULT_NARRATION);
 	}
 }
