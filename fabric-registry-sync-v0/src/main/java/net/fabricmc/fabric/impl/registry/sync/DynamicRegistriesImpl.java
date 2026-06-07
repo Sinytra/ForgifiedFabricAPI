@@ -16,27 +16,30 @@
 
 package net.fabricmc.fabric.impl.registry.sync;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import com.mojang.serialization.Codec;
-import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryValidator;
 import net.minecraft.resources.ResourceKey;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
-import java.util.*;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 
 public final class DynamicRegistriesImpl {
 	private static final List<RegistryDataLoader.RegistryData<?>> DYNAMIC_REGISTRIES = new ArrayList<>();
 	public static final Set<ResourceKey<?>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Set<ResourceKey<? extends Registry<?>>> DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Map<ResourceKey<? extends Registry<?>>, Codec<?>> NETWORK_CODECS = new HashMap<>();
-
-	static {
-		for (RegistryDataLoader.RegistryData<?> vanillaEntry : RegistryDataLoader.WORLDGEN_REGISTRIES) {
-			DYNAMIC_REGISTRY_KEYS.add(vanillaEntry.key());
-		}
-	}
 
 	private DynamicRegistriesImpl() {
 	}
@@ -45,7 +48,9 @@ public final class DynamicRegistriesImpl {
 		Objects.requireNonNull(key, "Registry key cannot be null");
 		Objects.requireNonNull(serverCodec, "Server codec cannot be null");
 
-		if (!DYNAMIC_REGISTRY_KEYS.add(key)) {
+		if (DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().anyMatch(d -> d.key().equals(key))
+				|| DYNAMIC_REGISTRY_KEYS.contains(key)
+		) {
 			throw new IllegalArgumentException("Dynamic registry " + key + " has already been registered!");
 		}
 
@@ -55,20 +60,20 @@ public final class DynamicRegistriesImpl {
 		return entry;
 	}
 
-	public static <T> void addSyncedRegistry(ResourceKey<? extends Registry<T>> key, Codec<T> networkCodec, DynamicRegistries.SyncOption... options) {
+	public static <T> void addSyncedRegistry(ResourceKey<? extends Registry<T>> key, Codec<T> clientCodec, DynamicRegistries.SyncOption... options) {
 		Objects.requireNonNull(key, "Registry key cannot be null");
-		Objects.requireNonNull(networkCodec, "Network codec cannot be null");
+		Objects.requireNonNull(clientCodec, "Client codec cannot be null");
 		Objects.requireNonNull(options, "Options cannot be null");
 
-        NETWORK_CODECS.put(key, networkCodec);
+		NETWORK_CODECS.put(key, clientCodec);
 		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
-    static void onNewDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
-        for (RegistryDataLoader.RegistryData dynamicRegistry : DYNAMIC_REGISTRIES) {
-            Codec networkCodec = NETWORK_CODECS.get(dynamicRegistry.key());
-            event.dataPackRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec(), networkCodec);
-        }
-    }
+	static void onNewDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+		for (RegistryDataLoader.RegistryData dynamicRegistry : DYNAMIC_REGISTRIES) {
+			Codec networkCodec = NETWORK_CODECS.get(dynamicRegistry.key());
+			event.dataPackRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec(), networkCodec);
+		}
+	}
 }
