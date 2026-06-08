@@ -31,14 +31,14 @@ import net.fabricmc.fabric.impl.content.registry.fluid.EntityFluidInteractionReg
 
 @Mixin(AbstractBoat.class)
 public class AbstractBoatMixin {
-	@WrapOperation(method = {"checkInWater", "isUnderwater"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;is(Lnet/minecraft/tags/TagKey;)Z"))
-	private boolean customFluidSupport(FluidState instance, TagKey<Fluid> water, Operation<Boolean> original) {
+	@WrapOperation(method = {"checkInWater"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/boat/AbstractBoat;canBoatInFluid(Lnet/minecraft/world/level/material/FluidState;)Z"))
+	private boolean customFluidSupport(AbstractBoat boat, FluidState instance, Operation<Boolean> original) {
 		for (TagKey<Fluid> tagKey : EntityFluidInteractionRegistryImpl.getTrackedFluids()) {
 			if (instance.is(tagKey) && EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).canSupportBoat(tagKey, (Entity) (Object) this)) {
 				return true;
 			}
 		}
 
-		return original.call(instance, water);
+		return original.call(boat, instance);
 	}
 }

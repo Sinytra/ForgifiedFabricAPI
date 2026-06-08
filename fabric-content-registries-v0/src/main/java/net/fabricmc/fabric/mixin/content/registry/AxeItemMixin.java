@@ -19,9 +19,12 @@ package net.fabricmc.fabric.mixin.content.registry;
 import java.util.function.Function;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.level.block.Block;
@@ -41,5 +44,14 @@ public class AxeItemMixin {
 		}
 
 		return mapper;
+	}
+	
+	@Inject(method = "getAxeStrippingState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;defaultBlockState()Lnet/minecraft/world/level/block/state/BlockState;"), cancellable = true)
+	private static void handleCustomStrippingBehaviorNeo(BlockState state, CallbackInfoReturnable<@Nullable BlockState> cir, @Local Block block) {
+		StrippableBlockRegistry.StrippingTransformer transformer = StrippableBlockRegistryImpl.getTransformer(state.getBlock());
+
+		if (transformer != null) {
+			cir.setReturnValue(transformer.getStrippedBlockState(block, state));
+		}
 	}
 }

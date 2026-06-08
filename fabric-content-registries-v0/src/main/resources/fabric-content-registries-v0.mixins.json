@@ -13,7 +13,6 @@
     "DecoratedPotPatternsAccessor",
     "DecoratedPotPatternsMixin",
     "FireBlockMixin",
-    "FuelValuesMixin",
     "GiveGiftToHeroAccessor",
     "GiveGiftToHeroMixin",
     "HoeItemAccessor",
@@ -31,7 +30,9 @@
     "fluid.EntityMixin",
     "fluid.LivingEntityAccessor",
     "fluid.LivingEntityMixin",
-    "fluid.SwimMixin"
+    "fluid.SwimMixin",
+    "BaseRegistryMixin",
+    "DataMapHooksMixin"
   ],
   "injectors": {
     "defaultRequire": 1

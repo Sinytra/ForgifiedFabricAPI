@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.content.registry;
 
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.fluids.FluidType;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
@@ -60,6 +63,11 @@ public abstract class WaterLikeFluid extends WaterFluid {
 	@Override
 	public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, Fluid fluid, Direction direction) {
 		return direction == Direction.DOWN;
+	}
+
+	@Override
+	public FluidType getFluidType() {
+		return NeoForgeMod.EMPTY_TYPE.value();
 	}
 
 	public static class Flowing extends WaterLikeFluid {

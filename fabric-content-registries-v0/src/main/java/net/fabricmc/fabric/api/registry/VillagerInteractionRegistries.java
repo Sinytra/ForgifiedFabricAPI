@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.api.registry;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -35,6 +37,8 @@ import net.fabricmc.fabric.mixin.content.registry.GiveGiftToHeroAccessor;
  */
 public final class VillagerInteractionRegistries {
 	private static final Logger LOGGER = LoggerFactory.getLogger(VillagerInteractionRegistries.class);
+	
+	public static final Map<ResourceKey<VillagerProfession>, ResourceKey<LootTable>> MODIFIED_GIFTS = new IdentityHashMap<>();
 
 	private VillagerInteractionRegistries() {
 	}
@@ -83,10 +87,12 @@ public final class VillagerInteractionRegistries {
 	public static void registerGiftLootTable(ResourceKey<VillagerProfession> profession, ResourceKey<LootTable> lootTable) {
 		Objects.requireNonNull(profession, "Profession cannot be null!");
 		Objects.requireNonNull(lootTable, "Loot table identifier cannot be null!");
-		ResourceKey<LootTable> oldValue = GiveGiftToHeroAccessor.fabric_getGifts().put(profession, lootTable);
+		ResourceKey<LootTable> oldValue = GiveGiftToHeroAccessor.fabric_getGifts().get(profession);
 
 		if (oldValue != null) {
 			LOGGER.info("Overriding previous gift loot table of {} profession, was: {}, now: {}", profession.identifier(), oldValue, lootTable);
 		}
+		
+		MODIFIED_GIFTS.put(profession, lootTable);
 	}
 }

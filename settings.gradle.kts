@@ -42,7 +42,7 @@ include("fabric-api-base")
 include("fabric-block-getter-api-v2")
 //include 'fabric-client-gametest-api-v1'
 include("fabric-command-api-v2")
-//include 'fabric-content-registries-v0'
+include("fabric-content-registries-v0")
 //include 'fabric-convention-tags-v2'
 //include 'fabric-creative-tab-api-v1'
 //include 'fabric-data-attachment-api-v1'
