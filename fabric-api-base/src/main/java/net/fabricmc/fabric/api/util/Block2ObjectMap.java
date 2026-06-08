@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
+// Moved from fabric-content-registries-v0 due to no split packages rule on Neo
 package net.fabricmc.fabric.api.util;
 
 import org.jspecify.annotations.NullMarked;
 
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 
 @NullMarked
-public interface Item2ObjectMap<V> {
-	V get(ItemLike item);
+public interface Block2ObjectMap<V> {
+	V get(Block block);
 
-	void add(ItemLike item, V value);
+	void add(Block block, V value);
 
-	void add(TagKey<Item> tag, V value);
+	void add(TagKey<Block> tag, V value);
 
-	void remove(ItemLike item);
+	void remove(Block block);
 
-	void remove(TagKey<Item> tag);
+	void remove(TagKey<Block> tag);
 
-	void clear(ItemLike item);
+	void clear(Block block);
 
-	void clear(TagKey<Item> tag);
+	void clear(TagKey<Block> tag);
 }

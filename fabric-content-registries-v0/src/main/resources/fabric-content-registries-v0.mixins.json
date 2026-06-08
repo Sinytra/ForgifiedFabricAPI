@@ -6,8 +6,11 @@
     "minVersion": "0.5.0"
   },
   "mixins": [
+    "BaseRegistryMixin",
     "BlockBehaviourAccessor",
     "BlockBehaviourBlockStateBaseMixin",
+    "DataMapHooksMixin",
+    "DecoratedPotPatternsMixin",
     "FireBlockMixin",
     "GiveGiftToHeroAccessor",
     "GiveGiftToHeroMixin",

@@ -18,6 +18,9 @@ package net.fabricmc.fabric.test.content.registry;
 
 import java.util.Optional;
 
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.fluids.FluidType;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -105,6 +108,11 @@ public abstract class TestFluid extends FlowingFluid {
 	@Override
 	public Optional<SoundEvent> getPickupSound() {
 		return Optional.of(SoundEvents.BUCKET_FILL);
+	}
+
+	@Override
+	public FluidType getFluidType() {
+		return NeoForgeMod.EMPTY_TYPE.value();
 	}
 
 	public static class Flowing extends TestFluid {

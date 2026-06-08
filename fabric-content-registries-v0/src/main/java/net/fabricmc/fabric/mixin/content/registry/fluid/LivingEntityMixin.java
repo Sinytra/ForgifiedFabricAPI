@@ -46,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity {
 		super(type, level);
 	}
 
-	@WrapWithCondition(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;travelInLava(Lnet/minecraft/world/phys/Vec3;DZD)V"))
+	@WrapWithCondition(method = "travelInFluid(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/level/material/FluidState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;travelInLava(Lnet/minecraft/world/phys/Vec3;DZD)V"))
 	private boolean travelInCustomFluid(LivingEntity instance, Vec3 vec3, double input, boolean baseGravity, double isFalling) {
 		for (TagKey<Fluid> tagKey : ((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids()) {
 			EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).travelInFluid(tagKey, (LivingEntity) (Object) this, vec3, input, baseGravity, isFalling);
@@ -126,12 +126,13 @@ public abstract class LivingEntityMixin extends Entity {
 		return custom != null ? custom : fluidTagKey;
 	}
 
-	@Definition(id = "LAVA", field = "Lnet/minecraft/tags/FluidTags;LAVA:Lnet/minecraft/tags/TagKey;")
-	@Definition(id = "jumpInLiquid", method = "Lnet/minecraft/world/entity/LivingEntity;jumpInLiquid(Lnet/minecraft/tags/TagKey;)V")
-	@Expression("this.jumpInLiquid(LAVA)")
-	@ModifyArg(method = "aiStep", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private TagKey<Fluid> swapFluidTag(TagKey<Fluid> fluidTagKey, @Share("fluid") LocalRef<TagKey<Fluid>> fluid) {
-		TagKey<Fluid> custom = fluid.get();
-		return custom != null ? custom : fluidTagKey;
-	}
+	// FIXME
+//	@Definition(id = "LAVA", field = "Lnet/minecraft/tags/FluidTags;LAVA:Lnet/minecraft/tags/TagKey;")
+//	@Definition(id = "jumpInLiquid", method = "Lnet/minecraft/world/entity/LivingEntity;jumpInLiquid(Lnet/minecraft/tags/TagKey;)V")
+//	@Expression("this.jumpInLiquid(LAVA)")
+//	@ModifyArg(method = "aiStep", at = @At("MIXINEXTRAS:EXPRESSION"))
+//	private TagKey<Fluid> swapFluidTag(TagKey<Fluid> fluidTagKey, @Share("fluid") LocalRef<TagKey<Fluid>> fluid) {
+//		TagKey<Fluid> custom = fluid.get();
+//		return custom != null ? custom : fluidTagKey;
+//	}
 }
