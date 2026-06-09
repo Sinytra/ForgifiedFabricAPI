@@ -19,6 +19,7 @@ package net.fabricmc.fabric.api.event.registry;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
 import org.jetbrains.annotations.Unmodifiable;
 
 import net.minecraft.core.Registry;
@@ -116,7 +117,7 @@ public final class DynamicRegistries {
 	 */
 	@Deprecated
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getDynamicRegistries() {
-		return DynamicRegistriesImpl.getBootstrappingRegistries();
+		return DataPackRegistriesHooks.getDataPackRegistries();
 	}
 
 	/**

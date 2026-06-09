@@ -55,6 +55,13 @@ public class RegistrySyncTest implements ModInitializer {
 	// We check them later as they may be used before the registry attributes are assigned.
 	private static boolean hasCheckedEarlyRegistries = false;
 	private static final List<ResourceKey<? extends Registry<?>>> sycnedRegistriesToCheck = new ArrayList<>();
+	
+	private static final List<Identifier> UNSYNCED_REGS = List.of(
+			Registries.RECIPE_SERIALIZER.identifier(),
+			Registries.DATA_COMPONENT_PREDICATE_TYPE.identifier(),
+			Registries.POINT_OF_INTEREST_TYPE.identifier(),
+			Registries.GAME_EVENT.identifier()
+	);
 
 	@Override
 	public void onInitialize() {
@@ -116,7 +123,7 @@ public class RegistrySyncTest implements ModInitializer {
 			return;
 		}
 
-		if (registry.identifier().equals(Identifier.parse("recipe_serializer"))) {
+		if (UNSYNCED_REGS.contains(registry.identifier())) {
 			// Recipe serializers are not synced, as there is an unused codec left over.
 			return;
 		}

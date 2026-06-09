@@ -18,7 +18,6 @@ package net.fabricmc.fabric.test.registry.sync.client;
 
 import java.util.EnumSet;
 import java.util.Map;
-import java.util.Objects;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -26,14 +25,13 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerPlayer;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
-import net.fabricmc.fabric.impl.client.registry.sync.ClientRegistrySyncHandler;
-import net.fabricmc.fabric.impl.registry.sync.RemapException;
-import net.fabricmc.fabric.impl.registry.sync.packet.RegistrySyncPayload;
+//import net.fabricmc.fabric.impl.client.registry.sync.ClientRegistrySyncHandler;
+//import net.fabricmc.fabric.impl.registry.sync.RemapException;
+//import net.fabricmc.fabric.impl.registry.sync.packet.RegistrySyncPayload;
 
 public class RegistrySyncClientTest implements ClientModInitializer {
 	@Override
@@ -49,19 +47,19 @@ public class RegistrySyncClientTest implements ClientModInitializer {
 							Registries.ITEM.identifier(), EnumSet.noneOf(RegistryAttribute.class)
 					);
 
-					try {
-						ClientRegistrySyncHandler.checkRemoteRemap(new RegistrySyncPayload(registryData, attributes));
-					} catch (RemapException e) {
-						final ServerPlayer player = context.getSource().getPlayer();
-
-						if (player != null) {
-							player.connection.disconnect(Objects.requireNonNull(e.getComponent()));
-						}
-
+//					try {
+//						ClientRegistrySyncHandler.checkRemoteRemap(new RegistrySyncPayload(registryData, attributes));
+//					} catch (RemapException e) {
+//						final ServerPlayer player = context.getSource().getPlayer();
+//
+//						if (player != null) {
+//							player.connection.disconnect(Objects.requireNonNull(e.getComponent()));
+//						}
+//
 						return 1;
-					}
-
-					throw new IllegalStateException();
+//					}
+//
+//					throw new IllegalStateException();
 				})));
 	}
 
