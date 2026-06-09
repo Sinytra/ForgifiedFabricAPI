@@ -16,51 +16,43 @@
 
 package net.fabricmc.fabric.impl.registry.sync;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.jetbrains.annotations.VisibleForTesting;
-
-import net.minecraft.resources.ResourceKey;
-
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
-import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.fabric.mixin.registry.sync.BaseMappedRegistryAccessor;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 public final class RegistryAttributeImpl implements RegistryAttributeHolder {
 	private static final Map<ResourceKey<?>, RegistryAttributeHolder> HOLDER_MAP = new ConcurrentHashMap<>();
 
-	public static RegistryAttributeHolder getHolder(ResourceKey<?> resourceKey) {
-		return HOLDER_MAP.computeIfAbsent(resourceKey, key -> new RegistryAttributeImpl());
+	public static RegistryAttributeHolder getHolder(ResourceKey<?> registryKey) {
+		return HOLDER_MAP.computeIfAbsent(registryKey, RegistryAttributeImpl::new);
 	}
 
-	private final EnumSet<RegistryAttribute> attributes = EnumSet.noneOf(RegistryAttribute.class);
+	private final ResourceKey<?> key;
 
-	private RegistryAttributeImpl() {
+	private RegistryAttributeImpl(ResourceKey<?> key) {
+		this.key = key;
 	}
 
 	@Override
 	public RegistryAttributeHolder addAttribute(RegistryAttribute attribute) {
-		attributes.add(attribute);
-		return this;
-	}
-
-	@VisibleForTesting
-	public void removeAttribute(RegistryAttribute attribute) {
-		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
-			throw new AssertionError();
+		if (attribute == RegistryAttribute.SYNCED) {
+			Registry<?> registry = BuiltInRegistries.REGISTRY.getValue((ResourceKey) this.key);
+			((BaseMappedRegistryAccessor) registry).invokeSetSync(true);
 		}
-
-		attributes.remove(attribute);
+		return this;
 	}
 
 	@Override
 	public boolean hasAttribute(RegistryAttribute attribute) {
-		return attributes.contains(attribute);
-	}
-
-	public EnumSet<RegistryAttribute> getAttributes() {
-		return attributes;
+		if (attribute == RegistryAttribute.SYNCED) {
+			return BuiltInRegistries.REGISTRY.getValue((ResourceKey) this.key).doesSync();
+		}
+		return attribute == RegistryAttribute.MODDED;
 	}
 }

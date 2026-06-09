@@ -16,207 +16,61 @@
 
 package net.fabricmc.fabric.impl.registry.sync;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
-import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
-import net.fabricmc.fabric.impl.registry.sync.packet.RegistrySyncPayload;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
+import net.fabricmc.fabric.mixin.registry.sync.BaseMappedRegistryAccessor;
+import net.fabricmc.fabric.mixin.registry.sync.MappedRegistryAccessor;
+import net.fabricmc.fabric.mixin.registry.sync.RegistryManagerAccessor;
+import net.minecraft.core.RegistrationInfo;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.callback.AddCallback;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FabricRegistryInit implements ModInitializer {
-	private static final int MAX_PACKET_SIZE = Integer.getInteger("fabric.registry.sync.max_packet_size", 128 * 1024 * 1024);
+    private static final Map<Registry<?>, Event<RegistryEntryAddedCallback>> REGISTRY_ENTRY_ADDED_CALLBACKS = new ConcurrentHashMap<>();
 
-	@Override
-	public void onInitialize() {
-		PayloadTypeRegistry.serverboundConfiguration().register(SyncCompletePayload.ID, SyncCompletePayload.CODEC);
-		PayloadTypeRegistry.clientboundConfiguration().registerLarge(RegistrySyncPayload.ID, RegistrySyncPayload.CODEC, MAX_PACKET_SIZE);
+    @Override
+    public void onInitialize() {
+        IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+        bus.addListener(DataPackRegistryEvent.NewRegistry.class, DynamicRegistriesImpl::onNewDatapackRegistries);
+    }
 
-		ServerConfigurationConnectionEvents.BEFORE_CONFIGURE.register(RegistrySyncManager::configureClient);
-		ServerConfigurationNetworking.registerGlobalReceiver(SyncCompletePayload.ID, (payload, context) -> {
-			context.packetListener().completeTask(RegistrySyncManager.SyncConfigurationTask.KEY);
-		});
+    public static <T> Event<RegistryEntryAddedCallback<T>> objectAddedEvent(Registry<T> registry) {
+        return (Event<RegistryEntryAddedCallback<T>>) (Object) REGISTRY_ENTRY_ADDED_CALLBACKS.computeIfAbsent(registry, k -> {
+            Event<RegistryEntryAddedCallback> event = EventFactory.createArrayBacked(RegistryEntryAddedCallback.class,
+                callbacks -> (rawId, id, object) -> {
+                    for (RegistryEntryAddedCallback callback : callbacks) {
+                        callback.onEntryAdded(rawId, id, object);
+                    }
+                }
+            );
+            k.addCallback(AddCallback.class, (reg, id, key, val) -> event.invoker().onEntryAdded(id, key.identifier(), val));
+            return event;
+        });
+    }
 
-		// Synced in ClientboundSoundPacket.
-		RegistryAttributeHolder.get(BuiltInRegistries.SOUND_EVENT)
-				.addAttribute(RegistryAttribute.SYNCED);
+    public static void addRegistry(Registry<?> registry) {
+        RegistryManagerAccessor.invokeTrackModdedRegistry(registry.key().identifier());
 
-		// Synced with RegistryTagContainer from RegistryTagManager.
-		RegistryAttributeHolder.get(BuiltInRegistries.FLUID)
-				.addAttribute(RegistryAttribute.SYNCED);
+        boolean frozen = ((MappedRegistryAccessor) BuiltInRegistries.REGISTRY).getFrozen();
+        if (frozen) {
+            ((BaseMappedRegistryAccessor) BuiltInRegistries.REGISTRY).invokeUnfreeze(false);
+        }
 
-		// MobEffectInstance serialises with raw id.
-		RegistryAttributeHolder.get(BuiltInRegistries.MOB_EFFECT)
-				.addAttribute(RegistryAttribute.SYNCED);
+        ((WritableRegistry) BuiltInRegistries.REGISTRY).register(registry.key(), registry, RegistrationInfo.BUILT_IN);
 
-		// Synced in ClientboundSectionBlocksUpdatePacket among other places, a pallet is used when saving.
-		RegistryAttributeHolder.get(BuiltInRegistries.BLOCK)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced in ClientboundAddEntityPacket and RegistryTagManager
-		RegistryAttributeHolder.get(BuiltInRegistries.ENTITY_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced in RegistryTagManager
-		RegistryAttributeHolder.get(BuiltInRegistries.ITEM)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registry
-		RegistryAttributeHolder.get(BuiltInRegistries.POTION)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Doesnt seem to be accessed apart from registering?
-		RegistryAttributeHolder.get(BuiltInRegistries.CARVER);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.FEATURE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.BLOCKSTATE_PROVIDER_TYPE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.FOLIAGE_PLACER_TYPE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.TRUNK_PLACER_TYPE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.TREE_DECORATOR_TYPE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.FEATURE_SIZE_TYPE);
-
-		// Synced in ClientboundLevelParticlesPacket
-		RegistryAttributeHolder.get(BuiltInRegistries.PARTICLE_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.BIOME_SOURCE);
-
-		// Synced. Vanilla uses raw ids in ClientboundBlockEntityDataPacket, and mods use the Vanilla syncing since 1.18
-		RegistryAttributeHolder.get(BuiltInRegistries.BLOCK_ENTITY_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registry
-		RegistryAttributeHolder.get(BuiltInRegistries.CUSTOM_STAT)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.CHUNK_STATUS);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.STRUCTURE_TYPE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.STRUCTURE_PIECE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.RULE_TEST);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.POS_RULE_TEST);
-
-		RegistryAttributeHolder.get(BuiltInRegistries.STRUCTURE_PROCESSOR);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.STRUCTURE_POOL_ELEMENT);
-
-		//  Uses the raw ID when syncing the command tree to the client
-		RegistryAttributeHolder.get(BuiltInRegistries.COMMAND_ARGUMENT_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced in ClientboundOpenScreenPacket
-		RegistryAttributeHolder.get(BuiltInRegistries.MENU)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Does not seem to be serialised, only queried by id. Not synced
-		RegistryAttributeHolder.get(BuiltInRegistries.RECIPE_TYPE);
-
-		// Synced by rawID in 24w03a+
-		RegistryAttributeHolder.get(BuiltInRegistries.ATTRIBUTE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced in ClientboundAwardStatsPacket
-		RegistryAttributeHolder.get(BuiltInRegistries.STAT_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID in EntityDataSerializers.VILLAGER_DATA
-		RegistryAttributeHolder.get(BuiltInRegistries.VILLAGER_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID in EntityDataSerializers.VILLAGER_DATA
-		RegistryAttributeHolder.get(BuiltInRegistries.VILLAGER_PROFESSION)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.POINT_OF_INTEREST_TYPE);
-
-		// Serialised by string, doesnt seem to be synced
-		RegistryAttributeHolder.get(BuiltInRegistries.MEMORY_MODULE_TYPE);
-
-		// Doesnt seem to be serialised or synced.
-		RegistryAttributeHolder.get(BuiltInRegistries.SENSOR_TYPE);
-
-		// Doesnt seem to be serialised or synced.
-		RegistryAttributeHolder.get(BuiltInRegistries.ACTIVITY);
-
-		// Doesnt seem to be serialised or synced.
-		RegistryAttributeHolder.get(BuiltInRegistries.LOOT_POOL_ENTRY_TYPE);
-
-		// Doesnt seem to be serialised or synced.
-		RegistryAttributeHolder.get(BuiltInRegistries.LOOT_FUNCTION_TYPE);
-
-		// Doesnt seem to be serialised or synced.
-		RegistryAttributeHolder.get(BuiltInRegistries.LOOT_CONDITION_TYPE);
-
-		// Synced in TagManager::toPacket/fromPacket -> TagGroup::serialize/deserialize
-		RegistryAttributeHolder.get(BuiltInRegistries.GAME_EVENT)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID in its serialization code.
-		RegistryAttributeHolder.get(BuiltInRegistries.NUMBER_FORMAT_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID.
-		RegistryAttributeHolder.get(BuiltInRegistries.POSITION_SOURCE_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID.
-		RegistryAttributeHolder.get(BuiltInRegistries.DATA_COMPONENT_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID.
-		RegistryAttributeHolder.get(BuiltInRegistries.DATA_COMPONENT_PREDICATE_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced by rawID.
-		RegistryAttributeHolder.get(BuiltInRegistries.MAP_DECORATION_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registry
-		RegistryAttributeHolder.get(BuiltInRegistries.CONSUME_EFFECT_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registryValue
-		RegistryAttributeHolder.get(BuiltInRegistries.RECIPE_DISPLAY)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registryValue
-		RegistryAttributeHolder.get(BuiltInRegistries.SLOT_DISPLAY)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registryValue
-		RegistryAttributeHolder.get(BuiltInRegistries.RECIPE_BOOK_CATEGORY)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registryValue
-		RegistryAttributeHolder.get(BuiltInRegistries.POINT_OF_INTEREST_TYPE)
-				.addAttribute(RegistryAttribute.SYNCED);
-
-		// Synced via ByteBufCodecs.registryValue
-		RegistryAttributeHolder.get(BuiltInRegistries.DEBUG_SUBSCRIPTION)
-				.addAttribute(RegistryAttribute.SYNCED);
-	}
+        if (frozen) {
+            ((WritableRegistry<?>) BuiltInRegistries.REGISTRY).freeze();
+        }
+    }
 }
