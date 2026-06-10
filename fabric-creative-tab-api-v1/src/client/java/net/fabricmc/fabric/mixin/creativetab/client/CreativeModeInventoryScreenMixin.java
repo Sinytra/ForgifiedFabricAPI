@@ -16,174 +16,83 @@
 
 package net.fabricmc.fabric.mixin.creativetab.client;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
-import org.lwjgl.glfw.GLFW;
+import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.ItemPickerMenu;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 
 import net.fabricmc.fabric.api.client.creativetab.v1.FabricCreativeModeInventoryScreen;
-import net.fabricmc.fabric.impl.client.creativetab.FabricCreativeGuiComponents;
-import net.fabricmc.fabric.impl.creativetab.FabricCreativeModeTabImpl;
 
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeModeInventoryScreenMixin extends AbstractContainerScreen<ItemPickerMenu> implements FabricCreativeModeInventoryScreen {
-	public CreativeModeInventoryScreenMixin(ItemPickerMenu menu, Inventory playerInventory, Component component) {
-		super(menu, playerInventory, component);
-	}
-
-	@Shadow
-	protected abstract void selectTab(CreativeModeTab creativeModeTab_1);
-
 	@Shadow
 	private static CreativeModeTab selectedTab;
 
-	// "static" matches selectedTab
-	@Unique
-	private static int currentPage = 0;
+	@Shadow
+	@Final
+	private List<CreativeTabsScreenPage> pages;
+	@Shadow
+	private CreativeTabsScreenPage currentPage;
 
-	@Unique
-	private void updateSelection() {
-		if (!isTabVisible(selectedTab)) {
-			CreativeModeTabs.allTabs()
-					.stream()
-					.filter(this::isTabVisible)
-					.min((a, b) -> Boolean.compare(a.isAlignedRight(), b.isAlignedRight()))
-					.ifPresent(this::selectTab);
-		}
-	}
-
-	@Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setTextColor(I)V", shift = At.Shift.AFTER))
-	private void init(CallbackInfo info) {
-		currentPage = getPage(selectedTab);
-
-		int xpos = leftPos + 171;
-		int ypos = topPos + 4;
-
-		CreativeModeInventoryScreen self = (CreativeModeInventoryScreen) (Object) this;
-		addRenderableWidget(new FabricCreativeGuiComponents.CreativeModeTabButton(xpos + 10, ypos, FabricCreativeGuiComponents.Type.NEXT, self));
-		addRenderableWidget(new FabricCreativeGuiComponents.CreativeModeTabButton(xpos, ypos, FabricCreativeGuiComponents.Type.PREVIOUS, self));
-	}
-
-	@Inject(method = "selectTab", at = @At("HEAD"), cancellable = true)
-	private void setSelectedTab(CreativeModeTab creativeModeTab, CallbackInfo info) {
-		if (!isTabVisible(creativeModeTab)) {
-			info.cancel();
-		}
-	}
-
-	@Inject(method = "checkTabHovering", at = @At("HEAD"), cancellable = true)
-	private void renderTabTooltipIfHovered(GuiGraphicsExtractor graphics, CreativeModeTab creativeModeTab, int mx, int my, CallbackInfoReturnable<Boolean> info) {
-		if (!isTabVisible(creativeModeTab)) {
-			info.setReturnValue(false);
-		}
-	}
-
-	@Inject(method = "checkTabClicked", at = @At("HEAD"), cancellable = true)
-	private void isClickInTab(CreativeModeTab creativeModeTab, double mx, double my, CallbackInfoReturnable<Boolean> info) {
-		if (!isTabVisible(creativeModeTab)) {
-			info.setReturnValue(false);
-		}
-	}
-
-	@Inject(method = "extractTabButton", at = @At("HEAD"), cancellable = true)
-	private void extractTabButton(GuiGraphicsExtractor guiGraphics, int i, int j, CreativeModeTab creativeModeTab, CallbackInfo info) {
-		if (!isTabVisible(creativeModeTab)) {
-			info.cancel();
-		}
-	}
-
-	@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-	private void keyPressed(KeyEvent context, CallbackInfoReturnable<Boolean> cir) {
-		if (context.key() == GLFW.GLFW_KEY_PAGE_UP) {
-			if (switchToPreviousPage()) {
-				cir.setReturnValue(true);
-			}
-		} else if (context.key() == GLFW.GLFW_KEY_PAGE_DOWN) {
-			if (switchToNextPage()) {
-				cir.setReturnValue(true);
-			}
-		}
-	}
-
-	@Unique
-	private boolean isTabVisible(CreativeModeTab creativeModeTab) {
-		return creativeModeTab.shouldDisplay() && currentPage == getPage(creativeModeTab);
-	}
-
-	@Override
-	public int getPage(CreativeModeTab creativeModeTab) {
-		if (FabricCreativeGuiComponents.COMMON_TABS.contains(creativeModeTab)) {
-			return currentPage;
-		}
-
-		final FabricCreativeModeTabImpl fabriccreativeModeTab = (FabricCreativeModeTabImpl) creativeModeTab;
-		return fabriccreativeModeTab.fabric_getPage();
-	}
-
-	@Unique
-	private boolean hasGroupForPage(int page) {
-		return CreativeModeTabs.tabs()
-				.stream()
-				.anyMatch(creativeModeTab -> getPage(creativeModeTab) == page);
+	public CreativeModeInventoryScreenMixin(ItemPickerMenu menu, Inventory inventory, Component title) {
+		super(menu, inventory, title);
 	}
 
 	@Override
 	public boolean switchToPage(int page) {
-		if (!hasGroupForPage(page)) {
-			return false;
-		}
-
-		if (currentPage == page) {
-			return false;
-		}
-
-		currentPage = page;
-		updateSelection();
-		return true;
+		CreativeTabsScreenPage oldPage = currentPage;
+		((CreativeModeInventoryScreen) (Object) this).setCurrentPage(pages.get(page));
+		return oldPage != currentPage;
 	}
 
 	@Override
-	public int getCurrentPage() {
-		return currentPage;
+	public boolean switchToNextPage() {
+		CreativeTabsScreenPage oldPage = currentPage;
+		((CreativeModeInventoryScreen) (Object) this).setCurrentPage(this.pages.get(Math.min(this.pages.indexOf(this.currentPage) + 1, this.pages.size() - 1)));
+		return oldPage != currentPage;
+	}
+
+	@Override
+	public boolean switchToPreviousPage() {
+		CreativeTabsScreenPage oldPage = currentPage;
+		((CreativeModeInventoryScreen) (Object) this).setCurrentPage(this.pages.get(Math.max(this.pages.indexOf(this.currentPage) - 1, 0)));
+		return oldPage != currentPage;
 	}
 
 	@Override
 	public int getPageCount() {
-		return FabricCreativeGuiComponents.getPageCount();
+		return pages.size();
 	}
 
 	@Override
 	public List<CreativeModeTab> getTabsOnPage(int page) {
-		return CreativeModeTabs.tabs()
-				.stream()
-				.filter(creativeModeTab -> getPage(creativeModeTab) == page)
-				// Thanks to isXander for the sorting
-				.sorted(Comparator.comparing(CreativeModeTab::row).thenComparingInt(CreativeModeTab::column))
-				.sorted((a, b) -> Boolean.compare(a.isAlignedRight(), b.isAlignedRight()))
-				.toList();
+		return pages.get(page).getVisibleTabs();
+	}
+
+	@Override
+	public int getPage(CreativeModeTab creativeModeTab) {
+		for (int i = 0; i < pages.size(); i++) {
+			CreativeTabsScreenPage page = pages.get(i);
+
+			if (page.getVisibleTabs().contains(creativeModeTab)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	@Override
 	public boolean hasAdditionalPages() {
-		return CreativeModeTabs.tabs().size() > (Objects.requireNonNull(CreativeModeTabs.CACHED_PARAMETERS).hasPermissions() ? 14 : 13);
+		return pages.size() > 1;
 	}
 
 	@Override
@@ -193,19 +102,10 @@ public abstract class CreativeModeInventoryScreenMixin extends AbstractContainer
 
 	@Override
 	public boolean setSelectedTab(CreativeModeTab creativeModeTab) {
-		Objects.requireNonNull(creativeModeTab, "creativeModeTab");
-
-		if (selectedTab == creativeModeTab) {
-			return false;
+		if (selectedTab != creativeModeTab) {
+			selectedTab = creativeModeTab;
+			return true;
 		}
-
-		if (currentPage != getPage(creativeModeTab)) {
-			if (!switchToPage(getPage(creativeModeTab))) {
-				return false;
-			}
-		}
-
-		selectTab(creativeModeTab);
-		return true;
+		return false;
 	}
 }
