@@ -18,20 +18,20 @@ package net.fabricmc.fabric.impl.client.keymapping;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 
 public final class KeyMappingRegistryImpl {
 	private static final List<KeyMapping> MODDED_KEY_BINDINGS = new ReferenceArrayList<>(); // ArrayList with identity based comparisons for contains/remove/indexOf etc., required for correctly handling duplicate keybinds
+	private static boolean processed;
 
 	private KeyMappingRegistryImpl() {
 	}
 
 	public static KeyMapping registerKeyMapping(KeyMapping binding) {
-		if (Minecraft.getInstance().options != null) {
+		if (processed) {
 			throw new IllegalStateException("GameOptions has already been initialised");
 		}
 
@@ -51,10 +51,8 @@ public final class KeyMappingRegistryImpl {
 	 * Processes the keymappings array for our modded ones by first removing existing modded keymappings and readding them,
 	 * we can make sure that there are no duplicates this way.
 	 */
-	public static KeyMapping[] process(KeyMapping[] keysAll) {
-		List<KeyMapping> newKeysAll = Lists.newArrayList(keysAll);
-		newKeysAll.removeAll(MODDED_KEY_BINDINGS);
-		newKeysAll.addAll(MODDED_KEY_BINDINGS);
-		return newKeysAll.toArray(new KeyMapping[0]);
+	public static void process(RegisterKeyMappingsEvent event) {
+		MODDED_KEY_BINDINGS.forEach(event::register);
+		processed = true;
 	}
 }
