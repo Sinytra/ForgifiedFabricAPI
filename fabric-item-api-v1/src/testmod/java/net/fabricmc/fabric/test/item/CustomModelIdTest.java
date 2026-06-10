@@ -24,13 +24,20 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItem;
 
 public class CustomModelIdTest implements ModInitializer {
 	public static final ResourceKey<Item> NOT_A_DIAMOND_KEY = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("fabric-item-api-v1-testmod", "not_a_diamond"));
-	public static final Item NOT_A_DIAMOND = new Item(new Item.Properties().setId(NOT_A_DIAMOND_KEY).modelId(Identifier.withDefaultNamespace("diamond")));
+	public static final Item NOT_A_DIAMOND = new Item(buildProperties());
 
 	@Override
 	public void onInitialize() {
 		Registry.register(BuiltInRegistries.ITEM, NOT_A_DIAMOND_KEY, NOT_A_DIAMOND);
+	}
+
+	private static Item.Properties buildProperties() {
+		Item.Properties props = new Item.Properties().setId(NOT_A_DIAMOND_KEY);
+		((FabricItem.Properties) props).modelId(Identifier.withDefaultNamespace("diamond"));
+		return props;
 	}
 }

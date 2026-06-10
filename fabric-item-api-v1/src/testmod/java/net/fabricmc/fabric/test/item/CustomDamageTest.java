@@ -43,6 +43,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
+import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.fabricmc.fabric.api.util.TriState;
 
 public class CustomDamageTest implements ModInitializer {
@@ -75,8 +76,14 @@ public class CustomDamageTest implements ModInitializer {
 
 	public static class WeirdPick extends Item {
 		protected WeirdPick(ResourceKey<Item> resourceKey) {
-			super(new Item.Properties().pickaxe(ToolMaterial.GOLD, 3f, 5f).customDamage(WEIRD_DAMAGE_HANDLER)
-					.cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE).setId(resourceKey));
+			super(buildProperties(resourceKey));
+		}
+
+		private static Item.Properties buildProperties(ResourceKey<Item> resourceKey) {
+			Item.Properties props = new Item.Properties().pickaxe(ToolMaterial.GOLD, 3f, 5f).setId(resourceKey);
+			((FabricItem.Properties) props).customDamage(WEIRD_DAMAGE_HANDLER);
+			((FabricItem.Properties) props).cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE);
+			return props;
 		}
 
 		@Override
