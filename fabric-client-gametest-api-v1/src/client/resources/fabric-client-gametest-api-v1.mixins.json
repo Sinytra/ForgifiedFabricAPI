@@ -11,7 +11,6 @@
     "gui.ScreenMixin",
     "input.GlCommandEncoderMixin",
     "input.InputConstantsMixin",
-    "input.KeyMappingAccessor",
     "input.KeyboardHandlerAccessor",
     "input.MinecraftMixin",
     "input.ScreenManagerMixin",
@@ -29,7 +28,8 @@
     "threading.MinecraftServerMixin",
     "threading.BlockableEventLoopMixin",
     "world.CreateWorldScreenMixin",
-    "world.GameRulesAccessor"
+    "world.GameRulesAccessor",
+    "MainMixin"
   ],
   "plugin": "net.fabricmc.fabric.impl.client.gametest.ClientGameTestMixinConfigPlugin",
   "injectors": {

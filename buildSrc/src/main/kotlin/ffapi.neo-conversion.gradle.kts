@@ -157,7 +157,7 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
         val mods: List<Mod>,
         val dependencies: Map<String, List<ModDependency>>,
         val mixins: List<Mixin>?,
-        val properties: Map<String, String>?
+        val modproperties: Map<String, Map<String, Any>>?
     )
 
     data class ModDependency(
@@ -267,11 +267,16 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                     throw RuntimeException("Unknown mixin config type $it")
                 }
             }
-            val properties =
-                if (json.getAsJsonObject("entrypoints")?.has("fabric-gametest") == true)
-                    mapOf("forgified-fabric-api:game-test-prefix" to originalModid)
-                else
-                    null
+            val allowedEntrypoints = listOf("fabric-client-gametest")
+            val modproperties = json.getAsJsonObject("entrypoints")
+                ?.takeIf { it.has("fabric-client-gametest") }
+                ?.let { 
+                    val entrypoints = mutableMapOf<String, List<String>>()
+                    allowedEntrypoints.forEach { key ->
+                        it.get(key)?.let { entrypoints[key] = it.asJsonArray.map { it.asString } }
+                    }
+                    mapOf<String, Map<String, Any>>(normalModid to mapOf("fabric:entrypoints" to entrypoints))
+                }
 
             val modsToml = ModsToml(
                 modLoader = if (containsCode) "javafml" else "lowcodefml",
@@ -283,7 +288,7 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                 mods,
                 dependencies = mapOf(normalModid to allDependencies),
                 mixins,
-                properties
+                modproperties
             )
             val modsTomlFile = output.resolve("META-INF/neoforge.mods.toml")
             modsTomlFile.deleteIfExists()

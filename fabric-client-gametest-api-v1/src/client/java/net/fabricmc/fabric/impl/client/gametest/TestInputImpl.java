@@ -37,7 +37,6 @@ import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.fabricmc.fabric.impl.client.gametest.util.WindowHooks;
-import net.fabricmc.fabric.mixin.client.gametest.input.KeyMappingAccessor;
 import net.fabricmc.fabric.mixin.client.gametest.input.KeyboardHandlerAccessor;
 import net.fabricmc.fabric.mixin.client.gametest.input.MouseHandlerAccessor;
 
@@ -339,7 +338,7 @@ public final class TestInputImpl implements TestInput {
 	}
 
 	private static InputConstants.Key getBoundKey(KeyMapping keyMapping, String action) {
-		InputConstants.Key boundKey = ((KeyMappingAccessor) keyMapping).getKey();
+		InputConstants.Key boundKey = keyMapping.getKey();
 
 		if (boundKey == InputConstants.UNKNOWN) {
 			throw new AssertionError("Cannot %s binding '%s' because it isn't bound to a key".formatted(action, keyMapping.getName()));

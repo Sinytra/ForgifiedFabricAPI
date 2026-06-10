@@ -5,24 +5,18 @@ loom {
 }
 
 sourceSets {
-	mixinConfig {
-		compileClasspath += configurations.loaderLibraries
-	}
-	client {
-		compileClasspath += mixinConfig.output
-		runtimeClasspath += mixinConfig.output
+	main {
+		java {
+			srcDir 'src/mixinConfig/java'
+		}
 	}
 }
 
-configurations {
-	clientImplementation.extendsFrom mixinConfigImplementation
-	clientRuntimeOnly.extendsFrom mixinConfigRuntimeOnly
-}
-
-dependencies {
-	mixinConfigImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-}
-
-jar {
-	from sourceSets.mixinConfig.output
+neoForge {
+	runs {
+		clientGametest {
+			client()
+			systemProperty 'fabric.client.gametest', 'true'
+		}
+	}
 }
