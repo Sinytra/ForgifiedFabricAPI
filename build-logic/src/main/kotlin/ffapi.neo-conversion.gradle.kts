@@ -267,9 +267,8 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                     throw RuntimeException("Unknown mixin config type $it")
                 }
             }
-            val allowedEntrypoints = listOf("fabric-client-gametest")
+            val allowedEntrypoints = listOf("fabric-client-gametest", "fabric-gametest")
             val modproperties = json.getAsJsonObject("entrypoints")
-                ?.takeIf { it.has("fabric-client-gametest") }
                 ?.let { 
                     val entrypoints = mutableMapOf<String, List<String>>()
                     allowedEntrypoints.forEach { key ->
@@ -277,6 +276,7 @@ abstract class GenerateForgeModMetadata : DefaultTask() {
                     }
                     mapOf<String, Map<String, Any>>(normalModid to mapOf("fabric:entrypoints" to entrypoints))
                 }
+                ?.takeIf { it.isNotEmpty() }
 
             val modsToml = ModsToml(
                 modLoader = if (containsCode) "javafml" else "lowcodefml",
