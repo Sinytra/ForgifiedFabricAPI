@@ -3,24 +3,20 @@
   "package": "net.fabricmc.fabric.mixin.item",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "AbstractFurnaceBlockEntityMixin",
     "AnvilMenuMixin",
-    "BrewingStandBlockEntityMixin",
     "BuiltInRegistriesMixin",
-    "CraftingRecipeMixin",
     "DataComponentInitializersMixin",
     "DataComponentInitializersPendingComponentsMixin",
     "DataComponentMapBuilderMixin",
     "EnchantCommandMixin",
     "EnchantmentBuilderAccessor",
     "EnchantmentBuilderMixin",
-    "EnchantmentHelperMixin",
     "EnchantRandomlyFunctionMixin",
     "ItemMixin",
     "ItemPropertiesMixin",
     "ItemStackMixin",
-    "LivingEntityMixin",
-    "ResourceManagerRegistryLoadTaskMixin"
+    "ResourceManagerRegistryLoadTaskMixin",
+    "IItemExtensionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

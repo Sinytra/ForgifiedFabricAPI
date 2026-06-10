@@ -53,7 +53,7 @@ include("fabric-debug-api-v1")
 //include 'fabric-events-interaction-v0'
 include("fabric-game-rule-api-v1")
 include("fabric-gametest-api-v1")
-//include 'fabric-item-api-v1'
+include("fabric-item-api-v1")
 include("fabric-key-mapping-api-v1")
 include("fabric-lifecycle-events-v1")
 include("fabric-loot-api-v3")

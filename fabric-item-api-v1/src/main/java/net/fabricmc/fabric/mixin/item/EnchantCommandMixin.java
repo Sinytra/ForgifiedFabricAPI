@@ -16,16 +16,13 @@
 
 package net.fabricmc.fabric.mixin.item;
 
-import java.util.Collection;
-
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
 import net.minecraft.server.commands.EnchantCommand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 
@@ -33,11 +30,11 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 
 @Mixin(EnchantCommand.class)
 abstract class EnchantCommandMixin {
-	@Redirect(
+	@WrapOperation(
 			method = "enchant",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/Enchantment;canEnchant(Lnet/minecraft/world/item/ItemStack;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;supportsEnchantment(Lnet/minecraft/core/Holder;)Z")
 	)
-	private static boolean callAllowEnchantingEvent(Enchantment instance, ItemStack stack, CommandSourceStack source, Collection<? extends Entity> targets, Holder<Enchantment> enchantment) {
-		return stack.canBeEnchantedWith(enchantment, EnchantingContext.ACCEPTABLE);
+	private static boolean callAllowEnchantingEvent(ItemStack instance, Holder<Enchantment> enchantment, Operation<Boolean> original) {
+		return instance.canBeEnchantedWith(enchantment, EnchantingContext.ACCEPTABLE) || original.call(instance, enchantment);
 	}
 }

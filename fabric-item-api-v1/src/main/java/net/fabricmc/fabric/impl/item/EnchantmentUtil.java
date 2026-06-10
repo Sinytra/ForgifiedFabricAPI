@@ -18,6 +18,8 @@ package net.fabricmc.fabric.impl.item;
 
 import java.util.List;
 
+import net.fabricmc.fabric.api.resource.v1.FabricResource;
+
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +79,11 @@ public class EnchantmentUtil {
 
 	public static EnchantmentSource determineSource(Resource resource) {
 		if (resource != null) {
-			PackSource packSource = resource.getFabricPackSource();
+			PackSource packSource = ((FabricResource) resource).getFabricPackSource();
 
 			if (packSource == PackSource.BUILT_IN) {
 				return EnchantmentSource.VANILLA;
-			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource) {
+			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource || resource.knownPackInfo().map(p -> !p.isVanilla()).orElse(false)) {
 				return EnchantmentSource.MOD;
 			}
 		}

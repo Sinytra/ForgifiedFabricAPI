@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.api.item.v1;
 
+import net.neoforged.neoforge.common.extensions.IItemStackExtension;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Holder;
@@ -30,7 +31,7 @@ import net.fabricmc.fabric.api.util.TriState;
  * Fabric-provided extensions for {@link ItemStack}.
  * This interface is automatically implemented on all item stacks via Mixin and interface injection.
  */
-public interface FabricItemStack {
+public interface FabricItemStack extends IItemStackExtension {
 	/**
 	 * Return a leftover item for use in recipes.
 	 *
@@ -41,7 +42,7 @@ public interface FabricItemStack {
 	 * @return the leftover item
 	 */
 	default @Nullable ItemStackTemplate getCraftingRemainder() {
-		return ((ItemStack) this).getItem().getCraftingRemainder((ItemStack) this);
+		return IItemStackExtension.super.getCraftingRemainder();
 	}
 
 	/**

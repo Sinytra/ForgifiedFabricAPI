@@ -16,11 +16,11 @@
 
 package net.fabricmc.fabric.mixin.item;
 
-import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Inventory;
@@ -40,14 +40,14 @@ abstract class AnvilMenuMixin extends ItemCombinerMenu {
 		super(type, syncId, playerInventory, context, forgingSlotsManager);
 	}
 
-	@Redirect(
-			method = "createResult",
+	@WrapOperation(
+			method = "createResultInternal",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/world/item/enchantment/Enchantment;canEnchant(Lnet/minecraft/world/item/ItemStack;)Z"
+					target = "Lnet/minecraft/world/item/ItemStack;supportsEnchantment(Lnet/minecraft/core/Holder;)Z"
 			)
 	)
-	private boolean callAllowEnchantingEvent(Enchantment instance, ItemStack stack, @Local(name = "enchantmentHolder") Holder<Enchantment> enchantmentHolder) {
-		return stack.canBeEnchantedWith(enchantmentHolder, EnchantingContext.ACCEPTABLE);
+	private boolean callAllowEnchantingEvent(ItemStack instance, Holder<Enchantment> registryEntry, Operation<Boolean> original) {
+		return instance.canBeEnchantedWith(registryEntry, EnchantingContext.ACCEPTABLE) || original.call(instance, registryEntry);
 	}
 }

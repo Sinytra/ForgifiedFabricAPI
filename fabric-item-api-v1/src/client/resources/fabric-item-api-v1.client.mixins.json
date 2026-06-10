@@ -3,9 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.item.client",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "MultiPlayerGameModeMixin",
-    "ItemInHandRendererMixin",
-    "ItemStackMixin"
+    "IItemExtensionClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
