@@ -1,14 +1,26 @@
-plugins {
-	id 'fabric-api.module'
-	id 'fabric-api.mixin-config'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file('src/client/resources/fabric-client-gametest-api-v1.classtweaker')
 }
 
-fabricApiModule {
-	moduleDependencies(
-		':fabric-networking-api-v1'
-	)
+moduleDependencies(project, [
+	':fabric-networking-api-v1'
+])
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/mixinConfig/java'
+		}
+	}
+}
+
+neoForge {
+	runs {
+		clientGametest {
+			client()
+			systemProperty 'fabric.client.gametest', 'true'
+		}
+	}
 }

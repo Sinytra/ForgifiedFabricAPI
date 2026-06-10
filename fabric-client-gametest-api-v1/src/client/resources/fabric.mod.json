@@ -17,7 +17,6 @@
   ],
   "depends": {
     "fabricloader": ">=0.19.3",
-    "fabric-resource-loader-v1": "*",
     "fabric-networking-api-v1": "*"
   },
   "description": "Allows registration of client game tests.",
