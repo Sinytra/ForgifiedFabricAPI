@@ -82,7 +82,7 @@ abstract class ReloadableServerRegistriesMixin {
 	}
 
 	@Inject(method = "lambda$scheduleRegistryLoad$0", at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
-	private static <T extends Validatable> void modifyLootTable(LootDataType<T> lootDataType, ResourceManager resourceManager, RegistryOps<JsonElement> registryOps, CallbackInfoReturnable<WritableRegistry<?>> cir, @Local(name = "elements") Map<Identifier, T> elements) {
+	private static <T extends Validatable> void modifyLootTable(LootDataType<T> lootDataType, RegistryOps<JsonElement> registryOps, ResourceManager resourceManager, CallbackInfoReturnable<WritableRegistry<?>> cir, @Local(name = "elements") Map<Identifier, T> elements) {
 		elements.replaceAll((identifier, t) -> modifyLootTable(t, identifier, registryOps));
 	}
 
@@ -109,12 +109,17 @@ abstract class ReloadableServerRegistriesMixin {
 		LootTable.Builder builder = FabricLootTableBuilder.copyOf(table);
 		LootTableEvents.MODIFY.invoker().modifyLootTable(key, builder, source, provider);
 
-		return (T) builder.build();
+		T newTable = (T) builder.build();
+		Identifier lootTableId = table.getLootTableId();
+		if (lootTableId != null) {
+			((LootTable) newTable).setLootTableId(lootTableId);
+		}
+		return newTable;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Inject(method = "lambda$scheduleRegistryLoad$0", at = @At("RETURN"))
-	private static <T extends Validatable> void onLootTablesLoaded(LootDataType<T> lootDataType, ResourceManager resourceManager, RegistryOps<JsonElement> registryOps, CallbackInfoReturnable<WritableRegistry<?>> cir) {
+	private static <T extends Validatable> void onLootTablesLoaded(LootDataType<T> lootDataType, RegistryOps<JsonElement> registryOps, ResourceManager resourceManager, CallbackInfoReturnable<WritableRegistry<?>> cir) {
 		if (lootDataType != LootDataType.TABLE) return;
 
 		Registry<LootTable> lootTableRegistry = (Registry<LootTable>) cir.getReturnValue();

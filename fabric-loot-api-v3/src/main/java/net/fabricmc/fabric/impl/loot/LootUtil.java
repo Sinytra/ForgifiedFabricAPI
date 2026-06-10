@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import net.fabricmc.fabric.api.resource.v1.FabricResource;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -38,11 +40,11 @@ public final class LootUtil {
 
 	public static LootTableSource determineSource(Resource resource) {
 		if (resource != null) {
-			PackSource packSource = resource.getFabricPackSource();
+			PackSource packSource = ((FabricResource) resource).getFabricPackSource();
 
 			if (packSource == PackSource.BUILT_IN) {
 				return LootTableSource.VANILLA;
-			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource) {
+			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource || resource.knownPackInfo().map(p -> !p.isVanilla()).orElse(false)) {
 				return LootTableSource.MOD;
 			}
 		}
