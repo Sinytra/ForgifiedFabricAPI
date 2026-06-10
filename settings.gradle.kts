@@ -47,7 +47,7 @@ include("fabric-content-registries-v0")
 //include 'fabric-creative-tab-api-v1'
 //include 'fabric-data-attachment-api-v1'
 //include 'fabric-data-generation-api-v1'
-//include 'fabric-debug-api-v1'
+//include("fabric-debug-api-v1")
 //include 'fabric-dimensions-v1'
 //include 'fabric-entity-events-v1'
 //include 'fabric-events-interaction-v0'
@@ -58,7 +58,7 @@ include("fabric-gametest-api-v1")
 include("fabric-lifecycle-events-v1")
 //include 'fabric-loot-api-v3'
 //include 'fabric-menu-api-v1'
-//include 'fabric-message-api-v1'
+include("fabric-message-api-v1")
 // //include 'fabric-model-loading-api-v1'
 //include 'fabric-networking-api-v1'
 //include 'fabric-object-builder-api-v1'
