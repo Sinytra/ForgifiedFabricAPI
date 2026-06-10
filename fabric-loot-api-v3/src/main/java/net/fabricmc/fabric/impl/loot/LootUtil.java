@@ -34,6 +34,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.fabricmc.fabric.api.loot.v3.FabricLootTableBuilder;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
+import net.fabricmc.fabric.api.resource.v1.FabricResource;
 import net.fabricmc.fabric.impl.resource.pack.BuiltinModPackSource;
 import net.fabricmc.fabric.impl.resource.pack.ModResourcePackCreator;
 
@@ -73,11 +74,11 @@ public final class LootUtil {
 
 	public static LootTableSource determineSource(Resource resource) {
 		if (resource != null) {
-			PackSource packSource = resource.getFabricPackSource();
+			PackSource packSource = ((FabricResource) resource).getFabricPackSource();
 
 			if (packSource == PackSource.BUILT_IN) {
 				return LootTableSource.VANILLA;
-			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource) {
+			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource || resource.knownPackInfo().map(p -> !p.isVanilla()).orElse(false)) {
 				return LootTableSource.MOD;
 			}
 		}
