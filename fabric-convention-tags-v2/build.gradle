@@ -13,26 +13,26 @@ testDependencies(project, [
 	':fabric-lifecycle-events-v1',
 ])
 
-fabricApi {
-	configureDataGeneration {
-		outputDirectory = file("src/generated/resources")
-		strictValidation = true
-		createSourceSet = true
-		modId = "fabric-convention-tags-v2-datagen"
-	}
-}
+//fabricApi {
+//	configureDataGeneration {
+//		outputDirectory = file("src/generated/resources")
+//		strictValidation = true
+//		createSourceSet = true
+//		modId = "fabric-convention-tags-v2-datagen"
+//	}
+//}
 
 dependencies {
-	datagenImplementation project(path: ":fabric-data-generation-api-v1")
+//	datagenImplementation project(path: ":fabric-data-generation-api-v1")
 }
 
 loom {
-	runs {
-		datagen {
-			name "Data Generation"
-			ideConfigGenerated = true
-		}
-	}
+//	runs {
+//		datagen {
+//			name "Data Generation"
+//			ideConfigGenerated = true
+//		}
+//	}
 }
 
-generateResources.dependsOn runDatagen
+//generateResources.dependsOn runDatagen
