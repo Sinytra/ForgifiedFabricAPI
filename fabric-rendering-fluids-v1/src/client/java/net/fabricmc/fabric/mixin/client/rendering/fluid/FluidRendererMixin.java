@@ -16,10 +16,11 @@
 
 package net.fabricmc.fabric.mixin.client.rendering.fluid;
 
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+
+import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderingRegistryImpl;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,8 +29,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
@@ -54,10 +53,8 @@ public class FluidRendererMixin {
 		}
 	}
 
-	@Definition(id = "HalfTransparentBlock", type = HalfTransparentBlock.class)
-	@Expression("? instanceof HalfTransparentBlock")
-	@ModifyExpressionValue(method = "tesselate", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private boolean modifyNonOverlayCheck(boolean original, @Local(name = "relativeBlock") Block block) {
-		return FluidRenderingRegistry.isBlockTransparent(block);
+	@ModifyExpressionValue(method = "tesselate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;shouldDisplayFluidOverlay(Lnet/minecraft/world/level/BlockAndLightGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/material/FluidState;)Z"))
+	private boolean modifyNonOverlayCheck(boolean original, @Local(name = "faceState") BlockState faceState) {
+		return FluidRenderingRegistryImpl.isBlockTransparent(faceState.getBlock(), original);
 	}
 }
