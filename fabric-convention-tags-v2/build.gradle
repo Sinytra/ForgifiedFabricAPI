@@ -17,6 +17,12 @@ fabricApiModule {
 	)
 }
 
+sourceSets {
+	main {
+		resources.srcDir 'src/generated/resources'
+	}
+}
+
 //fabricApi {
 //	configureDataGeneration {
 //		outputDirectory = file("src/generated/resources")

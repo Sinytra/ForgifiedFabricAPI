@@ -51,16 +51,16 @@ dependencies {
     "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
     "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
-    
+
     if (project.name != "fabric-gametest-api-v1") {
         "testmodImplementation"(project(":fabric-gametest-api-v1"))
     }
 }
 
 tasks {
-    afterEvaluate { 
+    afterEvaluate {
         named<Jar>("jar") {
-            manifest { 
+            manifest {
                 attributes(
                     "Implementation-Version" to project.version
                 )
@@ -93,6 +93,14 @@ modDev.apply {
 
             // Enable the gametest runner
             systemProperty("neoforge.enableGameTest", "true")
+        }
+
+        create("gametestClient") {
+            client()
+            sourceSet = testmod
+
+            // Enable the gametest runner
+            systemProperty("fabric.client.gametest", "true")
         }
 
         create("testmodClient") {
