@@ -1,13 +1,9 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file('src/main/resources/fabric-block-api-v1.classtweaker')
 }
 
-fabricApiModule {
-	testDependencies(
-		':fabric-rendering-v1',
-	)
-}
+testDependencies(project, [
+//	':fabric-rendering-v1',
+])

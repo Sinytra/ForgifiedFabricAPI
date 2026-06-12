@@ -38,7 +38,7 @@ include("fabric-api-base")
 
 //include 'fabric-api-lookup-api-v1'
 //include 'fabric-biome-api-v1'
-//include 'fabric-block-api-v1'
+include("fabric-block-api-v1")
 include("fabric-block-getter-api-v2")
 include("fabric-client-gametest-api-v1")
 include("fabric-command-api-v2")
