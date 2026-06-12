@@ -13,6 +13,12 @@ testDependencies(project, [
 	':fabric-lifecycle-events-v1',
 ])
 
+sourceSets {
+	main {
+		resources.srcDir 'src/generated/resources'
+	}
+}
+
 //fabricApi {
 //	configureDataGeneration {
 //		outputDirectory = file("src/generated/resources")
