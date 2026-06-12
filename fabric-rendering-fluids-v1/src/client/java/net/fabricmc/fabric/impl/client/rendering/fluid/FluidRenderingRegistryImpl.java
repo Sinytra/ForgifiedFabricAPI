@@ -74,6 +74,10 @@ public final class FluidRenderingRegistryImpl {
 	public static boolean isBlockTransparent(Block block) {
 		return TRANSPARENCY_FOR_OVERLAY.getOrDefault(block, block instanceof HalfTransparentBlock || block instanceof LeavesBlock);
 	}
+	
+	public static boolean isBlockTransparent(Block block, boolean defaultValue) {
+		return TRANSPARENCY_FOR_OVERLAY.getOrDefault(block, defaultValue);
+	}
 
 	public static Map<Fluid, FluidModel.Unbaked> getUnbakedModels() {
 		return Collections.unmodifiableMap(MODELS);
