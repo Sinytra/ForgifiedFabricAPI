@@ -27,6 +27,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -54,8 +56,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.permission.v1.MutablePermissionContext;
 import net.fabricmc.fabric.api.permission.v1.PermissionContext;
 import net.fabricmc.fabric.api.permission.v1.PermissionEvents;
@@ -83,7 +83,12 @@ public class PermissionTestMod implements ModInitializer, PermissionEvents.OnReq
 
 		this.runBasicTest();
 		ServerLifecycleEvents.SERVER_STARTED.register(this::runServerTest);
-		ServerPlayConnectionEvents.JOIN.register(this::runPlayerTest);
+
+		NeoForge.EVENT_BUS.addListener(EntityJoinLevelEvent.class, e -> {
+			if (e.getEntity() instanceof ServerPlayer serverPlayer) {
+				runPlayerTest(serverPlayer.connection);
+			}
+		});
 	}
 
 	private void runBasicTest() {
@@ -118,7 +123,7 @@ public class PermissionTestMod implements ModInitializer, PermissionEvents.OnReq
 	}
 
 	@SuppressWarnings("ConstantValue")
-	private void runPlayerTest(ServerGamePacketListenerImpl listener, PacketSender packetSender, MinecraftServer server) {
+	private void runPlayerTest(ServerGamePacketListenerImpl listener) {
 		if (listener.player.getPermissionContext().permissionLevel() == null) {
 			throw new IllegalStateException("Player entity permission level is null!");
 		}
