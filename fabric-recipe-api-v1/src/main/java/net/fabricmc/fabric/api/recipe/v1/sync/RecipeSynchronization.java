@@ -38,7 +38,7 @@ public final class RecipeSynchronization {
 	 * Event phase used for sending recipes to the client. It runs after the default event phase {@link Event#DEFAULT_PHASE}.
 	 * It's defined for {@link ServerLifecycleEvents#SYNC_DATA_PACK_CONTENTS} event.
 	 */
-	public static final Identifier RECIPE_SYNC_EVENT_PHASE = RecipeSyncImpl.RECIPE_SYNC_EVENT_PHASE;
+	public static final Identifier RECIPE_SYNC_EVENT_PHASE = Identifier.fromNamespaceAndPath("fabric", "recipe_sync");
 
 	private RecipeSynchronization() {
 	}

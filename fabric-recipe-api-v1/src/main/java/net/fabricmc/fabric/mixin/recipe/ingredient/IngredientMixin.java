@@ -16,105 +16,30 @@
 
 package net.fabricmc.fabric.mixin.recipe.ingredient;
 
-import java.util.Optional;
-
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import org.spongepowered.asm.mixin.Final;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.core.HolderSet;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
-import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
-import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
-import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientStreamCodec;
-import net.fabricmc.fabric.impl.recipe.ingredient.OptionalCustomIngredientStreamCodec;
+import net.fabricmc.fabric.impl.recipe.ingredient.compat.FabricICustomIngredientWrapper;
+import net.fabricmc.fabric.impl.recipe.ingredient.compat.NeoCustomIngredientWrapper;
 
 @Mixin(Ingredient.class)
 public class IngredientMixin implements FabricIngredient {
-	@Mutable
+	@Nullable
 	@Shadow
-	@Final
-	public static Codec<Ingredient> CODEC;
-
-	@Shadow
-	@Final
-	private HolderSet<Item> values;
-
-	@ModifyExpressionValue(
-			method = "<clinit>",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/network/codec/StreamCodec;map(Ljava/util/function/Function;Ljava/util/function/Function;)Lnet/minecraft/network/codec/StreamCodec;",
-					ordinal = 0
-			)
-	)
-	private static StreamCodec<RegistryFriendlyByteBuf, Ingredient> useCustomIngredientStreamCodec(StreamCodec<RegistryFriendlyByteBuf, Ingredient> original) {
-		return new CustomIngredientStreamCodec(original);
-	}
-
-	@ModifyExpressionValue(
-			method = "<clinit>",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/network/codec/StreamCodec;map(Ljava/util/function/Function;Ljava/util/function/Function;)Lnet/minecraft/network/codec/StreamCodec;",
-					ordinal = 1
-			)
-	)
-	private static StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> useOptionalCustomIngredientStreamCodec(StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> original) {
-		return new OptionalCustomIngredientStreamCodec(original);
-	}
-
-	@Inject(method = "<clinit>", at = @At("TAIL"))
-	private static void injectCodec(CallbackInfo ci) {
-		Codec<CustomIngredient> customIngredientCodec = CustomIngredientImpl.CODEC.dispatch(
-				CustomIngredientImpl.TYPE_KEY,
-				CustomIngredient::getSerializer,
-				CustomIngredientSerializer::getCodec);
-
-		CODEC = Codec.either(customIngredientCodec, CODEC).xmap(
-				either -> either.map(CustomIngredient::toVanilla, ingredient -> ingredient),
-				ingredient -> {
-					CustomIngredient customIngredient = ingredient.getCustomIngredient();
-					return customIngredient == null ? Either.right(ingredient) : Either.left(customIngredient);
-				}
-		);
-	}
-
-	// Targets the lambdas in the codecs which extract the entries from an ingredient.
-	// For custom ingredients, these lambdas will only be invoked when the client does not support this ingredient.
-	// In this case, use CustomIngredientImpl#getCustomMatchingItems, which as close as we can get.
-	@Inject(method = {"lambda$static$4", "lambda$static$2", "lambda$static$0"}, at = @At("HEAD"), cancellable = true)
-	private static void onGetEntries(Ingredient ingredient, CallbackInfoReturnable<HolderSet<Item>> cir) {
-		if (ingredient instanceof CustomIngredientImpl customIngredient) {
-			cir.setReturnValue(HolderSet.direct(customIngredient.getCustomMatchingItems()));
-		}
-	}
-
-	@Inject(method = "equals(Ljava/lang/Object;)Z", at = @At("HEAD"), cancellable = true)
-	private void onHeadEquals(Object obj, CallbackInfoReturnable<Boolean> cir) {
-		if (obj instanceof CustomIngredientImpl) {
-			// This will only get called when this isn't custom and other is custom, in which case the
-			// ingredients can never be equal.
-			cir.setReturnValue(false);
-		}
-	}
+	private ICustomIngredient customIngredient;
 
 	@Override
-	public int hashCode() {
-		return values.hashCode();
+	public @Nullable CustomIngredient getCustomIngredient() {
+		return customIngredient != null
+				? customIngredient instanceof NeoCustomIngredientWrapper(
+				CustomIngredient ingredient
+		) ? ingredient : new FabricICustomIngredientWrapper(customIngredient)
+				: null;
 	}
 }

@@ -6,10 +6,9 @@
     "RecipeAccessMixin",
     "RecipeManagerMixin",
     "ingredient.IngredientMixin",
-    "ingredient.ShapelessRecipeMixin",
+    "ingredient.IngredientCodecsMixin",
     "sync.ConnectionMixin",
     "sync.RecipeMapMixin",
-    "sync.ServerCommonPacketListenerImplAccessor",
     "sync.RecipeManagerAccessor"
   ],
   "injectors": {
