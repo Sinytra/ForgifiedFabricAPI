@@ -6,11 +6,9 @@
     "BlockBehaviourBlockStateBaseMixin",
     "ItemStackMixin",
     "PlayerAdvancementsMixin",
-    "PlayerMixin",
     "ServerGamePacketListenerImplMixin",
     "ServerPlayerGameModeMixin",
-    "ServerGamePacketListenerImplMixin",
-    "ServerPlayerMixin"
+    "ServerGamePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1

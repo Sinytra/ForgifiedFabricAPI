@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.event.interaction.client;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,18 +29,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -50,9 +41,6 @@ public abstract class MinecraftMixin {
 
 	@Shadow
 	public LocalPlayer player;
-
-	@Shadow
-	public abstract ClientPacketListener getConnection();
 
 	@Shadow
 	@Final
@@ -65,33 +53,6 @@ public abstract class MinecraftMixin {
 	@Shadow
 	@Nullable
 	public ClientLevel level;
-
-	@Inject(
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"
-			),
-			method = "startUseItem",
-			cancellable = true
-	)
-	private void injectUseEntityCallback(CallbackInfo ci, @Local(name = "hand") InteractionHand hand, @Local(name = "entityHit") EntityHitResult hitResult, @Local(name = "entity") Entity entity) {
-		InteractionResult result = UseEntityCallback.EVENT.invoker().interact(player, player.level(), hand, entity, hitResult);
-
-		if (result != InteractionResult.PASS) {
-			if (result.consumesAction()) {
-				Vec3 hitVec = hitResult.getLocation().subtract(entity.getX(), entity.getY(), entity.getZ());
-				getConnection().send(new ServerboundInteractPacket(entity.getId(), hand, hitVec, player.isShiftKeyDown()));
-			}
-
-			if (result instanceof InteractionResult.Success success) {
-				if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
-					player.swing(hand);
-				}
-			}
-
-			ci.cancel();
-		}
-	}
 
 	@Inject(
 			method = "handleKeybinds",
