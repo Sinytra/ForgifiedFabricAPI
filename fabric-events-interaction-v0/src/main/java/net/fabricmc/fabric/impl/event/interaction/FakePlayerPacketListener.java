@@ -26,9 +26,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-import net.fabricmc.fabric.impl.networking.UntrackedPacketListener;
-
-public final class FakePlayerPacketListener extends ServerGamePacketListenerImpl implements UntrackedPacketListener {
+public final class FakePlayerPacketListener extends ServerGamePacketListenerImpl {
 	private static final Connection FAKE_CONNECTION = new FakeConnection();
 
 	public FakePlayerPacketListener(ServerPlayer player) {
