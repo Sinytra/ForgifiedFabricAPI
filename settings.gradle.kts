@@ -78,5 +78,5 @@ include("fabric-sound-api-v1")
 include("fabric-tag-api-v1")
 //include 'fabric-transfer-api-v1'
 //include 'fabric-transitive-access-wideners-v1'
-//include 'deprecated'
-//include 'deprecated:fabric-resource-loader-v0'
+include("deprecated")
+include("deprecated:fabric-resource-loader-v0")
