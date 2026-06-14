@@ -3,8 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.object.builder.client",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "HangingSignEditScreenMixin",
-    "SignEditScreenMixin"
+    "WoodTypeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

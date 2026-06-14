@@ -61,7 +61,7 @@ include("fabric-loot-api-v3")
 include("fabric-message-api-v1")
 // //include 'fabric-model-loading-api-v1'
 //include 'fabric-networking-api-v1'
-//include 'fabric-object-builder-api-v1'
+include("fabric-object-builder-api-v1")
 //include 'fabric-particles-v1'
 include("fabric-permission-api-v1")
 include("fabric-recipe-api-v1")
