@@ -133,10 +133,10 @@ public final class FabricEntityDataRegistryImpl {
 					.attribute(RegistryAttribute.SYNCED)
 					.buildAndRegister();
 
-			RegistryIdRemapCallback.event(handlerRegistry).register(state -> {
-				storeExternalHandlers();
-				reorderHandlers();
-			});
+//			RegistryIdRemapCallback.event(handlerRegistry).register(state -> {
+//				storeExternalHandlers();
+//				reorderHandlers();
+//			});
 		}
 
 		Registry.register(handlerRegistry, id, handler);

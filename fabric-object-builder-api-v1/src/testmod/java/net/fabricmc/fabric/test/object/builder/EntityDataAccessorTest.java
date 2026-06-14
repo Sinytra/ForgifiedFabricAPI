@@ -17,10 +17,14 @@
 package net.fabricmc.fabric.test.object.builder;
 
 import java.util.Optional;
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
 import net.minecraft.core.GlobalPos;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -49,10 +53,10 @@ public class EntityDataAccessorTest implements ModInitializer {
 	static EntityDataSerializer<Optional<DyeColor>> OPTIONAL_DYE_COLOR = EntityDataSerializer.forValueType(DyeColor.STREAM_CODEC.apply(ByteBufCodecs::optional));
 
 	private static final ResourceKey<EntityType<?>> TRACK_STACK_KEY = ResourceKey.create(Registries.ENTITY_TYPE, ObjectBuilderTestConstants.id("track_stack"));
-	public static EntityType<TrackStackEntity> TRACK_STACK_ENTITY = FabricEntityType.Builder.createMob(TrackStackEntity::new, MobCategory.MISC, builder -> builder.defaultAttributes(Mob::createMobAttributes))
+	public static Supplier<EntityType<TrackStackEntity>> TRACK_STACK_ENTITY = Suppliers.memoize(() -> FabricEntityType.Builder.createMob(TrackStackEntity::new, MobCategory.MISC, builder -> builder.defaultAttributes(Mob::createMobAttributes))
 			.sized(0.4f, 2.8f)
 			.clientTrackingRange(10)
-			.build(TRACK_STACK_KEY);
+			.build(TRACK_STACK_KEY));
 
 	@Override
 	public void onInitialize() {
@@ -67,6 +71,9 @@ public class EntityDataAccessorTest implements ModInitializer {
 			FabricEntityDataRegistry.register(GLOBAL_POS_ID, GLOBAL_POS);
 		}
 
-		Registry.register(BuiltInRegistries.ENTITY_TYPE, TRACK_STACK_KEY, TRACK_STACK_ENTITY);
+		IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+		bus.addListener(RegisterEvent.class, e -> {
+			e.register(Registries.ENTITY_TYPE, TRACK_STACK_KEY.identifier(), (Supplier) TRACK_STACK_ENTITY);
+		});
 	}
 }

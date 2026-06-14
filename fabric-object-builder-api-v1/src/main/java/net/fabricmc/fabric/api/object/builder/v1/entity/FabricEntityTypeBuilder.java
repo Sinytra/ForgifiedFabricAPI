@@ -337,7 +337,7 @@ public class FabricEntityTypeBuilder<T extends Entity> {
 		}
 
 		if (this.forceTrackedVelocityUpdates != null) {
-			builder = builder.alwaysUpdateVelocity(this.forceTrackedVelocityUpdates);
+			builder = ((FabricEntityType.Builder<T>) builder).alwaysUpdateVelocity(this.forceTrackedVelocityUpdates);
 		}
 
 		return builder.build(key);
