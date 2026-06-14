@@ -57,7 +57,7 @@ include("fabric-item-api-v1")
 include("fabric-key-mapping-api-v1")
 include("fabric-lifecycle-events-v1")
 include("fabric-loot-api-v3")
-//include 'fabric-menu-api-v1'
+include("fabric-menu-api-v1")
 include("fabric-message-api-v1")
 // //include 'fabric-model-loading-api-v1'
 //include 'fabric-networking-api-v1'

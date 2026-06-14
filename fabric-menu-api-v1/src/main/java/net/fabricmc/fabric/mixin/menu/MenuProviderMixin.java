@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.mixin.menu;
 
+import net.neoforged.neoforge.common.extensions.IMenuProviderExtension;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.world.MenuProvider;
@@ -23,5 +24,9 @@ import net.minecraft.world.MenuProvider;
 import net.fabricmc.fabric.api.menu.v1.FabricMenuProvider;
 
 @Mixin(MenuProvider.class)
-public interface MenuProviderMixin extends FabricMenuProvider {
+public interface MenuProviderMixin extends IMenuProviderExtension, FabricMenuProvider {
+	@Override
+	default boolean shouldTriggerClientSideContainerClosingOnOpen() {
+		return shouldCloseCurrentScreen();
+	}
 }
