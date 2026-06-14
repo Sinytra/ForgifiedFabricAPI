@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.test.lookup.entity;
 
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -44,8 +47,9 @@ public class FabricEntityApiLookupTest {
 			.build(INSPECTABLE_PIG_KEY);
 
 	public static void onInitialize() {
-		Registry.register(BuiltInRegistries.ENTITY_TYPE, INSPECTABLE_PIG_KEY, INSPECTABLE_PIG);
-		FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes());
+		Registry.register(BuiltInRegistries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspectable_pig"), INSPECTABLE_PIG);
+		ModLoadingContext.get().getActiveContainer().getEventBus()
+				.addListener(FMLCommonSetupEvent.class, e -> FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes()));
 
 		INSPECTABLE.registerSelf(INSPECTABLE_PIG);
 		INSPECTABLE.registerForTypes(
