@@ -16,11 +16,17 @@
 
 package net.fabricmc.fabric.test.lookup.client.entity;
 
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+
 import net.fabricmc.fabric.test.lookup.entity.FabricEntityApiLookupTest;
 
 public class FabricEntityApiLookupTestClient {
 	public static void onInitializeClient() {
-		EntityRendererRegistry.register(FabricEntityApiLookupTest.INSPECTABLE_PIG, InspectablePigRenderer::new);
+		IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+		bus.addListener(EntityRenderersEvent.RegisterRenderers.class, event -> {
+			event.registerEntityRenderer(FabricEntityApiLookupTest.INSPECTABLE_PIG, InspectablePigRenderer::new);
+		});
 	}
 }

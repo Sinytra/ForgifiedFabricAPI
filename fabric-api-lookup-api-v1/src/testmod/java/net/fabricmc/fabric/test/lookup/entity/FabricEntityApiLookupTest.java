@@ -34,6 +34,9 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.test.lookup.FabricApiLookupTest;
 import net.fabricmc.fabric.test.lookup.api.Inspectable;
 
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+
 public class FabricEntityApiLookupTest {
 	public static final ResourceKey<EntityType<?>> INSPECTABLE_PIG_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspectable_pig"));
 	public static final EntityApiLookup<Inspectable, Void> INSPECTABLE =
@@ -47,8 +50,9 @@ public class FabricEntityApiLookupTest {
 			.build(INSPECTABLE_PIG_KEY);
 
 	public static void onInitialize() {
-		Registry.register(BuiltInRegistries.ENTITY_TYPE, INSPECTABLE_PIG_KEY, INSPECTABLE_PIG);
-		FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes());
+		Registry.register(BuiltInRegistries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(FabricApiLookupTest.MOD_ID, "inspectable_pig"), INSPECTABLE_PIG);
+		ModLoadingContext.get().getActiveContainer().getEventBus()
+				.addListener(FMLCommonSetupEvent.class, e -> FabricDefaultAttributeRegistry.register(INSPECTABLE_PIG, Pig.createAttributes()));
 
 		INSPECTABLE.registerSelf(INSPECTABLE_PIG);
 		INSPECTABLE.registerForTypes(

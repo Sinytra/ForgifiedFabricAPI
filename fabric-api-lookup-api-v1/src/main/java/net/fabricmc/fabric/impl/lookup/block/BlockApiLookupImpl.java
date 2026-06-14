@@ -36,7 +36,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.lookup.v1.custom.ApiLookupMap;
 import net.fabricmc.fabric.api.lookup.v1.custom.ApiProviderMap;
-import net.fabricmc.fabric.mixin.lookup.BlockEntityTypeAccessor;
 
 public final class BlockApiLookupImpl<A, C> implements BlockApiLookup<A, C> {
 	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-api-lookup-api-v1/block");
@@ -110,7 +109,7 @@ public final class BlockApiLookupImpl<A, C> implements BlockApiLookup<A, C> {
 	@Override
 	public void registerSelf(BlockEntityType<?>... blockEntityTypes) {
 		for (BlockEntityType<?> blockEntityType : blockEntityTypes) {
-			Block supportBlock = ((BlockEntityTypeAccessor) blockEntityType).getBlocks().iterator().next();
+			Block supportBlock = blockEntityType.getValidBlocks().iterator().next();
 			Objects.requireNonNull(supportBlock, "Could not get a support block for block entity type.");
 			BlockEntity blockEntity = blockEntityType.create(BlockPos.ZERO, supportBlock.defaultBlockState());
 			Objects.requireNonNull(blockEntity, "Instantiated block entity may not be null.");
@@ -164,7 +163,7 @@ public final class BlockApiLookupImpl<A, C> implements BlockApiLookup<A, C> {
 				}
 			};
 
-			Block[] blocks = ((BlockEntityTypeAccessor) blockEntityType).getBlocks().toArray(new Block[0]);
+			Block[] blocks = blockEntityType.getValidBlocks().toArray(new Block[0]);
 			registerForBlocks(nullCheckedProvider, blocks);
 		}
 	}
