@@ -46,19 +46,6 @@ public class WorldDimensionsMixin {
 	@Unique
 	private static final ScopedValue<Registry<LevelStem>> REGISTRY = ScopedValue.newInstance();
 
-	/**
-	 * Fix the issue that cannot load world after uninstalling a dimension mod/datapack.
-	 * After uninstalling a dimension mod/datapack, the dimension config in `level.dat` file cannot be deserialized.
-	 * The solution is to make it fail-soft.
-	 */
-	@Redirect(method = "lambda$static$0", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder$Instance;group(Lcom/mojang/datafixers/kinds/App;)Lcom/mojang/datafixers/Products$P1;"))
-	private static Products.P1 useFailSoftMap(RecordCodecBuilder.Instance instance, App app) {
-		return instance.group(
-				new FailSoftMapCodec<>(ResourceKey.codec(Registries.LEVEL_STEM), LevelStem.CODEC)
-						.fieldOf("dimensions").forGetter(WorldDimensions::dimensions)
-		);
-	}
-
 	@WrapMethod(method = "bake")
 	private WorldDimensions.Complete wrapBakeToProvideContext(Registry<LevelStem> baseDimensions, Operation<WorldDimensions.Complete> original) {
 		return ScopedValue.where(REGISTRY, baseDimensions).call(() -> original.call(baseDimensions));
