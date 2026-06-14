@@ -18,6 +18,8 @@ package net.fabricmc.fabric.api.menu.v1;
 
 import java.util.Objects;
 
+import net.neoforged.neoforge.network.IContainerFactory;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.MenuProvider;
@@ -27,6 +29,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 
 // TODO: This example needs an overhaul
+
 /**
  * A {@link MenuType} for an extended menus that
  * synchronizes additional data to the client when it is opened.
@@ -59,7 +62,7 @@ import net.minecraft.world.inventory.MenuType;
  * public class OvenMenu extends AbstractContainerMenu {
  * 	public OvenMenu(int syncId) {
  * 		super(MyMenus.OVEN, syncId);
- * 	}
+ *    }
  * }
  *
  * // Opening the extended menu
@@ -83,7 +86,7 @@ public class ExtendedMenuType<T extends AbstractContainerMenu, D> extends MenuTy
 	 * @param factory the menu factory used for {@link #create(int, Inventory, Object)}
 	 */
 	public ExtendedMenuType(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> streamCodec) {
-		super(null, FeatureFlags.VANILLA_SET);
+		super(new ExtendedMenuContainerFactory<>(factory, streamCodec), FeatureFlags.VANILLA_SET);
 		this.factory = Objects.requireNonNull(factory, "menu factory cannot be null");
 		this.streamCodec = Objects.requireNonNull(streamCodec, "stream codec cannot be null");
 	}
@@ -101,9 +104,9 @@ public class ExtendedMenuType<T extends AbstractContainerMenu, D> extends MenuTy
 	/**
 	 * Creates a new menu using the extra opening data.
 	 *
-	 * @param containerId    the container ID
-	 * @param inventory the player inventory
-	 * @param data      the synced opening data
+	 * @param containerId the container ID
+	 * @param inventory   the player inventory
+	 * @param data        the synced opening data
 	 * @return the created menu
 	 */
 	public T create(int containerId, Inventory inventory, D data) {
@@ -132,11 +135,21 @@ public class ExtendedMenuType<T extends AbstractContainerMenu, D> extends MenuTy
 		/**
 		 * Creates a new menu with additional screen opening data.
 		 *
-		 * @param containerId    the container ID
-		 * @param inventory the player inventory
-		 * @param data      the synced data
+		 * @param containerId the container ID
+		 * @param inventory   the player inventory
+		 * @param data        the synced data
 		 * @return the created menu
 		 */
 		T create(int containerId, Inventory inventory, D data);
+	}
+
+	private record ExtendedMenuContainerFactory<T extends AbstractContainerMenu, D>(
+			ExtendedFactory<T, D> factory,
+			StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) implements IContainerFactory<T> {
+		@Override
+		public T create(int syncId, Inventory inventory, RegistryFriendlyByteBuf buf) {
+			D data = buf == null ? null : packetCodec.decode(buf);
+			return factory.create(syncId, inventory, data);
+		}
 	}
 }
