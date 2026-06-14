@@ -26,7 +26,7 @@ masterSourceSets.forEach { sourceSet ->
         outputDir.set(targetDir)
         fabricModJson.set(modMetadataJson)
         testEnvironment = sourceSet.name == "testmod"
-        includeVersion.set(project.parent?.name == "deprecated")
+        includeVersion.set(false)
     }
     sourceSet.java.srcDir(task)
     val cleanTask = tasks.register(sourceSet.getTaskName("clean", baseTaskName), Delete::class.java) {
