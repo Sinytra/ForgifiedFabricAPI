@@ -3,10 +3,6 @@
   "package": "net.fabricmc.fabric.mixin.dimension",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "WorldDimensionsMixin",
-    "V2832Mixin",
-    "TaggedChoiceMixin",
-    "TaggedChoiceTaggedChoiceTypeMixin",
     "DimensionTypeAccessor",
     "MappedRegistryAccessor",
     "RegistryAccessImmutableRegistryAccessMixin"
