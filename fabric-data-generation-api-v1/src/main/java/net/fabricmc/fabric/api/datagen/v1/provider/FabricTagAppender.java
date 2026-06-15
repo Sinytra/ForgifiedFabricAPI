@@ -19,76 +19,95 @@ package net.fabricmc.fabric.api.datagen.v1.provider;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import net.neoforged.neoforge.common.extensions.ITagAppenderExtension;
+
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.tags.TagKey;
+
+import net.fabricmc.fabric.impl.datagen.ForcedTagEntry;
 
 /**
  * Interface-injected to {@link net.minecraft.data.tags.TagAppender}.
  */
 @SuppressWarnings("unchecked")
-public interface FabricTagAppender<E, T> {
+public interface FabricTagAppender<E, T> extends ITagAppenderExtension<E, T> {
 	/**
 	 * Sets the value of the {@code replace} flag. When set to {@code true}
 	 * this tag will replace contents of any other tag.
+	 *
 	 * @param replace whether to replace the contents of the tag
 	 * @return this, for chaining
 	 */
 	default TagAppender<E, T> setReplace(boolean replace) {
-		throw new AssertionError("Implemented via mixin");
+		replace(replace);
+		return (TagAppender<E, T>) this;
 	}
 
 	/**
 	 * Forces a tag key into the tag, bypassing any errors resulting from the
 	 * tag not existing at runtime.
+	 *
 	 * @param tag The tag to force into the contents of the tag
 	 * @return this, for chaining
 	 */
 	default TagAppender<E, T> forceAddTag(TagKey<T> tag) {
-		throw new AssertionError("Implemented via mixin");
+		add(new ForcedTagEntry(tag.location()));
+		return (TagAppender<E, T>) this;
 	}
 
 	/**
 	 * Removes an entry from the tag.
+	 *
 	 * @param element The entry to remove from the contents of the tag
 	 * @return this, for chaining
 	 */
-	default TagAppender<E, T> remove(E element) {
-		throw new AssertionError("Implemented via mixin");
-	}
+	TagAppender<E, T> remove(final E element);
 
 	/**
 	 * Removes multiple entries from the tag.
+	 *
 	 * @param elements The entries to remove from the contents of the tag
 	 * @return this, for chaining
 	 */
 	default TagAppender<E, T> remove(final E... elements) {
-		throw new AssertionError("Implemented via mixin");
+		for (E element : elements) {
+			remove(element);
+		}
+		return (TagAppender<E, T>) this;
 	}
 
 	/**
 	 * Removes multiple entries from the tag.
+	 *
 	 * @param elements The entries to remove from the contents of the tag
 	 * @return this, for chaining
 	 */
 	default TagAppender<E, T> removeAll(final Collection<E> elements) {
-		throw new AssertionError("Implemented via mixin");
+		for (E element : elements) {
+			remove(element);
+		}
+		return (TagAppender<E, T>) this;
 	}
 
 	/**
 	 * Removes multiple entries from the tag.
+	 *
 	 * @param elements The entries to remove from the contents of the tag
 	 * @return this, for chaining
 	 */
 	default TagAppender<E, T> removeAll(final Stream<E> elements) {
-		throw new AssertionError("Implemented via mixin");
+		elements.forEach(this::remove);
+		return (TagAppender<E, T>) this;
 	}
 
 	/**
 	 * Removes all entries of the specified tag from the tag.
+	 *
 	 * @param tag The tag to remove from the contents of the tag
 	 * @return this, for chaining
 	 */
 	default TagAppender<E, T> removeTag(TagKey<T> tag) {
-		throw new AssertionError("Implemented via mixin");
+		remove(tag);
+		return (TagAppender<E, T>) this;
 	}
 }

@@ -1,12 +1,17 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:true"
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_charcoal": {
+    "has_stick": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": "minecraft:charcoal"
+            "items": "minecraft:stick"
           }
         ]
       }
@@ -14,19 +19,19 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fabric-data-gen-api-v1-testmod:torch"
+        "recipe": "fabric_data_gen_api_v1_testmod:diamond"
       }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_charcoal"
+      "has_stick"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:torch"
+      "fabric_data_gen_api_v1_testmod:diamond"
     ]
   }
 }

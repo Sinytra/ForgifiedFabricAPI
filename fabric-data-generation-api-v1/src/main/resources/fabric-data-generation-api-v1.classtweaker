@@ -62,6 +62,7 @@ transitive-inject-interface	net/minecraft/data/tags/TagAppender	net/fabricmc/fab
 ### Generated access wideners below
 
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildRecipes	()V
+transitive-accessible	method	net/minecraft/data/recipes/packs/VanillaRecipeProvider	buildRecipes	()V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateForEnabledBlockFamilies	(Lnet/minecraft/world/flag/FeatureFlagSet;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	oneToOneConversionRecipe	(Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	oneToOneConversionRecipe	(Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;I)V
@@ -357,6 +358,7 @@ transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	create
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createCandleDrops	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createCandleCakeDrops	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	generate	()V
+transitive-accessible	method	net/minecraft/data/loot/packs/VanillaBlockLoot	generate	()V
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	addNetherVinesDropTable	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createDoorTable	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	dropPottedContents	(Lnet/minecraft/world/level/block/Block;)V

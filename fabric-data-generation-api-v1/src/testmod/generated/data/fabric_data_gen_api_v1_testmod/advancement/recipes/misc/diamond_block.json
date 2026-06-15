@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_payment": {
+    "has_pickaxe": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": "#minecraft:beacon_payment_items"
+            "items": "minecraft:diamond_pickaxe"
           }
         ]
       }
@@ -14,19 +14,19 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fabric-data-gen-api-v1-testmod:beacon"
+        "recipe": "fabric_data_gen_api_v1_testmod:diamond_block"
       }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_payment"
+      "has_pickaxe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:beacon"
+      "fabric_data_gen_api_v1_testmod:diamond_block"
     ]
   }
 }

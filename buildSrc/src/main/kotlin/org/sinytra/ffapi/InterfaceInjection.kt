@@ -35,10 +35,26 @@ object InterfaceInjection {
             }
 
             override fun visitInjectedInterface(owner: String, iface: String, transitive: Boolean) {
-                interfaces.computeIfAbsent(owner) { mutableListOf() }.add(iface)
+                val converted = convertGenerics(iface)
+                interfaces.computeIfAbsent(owner) { mutableListOf() }.add(converted)
             }
         }).read(reader, "official")
 
         return interfaces
+    }
+
+    private fun convertGenerics(name: String): String {
+        val open = name.indexOf('<')
+        if (open == -1) return name
+        val close = name.lastIndexOf('>')
+
+        val stripped = name.substring(open + 1, close)
+            .split(';')
+            .filter { it.isNotEmpty() }
+            .joinToString(",") { param ->
+                if (param.startsWith("T")) param.drop(1) else param
+            }
+
+        return name.substring(0, open) + "<" + stripped + ">"
     }
 }

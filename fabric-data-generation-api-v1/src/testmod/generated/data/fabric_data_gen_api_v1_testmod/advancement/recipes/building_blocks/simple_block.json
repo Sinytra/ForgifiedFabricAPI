@@ -1,21 +1,12 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:registry_contains",
-      "registry": "minecraft:item",
-      "values": [
-        "minecraft:diamond_block"
-      ]
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_frame": {
+    "has_log": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": "minecraft:item_frame"
+            "items": "#minecraft:acacia_logs"
           }
         ]
       }
@@ -23,19 +14,19 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fabric-data-gen-api-v1-testmod:diamond_ore"
+        "recipe": "fabric_data_gen_api_v1_testmod:simple_block"
       }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_frame"
+      "has_log"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:diamond_ore"
+      "fabric_data_gen_api_v1_testmod:simple_block"
     ]
   }
 }

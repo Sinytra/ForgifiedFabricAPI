@@ -10,7 +10,7 @@ moduleDependencies(project, [
 
 testDependencies(project, [
 	':fabric-creative-tab-api-v1',
-    ':fabric-object-builder-api-v1'
+	':fabric-object-builder-api-v1'
 ])
 
 dependencies {
@@ -28,28 +28,29 @@ sourceSets {
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabric-data-generation-api-v1.classtweaker")
+}
 
+neoForge {
 	runs {
 		datagen {
-			inherit testmodServer
-			name "Data Generation"
-			vmArg "-Dfabric-api.datagen"
-			vmArg "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
-			vmArg "-Dfabric-api.datagen.strict-validation"
+			server()
+			ideName = "Data Generation"
+			jvmArgument "-Dfabric-api.datagen"
+			jvmArgument "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
+			jvmArgument "-Dfabric-api.datagen.strict-validation"
 
-			ideConfigGenerated = true
-			runDir "build/datagen"
+			gameDirectory = file("build/datagen")
+			sourceSet = sourceSets.testmod
 		}
 		datagenClient {
 			client()
-			name "Data Generation Client"
-			vmArg "-Dfabric-api.datagen"
-			vmArg "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
-			vmArg "-Dfabric-api.datagen.strict-validation"
+			ideName = "Data Generation Client"
+			jvmArgument "-Dfabric-api.datagen"
+			jvmArgument "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
+			jvmArgument "-Dfabric-api.datagen.strict-validation"
 
-			ideConfigGenerated = true
-			runDir "build/datagen"
-			source sourceSets.testmodClient
+			gameDirectory = file("build/datagen")
+			sourceSet = sourceSets.testmod
 		}
 	}
 }
@@ -81,7 +82,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 tasks.register('generateClassTweaker') {
-	inputs.files(loom.getNamedMinecraftJars())
+//	inputs.files(loom.getNamedMinecraftJars())
 
 	doLast {
 		// Use parent provider to get the jar before the AWs are applied
@@ -106,7 +107,7 @@ tasks.register('generateClassTweaker') {
 
 		visitMethods(classes["net/minecraft/client/data/models/BlockModelGenerators"]) { name, desc, owner ->
 			if (desc == "()V")
-				// Skip over methods that dont take any arguments, as they are specific to minecraft.
+			// Skip over methods that dont take any arguments, as they are specific to minecraft.
 				return
 
 			out += "transitive-accessible\tmethod\t${owner}\t${name}\t${desc}\n"
@@ -169,7 +170,7 @@ static def getClasses(List<File> inputs) {
 	Map<String, ClassNode> classes = new TreeMap<>()
 
 	for (File input : inputs) {
-		new ZipFile(input).withCloseable { ZipFile zip  ->
+		new ZipFile(input).withCloseable { ZipFile zip ->
 			zip.entries().toList().forEach { ZipEntry entry ->
 				if (!entry.name.endsWith(".class")) {
 					return

@@ -1,17 +1,12 @@
 {
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:true"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_stick": {
+    "has_payment": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": "minecraft:stick"
+            "items": "#minecraft:beacon_payment_items"
           }
         ]
       }
@@ -19,19 +14,19 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "fabric-data-gen-api-v1-testmod:diamond"
+        "recipe": "fabric_data_gen_api_v1_testmod:beacon"
       }
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_stick"
+      "has_payment"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:diamond"
+      "fabric_data_gen_api_v1_testmod:beacon"
     ]
   }
 }
