@@ -47,6 +47,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.registries.RegistryPatchGenerator;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -85,6 +86,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricEntityLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagAppender;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableSubProvider;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
@@ -237,6 +239,9 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 									Ingredient.of(Items.IRON_INGOT, Items.GOLD_INGOT, Items.DIAMOND)))
 							.unlockedBy("has_payment", has(ItemTags.BEACON_PAYMENT_ITEMS))
 							.save(this.output);
+
+					// Test stonecutting
+					stonecutterResultFromBase(RecipeCategory.BUILDING_BLOCKS, SIMPLE_BLOCK, Items.GLASS);
 				}
 			};
 		}
@@ -300,17 +305,16 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider registries) {
-			valueLookupBuilder(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK);
+			wrap(valueLookupBuilder(BlockTags.FIRE)).setReplace(true).add(SIMPLE_BLOCK);
 			valueLookupBuilder(BlockTags.DIRT).add(SIMPLE_BLOCK);
-			valueLookupBuilder(BlockTags.ACACIA_LOGS).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
+			wrap(valueLookupBuilder(BlockTags.ACACIA_LOGS)).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
 
 			aliasGroup("flowers")
 					.add(BlockTags.FLOWERS, BlockTags.FLOWER_POTS);
 			aliasGroup(Identifier.fromNamespaceAndPath("other_namespace", "flowers"))
 					.add(BlockTags.FLOWERS, BlockTags.FLOWER_POTS);
 
-			valueLookupBuilder(BlockTags.SUPPORTS_WARPED_FUNGUS)
-					.remove(Blocks.SOUL_SOIL)
+			wrap(valueLookupBuilder(BlockTags.SUPPORTS_WARPED_FUNGUS).remove(Blocks.SOUL_SOIL))
 					.removeTag(BlockTags.DIRT);
 
 			((ITagAppenderExtension<Block, ?>) valueLookupBuilder(BlockTags.NEEDS_DIAMOND_TOOL))
@@ -323,6 +327,10 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.add(Blocks.BLUE_GLAZED_TERRACOTTA)
 					.add(Blocks.BROWN_GLAZED_TERRACOTTA)
 					.remove(Blocks.BLUE_GLAZED_TERRACOTTA);
+		}
+		
+		private <A extends TagAppender<E, T> & FabricTagAppender<E, T>, E, T> A wrap(TagAppender<E, T> appender) {
+			return (A) appender;
 		}
 	}
 
