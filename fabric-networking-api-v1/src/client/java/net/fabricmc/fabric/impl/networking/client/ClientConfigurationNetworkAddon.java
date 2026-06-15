@@ -34,7 +34,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ServerboundConfigurationChan
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
 import net.fabricmc.fabric.impl.networking.RegistrationPayload;
-import net.fabricmc.fabric.mixin.networking.client.accessor.ClientCommonPacketListenerImplAccessor;
 import net.fabricmc.fabric.mixin.networking.client.accessor.ClientConfigurationPacketListenerImplAccessor;
 
 public final class ClientConfigurationNetworkAddon extends ClientCommonNetworkAddon<ClientConfigurationNetworking.ConfigurationPayloadHandler<?>, ClientConfigurationPacketListenerImpl> {
@@ -43,7 +42,7 @@ public final class ClientConfigurationNetworkAddon extends ClientCommonNetworkAd
 	private boolean hasStarted;
 
 	public ClientConfigurationNetworkAddon(ClientConfigurationPacketListenerImpl listener, Minecraft client) {
-		super(ClientNetworkingImpl.CONFIGURATION, ((ClientCommonPacketListenerImplAccessor) listener).getConnection(), "ClientPlayNetworkAddon for " + ((ClientConfigurationPacketListenerImplAccessor) listener).getLocalGameProfile().name(), listener, client);
+		super(ClientNetworkingImpl.CONFIGURATION, listener.getConnection(), "ClientPlayNetworkAddon for " + ((ClientConfigurationPacketListenerImplAccessor) listener).getLocalGameProfile().name(), listener, client);
 		this.context = new ContextImpl(client, listener, this);
 
 		// Must register pending channels via lateinit
@@ -131,7 +130,7 @@ public final class ClientConfigurationNetworkAddon extends ClientCommonNetworkAd
 	}
 
 	public ChannelInfoHolder getChannelInfoHolder() {
-		return (ChannelInfoHolder) ((ClientCommonPacketListenerImplAccessor) listener).getConnection();
+		return (ChannelInfoHolder) listener.getConnection();
 	}
 
 	private record ContextImpl(Minecraft client, ClientConfigurationPacketListenerImpl packetListener, PacketSender responseSender) implements ClientConfigurationNetworking.Context {

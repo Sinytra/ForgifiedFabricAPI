@@ -23,6 +23,7 @@ import java.util.function.Function;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.netty.buffer.ByteBuf;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -176,9 +177,9 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 		startConfiguration();
 	}
 
-	@WrapOperation(method = "handleConfigurationFinished", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/RegistryFriendlyByteBuf;decorator(Lnet/minecraft/core/RegistryAccess;)Ljava/util/function/Function;"))
-	private Function<ByteBuf, RegistryFriendlyByteBuf> bindChannelInfo(RegistryAccess registryManager, Operation<Function<ByteBuf, RegistryFriendlyByteBuf>> original) {
-		return original.call(registryManager).andThen(registryByteBuf -> {
+	@WrapOperation(method = "handleConfigurationFinished", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/RegistryFriendlyByteBuf;decorator(Lnet/minecraft/core/RegistryAccess;Lnet/neoforged/neoforge/network/connection/ConnectionType;)Ljava/util/function/Function;"))
+	private Function<ByteBuf, RegistryFriendlyByteBuf> bindChannelInfo(RegistryAccess registryManager, ConnectionType connectionType, Operation<Function<ByteBuf, RegistryFriendlyByteBuf>> original) {
+		return original.call(registryManager, connectionType).andThen(registryByteBuf -> {
 			FabricRegistryFriendlyByteBuf fabricRegistryFriendlyByteBuf = (FabricRegistryFriendlyByteBuf) registryByteBuf;
 			fabricRegistryFriendlyByteBuf.fabric_setSendableConfigurationChannels(Set.copyOf(addon.getSendableChannels()));
 			return registryByteBuf;
