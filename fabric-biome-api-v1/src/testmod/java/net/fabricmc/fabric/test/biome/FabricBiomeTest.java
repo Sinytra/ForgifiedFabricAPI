@@ -20,6 +20,7 @@ import static net.fabricmc.fabric.test.biome.DataGeneratorEntrypoint.PLACED_COMM
 import static net.fabricmc.fabric.test.biome.DataGeneratorEntrypoint.PLACED_COMMON_ORE;
 
 import com.google.common.base.Preconditions;
+import net.neoforged.neoforge.data.loading.DatagenModLoader;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -53,6 +54,10 @@ public class FabricBiomeTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		if (DatagenModLoader.isRunningDataGen()) {				
+			return;
+		}
+
 		Preconditions.checkArgument(NetherBiomes.canGenerateInNether(Biomes.NETHER_WASTES));
 		Preconditions.checkArgument(!NetherBiomes.canGenerateInNether(Biomes.END_HIGHLANDS));
 

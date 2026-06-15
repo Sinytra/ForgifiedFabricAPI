@@ -303,3 +303,10 @@ fun testDependencies(project: Project, depNames: List<String>) {
         }
     }
 }
+
+neoForge.runs {
+    named("client") {
+        sourceSet = sourceSets.named("main")
+        loadedMods.set(loadedMods.map { it.filterNot { it.name.contains("testmod") } }.get())
+    }
+}

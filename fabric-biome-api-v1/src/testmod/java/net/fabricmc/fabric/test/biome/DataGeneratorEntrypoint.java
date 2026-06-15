@@ -16,36 +16,16 @@
 
 package net.fabricmc.fabric.test.biome;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.OreFeature;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraft.world.level.levelgen.placement.BiomeFilter;
-import net.minecraft.world.level.levelgen.placement.CountPlacement;
-import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
-import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.structure.StructureSet;
-import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+//import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint {
+public class DataGeneratorEntrypoint {
 	public static final ResourceKey<Feature> COMMON_DESERT_WELL = ResourceKey.create(
 			Registries.FEATURE,
 			Identifier.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "fab_desert_well")
@@ -67,64 +47,64 @@ public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.
 			Identifier.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "test")
 	);
 
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-		FabricDataGenerator.Pack pack = dataGenerator.createPack();
-		pack.addProvider(WorldgenProvider::new);
-		pack.addProvider(TestBiomeTagsProvider::new);
-	}
-
-	@Override
-	public void buildRegistry(RegistrySetBuilder registryBuilder) {
-		registryBuilder.add(Registries.FEATURE, this::bootstrapFeatures);
-		registryBuilder.add(Registries.PLACED_FEATURE, this::bootstrapPlacedFeatures);
-		registryBuilder.add(Registries.BIOME, TestBiomes::bootstrap);
-		registryBuilder.add(Registries.LEVEL_STEM, this::bootstrapLevelStems);
-	}
-
-	private void bootstrapFeatures(BootstrapContext<Feature> context) {
-		context.register(COMMON_DESERT_WELL, new OreFeature(new TagMatchTest(BlockTags.SAND), Blocks.SANDSTONE.defaultBlockState(), 1));
-
-		context.register(COMMON_ORE, new OreFeature(new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Blocks.DIAMOND_BLOCK.defaultBlockState(), 5));
-	}
-
-	private void bootstrapPlacedFeatures(BootstrapContext<PlacedFeature> context) {
-		HolderGetter<Feature> features = context.lookup(Registries.FEATURE);
-		Holder<Feature> commonDesertWell = features.getOrThrow(COMMON_DESERT_WELL);
-
-		// The placement config is taken from the vanilla desert well, but no randomness
-		PlacementUtils.register(context, PLACED_COMMON_DESERT_WELL, commonDesertWell,
-				InSquarePlacement.spread(),
-				PlacementUtils.HEIGHTMAP,
-				BiomeFilter.biome()
-		);
-
-		PlacementUtils.register(context, PLACED_COMMON_ORE, features.getOrThrow(COMMON_ORE),
-				CountPlacement.of(25),
-				HeightRangePlacement.uniform(
-					VerticalAnchor.BOTTOM,
-					VerticalAnchor.TOP
-				)
-		);
-	}
-
-	private void bootstrapLevelStems(BootstrapContext<LevelStem> context) {
-		HolderGetter<DimensionType> dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);
-		HolderGetter<Biome> biomes = context.lookup(Registries.BIOME);
-		HolderGetter<StructureSet> structureSets = context.lookup(Registries.STRUCTURE_SET);
-		HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
-		context.register(
-				TEST_LEVEL_STEM,
-				new LevelStem(
-						dimensionTypes.getOrThrow(BuiltinDimensionTypes.OVERWORLD),
-						new FlatLevelSource(
-								FlatLevelGeneratorSettings.getDefault(
-										biomes,
-										structureSets,
-										placedFeatures
-								)
-						)
-				)
-		);
-	}
+//	@Override
+//	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
+//		FabricDataGenerator.Pack pack = dataGenerator.createPack();
+//		pack.addProvider(WorldgenProvider::new);
+//		pack.addProvider(TestBiomeTagsProvider::new);
+//	}
+//
+//	@Override
+//	public void buildRegistry(RegistrySetBuilder registryBuilder) {
+//		registryBuilder.add(Registries.FEATURE, this::bootstrapFeatures);
+//		registryBuilder.add(Registries.PLACED_FEATURE, this::bootstrapPlacedFeatures);
+//		registryBuilder.add(Registries.BIOME, TestBiomes::bootstrap);
+//		registryBuilder.add(Registries.LEVEL_STEM, this::bootstrapLevelStems);
+//	}
+//
+//	private void bootstrapFeatures(BootstrapContext<Feature> context) {
+//		context.register(COMMON_DESERT_WELL, new OreFeature(new TagMatchTest(BlockTags.SAND), Blocks.SANDSTONE.defaultBlockState(), 1));
+//
+//		context.register(COMMON_ORE, new OreFeature(new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Blocks.DIAMOND_BLOCK.defaultBlockState(), 5));
+//	}
+//
+//	private void bootstrapPlacedFeatures(BootstrapContext<PlacedFeature> context) {
+//		HolderGetter<Feature> features = context.lookup(Registries.FEATURE);
+//		Holder<Feature> commonDesertWell = features.getOrThrow(COMMON_DESERT_WELL);
+//
+//		// The placement config is taken from the vanilla desert well, but no randomness
+//		PlacementUtils.register(context, PLACED_COMMON_DESERT_WELL, commonDesertWell,
+//				InSquarePlacement.spread(),
+//				PlacementUtils.HEIGHTMAP,
+//				BiomeFilter.biome()
+//		);
+//
+//		PlacementUtils.register(context, PLACED_COMMON_ORE, features.getOrThrow(COMMON_ORE),
+//				CountPlacement.of(25),
+//				HeightRangePlacement.uniform(
+//					VerticalAnchor.BOTTOM,
+//					VerticalAnchor.TOP
+//				)
+//		);
+//	}
+//
+//	private void bootstrapLevelStems(BootstrapContext<LevelStem> context) {
+//		HolderGetter<DimensionType> dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);
+//		HolderGetter<Biome> biomes = context.lookup(Registries.BIOME);
+//		HolderGetter<StructureSet> structureSets = context.lookup(Registries.STRUCTURE_SET);
+//		HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
+//		context.register(
+//				TEST_LEVEL_STEM,
+//				new LevelStem(
+//						dimensionTypes.getOrThrow(BuiltinDimensionTypes.OVERWORLD),
+//						new FlatLevelSource(
+//								FlatLevelGeneratorSettings.getDefault(
+//										biomes,
+//										structureSets,
+//										placedFeatures
+//								)
+//						)
+//				)
+//		);
+//	}
 }

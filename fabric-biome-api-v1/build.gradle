@@ -1,31 +1,27 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabric-biome-api-v1.classtweaker")
 }
 
-fabricApiModule {
-	testDependencies(
-		':fabric-api-base',
-		':fabric-resource-loader-v1',
-		':fabric-registry-sync-v0',
-		':fabric-data-generation-api-v1'
-	)
-}
+testDependencies(project, [
+	':fabric-api-base',
+	':fabric-resource-loader-v1',
+	':fabric-registry-sync-v0',
+//	':fabric-data-generation-api-v1'
+])
 
-fabricApi {
-	configureDataGeneration {
-		outputDirectory = file("src/testmod/generated")
-		addToResources = false
-		strictValidation = true
-	}
-}
+//fabricApi {
+//	configureDataGeneration {
+//		outputDirectory = file("src/testmod/generated")
+//		addToResources = false
+//		strictValidation = true
+//	}
+//}
 
-runDatagen {
-	outputs.dir("src/testmod/generated")
-}
+//runDatagen {
+//	outputs.dir("src/testmod/generated")
+//}
 
 sourceSets {
 	testmod {
@@ -37,14 +33,14 @@ sourceSets {
 	}
 }
 
-loom {
-	runs {
-		datagen {
-			displayName = "Data Generation"
-			sourceSet = sourceSets.testmod.name
-			generateRunConfig = true
-		}
-	}
-}
+//loom {
+//	runs {
+//		datagen {
+//			name "Data Generation"
+//			source sourceSets.testmod
+//			ideConfigGenerated = true
+//		}
+//	}
+//}
 
-generateResources.dependsOn runDatagen
+//generateResources.dependsOn runDatagen
