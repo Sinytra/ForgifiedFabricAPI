@@ -1,6 +1,4 @@
 import net.fabricmc.fabric.impl.build.AbstractGenerateClassTweakerTask
-
-import org.gradle.api.tasks.TaskAction
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
@@ -10,20 +8,18 @@ plugins {
 	id 'fabric-api.module'
 }
 
-fabricApiModule {
-	moduleDependencies(
-		'fabric-convention-tags-v2',
-		'fabric-recipe-api-v1',
-		'fabric-registry-sync-v0',
-		'fabric-resource-conditions-api-v1',
-		'fabric-tag-api-v1',
-	)
+moduleDependencies(
+	'fabric-convention-tags-v2',
+	'fabric-recipe-api-v1',
+	'fabric-registry-sync-v0',
+	'fabric-resource-conditions-api-v1',
+	'fabric-tag-api-v1',
+)
 
-	testDependencies(
-		':fabric-creative-tab-api-v1',
-		':fabric-object-builder-api-v1'
-	)
-}
+testDependencies(project, [
+	':fabric-creative-tab-api-v1',
+	':fabric-object-builder-api-v1'
+])
 
 dependencies {
 }
@@ -40,28 +36,29 @@ sourceSets {
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabric-data-generation-api-v1.classtweaker")
+}
 
+neoForge {
 	runs {
 		datagen {
-			inherit testmodServer
-			displayName = "Data Generation"
-			systemProperties.put("fabric-api.datagen", "")
-			systemProperties.put("fabric-api.datagen.output-dir", "${file("src/testmod/generated")}")
-			systemProperties.put("fabric-api.datagen.strict-validation", "")
+			server()
+			ideName = "Data Generation"
+			jvmArgument "-Dfabric-api.datagen"
+			jvmArgument "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
+			jvmArgument "-Dfabric-api.datagen.strict-validation"
 
-			generateRunConfig = true
-			runDirectory = file("build/datagen")
+			gameDirectory = file("build/datagen")
+			sourceSet = sourceSets.testmod
 		}
 		datagenClient {
 			client()
-			displayName = "Data Generation Client"
-			systemProperties.put("fabric-api.datagen", "")
-			systemProperties.put("fabric-api.datagen.output-dir", "${file("src/testmod/generated")}")
-			systemProperties.put("fabric-api.datagen.strict-validation", "")
+			ideName = "Data Generation Client"
+			jvmArgument "-Dfabric-api.datagen"
+			jvmArgument "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
+			jvmArgument "-Dfabric-api.datagen.strict-validation"
 
-			generateRunConfig = true
-			runDirectory = file("build/datagen")
-			sourceSet = sourceSets.testmodClient.name
+			gameDirectory = file("build/datagen")
+			sourceSet = sourceSets.testmod
 		}
 	}
 }

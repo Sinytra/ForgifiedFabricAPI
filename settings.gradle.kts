@@ -46,7 +46,7 @@ include("fabric-content-registries-v0")
 include("fabric-convention-tags-v2")
 include("fabric-creative-tab-api-v1")
 //include 'fabric-data-attachment-api-v1'
-//include 'fabric-data-generation-api-v1'
+include("fabric-data-generation-api-v1")
 include("fabric-debug-api-v1")
 include("fabric-dimensions-v1")
 //include 'fabric-entity-events-v1'

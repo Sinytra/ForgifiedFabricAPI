@@ -53,6 +53,7 @@ import net.minecraft.world.level.block.Block;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.tag.FabricTagKey;
 
 /**
  * Extend this class and implement {@link FabricLanguageProvider#generateTranslations}.
@@ -243,7 +244,7 @@ public abstract class FabricLanguageProvider implements DataProvider {
 		 * @param value  the value of the entry
 		 */
 		default void add(TagKey<?> tagKey, String value) {
-			add(tagKey.getTranslationKey(), value);
+			add(((FabricTagKey) (Object) tagKey).getTranslationKey(), value);
 		}
 
 		/**

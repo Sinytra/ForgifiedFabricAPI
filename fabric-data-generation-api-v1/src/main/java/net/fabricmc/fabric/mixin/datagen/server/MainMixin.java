@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.server.Bootstrap;
 import net.minecraft.server.Main;
 
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
@@ -30,6 +31,7 @@ public class MainMixin {
 	@Inject(method = "main", at = @At(value = "NEW", target = "net/minecraft/server/dedicated/DedicatedServerSettings"), cancellable = true)
 	private static void main(String[] args, CallbackInfo info) {
 		if (FabricDataGenHelper.ENABLED) {
+			Bootstrap.bootStrap();
 			FabricDataGenHelper.run();
 			info.cancel();
 		}

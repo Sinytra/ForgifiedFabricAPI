@@ -30,6 +30,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.advancements.Advancement;
@@ -85,14 +86,14 @@ public abstract class FabricRecipeProvider implements DataProvider {
 		Preconditions.checkArgument(conditions.length > 0, "Must add at least one condition.");
 		return new RecipeOutput() {
 			@Override
-			public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
+			public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... forgeConditions) {
 				FabricDataGenHelper.addConditions(recipe, conditions);
 
 				if (advancementHolder != null) {
-					FabricDataGenHelper.addConditions(advancementHolder.value(), conditions);
+					FabricDataGenHelper.addConditions(advancement.value(), conditions);
 				}
 
-				output.accept(key, recipe, advancementHolder);
+				output.accept(key, recipe, advancement);
 			}
 
 			@Override
