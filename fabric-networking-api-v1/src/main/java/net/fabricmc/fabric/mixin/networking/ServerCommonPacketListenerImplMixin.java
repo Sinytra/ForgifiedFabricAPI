@@ -51,13 +51,13 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 		final CustomPacketPayload payload = packet.payload();
 
 		try {
-			boolean handled;
+			boolean handled = false;
 
 			if (getAddon() instanceof ServerConfigurationNetworkAddon addon) {
 				handled = addon.handle(payload);
 			} else {
 				// Play should be handled in ServerGamePacketListenerImplMixin
-				throw new IllegalStateException("Unknown addon");
+//				throw new IllegalStateException("Unknown addon");
 			}
 
 			if (handled) {

@@ -30,7 +30,8 @@
     "accessor.PacketDecoderAccessor",
     "accessor.PacketEncoderAccessor",
     "accessor.ServerCommonPacketListenerImplAccessor",
-    "accessor.ServerLoginPacketListenerImplAccessor"
+    "accessor.ServerLoginPacketListenerImplAccessor",
+    "NetworkRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -25,6 +25,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.netty.channel.ChannelFutureListener;
+import net.neoforged.neoforge.network.payload.MinecraftRegisterPayload;
+import net.neoforged.neoforge.network.payload.MinecraftUnregisterPayload;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.network.Connection;
@@ -76,16 +78,16 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 		this.logger.debug("Handling inbound packet from channel with name \"{}\"", channelName);
 
 		// Handle reserved packets
-		if (payload instanceof RegistrationPayload registrationPayload) {
-			if (NetworkingImpl.REGISTER_CHANNEL.equals(channelName)) {
-				this.receiveRegistration(true, registrationPayload);
-				return true;
-			}
-
-			if (NetworkingImpl.UNREGISTER_CHANNEL.equals(channelName)) {
-				this.receiveRegistration(false, registrationPayload);
-				return true;
-			}
+		if (payload instanceof MinecraftRegisterPayload registrationPayload) {
+			this.receiveRegistration(true, new RegistrationPayload(RegistrationPayload.REGISTER,
+					new ArrayList<>(registrationPayload.newChannels())));
+			return true;
+		}
+		
+		if (payload instanceof MinecraftUnregisterPayload unregisterPayload) {
+			this.receiveRegistration(false, new RegistrationPayload(RegistrationPayload.UNREGISTER,
+					new ArrayList<>(unregisterPayload.forgottenChannels())));
+			return true;
 		}
 
 		@Nullable H handler = this.getHandler(channelName);
@@ -113,7 +115,7 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 	protected abstract void receive(H handler, CustomPacketPayload payload);
 
 	protected void sendInitialChannelRegistrationPacket() {
-		final RegistrationPayload payload = createRegistrationPayload(RegistrationPayload.REGISTER, this.getReceivableChannels());
+		final CustomPacketPayload payload = createRegistrationPayload(RegistrationPayload.REGISTER, this.getReceivableChannels());
 
 		if (payload != null) {
 			this.sendPacket(payload);
@@ -121,12 +123,13 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 	}
 
 	@Nullable
-	protected RegistrationPayload createRegistrationPayload(CustomPacketPayload.Type<RegistrationPayload> type, Collection<Identifier> channels) {
+	protected CustomPacketPayload createRegistrationPayload(CustomPacketPayload.Type<RegistrationPayload> type, Set<Identifier> channels) {
 		if (channels.isEmpty()) {
 			return null;
 		}
 
-		return new RegistrationPayload(type, new ArrayList<>(channels));
+		return type == RegistrationPayload.REGISTER ? new MinecraftRegisterPayload(channels)
+				: new MinecraftUnregisterPayload(channels);
 	}
 
 	// wrap in try with res (buf)

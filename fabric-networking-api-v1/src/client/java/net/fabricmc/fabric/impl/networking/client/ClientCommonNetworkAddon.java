@@ -21,6 +21,7 @@ import java.util.Collections;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.impl.networking.AbstractChanneledNetworkAddon;
@@ -48,7 +49,7 @@ abstract class ClientCommonNetworkAddon<H, T extends ClientCommonPacketListenerI
 	protected void handleRegistration(Identifier channelName) {
 		// If we can already send packets, immediately send the register packet for this channel
 		if (this.isServerReady) {
-			final RegistrationPayload payload = this.createRegistrationPayload(RegistrationPayload.REGISTER, Collections.singleton(channelName));
+			final CustomPacketPayload payload = this.createRegistrationPayload(RegistrationPayload.REGISTER, Collections.singleton(channelName));
 
 			if (payload != null) {
 				this.sendPacket(payload);
@@ -60,7 +61,7 @@ abstract class ClientCommonNetworkAddon<H, T extends ClientCommonPacketListenerI
 	protected void handleUnregistration(Identifier channelName) {
 		// If we can already send packets, immediately send the unregister packet for this channel
 		if (this.isServerReady) {
-			final RegistrationPayload payload = this.createRegistrationPayload(RegistrationPayload.UNREGISTER, Collections.singleton(channelName));
+			final CustomPacketPayload payload = this.createRegistrationPayload(RegistrationPayload.UNREGISTER, Collections.singleton(channelName));
 
 			if (payload != null) {
 				this.sendPacket(payload);
