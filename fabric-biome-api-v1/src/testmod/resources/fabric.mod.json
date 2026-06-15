@@ -12,7 +12,7 @@
     "main": [
       "net.fabricmc.fabric.test.biome.FabricBiomeTest"
     ],
-    "fabric-datagen": [
+    "fabric-datagen_old": [
       "net.fabricmc.fabric.test.biome.DataGeneratorEntrypoint"
     ]
   }

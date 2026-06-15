@@ -37,6 +37,8 @@ import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.biome.v1.NetherBiomes;
 import net.fabricmc.fabric.api.biome.v1.TheEndBiomes;
 
+import net.neoforged.neoforge.data.loading.DatagenModLoader;
+
 /**
  * <b>NOTES FOR TESTING:</b>
  * When running with this test-mod, also test this when running a dedicated server since there
@@ -52,6 +54,10 @@ public class FabricBiomeTest implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		if (DatagenModLoader.isRunningDataGen()) {				
+			return;
+		}
+
 		Preconditions.checkArgument(NetherBiomes.canGenerateInNether(Biomes.NETHER_WASTES));
 		Preconditions.checkArgument(!NetherBiomes.canGenerateInNether(Biomes.END_HIGHLANDS));
 

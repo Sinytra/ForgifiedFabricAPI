@@ -44,7 +44,7 @@ import net.minecraft.world.level.biome.TheEndBiomeSource;
 
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 
-@Mixin(TheEndBiomeSource.class)
+@Mixin(value = TheEndBiomeSource.class, priority = 1500)
 public class TheEndBiomeSourceMixin extends BiomeSourceMixin {
 	@Shadow
 	@Mutable

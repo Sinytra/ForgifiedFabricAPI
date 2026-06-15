@@ -5,13 +5,10 @@
   "mixins": [
     "BiomeSourceMixin",
     "NoiseChunkMixin",
-    "MultiNoiseBiomeSourceMixin",
     "ClimateSamplerMixin",
     "NetherBiomePresetMixin",
     "RandomStateMixin",
-    "TheEndBiomeSourceMixin",
-    "modification.RegistryAccessImmutableRegistryAccessMixin",
-    "modification.MinecraftServerMixin"
+    "TheEndBiomeSourceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

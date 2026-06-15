@@ -38,9 +38,9 @@ import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+//import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint {
+public class DataGeneratorEntrypoint {
 	public static final ResourceKey<ConfiguredFeature<?, ?>> COMMON_DESERT_WELL = ResourceKey.create(
 			Registries.CONFIGURED_FEATURE,
 			Identifier.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "fab_desert_well")
@@ -57,45 +57,45 @@ public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.
 			Registries.PLACED_FEATURE,
 			Identifier.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "common_ore")
 	);
-
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-		FabricDataGenerator.Pack pack = dataGenerator.createPack();
-		pack.addProvider(WorldgenProvider::new);
-		pack.addProvider(TestBiomeTagsProvider::new);
-	}
-
-	@Override
-	public void buildRegistry(RegistrySetBuilder registryBuilder) {
-		registryBuilder.add(Registries.CONFIGURED_FEATURE, this::bootstrapConfiguredFeatures);
-		registryBuilder.add(Registries.PLACED_FEATURE, this::bootstrapPlacedFeatures);
-		registryBuilder.add(Registries.BIOME, TestBiomes::bootstrap);
-	}
-
-	private void bootstrapConfiguredFeatures(BootstrapContext<ConfiguredFeature<?, ?>> context) {
-		FeatureUtils.register(context, COMMON_DESERT_WELL, Feature.DESERT_WELL);
-
-		OreConfiguration featureConfig = new OreConfiguration(new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Blocks.DIAMOND_BLOCK.defaultBlockState(), 5);
-		FeatureUtils.register(context, COMMON_ORE, Feature.ORE, featureConfig);
-	}
-
-	private void bootstrapPlacedFeatures(BootstrapContext<PlacedFeature> context) {
-		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
-		Holder<ConfiguredFeature<?, ?>> commonDesertWell = configuredFeatures.getOrThrow(COMMON_DESERT_WELL);
-
-		// The placement config is taken from the vanilla desert well, but no randomness
-		PlacementUtils.register(context, PLACED_COMMON_DESERT_WELL, commonDesertWell,
-				InSquarePlacement.spread(),
-				PlacementUtils.HEIGHTMAP,
-				BiomeFilter.biome()
-		);
-
-		PlacementUtils.register(context, PLACED_COMMON_ORE, configuredFeatures.getOrThrow(COMMON_ORE),
-				CountPlacement.of(25),
-				HeightRangePlacement.uniform(
-					VerticalAnchor.BOTTOM,
-					VerticalAnchor.TOP
-				)
-		);
-	}
+//
+//	@Override
+//	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
+//		FabricDataGenerator.Pack pack = dataGenerator.createPack();
+//		pack.addProvider(WorldgenProvider::new);
+//		pack.addProvider(TestBiomeTagsProvider::new);
+//	}
+//
+//	@Override
+//	public void buildRegistry(RegistrySetBuilder registryBuilder) {
+//		registryBuilder.add(Registries.CONFIGURED_FEATURE, this::bootstrapConfiguredFeatures);
+//		registryBuilder.add(Registries.PLACED_FEATURE, this::bootstrapPlacedFeatures);
+//		registryBuilder.add(Registries.BIOME, TestBiomes::bootstrap);
+//	}
+//
+//	private void bootstrapConfiguredFeatures(BootstrapContext<ConfiguredFeature<?, ?>> context) {
+//		FeatureUtils.register(context, COMMON_DESERT_WELL, Feature.DESERT_WELL);
+//
+//		OreConfiguration featureConfig = new OreConfiguration(new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Blocks.DIAMOND_BLOCK.defaultBlockState(), 5);
+//		FeatureUtils.register(context, COMMON_ORE, Feature.ORE, featureConfig);
+//	}
+//
+//	private void bootstrapPlacedFeatures(BootstrapContext<PlacedFeature> context) {
+//		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
+//		Holder<ConfiguredFeature<?, ?>> commonDesertWell = configuredFeatures.getOrThrow(COMMON_DESERT_WELL);
+//
+//		// The placement config is taken from the vanilla desert well, but no randomness
+//		PlacementUtils.register(context, PLACED_COMMON_DESERT_WELL, commonDesertWell,
+//				InSquarePlacement.spread(),
+//				PlacementUtils.HEIGHTMAP,
+//				BiomeFilter.biome()
+//		);
+//
+//		PlacementUtils.register(context, PLACED_COMMON_ORE, configuredFeatures.getOrThrow(COMMON_ORE),
+//				CountPlacement.of(25),
+//				HeightRangePlacement.uniform(
+//					VerticalAnchor.BOTTOM,
+//					VerticalAnchor.TOP
+//				)
+//		);
+//	}
 }
