@@ -8,6 +8,7 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 import net.neoforged.neoforge.network.filters.DynamicChannelHandler;
 
 import net.minecraft.network.Connection;
+import net.minecraft.network.HandlerNames;
 import net.minecraft.network.protocol.Packet;
 
 import net.fabricmc.fabric.impl.networking.context.PacketContextImpl;
@@ -17,7 +18,7 @@ public class ChannelEncoderContextProvider extends MessageToMessageEncoder<Packe
 
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-		if (ctx.pipeline().get("encoder") instanceof PacketContextSetter setter && setter.fabric_getPacketContext() != null) {
+		if (ctx.pipeline().get(HandlerNames.ENCODER) instanceof PacketContextSetter setter && setter.fabric_getPacketContext() != null) {
 			ScopedValue.where(PacketContextImpl.VALUE, setter.fabric_getPacketContext())
 					.run(() -> {
 						try {
@@ -38,6 +39,6 @@ public class ChannelEncoderContextProvider extends MessageToMessageEncoder<Packe
 
 	@Override
 	public boolean isNecessary(Connection manager) {
-		return true; // TODO?
+		return true;
 	}
 }

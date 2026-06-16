@@ -81,18 +81,23 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 		if (payload instanceof MinecraftRegisterPayload registrationPayload) {
 			this.receiveRegistration(true, new RegistrationPayload(RegistrationPayload.REGISTER,
 					new ArrayList<>(registrationPayload.newChannels())));
-			return true;
+			return false; // Propagate to Neo
 		}
 		
 		if (payload instanceof MinecraftUnregisterPayload unregisterPayload) {
 			this.receiveRegistration(false, new RegistrationPayload(RegistrationPayload.UNREGISTER,
 					new ArrayList<>(unregisterPayload.forgottenChannels())));
-			return true;
+			return false; // Propagate to Neo
 		}
 
 		@Nullable H handler = this.getHandler(channelName);
 
 		if (handler == null) {
+			// FFAPI: Prevent Neo from panicking
+			if (this.receiver.getPayloadTypeRegistry().get(channelName) != null) {
+				return true;
+			}
+			
 			return false;
 		}
 
@@ -156,11 +161,17 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 		}
 
 		this.sendableChannels.add(id);
+		onUpdateSendableChannels();
 	}
 
 	void unregister(List<Identifier> ids) {
 		this.sendableChannels.removeAll(ids);
+		onUpdateSendableChannels();
 		schedule(() -> this.invokeUnregisterEvent(ids));
+	}
+
+	protected void onUpdateSendableChannels() {
+		
 	}
 
 	@Override

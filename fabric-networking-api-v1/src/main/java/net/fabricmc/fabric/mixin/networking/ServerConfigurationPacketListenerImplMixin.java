@@ -16,10 +16,12 @@
 
 package net.fabricmc.fabric.mixin.networking;
 
+import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Function;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.netty.buffer.ByteBuf;
@@ -35,6 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ConfigurationTask;
@@ -56,9 +59,6 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 	@Final
 	private Queue<ConfigurationTask> configurationTasks;
 
-	@Shadow
-	public abstract boolean isAcceptingMessages();
-
 	@Unique
 	private ServerConfigurationNetworkAddon addon;
 
@@ -71,6 +71,13 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 		this.addon = new ServerConfigurationNetworkAddon((ServerConfigurationPacketListenerImpl) (Object) this, this.server);
 		// A bit of a hack but it allows the field above to be set in case someone registers handlers during INIT event which refers to said field
 		this.addon.lateInit();
+	}
+	
+	@ModifyExpressionValue(method = "startConfiguration", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/registration/NetworkRegistry;getInitialListeningChannels(Lnet/minecraft/network/protocol/PacketFlow;)Ljava/util/Set;"))
+	private Set<Identifier> addInitialReceivableChannels(Set<Identifier> original) {
+		Set<Identifier> union = new HashSet<>(original);
+		union.addAll(this.addon.getReceivableChannels());
+		return union;
 	}
 
 	@Inject(method = "runConfiguration", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/ConfigurationInitialization;configureEarlyTasks(Lnet/minecraft/network/protocol/configuration/ServerConfigurationPacketListener;Ljava/util/function/Consumer;)V"))

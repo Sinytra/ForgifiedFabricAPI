@@ -29,11 +29,11 @@ public final class PacketContextClientTest implements ClientModInitializer {
 		// Sending context checking packets from client to server
 
 		ClientConfigurationConnectionEvents.COMPLETE.register((listener, client) -> {
-//			listener.send(new ServerboundCustomPayloadPacket(new PacketContextTest.ContextCheckPacket("Client Configuration")));
+			listener.send(new ServerboundCustomPayloadPacket(new PacketContextTest.ContextCheckPacket("Client Configuration")));
 		});
 
 		ClientPlayConnectionEvents.INIT.register((listener, client) -> {
-//			listener.send(new ServerboundCustomPayloadPacket(new PacketContextTest.ContextCheckPacket("Client Play")));
+			listener.send(new ServerboundCustomPayloadPacket(new PacketContextTest.ContextCheckPacket("Client Play")));
 		});
 	}
 }

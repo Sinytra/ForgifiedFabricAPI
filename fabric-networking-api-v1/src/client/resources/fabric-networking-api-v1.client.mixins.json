@@ -12,7 +12,8 @@
     "ClientHandshakePacketListenerImplMixin",
     "ClientPacketListenerMixin",
     "LocalPlayerMixin",
-    "ClientNetworkRegistryMixin"
+    "ClientNetworkRegistryMixin",
+    "NetworkRegistryClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

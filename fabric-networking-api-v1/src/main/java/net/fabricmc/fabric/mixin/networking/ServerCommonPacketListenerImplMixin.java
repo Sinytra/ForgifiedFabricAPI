@@ -25,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.ServerboundPongPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RunningOnDifferentThreadException;
@@ -57,7 +56,8 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 				handled = addon.handle(payload);
 			} else {
 				// Play should be handled in ServerGamePacketListenerImplMixin
-//				throw new IllegalStateException("Unknown addon"); FIXME
+				// Disabled: Neo will take care of this
+//				throw new IllegalStateException("Unknown addon");
 			}
 
 			if (handled) {
@@ -66,13 +66,6 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 		} catch (RunningOnDifferentThreadException e) {
 			this.server.packetProcessor().scheduleIfPossible((ServerCommonPacketListenerImpl) (Object) this, packet);
 			ci.cancel();
-		}
-	}
-
-	@Inject(method = "handlePong", at = @At("HEAD"))
-	private void onPlayPong(ServerboundPongPacket packet, CallbackInfo ci) {
-		if (getAddon() instanceof ServerConfigurationNetworkAddon addon) {
-			addon.onPong(packet.getId());
 		}
 	}
 
