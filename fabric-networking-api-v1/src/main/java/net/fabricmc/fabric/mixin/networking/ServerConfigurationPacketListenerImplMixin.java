@@ -24,7 +24,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import io.netty.buffer.ByteBuf;
 import net.neoforged.neoforge.network.connection.ConnectionType;
-import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,10 +50,6 @@ import net.fabricmc.fabric.impl.networking.server.ServerConfigurationNetworkAddo
 @Mixin(value = ServerConfigurationPacketListenerImpl.class, priority = 900)
 public abstract class ServerConfigurationPacketListenerImplMixin extends ServerCommonPacketListenerImpl implements PacketListenerExtensions, FabricServerConfigurationPacketListenerImpl {
 	@Shadow
-	@Nullable
-	private ConfigurationTask currentTask;
-
-	@Shadow
 	protected abstract void finishCurrentTask(ConfigurationTask.Type key);
 
 	@Shadow
@@ -64,17 +59,8 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 	@Shadow
 	public abstract boolean isAcceptingMessages();
 
-	@Shadow
-	public abstract void startConfiguration();
-
 	@Unique
 	private ServerConfigurationNetworkAddon addon;
-
-	@Unique
-	private boolean sentConfiguration;
-
-	@Unique
-	private boolean earlyTaskExecution;
 
 	public ServerConfigurationPacketListenerImplMixin(MinecraftServer server, Connection connection, CommonListenerCookie arg) {
 		super(server, connection, arg);
@@ -87,67 +73,9 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 		this.addon.lateInit();
 	}
 
-	@Inject(method = "startConfiguration", at = @At("HEAD"), cancellable = true)
-	private void onClientReady(CallbackInfo ci) {
-		// Send the initial channel registration packet
-		if (this.addon.startConfiguration()) {
-			if (currentTask != null) {
-				throw new IllegalStateException("A task is already running: " + currentTask.type().id());
-			}
-
-			ci.cancel();
-			return;
-		}
-
-		// Ready to start sending packets
-		if (!sentConfiguration) {
-			this.addon.preConfiguration();
-			sentConfiguration = true;
-			earlyTaskExecution = true;
-		}
-
-		// Run the early tasks
-		if (earlyTaskExecution) {
-			if (pollEarlyTasks()) {
-				ci.cancel();
-				return;
-			} else {
-				earlyTaskExecution = false;
-			}
-		}
-
-		// All early tasks should have been completed
-		if (currentTask != null || !configurationTasks.isEmpty()) {
-			throw new IllegalStateException("All early tasks should have been completed, current: " + currentTask + ", queued: " + configurationTasks.size());
-		}
-
-		// Run the vanilla tasks.
-		this.addon.configuration();
-	}
-
-	@Unique
-	private boolean pollEarlyTasks() {
-		if (!earlyTaskExecution) {
-			throw new IllegalStateException("Early task execution has finished");
-		}
-
-		if (this.currentTask != null) {
-			throw new IllegalStateException("Task " + this.currentTask.type().id() + " has not finished yet");
-		}
-
-		if (!this.isAcceptingMessages()) {
-			return false;
-		}
-
-		final ConfigurationTask task = this.configurationTasks.poll();
-
-		if (task != null) {
-			this.currentTask = task;
-			task.start(this::send);
-			return true;
-		}
-
-		return false;
+	@Inject(method = "runConfiguration", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/ConfigurationInitialization;configureEarlyTasks(Lnet/minecraft/network/protocol/configuration/ServerConfigurationPacketListener;Ljava/util/function/Consumer;)V"))
+	private void beforeConfigureEarlyTasks(CallbackInfo ci) {
+		this.addon.preConfiguration();
 	}
 
 	@Override
@@ -162,19 +90,7 @@ public abstract class ServerConfigurationPacketListenerImplMixin extends ServerC
 
 	@Override
 	public void completeTask(ConfigurationTask.Type key) {
-		if (!earlyTaskExecution) {
-			finishCurrentTask(key);
-			return;
-		}
-
-		final ConfigurationTask.Type currentKey = this.currentTask != null ? this.currentTask.type() : null;
-
-		if (!key.equals(currentKey)) {
-			throw new IllegalStateException("Unexpected request for task finish, current task: " + currentKey + ", requested: " + key);
-		}
-
-		this.currentTask = null;
-		startConfiguration();
+		finishCurrentTask(key);
 	}
 
 	@WrapOperation(method = "handleConfigurationFinished", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/RegistryFriendlyByteBuf;decorator(Lnet/minecraft/core/RegistryAccess;Lnet/neoforged/neoforge/network/connection/ConnectionType;)Ljava/util/function/Function;"))

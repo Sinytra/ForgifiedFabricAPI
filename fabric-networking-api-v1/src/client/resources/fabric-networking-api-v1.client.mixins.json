@@ -11,7 +11,8 @@
     "ClientConfigurationPacketListenerImplMixin",
     "ClientHandshakePacketListenerImplMixin",
     "ClientPacketListenerMixin",
-    "LocalPlayerMixin"
+    "LocalPlayerMixin",
+    "ClientNetworkRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

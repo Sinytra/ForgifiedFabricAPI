@@ -43,6 +43,11 @@ public class PacketDecoderMixin implements PacketContextSetter {
 	}
 
 	@Override
+	public PacketContext fabric_getPacketContext() {
+		return this.packetContext;
+	}
+
+	@Override
 	public void fabric_setPacketContext(PacketContext context) {
 		this.packetContext = context;
 	}

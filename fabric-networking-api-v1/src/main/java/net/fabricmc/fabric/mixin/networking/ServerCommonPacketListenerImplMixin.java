@@ -57,7 +57,7 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 				handled = addon.handle(payload);
 			} else {
 				// Play should be handled in ServerGamePacketListenerImplMixin
-//				throw new IllegalStateException("Unknown addon");
+//				throw new IllegalStateException("Unknown addon"); FIXME
 			}
 
 			if (handled) {

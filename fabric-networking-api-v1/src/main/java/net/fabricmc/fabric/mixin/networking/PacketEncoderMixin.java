@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.mixin.networking;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,7 +28,6 @@ import net.minecraft.network.PacketEncoder;
 import net.minecraft.network.protocol.Packet;
 
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
-import net.fabricmc.fabric.impl.networking.context.PacketContextImpl;
 import net.fabricmc.fabric.impl.networking.context.PacketContextSetter;
 import net.fabricmc.fabric.impl.networking.splitter.PassthroughPacket;
 
@@ -49,12 +46,12 @@ public class PacketEncoderMixin implements PacketContextSetter {
 	}
 
 	@Override
-	public void fabric_setPacketContext(PacketContext context) {
-		this.packetContext = context;
+	public PacketContext fabric_getPacketContext() {
+		return this.packetContext;
 	}
 
-	@WrapMethod(method = "encode(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/protocol/Packet;Lio/netty/buffer/ByteBuf;)V")
-	private void wrapWithContext(ChannelHandlerContext ctx, Packet<?> packet, ByteBuf output, Operation<Void> original) {
-		ScopedValue.where(PacketContextImpl.VALUE, this.packetContext).run(() -> original.call(ctx, packet, output));
+	@Override
+	public void fabric_setPacketContext(PacketContext context) {
+		this.packetContext = context;
 	}
 }
