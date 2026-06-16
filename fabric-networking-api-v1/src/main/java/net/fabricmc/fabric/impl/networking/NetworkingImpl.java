@@ -16,16 +16,20 @@
 
 package net.fabricmc.fabric.impl.networking;
 
+import java.util.Set;
+
+import io.netty.util.AttributeKey;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.impl.networking.splitter.FabricSplitPacketPayload;
 
 public final class NetworkingImpl {
 	public static final String MOD_ID = "fabric-networking-api-v1";
@@ -41,6 +45,8 @@ public final class NetworkingImpl {
 	 */
 	public static final Identifier UNREGISTER_CHANNEL = Identifier.withDefaultNamespace("unregister");
 
+	public static final AttributeKey<Set<Identifier>> SENDABLE_CHANNELS = AttributeKey.valueOf("fabric:channels");
+
 	public static boolean isReservedCommonChannel(Identifier channelName) {
 		return channelName.equals(REGISTER_CHANNEL) || channelName.equals(UNREGISTER_CHANNEL);
 	}
@@ -55,15 +61,25 @@ public final class NetworkingImpl {
 		PayloadTypeRegistry.clientboundPlay().register(RegistrationPayload.UNREGISTER, RegistrationPayload.UNREGISTER_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RegistrationPayload.REGISTER, RegistrationPayload.REGISTER_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(RegistrationPayload.UNREGISTER, RegistrationPayload.UNREGISTER_CODEC);
-
-		// Fabric Packet Splitter packet
-		registerGeneric(FabricSplitPacketPayload.TYPE, FabricSplitPacketPayload.CODEC);
 	}
-
-	private static <T extends CustomPacketPayload> void registerGeneric(CustomPacketPayload.Type<T> id, StreamCodec<? super FriendlyByteBuf, T> codec) {
-		PayloadTypeRegistry.clientboundConfiguration().register(id, codec);
-		PayloadTypeRegistry.serverboundConfiguration().register(id, codec);
-		PayloadTypeRegistry.clientboundPlay().register(id, codec);
-		PayloadTypeRegistry.serverboundPlay().register(id, codec);
+	
+	public static CustomPacketPayload.@Nullable TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> getCodec(Identifier id, ConnectionProtocol protocol, PacketFlow flow) {
+		if (flow == PacketFlow.CLIENTBOUND) {
+			if (protocol == ConnectionProtocol.PLAY) {
+				return PayloadTypeRegistryImpl.CLIENTBOUND_PLAY.get(id);
+			}
+			if (protocol == ConnectionProtocol.CONFIGURATION) {
+				return PayloadTypeRegistryImpl.CLIENTBOUND_CONFIGURATION.get(id);
+			}
+		}
+		if (flow == PacketFlow.SERVERBOUND) {
+			if (protocol == ConnectionProtocol.PLAY) {
+				return PayloadTypeRegistryImpl.SERVERBOUND_PLAY.get(id);
+			}
+			if (protocol == ConnectionProtocol.CONFIGURATION) {
+				return PayloadTypeRegistryImpl.SERVERBOUND_CONFIGURATION.get(id);
+			}
+		}
+		return null;
 	}
 }

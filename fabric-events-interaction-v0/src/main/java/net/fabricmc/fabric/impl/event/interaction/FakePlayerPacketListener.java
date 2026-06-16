@@ -17,6 +17,9 @@
 package net.fabricmc.fabric.impl.event.interaction;
 
 import io.netty.channel.ChannelFutureListener;
+
+import net.fabricmc.fabric.impl.networking.UntrackedPacketListener;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.network.Connection;
@@ -26,7 +29,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public final class FakePlayerPacketListener extends ServerGamePacketListenerImpl {
+public final class FakePlayerPacketListener extends ServerGamePacketListenerImpl implements UntrackedPacketListener {
 	private static final Connection FAKE_CONNECTION = new FakeConnection();
 
 	public FakePlayerPacketListener(ServerPlayer player) {

@@ -19,6 +19,7 @@ package net.fabricmc.fabric.impl.networking.server;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
@@ -133,6 +134,12 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 	@Override
 	protected boolean isReservedChannel(Identifier channelName) {
 		return NetworkingImpl.isReservedCommonChannel(channelName);
+	}
+
+	@Override
+	protected void onUpdateSendableChannels() {
+		super.onUpdateSendableChannels();
+		this.listener.getConnection().channel().attr(NetworkingImpl.SENDABLE_CHANNELS).set(Set.copyOf(this.sendableChannels));
 	}
 
 	public void reconfigure() {

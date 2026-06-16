@@ -231,4 +231,8 @@ public final class GlobalReceiverRegistry<H> {
 	public ConnectionProtocol getProtocol() {
 		return protocol;
 	}
+
+	public @Nullable PayloadTypeRegistryImpl<?> getPayloadTypeRegistry() {
+		return payloadTypeRegistry;
+	}
 }

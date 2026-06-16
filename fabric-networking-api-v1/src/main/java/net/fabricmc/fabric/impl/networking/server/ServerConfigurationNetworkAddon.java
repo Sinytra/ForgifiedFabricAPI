@@ -21,11 +21,10 @@ import java.util.List;
 import java.util.Objects;
 
 import io.netty.channel.ChannelFutureListener;
-import org.jspecify.annotations.Nullable;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
@@ -40,15 +39,12 @@ import net.fabricmc.fabric.impl.networking.AbstractChanneledNetworkAddon;
 import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
 import net.fabricmc.fabric.impl.networking.NetworkingImpl;
 import net.fabricmc.fabric.impl.networking.RegistrationPayload;
-import net.fabricmc.fabric.mixin.networking.accessor.ServerCommonPacketListenerImplAccessor;
 
 public final class ServerConfigurationNetworkAddon extends AbstractChanneledNetworkAddon<ServerConfigurationNetworking.ConfigurationPacketHandler<?>> {
 	private final ServerConfigurationPacketListenerImpl listener;
 	private final MinecraftServer server;
 	private final ServerConfigurationNetworking.Context context;
 	private RegisterState registerState = RegisterState.NOT_SENT;
-	@Nullable
-	private String clientBrand = null;
 	private boolean isReconfiguring = false;
 
 	public ServerConfigurationNetworkAddon(ServerConfigurationPacketListenerImpl listener, MinecraftServer server) {
@@ -63,12 +59,7 @@ public final class ServerConfigurationNetworkAddon extends AbstractChanneledNetw
 
 	@Override
 	public boolean handle(CustomPacketPayload payload) {
-		if (payload instanceof BrandPayload brandPayload) {
-			clientBrand = brandPayload.brand();
-			return false;
-		}
-
-		return super.handle(payload);
+		return !(payload instanceof BrandPayload) && super.handle(payload);
 	}
 
 	@Override
@@ -82,30 +73,15 @@ public final class ServerConfigurationNetworkAddon extends AbstractChanneledNetw
 	}
 
 	public void preConfiguration() {
+		if (listener.getConnectionType() == ConnectionType.NEOFORGE) {
+			registerState = RegisterState.RECEIVED;
+		}
+
 		ServerConfigurationConnectionEvents.BEFORE_CONFIGURE.invoker().onSendConfiguration(listener, server);
 	}
 
 	public void configuration() {
 		ServerConfigurationConnectionEvents.CONFIGURE.invoker().onSendConfiguration(listener, server);
-	}
-
-	@Override
-	protected void receiveRegistration(boolean register, RegistrationPayload resolvable) {
-		super.receiveRegistration(register, resolvable);
-
-		if (register && registerState == RegisterState.SENT) {
-			// We received the registration packet, thus we know this is a modded client, continue with configuration.
-			registerState = RegisterState.RECEIVED;
-			listener.startConfiguration();
-		}
-	}
-
-	public void onPong(int parameter) {
-		if (registerState == RegisterState.SENT) {
-			// We did not receive the registration packet, thus we think this is a vanilla client, continue with configuration.
-			registerState = RegisterState.NOT_RECEIVED;
-			listener.startConfiguration();
-		}
 	}
 
 	@Override
@@ -172,10 +148,6 @@ public final class ServerConfigurationNetworkAddon extends AbstractChanneledNetw
 	@Override
 	public void sendPacket(Packet<?> packet, ChannelFutureListener callback) {
 		listener.send(packet, callback);
-	}
-
-	public @Nullable String getClientBrand() {
-		return clientBrand;
 	}
 
 	public boolean isReconfiguring() {

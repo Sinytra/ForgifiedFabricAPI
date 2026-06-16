@@ -129,25 +129,6 @@ public class PayloadTypeRegistryImpl<B extends FriendlyByteBuf> implements Paylo
 		return (CustomPacketPayload.TypeAndCodec<B, T>) packetTypes.get(type.id());
 	}
 
-	/**
-	 * @return the max packet size, or -1 if the payload type does not need splitting.
-	 */
-	public int getMaxPacketSizeForSplitting(Identifier id) {
-		IntSupplier supplier = this.pendingMaxPacketSizes.remove(id);
-
-		if (supplier != null) {
-			int maxPacketSize = supplier.getAsInt();
-
-			if (maxPacketSize < 0) {
-				throw new IllegalArgumentException("maxPacketSize supplier for packet type " + id + ": must be positive!");
-			}
-
-			padAndSetMaxPacketSize(id, maxPacketSize);
-		}
-
-		return this.maxPacketSizes.getOrDefault(id, -1);
-	}
-
 	public ConnectionProtocol getProtocol() {
 		return protocol;
 	}
