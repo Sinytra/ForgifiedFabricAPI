@@ -35,8 +35,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
-import net.minecraft.network.PacketDecoder;
-import net.minecraft.network.PacketEncoder;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.ProtocolInfo;
 import net.minecraft.network.UnconfiguredPipelineHandler;
@@ -49,12 +47,8 @@ import net.fabricmc.fabric.api.networking.v1.context.PacketContextProvider;
 import net.fabricmc.fabric.impl.networking.ChannelInfoHolder;
 import net.fabricmc.fabric.impl.networking.PacketCallbackListener;
 import net.fabricmc.fabric.impl.networking.PacketListenerExtensions;
-import net.fabricmc.fabric.impl.networking.PayloadTypeRegistryImpl;
-import net.fabricmc.fabric.impl.networking.VanillaPacketTypes;
 import net.fabricmc.fabric.impl.networking.context.PacketContextImpl;
 import net.fabricmc.fabric.impl.networking.context.PacketContextSetter;
-import net.fabricmc.fabric.impl.networking.splitter.FabricPacketMerger;
-import net.fabricmc.fabric.impl.networking.splitter.FabricPacketSplitter;
 
 @Mixin(Connection.class)
 abstract class ConnectionMixin implements ChannelInfoHolder, PacketContextProvider {
@@ -107,17 +101,7 @@ abstract class ConnectionMixin implements ChannelInfoHolder, PacketContextProvid
 				setter.fabric_setPacketContext(this.packetContext);
 			}
 		});
-
-		PayloadTypeRegistryImpl<?> payloadTypeRegistry = PayloadTypeRegistryImpl.get(protocolInfo);
-
-		if (payloadTypeRegistry == null) {
-			return transitioner;
-		}
-
-		return ((UnconfiguredPipelineHandler.InboundConfigurationTask) transitioner).andThen((context) -> {
-			FabricPacketMerger merger = new FabricPacketMerger(context.pipeline().get(PacketDecoder.class), payloadTypeRegistry, VanillaPacketTypes.get(protocolInfo));
-			context.pipeline().addAfter("decoder", "fabric:merger", merger);
-		});
+		return transitioner;
 	}
 
 	@ModifyArg(method = "setupOutboundProtocol", at = @At(value = "INVOKE", target = "Lio/netty/channel/Channel;writeAndFlush(Ljava/lang/Object;)Lio/netty/channel/ChannelFuture;"))
@@ -127,17 +111,7 @@ abstract class ConnectionMixin implements ChannelInfoHolder, PacketContextProvid
 				setter.fabric_setPacketContext(this.packetContext);
 			}
 		});
-
-		PayloadTypeRegistryImpl<?> payloadTypeRegistry = PayloadTypeRegistryImpl.get(protocolInfo);
-
-		if (payloadTypeRegistry == null) {
-			return transitioner;
-		}
-
-		return ((UnconfiguredPipelineHandler.OutboundConfigurationTask) transitioner).andThen((context) -> {
-			FabricPacketSplitter splitter = new FabricPacketSplitter(context.pipeline().get(PacketEncoder.class), payloadTypeRegistry);
-			context.pipeline().addAfter("encoder", "fabric:splitter", splitter);
-		});
+		return transitioner;
 	}
 
 	@Override

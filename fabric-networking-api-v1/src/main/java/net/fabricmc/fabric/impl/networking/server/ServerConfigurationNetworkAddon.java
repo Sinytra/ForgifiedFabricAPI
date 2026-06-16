@@ -89,26 +89,6 @@ public final class ServerConfigurationNetworkAddon extends AbstractChanneledNetw
 		ServerConfigurationConnectionEvents.CONFIGURE.invoker().onSendConfiguration(listener, server);
 	}
 
-	public boolean startConfiguration() {
-		if (this.registerState == RegisterState.NOT_SENT) {
-			// Send the registration packet, followed by a ping
-			this.sendInitialChannelRegistrationPacket();
-			this.sendPacket(new ClientboundPingPacket(0xFAB71C));
-
-			this.registerState = RegisterState.SENT;
-
-			// Cancel the configuration for now, the response from the ping or registration packet will continue.
-			return true;
-		}
-
-		// We should have received a response
-		if (!(registerState == RegisterState.RECEIVED || registerState == RegisterState.NOT_RECEIVED)) {
-			throw new IllegalStateException();
-		}
-
-		return false;
-	}
-
 	@Override
 	protected void receiveRegistration(boolean register, RegistrationPayload resolvable) {
 		super.receiveRegistration(register, resolvable);
