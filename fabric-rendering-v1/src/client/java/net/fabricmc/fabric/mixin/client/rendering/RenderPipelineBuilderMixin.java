@@ -31,6 +31,7 @@ import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.pipeline.ShaderType;
 import com.mojang.renderpearl.api.vertex.VertexFormat;
+import net.neoforged.neoforge.client.stencil.StencilTest;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -42,6 +43,7 @@ import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderPipeline;
+import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderPipeline.Snippet;
 import net.fabricmc.fabric.impl.client.rendering.FabricRenderPipelineImpl;
 import net.fabricmc.fabric.impl.client.rendering.FabricRenderPipelineInternals;
 
@@ -66,8 +68,8 @@ class RenderPipelineBuilderMixin implements FabricRenderPipeline.Builder {
 			method = "withSnippet",
 			at = @At("TAIL")
 	)
-	private void copyUsePipelineDrawModeForGuiFromSnippet(RenderPipeline.Snippet snippet, CallbackInfoReturnable<RenderPipeline.Builder> cir) {
-		((FabricRenderPipeline.Snippet) (Object) snippet).usePipelineDrawModeForGui().ifPresent(value -> this.usePipelineDrawModeForGui = Optional.of(value));
+	private void copyUsePipelineDrawModeForGuiFromSnippet(RenderPipeline.Snippet snippet, CallbackInfoReturnable<RenderPipeline.Builder> ci) {
+		((Snippet) (Object) snippet).usePipelineDrawModeForGui().ifPresent(value -> this.usePipelineDrawModeForGui = Optional.of(value));
 	}
 
 	@WrapOperation(
@@ -88,10 +90,11 @@ class RenderPipelineBuilderMixin implements FabricRenderPipeline.Builder {
 			Optional<Boolean> cull,
 			@Nullable VertexFormat[] vertexFormatPerBuffer,
 			Optional<PrimitiveTopology> vertexFormatMode,
+			Optional<StencilTest> stencilTest,
 			int pushConstantSize,
 			Operation<RenderPipeline.Snippet> original
 	) {
-		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(shaders, shaderDefines, bindGroupLayouts, colorTargetStates, activeColorTargetStateCount, depthStencilState, polygonMode, cull, vertexFormatPerBuffer, vertexFormatMode, pushConstantSize), usePipelineDrawModeForGui);
+		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(shaders, shaderDefines, bindGroupLayouts, colorTargetStates, activeColorTargetStateCount, depthStencilState, polygonMode, cull, vertexFormatPerBuffer, vertexFormatMode, stencilTest, pushConstantSize), usePipelineDrawModeForGui);
 	}
 
 	@ModifyReturnValue(

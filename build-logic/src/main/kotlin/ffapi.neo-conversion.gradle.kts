@@ -62,12 +62,20 @@ extensions.getByType<SourceSetContainer>().configureEach {
     tasks.named<Jar>("jar") {
         exclude("fabric.mod.json")
     }
+    tasks.named("copyAccessTransformersPublications") {
+        dependsOn(task)
+    }
 }
 
 afterEvaluate {
     loomStub.accessWidenerPath.orNull?.also { value ->
         tasks.withType<Jar> {
             exclude(loomStub.accessWidenerPath.get().asFile.name)
+        }
+
+        val outputFile = project.file("src/generated/main/resources/META-INF/accesstransformer.cfg")
+        if (outputFile.exists()) {
+            modDev.accessTransformers.publish(outputFile)
         }
 
         val file = value.asFile
