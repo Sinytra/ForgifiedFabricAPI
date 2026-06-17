@@ -28,7 +28,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.networking.NetworkingImpl;
@@ -55,10 +54,6 @@ public class NetworkRegistryMixin {
 		}
 
 		if (listener instanceof ServerGamePacketListenerImpl impl && ServerPlayNetworking.canSend(impl, type)) {
-			ci.cancel();
-		}
-
-		if (listener.protocol() == ConnectionProtocol.PLAY && ClientPlayNetworking.canSend(type)) {
 			ci.cancel();
 		}
 

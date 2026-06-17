@@ -16,73 +16,60 @@
 
 package net.fabricmc.fabric.impl.attachment;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import net.neoforged.neoforge.attachment.IAttachmentSerializer;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.impl.attachment.sync.AttachmentSync;
+import net.fabricmc.fabric.mixin.attachment.BaseMappedRegistryAccessor;
 
 public final class AttachmentRegistryImpl {
-	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-data-attachment-api-v1");
-	private static final Map<Identifier, AttachmentType<?>> attachmentRegistry = new HashMap<>();
-	private static final Set<Identifier> syncableAttachments = new HashSet<>();
-	private static final Set<Identifier> syncableView = Collections.unmodifiableSet(syncableAttachments);
-	private static int maxSyncPacketSize = AttachmentSync.DEFAULT_ATTACHMENT_SYNC_PACKET_SIZE;
+	private static final Map<net.neoforged.neoforge.attachment.AttachmentType<?>, AttachmentType<?>> FABRIC_ATTACHMENT_TYPES = new ConcurrentHashMap<>();
+	private static final Map<Identifier, net.neoforged.neoforge.attachment.AttachmentType<?>> NEO_ATTACHMENT_TYPES = new ConcurrentHashMap<>();
+	private static boolean deferRegistration = true;
 
-	public static <A> void register(Identifier id, AttachmentType<A> attachmentType) {
-		AttachmentType<?> existing = attachmentRegistry.put(id, attachmentType);
-
-		if (existing != null) {
-			LOGGER.warn("Encountered duplicate type registration for id {}", id);
-
-			// Prevent duplicate registration from incorrectly overriding a synced type with a non-synced one or vice-versa
-			if (existing.isSynced() && !attachmentType.isSynced()) {
-				syncableAttachments.remove(id);
-			} else if (!existing.isSynced() && attachmentType.isSynced()) {
-				syncableAttachments.add(id);
-			}
-		} else if (attachmentType.isSynced()) {
-			syncableAttachments.add(id);
+	public static <A> net.neoforged.neoforge.attachment.AttachmentType<A> registerNeoForgeAttachment(Identifier id, net.neoforged.neoforge.attachment.AttachmentType<A> attachmentType) {
+		if (deferRegistration) {
+			NEO_ATTACHMENT_TYPES.put(id, attachmentType);
+		} else {
+			((BaseMappedRegistryAccessor) NeoForgeRegistries.ATTACHMENT_TYPES).invokeUnfreeze(false);
+			Registry.register(NeoForgeRegistries.ATTACHMENT_TYPES, id, attachmentType);
+			NeoForgeRegistries.ATTACHMENT_TYPES.freeze();
 		}
+		return attachmentType;
 	}
 
-	@Nullable
-	public static AttachmentType<?> get(Identifier id) {
-		return attachmentRegistry.get(id);
+	public static void registerNeoTypes(RegisterEvent.RegisterHelper<net.neoforged.neoforge.attachment.AttachmentType<?>> helper) {
+		deferRegistration = false;
+		NEO_ATTACHMENT_TYPES.forEach(helper::register);
 	}
 
-	public static Set<Identifier> getSyncableAttachments() {
-		return syncableView;
+	@SuppressWarnings("unchecked")
+	public static <A> AttachmentType<A> getFabricAttachmentType(net.neoforged.neoforge.attachment.AttachmentType<A> neoType) {
+		return (AttachmentType<A>) FABRIC_ATTACHMENT_TYPES.get(neoType);
 	}
 
 	public static <A> AttachmentRegistry.Builder<A> builder() {
 		return new BuilderImpl<>();
-	}
-
-	public static int getMaxSyncPacketSize() {
-		if (maxSyncPacketSize == -1) {
-			throw new IllegalStateException("getMaxSyncPacketSize should only be called ONCE!");
-		}
-
-		int maxSize = maxSyncPacketSize;
-		maxSyncPacketSize = -1;
-		return maxSize;
 	}
 
 	public static class BuilderImpl<A> implements AttachmentRegistry.Builder<A> {
@@ -145,26 +132,9 @@ public final class AttachmentRegistryImpl {
 		public AttachmentType<A> buildAndRegister(Identifier id) {
 			Objects.requireNonNull(id, "identifier cannot be null");
 
-			if (syncPredicate != null && id.toString().length() > AttachmentSync.MAX_IDENTIFIER_SIZE) {
-				throw new IllegalArgumentException(
-						"Identifier length is too long for a synced attachment type (was %d, maximum is %d)".formatted(
-								id.toString().length(),
-								AttachmentSync.MAX_IDENTIFIER_SIZE
-						)
-				);
-			}
-
-			if (maxSyncSize <= AttachmentSync.DEFAULT_MAX_DATA_SIZE) {
-				maxSyncSize = AttachmentSync.DEFAULT_MAX_DATA_SIZE;
-			} else if (maxSyncPacketSize == -1) {
-				throw new IllegalStateException("Large attachment " + id + " registered too late! Must be registered during mod initialization.");
-			} else {
-				int newMaxPacketSize = maxSyncSize + AttachmentSync.MAX_PADDING_SIZE_IN_BYTES;
-				newMaxPacketSize = newMaxPacketSize < 0 ? Integer.MAX_VALUE : newMaxPacketSize; // prevent overflow
-				maxSyncPacketSize = Math.max(newMaxPacketSize, maxSyncPacketSize);
-			}
-
-			var attachment = new AttachmentTypeImpl<>(
+			net.neoforged.neoforge.attachment.AttachmentType<A> neoType = registerNeoForgeAttachment(id, toNeoForgeAttachmentType(id));
+			AttachmentType<A> attachmentType = new AttachmentTypeImpl<>(
+					neoType,
 					id,
 					defaultInitializer,
 					persistenceCodec,
@@ -173,8 +143,40 @@ public final class AttachmentRegistryImpl {
 					copyOnDeath,
 					maxSyncSize
 			);
-			register(id, attachment);
-			return attachment;
+			FABRIC_ATTACHMENT_TYPES.put(neoType, attachmentType);
+			return attachmentType;
+		}
+
+		private net.neoforged.neoforge.attachment.AttachmentType<A> toNeoForgeAttachmentType(Identifier id) {
+			net.neoforged.neoforge.attachment.AttachmentType.Builder<A> builder = net.neoforged.neoforge.attachment.AttachmentType.builder(this.defaultInitializer != null ? this.defaultInitializer : () -> null);
+			if (this.persistenceCodec != null) {
+				builder.serialize(this.persistenceCodec.fieldOf(id.getPath()));
+				if (this.copyOnDeath) {
+					builder.copyOnDeath();
+				}
+			} else {
+				builder.serialize((IAttachmentSerializer) DummyAttachmentSerializer.INSTANCE);
+				builder.copyHandler((value, holder, provider) -> value);
+			}
+			if (this.streamCodec != null) {
+				Objects.requireNonNull(this.syncPredicate, "sync predicate cannot be null");
+				builder.sync((holder, player) -> this.syncPredicate.test((AttachmentTarget) holder, player), this.streamCodec);
+			}
+			return builder.build();
+		}
+	}
+
+	private static class DummyAttachmentSerializer implements IAttachmentSerializer<Tag> {
+		private static final DummyAttachmentSerializer INSTANCE = new DummyAttachmentSerializer();
+
+		@Override
+		public Tag read(IAttachmentHolder holder, ValueInput input) {
+			return null;
+		}
+
+		@Override
+		public boolean write(Tag attachment, ValueOutput output) {
+			return false;
 		}
 	}
 }

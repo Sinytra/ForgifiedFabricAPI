@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 
 public record AttachmentTypeImpl<A>(
+		net.neoforged.neoforge.attachment.AttachmentType<A> internalType,
 		Identifier identifier,
 		@Nullable Supplier<A> initializer,
 		@Nullable Codec<A> persistenceCodec,

@@ -20,6 +20,9 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import net.fabricmc.fabric.impl.attachment.AttachmentChangeEvents;
+
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.Nullable;
@@ -31,6 +34,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
 
 /**
  * Marks all objects on which data can be attached using {@link AttachmentType}s.
@@ -79,7 +83,7 @@ public interface AttachmentTarget {
 	 */
 	@Nullable
 	default <A> A getAttached(AttachmentType<A> type) {
-		throw new UnsupportedOperationException("Implemented via mixin");
+		return ((IAttachmentHolder) this).getExistingData(((AttachmentTypeImpl<A>) type).internalType()).orElse(null);
 	}
 
 	/**
@@ -144,13 +148,11 @@ public interface AttachmentTarget {
 	 * @return the attached data, initialized if originally absent
 	 */
 	default <A> A getAttachedOrCreate(AttachmentType<A> type) {
-		Supplier<A> init = type.initializer();
-
-		if (init == null) {
+		if (type.initializer() == null) {
 			throw new IllegalArgumentException("Single-argument getAttachedOrCreate is reserved for attachment types with default initializers");
 		}
 
-		return getAttachedOrCreate(type, init);
+		return ((IAttachmentHolder) this).getData(((AttachmentTypeImpl<A>) type).internalType());
 	}
 
 	/**
@@ -164,8 +166,7 @@ public interface AttachmentTarget {
 	 */
 	@Contract("_, !null -> !null")
 	default <A> A getAttachedOrElse(AttachmentType<A> type, @Nullable A defaultValue) {
-		A attached = getAttached(type);
-		return attached == null ? defaultValue : attached;
+		return ((IAttachmentHolder) this).getExistingData(((AttachmentTypeImpl<A>) type).internalType()).orElse(defaultValue);
 	}
 
 	/**
@@ -181,8 +182,7 @@ public interface AttachmentTarget {
 	default <A> A getAttachedOrGet(AttachmentType<A> type, Supplier<A> defaultValue) {
 		Objects.requireNonNull(defaultValue, "default value supplier cannot be null");
 
-		A attached = getAttached(type);
-		return attached == null ? defaultValue.get() : attached;
+		return ((IAttachmentHolder) this).getExistingData(((AttachmentTypeImpl<A>) type).internalType()).orElseGet(defaultValue);
 	}
 
 	/**
@@ -195,7 +195,7 @@ public interface AttachmentTarget {
 	 */
 	@Nullable
 	default <A> A setAttached(AttachmentType<A> type, @Nullable A value) {
-		throw new UnsupportedOperationException("Implemented via mixin");
+		return ((IAttachmentHolder) this).setData(((AttachmentTypeImpl<A>) type).internalType(), value);
 	}
 
 	/**
@@ -206,7 +206,7 @@ public interface AttachmentTarget {
 	 * @return whether there is associated data
 	 */
 	default boolean hasAttached(AttachmentType<?> type) {
-		throw new UnsupportedOperationException("Implemented via mixin");
+		return ((IAttachmentHolder) this).hasData(((AttachmentTypeImpl<?>) type).internalType());
 	}
 
 	/**
@@ -219,7 +219,7 @@ public interface AttachmentTarget {
 	 */
 	@Nullable
 	default <A> A removeAttached(AttachmentType<A> type) {
-		return setAttached(type, null);
+		return ((IAttachmentHolder) this).removeData(((AttachmentTypeImpl<A>) type).internalType());
 	}
 
 	/**
@@ -231,7 +231,7 @@ public interface AttachmentTarget {
 	 * @return event associated with this target and attachment type
 	 */
 	default <A> Event<OnAttachedSet<A>> onAttachedSet(AttachmentType<A> type) {
-		throw new UnsupportedOperationException("Implemented via mixin");
+		return AttachmentChangeEvents.onAttachedSet(type);
 	}
 
 	/**
@@ -254,9 +254,9 @@ public interface AttachmentTarget {
 		/**
 		 * Called after the attachment is set on this target.
 		 *
-		 * @see AttachmentTarget#onAttachedSet(AttachmentType)
 		 * @param oldValue attachment value on the target prior to it being set
 		 * @param newValue attachment value on the target after it was set
+		 * @see AttachmentTarget#onAttachedSet(AttachmentType)
 		 */
 		void onAttachedSet(@Nullable A oldValue, @Nullable A newValue);
 	}

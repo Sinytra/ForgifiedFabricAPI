@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.api.attachment.v1;
 
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 
@@ -31,5 +33,5 @@ import net.minecraft.world.level.Level;
  * while on the client it is bound to {@code ClientPacketListener} and should only be accessed when in a world
  * (when {@code Minecraft.getInstance().level} is not null).
  */
-public interface GlobalAttachments extends AttachmentTarget {
+public interface GlobalAttachments extends AttachmentTarget, IAttachmentHolder {
 }

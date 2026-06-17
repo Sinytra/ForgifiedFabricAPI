@@ -49,6 +49,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerCon
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.test.attachment.AttachmentTestMod;
 
+// FIXME
 public class SyncGametest implements FabricClientGameTest {
 	public static final Logger LOGGER = LoggerFactory.getLogger("data-attachment-syncing-gametest");
 

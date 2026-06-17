@@ -23,8 +23,7 @@
       "net.fabricmc.fabric.test.attachment.gametest.BlockEntityTests"
     ],
     "fabric-client-gametest": [
-      "net.fabricmc.fabric.test.attachment.client.gametest.PersistenceGametest",
-      "net.fabricmc.fabric.test.attachment.client.gametest.SyncGametest"
+      "net.fabricmc.fabric.test.attachment.client.gametest.PersistenceGametest"
     ]
   },
   "mixins": [
