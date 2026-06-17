@@ -14,5 +14,12 @@ testDependencies(project, [
 	':fabric-client-gametest-api-v1',
 	':fabric-item-api-v1',
 	':fabric-object-builder-api-v1',
-	':fabric-screen-api-v1'
+	':fabric-screen-api-v1',
+	':fabric-resource-loader-v1'
 ])
+
+neoForge.mods {
+	resourceLoaderTestMod {
+		sourceSet project(':fabric-resource-loader-v1').sourceSets.testmod
+	}
+}

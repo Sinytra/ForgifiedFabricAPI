@@ -33,6 +33,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderPipeline;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 
 public class GuiRendererNonQuadsTest implements ClientModInitializer {
@@ -53,7 +54,7 @@ public class GuiRendererNonQuadsTest implements ClientModInitializer {
 							graphics.guiHeight() / 8 + xOffset, graphics.guiHeight() / 8 + yOffset,
 							graphics.guiHeight() / 8 + 16 + xOffset, graphics.guiHeight() / 8 + 16 + yOffset,
 							graphics.guiWidth() / 8 + xOffset, graphics.guiHeight() / 8 + yOffset
-			);
+					);
 
 			graphics.guiRenderState.addGuiElement(testStateCreator.apply(0, 0));
 			// this second triangle should not stretch to include the first triangle's vertex
@@ -63,16 +64,22 @@ public class GuiRendererNonQuadsTest implements ClientModInitializer {
 		});
 	}
 
-	record CustomTestState(Matrix3x2f matrix, ScreenRectangle bounds, @Nullable ScreenRectangle scissorArea, int x0, int y0, int x1, int y1, int x2, int y2) implements GuiElementRenderState {
+	record CustomTestState(Matrix3x2f matrix, ScreenRectangle bounds,
+	                       @Nullable ScreenRectangle scissorArea, int x0, int y0, int x1, int y1,
+	                       int x2, int y2) implements GuiElementRenderState {
 		CustomTestState(Matrix3x2f matrix, @Nullable ScreenRectangle scissorArea, int x0, int y0, int x1, int y1, int x2, int y2) {
 			this(matrix, createTriangleBounds(x0, y0, x1, y1, x2, y2, matrix, scissorArea), scissorArea, x0, y0, x1, y1, x2, y2);
 		}
 
-		private static final RenderPipeline PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
-				.withLocation(Identifier.fromNamespaceAndPath("test", "gui_renderer_non_quads_test"))
-				.withUsePipelineDrawModeForGui(true)
-				.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
-				.build();
+		private static final RenderPipeline PIPELINE;
+
+		static {
+			RenderPipeline.Builder builder = RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
+					.withLocation(Identifier.fromNamespaceAndPath("test", "gui_renderer_non_quads_test"))
+					.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN);
+			((FabricRenderPipeline.Builder) builder).withUsePipelineDrawModeForGui(true);
+			PIPELINE = builder.build();
+		}
 
 		@Override
 		public void buildVertices(VertexConsumer vertices) {

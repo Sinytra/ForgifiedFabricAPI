@@ -8,15 +8,12 @@
     "CapeLayerMixin",
     "ClientLevelMixin",
     "ClientTooltipComponentMixin",
-    "DebugOptionsScreenEntryMixin",
-    "DebugOptionsScreenOptionListMixin",
     "DrawAccessor",
     "EntityRenderDispatcherMixin",
     "EntityRenderersMixin",
     "GameRendererMixin",
     "GuiAccessor",
     "GuiGraphicsExtractorMixin",
-    "GuiMixin",
     "GuiRendererMixin",
     "HumanoidArmorLayerMixin",
     "HumanoidMobRendererMixin",
@@ -50,7 +47,8 @@
     "renderstate.RenderStateMixin",
     "renderstate.SkyRenderStateMixin",
     "renderstate.WeatherRenderStateMixin",
-    "renderstate.WorldBorderRenderStateMixin"
+    "renderstate.WorldBorderRenderStateMixin",
+    "GuiLayerManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

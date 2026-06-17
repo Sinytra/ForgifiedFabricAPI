@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.mixin.client.rendering;
 
+import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -40,4 +41,7 @@ public interface GuiAccessor {
 
 	@Invoker("getCameraPlayer")
 	Player fabric$callGetCameraPlayer();
+	
+	@Accessor("layerManager")
+	GuiLayerManager fabric$getLayerManager();
 }

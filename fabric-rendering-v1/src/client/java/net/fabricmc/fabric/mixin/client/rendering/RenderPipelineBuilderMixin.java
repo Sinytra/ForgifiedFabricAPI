@@ -27,6 +27,10 @@ import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.PolygonMode;
 import com.mojang.blaze3d.vertex.VertexFormat;
+
+import net.fabricmc.fabric.api.client.rendering.v1.FabricRenderPipeline.Snippet;
+
+import net.neoforged.neoforge.client.stencil.StencilTest;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -62,7 +66,7 @@ class RenderPipelineBuilderMixin implements FabricRenderPipeline.Builder {
 			at = @At("TAIL")
 	)
 	private void copyUsePipelineDrawModeForGuiFromSnippet(RenderPipeline.Snippet snippet, CallbackInfo ci) {
-		snippet.usePipelineDrawModeForGui().ifPresent(value -> this.usePipelineDrawModeForGui = Optional.of(value));
+		((Snippet) (Object) snippet).usePipelineDrawModeForGui().ifPresent(value -> this.usePipelineDrawModeForGui = Optional.of(value));
 	}
 
 	@WrapOperation(
@@ -84,9 +88,10 @@ class RenderPipelineBuilderMixin implements FabricRenderPipeline.Builder {
 			Optional<Boolean> cull,
 			Optional<VertexFormat> vertexFormat,
 			Optional<VertexFormat.Mode> vertexFormatMode,
+			Optional<StencilTest> stencilTest,
 			Operation<RenderPipeline.Snippet> original
 	) {
-		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(vertexShader, fragmentShader, shaderDefines, samplers, uniforms, colorTargetState, depthStencilState, polygonMode, cull, vertexFormat, vertexFormatMode), usePipelineDrawModeForGui);
+		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(vertexShader, fragmentShader, shaderDefines, samplers, uniforms, colorTargetState, depthStencilState, polygonMode, cull, vertexFormat, vertexFormatMode, stencilTest), usePipelineDrawModeForGui);
 	}
 
 	@ModifyReturnValue(

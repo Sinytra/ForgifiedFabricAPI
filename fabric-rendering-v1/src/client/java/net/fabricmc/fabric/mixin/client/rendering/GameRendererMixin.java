@@ -25,35 +25,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.resources.model.ModelManager;
 
-import net.fabricmc.fabric.impl.client.rendering.GuiRendererExtensions;
 import net.fabricmc.fabric.impl.client.rendering.LevelRendererExtensions;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 	@Shadow
 	@Final
-	private GuiRenderer guiRenderer;
-
-	@Shadow
-	@Final
-	private SubmitNodeStorage submitNodeStorage;
-
-	@Shadow
-	@Final
 	private Minecraft minecraft;
-
-	@Inject(method = "<init>", at = @At(value = "RETURN"))
-	private void guiRendererReady(Minecraft minecraft, ItemInHandRenderer itemInHandRenderer, RenderBuffers renderBuffers, ModelManager modelManager, CallbackInfo ci) {
-		GuiRendererExtensions guiRenderer = (GuiRendererExtensions) this.guiRenderer;
-		guiRenderer.fabric_onReady(this.submitNodeStorage);
-	}
 
 	@Inject(method = "extract", at = @At(value = "HEAD"))
 	private void beforeExtract(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {

@@ -6,10 +6,7 @@
   "environment": "*",
   "license": "Apache-2.0",
   "depends": {
-    "fabric-resource-loader-v1": "*",
-    "fabric-resource-loader-v1-testmod-a": "*",
-    "fabric-resource-loader-v1-testmod-b": "*",
-    "fabric-resource-loader-v1-testmod-c": "*"
+    "fabric-resource-loader-v1": "*"
   },
   "entrypoints": {
     "main": [

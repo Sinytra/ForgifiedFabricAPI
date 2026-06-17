@@ -290,6 +290,7 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
     project.dependencies {
         deps.forEach {
             api(it)
+            add("accessTransformers", it)
         }
     }
 }
