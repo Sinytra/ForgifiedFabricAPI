@@ -3,11 +3,8 @@
   "package": "net.fabricmc.fabric.mixin.particle",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "BlockParticleOptionMixin",
     "BreezeMixin",
     "BrushItemMixin",
-    "EntityMixin",
-    "LivingEntityMixin",
     "ParticleUtilsMixin",
     "ServerPlayerMixin",
     "WardenMixin"
