@@ -1,6 +1,10 @@
 import net.fabricmc.fabric.impl.build.AbstractGenerateClassTweakerTask
 
-import org.gradle.api.tasks.TaskAction
+testDependencies(project, [
+	':fabric-object-builder-api-v1'
+])
+
+
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
