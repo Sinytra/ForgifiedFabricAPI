@@ -47,7 +47,6 @@ import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.util.EventResult;
 
 @Mixin(ServerPlayer.class)
@@ -84,12 +83,7 @@ abstract class ServerPlayerMixin extends LivingEntityMixin {
 		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.invoker().afterChangeLevel((ServerPlayer) (Object) this, origin, this.level());
 	}
 
-	@Inject(method = "restoreFrom", at = @At("TAIL"))
-	private void onCopyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
-		ServerPlayerEvents.COPY_FROM.invoker().copyFromPlayer(oldPlayer, (ServerPlayer) (Object) this, alive);
-	}
-
-	@WrapOperation(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getValue(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;"))
+	@WrapOperation(method = "lambda$startSleepInBed$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getValue(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;"))
 	private Comparable<?> redirectSleepDirection(BlockState instance, Property<Direction> property, Operation<Comparable<Direction>> original, BlockPos pos, @Cancellable CallbackInfoReturnable<Either<Player.BedSleepingProblem, Unit>> cir) {
 		Direction initial = (Direction) (instance.hasProperty(property) ? original.call(instance, property) : null);
 		Direction dir = EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.invoker().modifySleepDirection((LivingEntity) (Object) this, pos, initial);
@@ -101,14 +95,14 @@ abstract class ServerPlayerMixin extends LivingEntityMixin {
 		return dir;
 	}
 
-	@WrapOperation(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/server/level/ServerPlayer$RespawnConfig;Z)V"))
+	@WrapOperation(method = "lambda$startSleepInBed$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/server/level/ServerPlayer$RespawnConfig;Z)V"))
 	private void onSetSpawnPoint(ServerPlayer player, ServerPlayer.RespawnConfig spawnPoint, boolean sendMessage, Operation<Void> original) {
 		if (EntitySleepEvents.ALLOW_SETTING_SPAWN.invoker().allowSettingSpawn(player, spawnPoint.respawnData().pos())) {
 			original.call(player, spawnPoint, sendMessage);
 		}
 	}
 
-	@Redirect(method = "startSleepInBed", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"))
+	@Redirect(method = "lambda$startSleepInBed$0", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"))
 	private boolean hasNoMonstersNearby(List<Monster> monsters, BlockPos pos) {
 		boolean vanillaResult = monsters.isEmpty();
 		EventResult result = EntitySleepEvents.ALLOW_NEARBY_MONSTERS.invoker().allowNearbyMonsters((Player) (Object) this, pos, vanillaResult);

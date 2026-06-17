@@ -49,7 +49,7 @@ include("fabric-creative-tab-api-v1")
 include("fabric-data-generation-api-v1")
 include("fabric-debug-api-v1")
 include("fabric-dimensions-v1")
-//include 'fabric-entity-events-v1'
+include("fabric-entity-events-v1")
 include("fabric-events-interaction-v0")
 include("fabric-game-rule-api-v1")
 include("fabric-gametest-api-v1")

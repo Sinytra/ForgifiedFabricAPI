@@ -17,12 +17,7 @@
 package net.fabricmc.fabric.mixin.entity.event.effect;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,19 +43,6 @@ public abstract class LivingEntityMixin extends Entity {
 		super(entityType, level);
 	}
 
-	@WrapMethod(method = "canBeAffected")
-	private boolean allowAddEffect(MobEffectInstance effectInstance, Operation<Boolean> original) {
-		if (this.isClient()) {
-			return original.call(effectInstance);
-		}
-
-		if (!ServerMobEffectEvents.ALLOW_ADD.invoker().allowAdd(effectInstance, this.self(), MobEffectUtil.getCommandContext())) {
-			return false;
-		}
-
-		return original.call(effectInstance);
-	}
-
 	@Inject(
 			method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
 			at = @At(
@@ -80,7 +62,7 @@ public abstract class LivingEntityMixin extends Entity {
 			method = "forceAddEffect",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/world/entity/LivingEntity;canBeAffected(Lnet/minecraft/world/effect/MobEffectInstance;)Z",
+					target = "Lnet/neoforged/neoforge/common/CommonHooks;canMobEffectBeApplied(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
 					shift = At.Shift.AFTER
 			)
 	)
@@ -102,55 +84,6 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		ServerMobEffectEvents.AFTER_ADD.invoker().afterAdd(effectInstance, this.self(), MobEffectUtil.getCommandContext());
-	}
-
-	@WrapOperation(
-			method = "removeAllEffects",
-			at = @At(
-					value = "INVOKE",
-					target = "Ljava/util/Map;clear()V"
-			)
-	)
-	private void allowRemoveAllEffects(Map<Holder<MobEffect>, MobEffectInstance> instance, Operation<Void> original) {
-		if (this.isClient()) {
-			return;
-		}
-
-		Set<Map.Entry<Holder<MobEffect>, MobEffectInstance>> effectEntries = Set.copyOf(instance.entrySet());
-		original.call(instance);
-
-		for (Map.Entry<Holder<MobEffect>, MobEffectInstance> entry : effectEntries) {
-			Holder<MobEffect> effect = entry.getKey();
-			MobEffectInstance effectInstance = entry.getValue();
-			boolean cannotRemove = !ServerMobEffectEvents.ALLOW_EARLY_REMOVE.invoker()
-					.allowEarlyRemove(effectInstance, this.self(), MobEffectUtil.getCommandContext());
-
-			if (cannotRemove) {
-				instance.put(effect, effectInstance);
-			}
-		}
-	}
-
-	@WrapMethod(method = "removeEffect")
-	private boolean allowRemoveEffect(Holder<MobEffect> holder, Operation<Boolean> original) {
-		if (this.isClient()) {
-			return original.call(holder);
-		}
-
-		MobEffectInstance effectInstance = this.self().getEffect(holder);
-
-		if (effectInstance == null) {
-			return original.call(holder);
-		}
-
-		boolean cannotRemove = !ServerMobEffectEvents.ALLOW_EARLY_REMOVE.invoker()
-				.allowEarlyRemove(effectInstance, this.self(), MobEffectUtil.getCommandContext());
-
-		if (cannotRemove) {
-			return false;
-		}
-
-		return original.call(holder);
 	}
 
 	@Inject(
@@ -191,8 +124,8 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(
 			method = "removeAllEffects",
 			at = @At(
-					value = "INVOKE",
-					target = "Lcom/google/common/collect/Maps;newHashMap(Ljava/util/Map;)Ljava/util/HashMap;"
+					value = "NEW",
+					target = "java/util/HashMap"
 			)
 	)
 	private void beforeRemoveAllEffects(CallbackInfoReturnable<Boolean> cir) {
