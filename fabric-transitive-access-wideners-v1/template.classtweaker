@@ -61,7 +61,11 @@ transitive-accessible	method	net/minecraft/world/entity/schedule/Activity	<init>
 
 # Living entity methods
 transitive-accessible	method	net/minecraft/world/entity/LivingEntity	hurtArmor	(Lnet/minecraft/world/damagesource/DamageSource;F)V
+transitive-accessible	method	net/minecraft/world/entity/player/Player	hurtArmor	(Lnet/minecraft/world/damagesource/DamageSource;F)V
+transitive-accessible	method	net/minecraft/world/entity/animal/equine/Horse	hurtArmor	(Lnet/minecraft/world/damagesource/DamageSource;F)V
+transitive-accessible	method	net/minecraft/world/entity/animal/wolf/Wolf	hurtArmor	(Lnet/minecraft/world/damagesource/DamageSource;F)V
 transitive-accessible	method	net/minecraft/world/entity/LivingEntity	hurtHelmet	(Lnet/minecraft/world/damagesource/DamageSource;F)V
+transitive-accessible	method	net/minecraft/world/entity/player/Player	hurtHelmet	(Lnet/minecraft/world/damagesource/DamageSource;F)V
 
 # Entity constructors
 transitive-accessible	method	net/minecraft/world/entity/projectile/Projectile	<init>	(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V
