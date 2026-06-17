@@ -63,7 +63,7 @@ public final class ParticleProviderRegistryImpl implements ParticleProviderRegis
 	record DirectParticleProviderRegistry(ParticleResources particleResources) implements ParticleProviderRegistry {
 		@Override
 		public <T extends ParticleOptions> void register(ParticleType<T> type, ParticleProvider<T> provider) {
-			particleResources.providers.put(BuiltInRegistries.PARTICLE_TYPE.getId(type), provider);
+			particleResources.providers.put(BuiltInRegistries.PARTICLE_TYPE.getKey(type), provider);
 		}
 
 		@Override

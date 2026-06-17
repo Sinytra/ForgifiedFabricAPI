@@ -28,8 +28,6 @@ public final class BlockParticleOptionFactoryImpl {
 	}
 
 	public static BlockParticleOption create(ParticleType<BlockParticleOption> type, BlockState blockState, @Nullable BlockPos blockPos) {
-		BlockParticleOption effect = new BlockParticleOption(type, blockState);
-		((BlockParticleOptionExtension) effect).fabric_setBlockPos(blockPos);
-		return effect;
+		return new BlockParticleOption(type, blockState, blockPos);
 	}
 }
