@@ -31,11 +31,9 @@
   ],
   "entrypoints": {
     "main": [
-      "net.fabricmc.fabric.impl.attachment.AttachmentEntrypoint",
-      "net.fabricmc.fabric.impl.attachment.sync.AttachmentSync"
+      "net.fabricmc.fabric.impl.attachment.AttachmentEntrypoint"
     ],
     "client": [
-      "net.fabricmc.fabric.impl.attachment.client.AttachmentSyncClient"
     ]
   },
   "accessWidener": "fabric-data-attachment-api-v1.classtweaker",

@@ -16,19 +16,26 @@
 
 package net.fabricmc.fabric.impl.attachment.sync.clientbound;
 
+import java.util.List;
+
+import net.neoforged.neoforge.attachment.AttachmentSync;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-import net.fabricmc.fabric.impl.attachment.sync.AttachmentChange;
-
-public record ClientboundAttachmentSyncPayload(AttachmentChange attachment) implements CustomPacketPayload {
-	public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundAttachmentSyncPayload> CODEC = StreamCodec.composite(
-			AttachmentChange.PACKET_CODEC,
-			ClientboundAttachmentSyncPayload::attachment,
-			ClientboundAttachmentSyncPayload::new
-	);
+public record ClientboundAttachmentSyncPayload(List<AttachmentType<?>> types,
+                                               byte[] syncPayload) implements CustomPacketPayload {
+	public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundAttachmentSyncPayload> STREAM_CODEC = StreamCodec.composite(
+			ByteBufCodecs.registry(AttachmentSync.SYNCED_ATTACHMENT_TYPES.key()).apply(ByteBufCodecs.list()),
+			ClientboundAttachmentSyncPayload::types,
+			NeoForgeStreamCodecs.UNBOUNDED_BYTE_ARRAY,
+			ClientboundAttachmentSyncPayload::syncPayload,
+			ClientboundAttachmentSyncPayload::new);
 	public static final Identifier PACKET_ID = Identifier.fromNamespaceAndPath("fabric", "attachment_sync_v1");
 	public static final Type<ClientboundAttachmentSyncPayload> TYPE = new Type<>(PACKET_ID);
 

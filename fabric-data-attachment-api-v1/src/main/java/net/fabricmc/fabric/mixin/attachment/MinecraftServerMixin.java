@@ -48,7 +48,7 @@ public abstract class MinecraftServerMixin implements GlobalAttachmentsProvider 
 
 		var type = new SavedDataType<>(
 				AttachmentSavedData.ID,
-				() -> new AttachmentSavedData(globalAttachments),
+				() -> new AttachmentSavedData(server),
 				AttachmentSavedData.codec(server),
 				null
 		);

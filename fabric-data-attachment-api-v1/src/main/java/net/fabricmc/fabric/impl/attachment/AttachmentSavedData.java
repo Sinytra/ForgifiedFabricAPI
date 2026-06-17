@@ -16,27 +16,18 @@
 
 package net.fabricmc.fabric.impl.attachment;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Decoder;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.Encoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-
-import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 
 /**
  * Backing storage for server-side global and level attachments.
@@ -45,48 +36,39 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 public class AttachmentSavedData extends SavedData {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentSavedData.class);
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("fabric", "attachments");
-	private final AttachmentTargetImpl target;
-	private final boolean wasSerialized;
+	private final MinecraftServer server;
 
-	public AttachmentSavedData(AttachmentTarget target) {
-		this.target = (AttachmentTargetImpl) target;
-		this.wasSerialized = this.target.fabric_hasPersistentAttachments();
+	public AttachmentSavedData(MinecraftServer server) {
+		this.server = server;
 	}
 
 	public static Codec<AttachmentSavedData> codec(MinecraftServer server) {
-		return codec((AttachmentTargetImpl) server.globalAttachments(), () -> "AttachmentSavedData @ global server attachments");
+		return codec(server, () -> "AttachmentSavedData @ global server attachments");
 	}
 
-	public static Codec<AttachmentSavedData> codec(ServerLevel level) {
-		return codec((AttachmentTargetImpl) level, () -> "AttachmentSavedData @ " + level.dimension().identifier());
-	}
-
-	// TODO 1.21.5 look at making this more idiomatic
-	private static Codec<AttachmentSavedData> codec(AttachmentTargetImpl target, ProblemReporter.PathElement reporterContext) {
-		return Codec.of(new Encoder<>() {
-			@Override
-			public <T> DataResult<T> encode(AttachmentSavedData input, DynamicOps<T> ops, T prefix) {
-				try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(reporterContext, LOGGER)) {
-					TagValueOutput output = TagValueOutput.createWithoutContext(reporter);
-					target.fabric_writeAttachmentsToNbt(output);
-					return DataResult.success(NbtOps.INSTANCE.convertTo(ops, output.buildResult()));
-				}
+	private static Codec<AttachmentSavedData> codec(MinecraftServer server, ProblemReporter.PathElement reporterContext) {
+		return CompoundTag.CODEC.flatXmap(tag -> {
+			try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(reporterContext, LOGGER)) {
+				var data = new AttachmentSavedData(server);
+				// Note: Side effect here, keep an eye on this
+				((GlobalAttachmentsImpl) data.server.globalAttachments()).doDeserializeAttachments(TagValueInput.create(reporter, data.server.registryAccess(), tag));
+				return !reporter.isEmpty()
+						? DataResult.error(() -> "Deserialisation error in level attachments: " + reporter.getReport())
+						: DataResult.success(data);
 			}
-		}, new Decoder<>() {
-			@Override
-			public <T> DataResult<Pair<AttachmentSavedData, T>> decode(DynamicOps<T> ops, T input) {
-				try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(reporterContext, LOGGER)) {
-					ValueInput valueInput = TagValueInput.create(reporter, target.fabric_getRegistryAccess(), (CompoundTag) ops.convertTo(NbtOps.INSTANCE, input));
-					target.fabric_readAttachmentsFromNbt(valueInput);
-					return DataResult.success(Pair.of(new AttachmentSavedData(target), ops.empty()));
-				}
+		}, data -> {
+			try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(reporterContext, LOGGER)) {
+				var tag = TagValueOutput.createWithContext(reporter, data.server.registryAccess());
+				((GlobalAttachmentsImpl) data.server.globalAttachments()).serializeAttachments(tag);
+				return !reporter.isEmpty()
+						? DataResult.error(() -> "Serialisation error in level attachments: " + reporter.getReport())
+						: DataResult.success(tag.buildResult());
 			}
 		});
 	}
 
 	@Override
 	public boolean isDirty() {
-		// Only write data if there are attachments, or if we previously wrote data.
-		return wasSerialized || target.fabric_hasPersistentAttachments();
+		return true;
 	}
 }
