@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.client.model.loading;
+package net.fabricmc.fabric.mixin.block;
 
-import com.google.gson.Gson;
+import net.neoforged.neoforge.common.extensions.IBlockStateExtension;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 
-@Mixin(CuboidModel.class)
-public interface CuboidModelAccessor {
-	@Accessor("GSON")
-	static Gson fabric_getGson() {
-		throw new AssertionError();
-	}
+@Mixin(IBlockStateExtension.class)
+public interface IBlockStateExtensionMixin extends FabricBlockState {
 }

@@ -96,7 +96,7 @@ public class AltModelBlockRendererImpl implements AltModelBlockRenderer, QuadTra
 		this.level = level;
 		this.pos = pos;
 		this.blockState = blockState;
-		defaultAo = ambientOcclusion && blockState.getLightEmission() == 0;
+		defaultAo = ambientOcclusion && blockState.getLightEmission(level, pos) == 0;
 
 		cacheValid = 0;
 		shouldCullFaceCache = 0;

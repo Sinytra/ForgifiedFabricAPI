@@ -97,6 +97,11 @@ afterEvaluate {
             neoForge.interfaceInjectionData.from(
                 files(generatedFile).builtBy(generateInjectedInterfaces)
             )
+            neoForge.interfaceInjectionData.publish(generatedFile)
+            
+            tasks.named("copyInterfaceInjectionDataPublications") {
+                dependsOn("generateInjectedInterfaces", "generateForgeModMetadata")
+            }
         }
     }
 }

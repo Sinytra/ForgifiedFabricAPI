@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import net.neoforged.neoforge.client.extensions.BlockStateModelExtension;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.Minecraft;
@@ -48,7 +49,7 @@ import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadView;
  *
  * <p>Note: This interface is automatically implemented on {@link BlockStateModel} via Mixin and interface injection.
  */
-public interface FabricBlockStateModel {
+public interface FabricBlockStateModel extends BlockStateModelExtension {
 	/**
 	 * Produces this model's geometry. <b>This method must be called instead of
 	 * {@link BlockStateModel#collectParts(RandomSource, List)}; the vanilla method
@@ -155,7 +156,7 @@ public interface FabricBlockStateModel {
 	 * @return the particle material
 	 */
 	default Material.Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
-		return ((BlockStateModel) this).particleMaterial();
+		return BlockStateModelExtension.super.particleMaterial(level, pos, state);
 	}
 
 	/**
@@ -193,7 +194,7 @@ public interface FabricBlockStateModel {
 	 */
 	@BakedQuad.MaterialFlags
 	default int materialFlags(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
-		return ((BlockStateModel) this).materialFlags();
+		return BlockStateModelExtension.super.materialFlags(level, pos, state);
 	}
 
 	/**
@@ -218,6 +219,6 @@ public interface FabricBlockStateModel {
 	 * @see #materialFlags(BlockAndTintGetter, BlockPos, BlockState, RandomSource)
 	 */
 	default boolean hasMaterialFlag(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, @BakedQuad.MaterialFlags int flag) {
-		return (materialFlags(level, pos, state, random) & flag) != 0;
+		return BlockStateModelExtension.super.hasMaterialFlag(level, pos, state, flag);
 	}
 }

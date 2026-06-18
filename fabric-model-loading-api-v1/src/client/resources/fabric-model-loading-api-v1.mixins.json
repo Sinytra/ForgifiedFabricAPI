@@ -3,12 +3,11 @@
   "package": "net.fabricmc.fabric.mixin.client.model.loading",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "ModelManagerMixin",
-    "CuboidModelAccessor",
-    "CuboidModelMixin",
+    "BlockStateModelUnbakedMixin",
     "ModelBakeryBakingResultMixin",
     "ModelBakeryMixin",
-    "BlockStateModelUnbakedMixin"
+    "ModelManagerMixin",
+    "UnbakedModelParserDeserializerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

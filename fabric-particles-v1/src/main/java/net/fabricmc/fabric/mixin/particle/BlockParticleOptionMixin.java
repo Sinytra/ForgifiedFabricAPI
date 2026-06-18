@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.block;
+package net.fabricmc.fabric.mixin.particle;
 
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
 
-import net.fabricmc.fabric.api.block.v1.FabricBlockState;
+import net.fabricmc.fabric.api.particle.v1.FabricBlockParticleOption;
 
-@Mixin(BlockState.class)
-public class BlockStateMixin implements FabricBlockState { }
+@Mixin(BlockParticleOption.class)
+abstract class BlockParticleOptionMixin implements FabricBlockParticleOption {
+	@Override
+	@Nullable
+	public BlockPos getBlockPos() {
+		return ((BlockParticleOption) (Object) this).getPos();
+	}
+}

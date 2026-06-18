@@ -1,16 +1,23 @@
-plugins {
-	id 'fabric-api.module'
-	id 'fabric-api.mixin-config'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file("src/client/resources/fabric-renderer-indigo.classtweaker")
 }
 
-fabricApiModule {
-	moduleDependencies(
-		'fabric-api-base',
-		'fabric-renderer-api-v1',
-		'fabric-rendering-v1'
-	)
+moduleDependencies(project, [
+	'fabric-api-base',
+	'fabric-renderer-api-v1',
+	'fabric-rendering-v1'
+])
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/mixinConfig/java'
+		}
+	}
+}
+
+dependencies {
+	interfaceInjectionData project(':fabric-renderer-api-v1')
 }

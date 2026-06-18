@@ -16,8 +16,8 @@
 
 package net.fabricmc.fabric.impl.client.rendering;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.ArmorModelSet;
@@ -25,8 +25,8 @@ import net.minecraft.client.renderer.entity.ArmorModelSet;
 import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 
 public final class ModelLayerImpl {
-	public static final Map<ModelLayerLocation, ModelLayerRegistry.TexturedLayerDefinitionProvider> PROVIDERS = new HashMap<>();
-	public static final Map<ArmorModelSet<ModelLayerLocation>, ModelLayerRegistry.TexturedArmorModelSetProvider> ARMOR_PROVIDERS = new HashMap<>();
+	public static final Map<ModelLayerLocation, ModelLayerRegistry.TexturedLayerDefinitionProvider> PROVIDERS = new ConcurrentHashMap<>();
+	public static final Map<ArmorModelSet<ModelLayerLocation>, ModelLayerRegistry.TexturedArmorModelSetProvider> ARMOR_PROVIDERS = new ConcurrentHashMap<>();
 
 	private ModelLayerImpl() {
 	}

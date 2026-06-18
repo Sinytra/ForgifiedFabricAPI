@@ -27,7 +27,6 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.WeightedVariants;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -46,19 +45,6 @@ abstract class WeightedVariantsMixin implements BlockStateModel {
 	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, Predicate<@Nullable Direction> cullTest) {
 		list.getRandomOrThrow(random).emitQuads(emitter,
 				level, pos, state, random, cullTest);
-	}
-
-	@Override
-	@Nullable
-	public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
-		return list.getRandomOrThrow(random).createGeometryKey(
-				level, pos, state, random);
-	}
-
-	@Override
-	public Material.Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
-		return list.unwrap().getFirst().value().particleMaterial(
-				level, pos, state);
 	}
 
 	@Override

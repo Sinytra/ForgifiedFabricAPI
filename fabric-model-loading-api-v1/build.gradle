@@ -19,3 +19,7 @@ fabricApiModule {
 loom {
 	accessWidenerPath = file('src/client/resources/fabric-model-loading-api-v1.classtweaker')
 }
+
+dependencies {
+	interfaceInjectionData project(':fabric-renderer-api-v1')
+}
