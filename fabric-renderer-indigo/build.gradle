@@ -11,24 +11,13 @@ moduleDependencies(project, [
 ])
 
 sourceSets {
-	mixinConfig {
-		compileClasspath += configurations.loaderLibraries
+	main {
+		java {
+			srcDir 'src/mixinConfig/java'
+		}
 	}
-	client {
-		compileClasspath += mixinConfig.output
-		runtimeClasspath += mixinConfig.output
-	}
-}
-
-configurations {
-	clientImplementation.extendsFrom mixinConfigImplementation
-	clientRuntimeOnly.extendsFrom mixinConfigRuntimeOnly
 }
 
 dependencies {
-	mixinConfigImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-}
-
-jar {
-	from sourceSets.mixinConfig.output
+	interfaceInjectionData project(':fabric-renderer-api-v1')
 }

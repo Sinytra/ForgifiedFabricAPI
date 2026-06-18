@@ -16,15 +16,13 @@
 
 package net.fabricmc.fabric.mixin.client.renderer.block.render;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
@@ -33,14 +31,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 @Mixin(LevelRenderer.class)
 abstract class LevelRendererMixin {
-	@Shadow
-	private ClientLevel level;
-
 	@Unique
 	private final RandomSource random = RandomSource.createThreadLocalInstance(0L);
 
-	@Redirect(method = "extractBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;hasMaterialFlag(I)Z"))
-	private boolean hasMaterialFlagProxy(BlockStateModel model, @BakedQuad.MaterialFlags int flag, @Local(name = "pos") BlockPos pos, @Local(name = "state") BlockState state) {
+	@Redirect(method = "extractBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;hasMaterialFlag(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+	private boolean hasMaterialFlagProxy(BlockStateModel model, BlockAndTintGetter level, BlockPos pos, BlockState state, @BakedQuad.MaterialFlags int flag) {
 		random.setSeed(state.getSeed(pos));
 		return model.hasMaterialFlag(level, pos, state, random, flag);
 	}

@@ -12,7 +12,6 @@
     "block.model.WeightedVariantsMixin",
     "block.particle.BlockMarkerMixin",
     "block.particle.BlockStateModelSetMixin",
-    "block.particle.ScreenEffectRendererMixin",
     "block.particle.TerrainParticleMixin",
     "block.render.BlockFeatureRendererMixin",
     "block.render.BlockModelRenderStateMixin",

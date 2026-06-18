@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.client.renderer.block.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -29,7 +28,6 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.multipart.MultiPartModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -64,47 +62,6 @@ abstract class MultiPartModelMixin implements BlockStateModel {
 			model.emitQuads(emitter,
 					level, pos, state, random, cullTest);
 		}
-	}
-
-	@Override
-	@Nullable
-	public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
-		if (models == null) {
-			models = shared.selectModels(this.blockState);
-		}
-
-		int count = models.size();
-		long seed = random.nextLong();
-
-		if (count == 1) {
-			random.setSeed(seed);
-			return models.getFirst().createGeometryKey(level, pos, state, random);
-		} else {
-			List<Object> subkeys = new ArrayList<>(count);
-
-			for (int i = 0; i < count; i++) {
-				random.setSeed(seed);
-				Object subkey = models.get(i).createGeometryKey(
-						level, pos, state, random);
-
-				if (subkey == null) {
-					return null;
-				}
-
-				subkeys.add(subkey);
-			}
-
-			record Key(List<Object> subkeys) {
-			}
-
-			return new Key(subkeys);
-		}
-	}
-
-	@Override
-	public Material.Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
-		return ((MultiPartModelSharedBakedStateAccessor) (Object) shared).getSelectors().getFirst().model().particleMaterial(
-				level, pos, state);
 	}
 
 	@Override

@@ -4,11 +4,10 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "ModelManagerMixin",
-    "CuboidModelAccessor",
-    "CuboidModelMixin",
     "ModelBakeryBakingResultMixin",
     "ModelBakeryMixin",
-    "BlockStateModelUnbakedMixin"
+    "BlockStateModelUnbakedMixin",
+    "UnbakedModelParserDeserializerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

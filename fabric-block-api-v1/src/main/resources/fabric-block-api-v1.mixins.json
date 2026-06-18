@@ -5,7 +5,7 @@
   "mixins": [
     "BlockBehaviourPropertiesMixin",
     "BlockMixin",
-    "BlockStateMixin",
+    "IBlockStateExtensionMixin",
     "LivingEntityMixin"
   ],
   "injectors": {

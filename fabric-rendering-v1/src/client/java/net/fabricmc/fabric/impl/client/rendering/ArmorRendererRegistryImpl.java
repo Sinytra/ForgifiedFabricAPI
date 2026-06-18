@@ -16,8 +16,9 @@
 
 package net.fabricmc.fabric.impl.client.rendering;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jspecify.annotations.Nullable;
 
@@ -27,10 +28,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
+import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer.Factory;
 
 public class ArmorRendererRegistryImpl {
-	private static final HashMap<Item, ArmorRenderer.Factory> FACTORIES = new HashMap<>();
-	private static final HashMap<Item, ArmorRenderer> RENDERERS = new HashMap<>();
+	private static final Map<Item, Factory> FACTORIES = new ConcurrentHashMap<>();
+	private static final Map<Item, ArmorRenderer> RENDERERS = new ConcurrentHashMap<>();
 
 	public static void register(ArmorRenderer.Factory factory, ItemLike... items) {
 		Objects.requireNonNull(factory, "renderer factory is null");

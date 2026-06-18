@@ -21,6 +21,7 @@ import java.io.Reader;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.neoforged.neoforge.client.model.UnbakedModelParser;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -77,7 +78,7 @@ public interface UnbakedModelDeserializer {
 	 * method to {@link CuboidModel#fromStream(Reader)}.
 	 */
 	static UnbakedModel deserialize(Reader reader) throws JsonParseException {
-		return UnbakedModelDeserializerRegistry.deserialize(reader);
+		return UnbakedModelParser.parse(reader);
 	}
 
 	/**

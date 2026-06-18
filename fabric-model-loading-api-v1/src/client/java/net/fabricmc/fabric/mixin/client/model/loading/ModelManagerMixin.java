@@ -16,7 +16,6 @@
 
 package net.fabricmc.fabric.mixin.client.model.loading;
 
-import java.io.Reader;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -25,13 +24,13 @@ import java.util.function.Function;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.neoforged.neoforge.client.model.standalone.StandaloneModelLoader;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -41,13 +40,11 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelDiscovery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.client.resources.model.cuboid.CuboidModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 import net.fabricmc.fabric.api.client.model.loading.v1.ExtraModelKey;
 import net.fabricmc.fabric.api.client.model.loading.v1.FabricModelManager;
-import net.fabricmc.fabric.api.client.model.loading.v1.UnbakedModelDeserializer;
 import net.fabricmc.fabric.impl.client.model.loading.BakedModelsHooks;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingEventDispatcher;
 import net.fabricmc.fabric.impl.client.model.loading.ModelLoadingPluginManager;
@@ -116,9 +113,12 @@ abstract class ModelManagerMixin implements FabricModelManager {
 		};
 	}
 
-	@Inject(method = "discoverModelDependencies", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelDiscovery;resolve()Ljava/util/Map;"))
+	@Inject(
+			method = "discoverModelDependencies(Ljava/util/Map;Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;Lnet/minecraft/client/resources/model/ClientItemInfoLoader$LoadedClientInfos;Lnet/neoforged/neoforge/client/model/standalone/StandaloneModelLoader$LoadedModels;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelDiscovery;resolve()Ljava/util/Map;")
+	)
 	private static void resolveExtraModels(
-			Map<Identifier, UnbakedModel> modelMap, BlockStateModelLoader.LoadedModels stateDefinition, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, CallbackInfoReturnable<?> cir,
+			Map<Identifier, UnbakedModel> modelMap, BlockStateModelLoader.LoadedModels stateDefinition, ClientItemInfoLoader.LoadedClientInfos loadedClientInfos, StandaloneModelLoader.LoadedModels standaloneModels, CallbackInfoReturnable<?> cir,
 			@Local(name = "result") ModelDiscovery result
 	) {
 		// We know eventDispatcherFuture is available, as it is required by the item and block models (hookModels).
@@ -129,22 +129,5 @@ abstract class ModelManagerMixin implements FabricModelManager {
 	@Inject(method = "apply", at = @At(value = "RETURN"))
 	private void onReturnUpload(CallbackInfo ci, @Local(name = "bakedModels") ModelBakery.BakingResult bakedModels) {
 		extraModels = ((BakedModelsHooks) (Object) bakedModels).fabric_getExtraModels();
-	}
-
-	// We want to redirect the BlockModel.deserialize call, but its return type is BlockModel, so we can't
-	// do that directly.
-	// Instead, cancel the original call and then modify the null value when it's being used to construct the Pair.
-	@Redirect(method = "lambda$loadBlockModels$2(Ljava/util/Map$Entry;)Lcom/mojang/datafixers/util/Pair;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/cuboid/CuboidModel;fromStream(Ljava/io/Reader;)Lnet/minecraft/client/resources/model/cuboid/CuboidModel;"))
-	private static CuboidModel cancelVanillaDeserialize(Reader reader) {
-		return null;
-	}
-
-	// Here we replace the null model with one produced by our own deserializer.
-	// The Pair's type is actually Pair<Identifier, BlockModel>, but since generics don't really exist, vanilla
-	// code doesn't explicitly cast the model to BlockModel, and the enclosing method returns UnbakedModels per
-	// its return type, it's safe to return an UnbakedModel here.
-	@ModifyArg(method = "lambda$loadBlockModels$2(Ljava/util/Map$Entry;)Lcom/mojang/datafixers/util/Pair;", at = @At(value = "INVOKE", target = "Lcom/mojang/datafixers/util/Pair;of(Ljava/lang/Object;Ljava/lang/Object;)Lcom/mojang/datafixers/util/Pair;"), index = 1)
-	private static Object actuallyDeserializeModel(Object originalModel, @Local(name = "reader") Reader reader) {
-		return UnbakedModelDeserializer.deserialize(reader);
 	}
 }

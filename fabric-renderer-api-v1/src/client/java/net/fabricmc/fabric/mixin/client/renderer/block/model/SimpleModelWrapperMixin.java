@@ -22,6 +22,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+
+import net.minecraft.client.resources.model.ResolvedModel;
+
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,8 +56,8 @@ abstract class SimpleModelWrapperMixin implements BlockStateModelPart {
 	@Final
 	private boolean useAmbientOcclusion;
 
-	@Inject(method = "bake", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/QuadCollection;getAll()Ljava/util/List;"))
-	private static void analyzeMesh(final ModelBaker modelBakery, final Identifier location, final ModelState state, CallbackInfoReturnable<BlockStateModelPart> cir, @Local(name = "geometry") QuadCollection geometry, @Local(name = "forbiddenSprites") LocalRef<Multimap<Identifier, Identifier>> forbiddenSpritesRef) {
+	@Inject(method = "bake(Lnet/minecraft/client/resources/model/ModelBaker;Lnet/minecraft/client/resources/model/ResolvedModel;Lnet/minecraft/client/renderer/block/dispatch/ModelState;)Lnet/minecraft/client/renderer/block/dispatch/BlockStateModelPart;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/QuadCollection;getAll()Ljava/util/List;"))
+	private static void analyzeMesh(final ModelBaker modelBakery, final ResolvedModel model, final ModelState state, CallbackInfoReturnable<BlockStateModelPart> cir, @Local(name = "geometry") QuadCollection geometry, @Local(name = "forbiddenSprites") LocalRef<Multimap<Identifier, Identifier>> forbiddenSpritesRef) {
 		if (geometry instanceof MeshQuadCollection meshQuadCollection) {
 			meshQuadCollection.getMesh().forEach(quad -> {
 				if (quad.atlas() != QuadAtlas.BLOCK) {

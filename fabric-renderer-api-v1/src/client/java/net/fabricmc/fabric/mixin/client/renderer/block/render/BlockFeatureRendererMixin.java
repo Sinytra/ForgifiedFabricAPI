@@ -110,11 +110,11 @@ abstract class BlockFeatureRendererMixin {
 		}));
 	}
 
-	@Redirect(method = "renderMovingBlockSubmits", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;hasMaterialFlag(I)Z"))
-	private boolean hasMaterialFlagProxy(BlockStateModel model, @BakedQuad.MaterialFlags int flag, @Local(name = "movingBlockRenderState") MovingBlockRenderState movingBlockRenderState, @Local(name = "blockState") BlockState blockState) {
+	@Redirect(method = "renderMovingBlockSubmits", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/block/dispatch/BlockStateModel.hasMaterialFlag (Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+	private boolean hasMaterialFlagProxy(BlockStateModel model, BlockAndTintGetter level, BlockPos pos, BlockState state, @BakedQuad.MaterialFlags int flag, @Local(name = "movingBlockRenderState") MovingBlockRenderState movingBlockRenderState, @Local(name = "blockState") BlockState blockState) {
 		long blockSeed = blockState.getSeed(movingBlockRenderState.randomSeedPos);
 		random.setSeed(blockSeed);
-		return model.hasMaterialFlag(movingBlockRenderState, movingBlockRenderState.blockPos, blockState, random, flag);
+		return model.hasMaterialFlag(level, pos, state, random, flag);
 	}
 
 	@Redirect(method = "renderMovingBlockSubmits", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/block/ModelBlockRenderer.tesselateBlock(Lnet/minecraft/client/renderer/block/BlockQuadOutput;FFFLnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;J)V"))

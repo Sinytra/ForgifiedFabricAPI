@@ -17,6 +17,8 @@
 package net.fabricmc.fabric.impl.client.rendering;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -27,7 +29,7 @@ import net.minecraft.world.entity.EntityType;
  * Helper class for registering EntityRenderers.
  */
 public final class EntityRendererRegistryImpl {
-	private static HashMap<EntityType<?>, EntityRendererProvider<?>> map = new HashMap<>();
+	private static Map<EntityType<?>, EntityRendererProvider<?>> map = new ConcurrentHashMap<>();
 	private static BiConsumer<EntityType<?>, EntityRendererProvider<?>> handler = (type, function) -> map.put(type, function);
 
 	public static <T extends Entity> void register(EntityType<? extends T> entityType, EntityRendererProvider<T> factory) {

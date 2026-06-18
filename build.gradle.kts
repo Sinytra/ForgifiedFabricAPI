@@ -109,7 +109,7 @@ allprojects {
     neoForge {
         enable {
             version = versionNeoForge
-//            isDisableRecompilation = true
+            isDisableRecompilation = true
         }
     
         runs {
@@ -291,6 +291,7 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
         deps.forEach {
             api(it)
             add("accessTransformers", it)
+//            add("interfaceInjectionData", it)
         }
     }
 }
