@@ -19,6 +19,8 @@ package net.fabricmc.fabric.impl.transfer.fluid;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiNeoCompat;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.world.item.Item;
@@ -68,6 +70,10 @@ public class CombinedProvidersImpl {
 		@Override
 		@Nullable
 		public Storage<FluidVariant> find(ItemStack itemStack, ContainerItemContext context) {
+			if (TransferApiNeoCompat.isInNeoTx()) {
+				return null;
+			}
+
 			if (!context.getItemVariant().matches(itemStack)) {
 				String errorMessage = String.format(
 						"Query stack %s and ContainerItemContext variant %s don't match.",
