@@ -22,6 +22,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.impl.registry.sync.FabricRegistryInit;
 
 /**
  * The remapping process functions as follows:
@@ -48,6 +49,6 @@ public interface RegistryIdRemapCallback<T> {
 	}
 
 	static <T> Event<RegistryIdRemapCallback<T>> event(Registry<T> registry) {
-		throw new UnsupportedOperationException("Not implemented on NeoForge");
+		return FabricRegistryInit.getRemapCallbackEvent(registry);
 	}
 }

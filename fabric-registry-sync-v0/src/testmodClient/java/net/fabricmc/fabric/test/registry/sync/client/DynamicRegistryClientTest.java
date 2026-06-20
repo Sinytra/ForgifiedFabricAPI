@@ -77,9 +77,9 @@ public final class DynamicRegistryClientTest implements ClientModInitializer {
 //			//}
 //
 //			// See ClientRegistriesDynamicBuiltInRegistriesMixin
-//			if (handler.registryAccess().lookup(TEST_EMPTY_SYNCED_DYNAMIC_REGISTRY_KEY).isPresent()) {
-//				throw new AssertionError("Received empty registry that should have been skipped");
-//			}
+////			if (handler.registryAccess().lookup(TEST_EMPTY_SYNCED_DYNAMIC_REGISTRY_KEY).isPresent()) {
+////				throw new AssertionError("Received empty registry that should have been skipped");
+////			}
 //
 //			LOGGER.info("Dynamic registry sync tests passed!");
 //		});
