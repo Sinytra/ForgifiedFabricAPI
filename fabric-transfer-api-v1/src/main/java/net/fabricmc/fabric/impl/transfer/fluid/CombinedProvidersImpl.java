@@ -32,6 +32,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiNeoCompat;
 
 public class CombinedProvidersImpl {
 	public static Event<FluidStorage.CombinedItemApiProvider> createEvent(boolean invokeFallback) {
@@ -68,6 +69,10 @@ public class CombinedProvidersImpl {
 		@Override
 		@Nullable
 		public Storage<FluidVariant> find(ItemStack itemStack, ContainerItemContext context) {
+			if (TransferApiNeoCompat.isInNeoTx()) {
+				return null;
+			}
+
 			if (!context.getItemVariant().matches(itemStack)) {
 				String errorMessage = String.format(
 						"Query stack %s and ContainerItemContext variant %s don't match.",

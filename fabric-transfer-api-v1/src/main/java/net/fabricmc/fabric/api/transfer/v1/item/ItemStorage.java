@@ -26,8 +26,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
@@ -40,9 +38,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedSlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
-import net.fabricmc.fabric.impl.transfer.item.BundleContentsStorage;
-import net.fabricmc.fabric.impl.transfer.item.ComposterWrapper;
-import net.fabricmc.fabric.impl.transfer.item.ItemContainerContentsStorage;
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiNeoCompat;
 import net.fabricmc.fabric.mixin.transfer.CompoundContainerAccessor;
 
 /**
@@ -99,20 +95,17 @@ public final class ItemStorage {
 	}
 
 	static {
-		// Composter support.
-		ItemStorage.SIDED.registerForBlocks((level, pos, state, blockEntity, direction) -> ComposterWrapper.get(level, pos, direction), Blocks.COMPOSTER);
-
 		// Support for SidedStorageBlockEntity.
-		ItemStorage.SIDED.registerFallback((level, pos, state, blockEntity, direction) -> {
+		ItemStorage.SIDED.registerFallback(TransferApiNeoCompat.wrapProviderSafely((level, pos, state, blockEntity, direction) -> {
 			if (blockEntity instanceof SidedStorageBlockEntity sidedStorageBlockEntity) {
 				return sidedStorageBlockEntity.getItemStorage(direction);
 			}
 
 			return null;
-		});
+		}));
 
 		// Register container fallback.
-		ItemStorage.SIDED.registerFallback((level, pos, state, blockEntity, direction) -> {
+		ItemStorage.SIDED.registerFallback(TransferApiNeoCompat.wrapProviderSafely((level, pos, state, blockEntity, direction) -> {
 			Container containerToWrap = null;
 
 			if (state.getBlock() instanceof WorldlyContainerHolder provider) {
@@ -142,26 +135,8 @@ public final class ItemStorage {
 			}
 
 			return containerToWrap != null ? ContainerStorage.of(containerToWrap, direction) : null;
-		});
+		}));
 
-		ItemStorage.ITEM.registerForItems(
-				(itemStack, context) -> new ItemContainerContentsStorage(context, 27),
-				Items.SHULKER_BOX
-		);
-
-		Items.DYED_SHULKER_BOX.forEach(item -> ItemStorage.ITEM.registerForItems(
-				(itemStack, context) -> new ItemContainerContentsStorage(context, 27),
-				item
-		));
-
-		ItemStorage.ITEM.registerForItems(
-				(itemStack, context) -> new BundleContentsStorage(context),
-				Items.BUNDLE
-		);
-
-		Items.DYED_BUNDLE.forEach(item -> ItemStorage.ITEM.registerForItems(
-				(itemStack, context) -> new BundleContentsStorage(context),
-				item
-		));
+		TransferApiNeoCompat.registerTransferApiItemNeoBridge();
 	}
 }

@@ -28,6 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.impl.transfer.compat.FabricPlayerInventoryStorage;
 import net.fabricmc.fabric.impl.transfer.item.CursorSlotWrapper;
 
 /**
@@ -55,7 +56,7 @@ public interface PlayerInventoryStorage extends ContainerStorage {
 	 * Return an instance for the passed player inventory.
 	 */
 	static PlayerInventoryStorage of(Inventory playerInventory) {
-		return (PlayerInventoryStorage) ContainerStorage.of(playerInventory, null);
+		return FabricPlayerInventoryStorage.of(playerInventory);
 	}
 
 	/**

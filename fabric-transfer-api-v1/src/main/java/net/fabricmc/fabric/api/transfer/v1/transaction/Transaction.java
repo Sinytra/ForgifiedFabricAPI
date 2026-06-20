@@ -20,7 +20,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-import net.fabricmc.fabric.impl.transfer.transaction.TransactionManagerImpl;
+import net.fabricmc.fabric.impl.transfer.transaction.NeoTransactions;
 
 /**
  * A global operation where participants guarantee atomicity: either the whole operation succeeds,
@@ -82,7 +82,7 @@ public interface Transaction extends AutoCloseable, TransactionContext {
 	 * @throws IllegalStateException If a transaction is already active on the current thread.
 	 */
 	static Transaction openOuter() {
-		return TransactionManagerImpl.MANAGERS.get().openOuter();
+		return NeoTransactions.openOuter();
 	}
 
 	/**
@@ -96,14 +96,14 @@ public interface Transaction extends AutoCloseable, TransactionContext {
 	 * @return The current lifecycle of the transaction stack on this thread.
 	 */
 	static Lifecycle getLifecycle() {
-		return TransactionManagerImpl.MANAGERS.get().getLifecycle();
+		return NeoTransactions.getLifecycle();
 	}
 
 	/**
 	 * Open a nested transaction if {@code maybeParent} is non-null, or an outer transaction if {@code maybeParent} is null.
 	 */
 	static Transaction openNested(@Nullable TransactionContext maybeParent) {
-		return maybeParent == null ? openOuter() : maybeParent.openNested();
+		return NeoTransactions.openNested(maybeParent);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public interface Transaction extends AutoCloseable, TransactionContext {
 	@Deprecated
 	@Nullable
 	static TransactionContext getCurrentUnsafe() {
-		return TransactionManagerImpl.MANAGERS.get().getCurrentUnsafe();
+		return NeoTransactions.getCurrentUnsafe();
 	}
 
 	/**
