@@ -6,7 +6,7 @@ plugins {
     java
     `maven-publish`
     id("net.neoforged.moddev") // Version declared in buildSrc
-    id("me.modmuss50.mod-publish-plugin") version "0.5.+"
+    id("me.modmuss50.mod-publish-plugin") version "2.0.+"
 }
 
 val implementationVersion: String by project
@@ -212,6 +212,8 @@ publishMods {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
         projectId.set(curseForgeId)
         minecraftVersions.add(versionMc)
+        client.set(false)
+        server.set(false)
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
