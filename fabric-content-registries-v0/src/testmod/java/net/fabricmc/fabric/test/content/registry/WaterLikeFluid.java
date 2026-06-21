@@ -65,11 +65,6 @@ public abstract class WaterLikeFluid extends WaterFluid {
 		return direction == Direction.DOWN;
 	}
 
-	@Override
-	public FluidType getFluidType() {
-		return NeoForgeMod.EMPTY_TYPE.value();
-	}
-
 	public static class Flowing extends WaterLikeFluid {
 		public Flowing() {
 		}

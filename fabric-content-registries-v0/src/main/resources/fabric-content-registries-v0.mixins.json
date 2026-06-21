@@ -21,6 +21,7 @@
     "WeatheringCopperMixin",
     "WorkAtComposterAccessor",
     "fluid.AbstractBoatMixin",
+    "fluid.CommonHooksMixin",
     "fluid.EntityAccessor",
     "fluid.EntityMixin",
     "fluid.FloatGoalMixin",
