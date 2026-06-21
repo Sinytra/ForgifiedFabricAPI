@@ -16,16 +16,16 @@
 
 package net.fabricmc.fabric.impl.client.model.loading;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.client.model.loading.v1.UnbakedModelDeserializer;
 
 public class UnbakedModelDeserializerRegistry {
-	private static final Map<Identifier, UnbakedModelDeserializer> DESERIALIZERS = new HashMap<>();
+	private static final Map<Identifier, UnbakedModelDeserializer> DESERIALIZERS = new ConcurrentHashMap<>();
 
 	public static void register(Identifier id, UnbakedModelDeserializer deserializer) {
 		Objects.requireNonNull(id, "id cannot be null");

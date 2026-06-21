@@ -17,8 +17,9 @@
 package net.fabricmc.fabric.impl.content.registry.fluid;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
@@ -26,7 +27,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.fabricmc.fabric.api.registry.fluid.FluidBehavior;
 
 public final class EntityFluidInteractionRegistryImpl {
-	private static final HashMap<TagKey<Fluid>, FluidBehavior> TRACKED_FLUIDS = new HashMap<>();
+	private static final Map<TagKey<Fluid>, FluidBehavior> TRACKED_FLUIDS = new ConcurrentHashMap<>();
 
 	public static void register(TagKey<Fluid> fluidTagKey, FluidBehavior behaviour) {
 		TRACKED_FLUIDS.put(fluidTagKey, behaviour);
