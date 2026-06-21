@@ -4,6 +4,10 @@ loom {
 	accessWidenerPath = file('src/client/resources/fabric-client-gametest-api-v1.classtweaker')
 }
 
+testDependencies(project, [
+	':fabric-screen-api-v1',
+])
+
 sourceSets {
 	main {
 		java {
@@ -18,5 +22,11 @@ neoForge {
 			client()
 			systemProperty 'fabric.client.gametest', 'true'
 		}
+	}
+}
+
+neoForge.mods {
+	screenTestMod {
+		sourceSet project(':fabric-screen-api-v1').sourceSets.testmod
 	}
 }

@@ -26,7 +26,7 @@ masterSourceSets.forEach { sourceSet ->
         outputDir.set(targetDir)
         fabricModJson.set(modMetadataJson)
         testEnvironment = sourceSet.name == "testmod"
-        includeVersion.set(false)
+        includeVersion.set(project.parent?.name == "deprecated")
     }
     sourceSet.java.srcDir(task)
     val cleanTask = tasks.register(sourceSet.getTaskName("clean", baseTaskName), Delete::class.java) {
@@ -60,7 +60,7 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
     val outputDir: DirectoryProperty = project.objects.directoryProperty()
 
     private val projectNamePattern = "^fabric_(.+?)(?:_v\\d)?\$".toRegex()
-    private val projectVersionNamePattern = "^fabric_(.+?_v\\d)?\$".toRegex()
+    private val projectVersionNamePattern = "^fabric_(.+?_v\\d.*)?\$".toRegex()
 
     @TaskAction
     fun run() {

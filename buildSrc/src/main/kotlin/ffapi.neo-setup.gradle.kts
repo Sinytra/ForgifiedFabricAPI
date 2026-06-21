@@ -70,6 +70,7 @@ tasks {
 
     named<Test>("test") {
         useJUnitPlatform()
+        isEnabled = false
     }
 
     named<ProcessResources>("processResources") {

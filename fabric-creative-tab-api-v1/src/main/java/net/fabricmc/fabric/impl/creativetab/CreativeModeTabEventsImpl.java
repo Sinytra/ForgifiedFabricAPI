@@ -16,8 +16,8 @@
 
 package net.fabricmc.fabric.impl.creativetab;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +29,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
 public class CreativeModeTabEventsImpl {
-	private static final Map<ResourceKey<CreativeModeTab>, Event<CreativeModeTabEvents.ModifyOutput>> CREATIVE_MODE_TAB_EVENT_MAP = new HashMap<>();
+	private static final Map<ResourceKey<CreativeModeTab>, Event<CreativeModeTabEvents.ModifyOutput>> CREATIVE_MODE_TAB_EVENT_MAP = new ConcurrentHashMap<>();
 
 	public static Event<CreativeModeTabEvents.ModifyOutput> getOrCreateModifyOutputEvent(ResourceKey<CreativeModeTab> resourceKey) {
 		return CREATIVE_MODE_TAB_EVENT_MAP.computeIfAbsent(resourceKey, (g -> createModifyEvent()));
