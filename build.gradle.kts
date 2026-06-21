@@ -133,36 +133,13 @@ allprojects {
 
 dependencies {
     // Include Forgified Fabric Loader
-//    jarJar("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
-    compileOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
-//    runtimeOnly("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
+    jarJar("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader") {
+        version {
+            strictly(versionForgifiedFabricLoader)
+            prefer(versionForgifiedFabricLoader)
+        }
+    }
 }
-
-//val processIncludedJars by tasks.registering(NestableJarGenerationTask::class) {
-//    from(configurations.getByName(Constants.Configurations.INCLUDE_INTERNAL))
-//    outputDirectory.set(layout.buildDirectory.dir(name))
-//}
-
-//tasks {
-//    named<Jar>("jar") {
-//        val nestedJars = files(fileTree(processIncludedJars.flatMap { it.outputDirectory }))
-//        nestedJars.builtBy(processIncludedJars)
-//        inputs.files(nestedJars)
-//
-//        doLast {
-//            JarNester.nestJars(
-//                nestedJars.files,
-//                archiveFile.get().asFile,
-//                loom.platform.get(),
-//                project.logger
-//            )
-//        }
-//    }
-//
-//    withType<JavaCompile> {
-//        options.release = 21
-//    }
-//}
 
 // Subprojects
 
@@ -208,15 +185,6 @@ allprojects {
     }
 
     if (project != rootProject) {
-//        configurations {
-//            apiElements {
-//                setExtendsFrom(emptySet())
-//            }
-//            runtimeElements {
-//                setExtendsFrom(emptySet())
-//            }
-//        }
-
         neoForge.runs {
             listOf("client", "server").forEach { run ->
                 named(run) {
@@ -291,7 +259,6 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
         deps.forEach {
             api(it)
             add("accessTransformers", it)
-//            add("interfaceInjectionData", it)
         }
     }
 }

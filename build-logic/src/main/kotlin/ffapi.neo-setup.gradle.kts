@@ -36,15 +36,9 @@ sourceSets.named("test") {
 }
 
 dependencies {
-    "compileOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
-    "runtimeOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
+    "implementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
 
     "testmodImplementation"(mainSourceSet.output)
-//    "testmodImplementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
-
-//    if (project.name != "fabric-gametest-api-v1") { TODO
-//        "testmodImplementation"(project(":fabric-gametest-api-v1", "namedElements"))
-//    }
 
     "testImplementation"(testmod.output)
     "testImplementation"("org.mockito:mockito-core:5.4.0")
