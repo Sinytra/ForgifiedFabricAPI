@@ -212,8 +212,6 @@ publishMods {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
         projectId.set(curseForgeId)
         minecraftVersions.add(versionMc)
-        client.set(false)
-        server.set(false)
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
