@@ -15,6 +15,7 @@ import java.io.File
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteIfExists
+import kotlin.io.path.name
 import kotlin.io.path.notExists
 import kotlin.text.split
 
@@ -86,6 +87,7 @@ abstract class GenerateModMetadataTask : DefaultTask() {
 
             val root = sourceRoot.toPath()
             val fabricMetadata = root.resolve("fabric.mod.json")
+            val isTestMod = root.parent.name.contains("test")
 
             if (fabricMetadata.notExists()) {
                 continue
@@ -159,15 +161,20 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                 }
             }
             val allowedEntrypoints = listOf("fabric-client-gametest", "fabric-gametest", "fabric-datagen")
-            val modproperties = json.getAsJsonObject("entrypoints")
+            val modproperties = mutableMapOf<String, Any>();
+            
+            if (isTestMod) {
+                modproperties["sinytra:use_default_fluid_type"] = true
+            }
+
+            json.getAsJsonObject("entrypoints")
                 ?.let { 
                     val entrypoints = mutableMapOf<String, List<String>>()
                     allowedEntrypoints.forEach { key ->
                         it.get(key)?.let { entrypoints[key] = it.asJsonArray.map { it.asString } }
                     }
-                    mapOf<String, Map<String, Any>>(normalModid to mapOf("fabric:entrypoints" to entrypoints))
+                    modproperties["fabric:entrypoints"] = entrypoints
                 }
-                ?.takeIf { it.isNotEmpty() }
 
             val modsToml = ModsToml(
                 modLoader = if (containsCode) "javafml" else "lowcodefml",
@@ -179,7 +186,7 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                 mods,
                 dependencies = mapOf(normalModid to allDependencies),
                 mixins,
-                modproperties
+                modproperties.takeIf { it.isNotEmpty() }?.let { mapOf(normalModid to it) }
             )
             output.deleteIfExists()
             output.parent.createDirectories()

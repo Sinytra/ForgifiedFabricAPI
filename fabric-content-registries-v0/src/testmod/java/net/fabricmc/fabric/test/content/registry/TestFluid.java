@@ -110,11 +110,6 @@ public abstract class TestFluid extends FlowingFluid {
 		return Optional.of(SoundEvents.BUCKET_FILL);
 	}
 
-	@Override
-	public FluidType getFluidType() {
-		return NeoForgeMod.EMPTY_TYPE.value();
-	}
-
 	public static class Flowing extends TestFluid {
 		public Flowing() {
 		}
