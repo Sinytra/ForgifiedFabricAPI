@@ -307,8 +307,14 @@ fun testDependencies(project: Project, depNames: List<String>) {
 }
 
 neoForge.runs {
-    named("client") {
-        sourceSet = sourceSets.named("main")
-        loadedMods.set(loadedMods.map { it.filterNot { it.name.contains("testmod") } }.get())
+    listOf("client", "server").forEach { run ->
+        named(run) {
+            sourceSet = sourceSets.named("main")
+            loadedMods.set(loadedMods.map { it.filterNot { it.name.contains("testmod") } }.get())
+        }  
     }
+    
+//    named("testmodServer") {
+//        loadedMods.set(loadedMods.map { it.filter { it.name.contains("recipe") || !it.name.contains("testmod") } }.get())
+//    }
 }

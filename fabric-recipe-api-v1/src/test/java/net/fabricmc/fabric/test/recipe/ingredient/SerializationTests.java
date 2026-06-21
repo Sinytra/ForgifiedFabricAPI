@@ -38,6 +38,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientInit;
 
 public class SerializationTests {
@@ -94,6 +95,6 @@ public class SerializationTests {
 		// Make sure that we can deserialize it
 		Ingredient deserialized = Ingredient.CODEC.parse(registryOps, json).getOrThrow(JsonParseException::new);
 		assertNotNull(deserialized.getCustomIngredient(), "Custom ingredient was not deserialized");
-		assertSame(deserialized.getCustomIngredient().getSerializer(), ingredient.getCustomIngredient().getSerializer(), "Serializer did not match");
+		assertSame(((FabricIngredient) deserialized).getCustomIngredient().getSerializer(), ((FabricIngredient) ingredient).getCustomIngredient().getSerializer(), "Serializer did not match");
 	}
 }

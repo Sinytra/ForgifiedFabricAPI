@@ -8,6 +8,10 @@ moduleDependencies(project, [
 	':fabric-networking-api-v1'
 ])
 
+testDependencies(project, [
+	':fabric-screen-api-v1',
+])
+
 sourceSets {
 	main {
 		java {
@@ -22,5 +26,11 @@ neoForge {
 			client()
 			systemProperty 'fabric.client.gametest', 'true'
 		}
+	}
+}
+
+neoForge.mods {
+	screenTestMod {
+		sourceSet project(':fabric-screen-api-v1').sourceSets.testmod
 	}
 }
