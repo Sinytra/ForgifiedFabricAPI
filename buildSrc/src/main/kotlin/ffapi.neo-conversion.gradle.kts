@@ -32,7 +32,6 @@ extensions.getByType<SourceSetContainer>().configureEach {
     val generateModMeta = tasks.register(modMetaTaskName, GenerateModMetadataTask::class.java) {
         group = "sinytra"
         description = "Generates neoforge.mods.toml for $sourceSetName fabric mod."
-        dependsOn("createMinecraftArtifacts")
 
         // Only apply to default source directory since we also add the generated
         // sources to the source set.
