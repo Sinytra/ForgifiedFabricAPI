@@ -55,7 +55,7 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 		}
 
-		ServerMobEffectEvents.BEFORE_ADD.invoker().beforeAdd(effectInstance, this.self(), MobEffectUtil.getCommandContext());
+		ServerMobEffectEvents.BEFORE_ADD.invoker().beforeAdd(effectInstance, this.fabric$self(), MobEffectUtil.getCommandContext());
 	}
 
 	@Inject(
@@ -71,7 +71,7 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 		}
 
-		ServerMobEffectEvents.BEFORE_ADD.invoker().beforeAdd(effectInstance, this.self(), MobEffectUtil.getCommandContext());
+		ServerMobEffectEvents.BEFORE_ADD.invoker().beforeAdd(effectInstance, this.fabric$self(), MobEffectUtil.getCommandContext());
 	}
 
 	@Inject(
@@ -83,7 +83,7 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 		}
 
-		ServerMobEffectEvents.AFTER_ADD.invoker().afterAdd(effectInstance, this.self(), MobEffectUtil.getCommandContext());
+		ServerMobEffectEvents.AFTER_ADD.invoker().afterAdd(effectInstance, this.fabric$self(), MobEffectUtil.getCommandContext());
 	}
 
 	@Inject(
@@ -95,7 +95,7 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 		}
 
-		MobEffectInstance effectInstance = this.self().getEffect(holder);
+		MobEffectInstance effectInstance = this.fabric$self().getEffect(holder);
 
 		if (effectInstance == null) {
 			return;
@@ -118,7 +118,7 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 
 		ServerMobEffectEvents.BEFORE_REMOVE.invoker()
-				.beforeRemove(effect, this.self(), MobEffectUtil.getCommandContext());
+				.beforeRemove(effect, this.fabric$self(), MobEffectUtil.getCommandContext());
 	}
 
 	@Inject(
@@ -133,9 +133,9 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 		}
 
-		for (MobEffectInstance effectInstance : (this.self()).getActiveEffects()) {
+		for (MobEffectInstance effectInstance : (this.fabric$self()).getActiveEffects()) {
 			ServerMobEffectEvents.BEFORE_REMOVE.invoker()
-					.beforeRemove(effectInstance, this.self(), MobEffectUtil.getCommandContext());
+					.beforeRemove(effectInstance, this.fabric$self(), MobEffectUtil.getCommandContext());
 		}
 	}
 
@@ -150,7 +150,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 		for (MobEffectInstance effectInstance : collection) {
 			ServerMobEffectEvents.AFTER_REMOVE.invoker()
-					.afterRemove(effectInstance, this.self(), MobEffectUtil.getCommandContext());
+					.afterRemove(effectInstance, this.fabric$self(), MobEffectUtil.getCommandContext());
 		}
 	}
 
@@ -160,7 +160,7 @@ public abstract class LivingEntityMixin extends Entity {
 	}
 
 	@Unique
-	private LivingEntity self() {
+	private LivingEntity fabric$self() {
 		return (LivingEntity) (Object) this;
 	}
 }
