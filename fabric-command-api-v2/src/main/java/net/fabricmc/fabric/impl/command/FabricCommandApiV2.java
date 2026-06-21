@@ -1,7 +1,7 @@
 package net.fabricmc.fabric.impl.command;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import net.neoforged.bus.api.IEventBus;
@@ -20,8 +20,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 public class FabricCommandApiV2 implements ModInitializer {
 	@SuppressWarnings("rawtypes")
-	private static final Map<Class, ArgumentTypeInfo<?, ?>> ARGUMENT_TYPE_CLASSES = new HashMap<>();
-	private static final Map<Identifier, ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = new HashMap<>();
+	private static final Map<Class, ArgumentTypeInfo<?, ?>> ARGUMENT_TYPE_CLASSES = new ConcurrentHashMap<>();
+	private static final Map<Identifier, ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES = new ConcurrentHashMap<>();
 
 	@Override
 	public void onInitialize() {

@@ -79,9 +79,10 @@ extensions.getByType<SourceSetContainer>().named("main").configure {
         classTweaker = provider { loomStub.accessWidenerPath.orNull }
     }
 
+    val modMetaTaskName = getTaskName("generate", Constants.modMetaBaseTaskName)
     resources.srcDir(
         files("src/generated/main/resources")
-            .builtBy(generateAccessTransformer, generateInjectedInterfaces)
+            .builtBy(generateAccessTransformer, generateInjectedInterfaces, modMetaTaskName)
     )
 
     tasks.named("generate") {

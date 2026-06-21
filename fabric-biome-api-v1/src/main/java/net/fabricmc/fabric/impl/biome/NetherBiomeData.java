@@ -18,10 +18,10 @@ package net.fabricmc.fabric.impl.biome;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import com.google.common.base.Preconditions;
@@ -40,7 +40,7 @@ public final class NetherBiomeData {
 	// for data packs (as those would be distinct biome sources).
 	private static final Set<ResourceKey<Biome>> NETHER_BIOMES = new HashSet<>();
 
-	private static final Map<ResourceKey<Biome>, Climate.ParameterPoint> NETHER_BIOME_NOISE_POINTS = new HashMap<>();
+	private static final Map<ResourceKey<Biome>, Climate.ParameterPoint> NETHER_BIOME_NOISE_POINTS = new ConcurrentHashMap<>();
 
 	private NetherBiomeData() {
 	}
