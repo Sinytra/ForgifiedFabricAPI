@@ -1,0 +1,67 @@
+name: 🐞 Bug Report
+description: Report an issue you've encountered
+labels: [ bug ]
+body:
+  - type: markdown
+    attributes:
+      value: "## 👋 Welcome!"
+  - type: markdown
+    attributes:
+      value: |
+        ### 📋 Checklist
+        Thank you for taking your time to report this bug!  
+        Before reporting, please ensure that:
+        - You are using the **latest** available version of Forgified Fabric API
+        - You've installed a **minimal set of mods** required to reproduce the issue. 
+          Issues with modpacks and excessive amount of mods will *not* be accepted, as they take a long time to diagnose.
+          Knowing which mods are causing problems allows us to focus on fixing the issue as soon as possible.  
+          If you're unsure which mods might be at fault, try using [binary search](https://www.reddit.com/r/feedthebeast/comments/evpy6r/tips_for_modpack_authors_how_to_find_misbehaving/) - removing half of installed mods
+          repeatedly until the faulty mod is found.
+
+        > [!WARNING]
+        > Note: Custom server APIs (such as Mohist, Magma, Arclight) are **not supported**.
+        > This also applies to launchers for mobile platforms (Pojav, FoldCraft).
+  - type: dropdown
+    id: version
+    attributes:
+      label: Minecraft version
+      description: What version of Minecraft are you running? Please note that only the versions listed below are supported. If you're running an outdated version, update to receive support.
+      options:
+        - "26.1.x"
+        - "1.21.1 (LTS)"
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: description
+    attributes:
+      label: Describe the bug
+      description: "A clear and concise description of what the bug is."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: |
+        How do you trigger this bug? Please walk us through it step by step.
+        If applicable, add screenshots to help explain your problem.
+      value: |
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: true
+  - type: input
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        If applicable (crash, error output in console), please provide your debug.log **and** crash report
+        To upload logs, use an external paste site, such as [Github Gist](https://gist.github.com/) (recommended), [Ubuntu Pastebin](https://paste.ubuntu.com/) or [Pastebin](http://pastebin.com)
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: "Add any other context about the problem here, such as your current environment or other mods that might be causing this bug."
