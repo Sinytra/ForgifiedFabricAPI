@@ -3,6 +3,8 @@
   "package": "net.fabricmc.fabric.mixin.client.model.loading",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "BlockStateModelHooksAccessor",
+    "BlockStateModelHooksMixin",
     "BlockStateModelUnbakedMixin",
     "ModelBakeryBakingResultMixin",
     "ModelBakeryMixin",
