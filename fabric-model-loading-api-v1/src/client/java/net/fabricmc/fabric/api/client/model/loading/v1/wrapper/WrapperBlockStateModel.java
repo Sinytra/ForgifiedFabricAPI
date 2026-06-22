@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialFlags;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -92,5 +93,20 @@ public abstract class WrapperBlockStateModel implements BlockStateModel {
 	@Override
 	public boolean hasMaterialFlag(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, @BakedQuad.MaterialFlags int flag) {
 		return wrapped.hasMaterialFlag(level, pos, state, random, flag);
+	}
+
+	@Override
+	public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+		wrapped.collectParts(level, pos, state, random, parts);
+	}
+
+	@Override
+	public @MaterialFlags int materialFlags(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+		return wrapped.materialFlags(level, pos, state);
+	}
+
+	@Override
+	public boolean hasMaterialFlag(BlockAndTintGetter level, BlockPos pos, BlockState state, @MaterialFlags int flag) {
+		return wrapped.hasMaterialFlag(level, pos, state, flag);
 	}
 }

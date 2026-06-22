@@ -100,7 +100,7 @@ public interface FabricBlockStateModel extends BlockStateModelExtension {
 		}
 
 		final List<BlockStateModelPart> parts = new ArrayList<>();
-		((BlockStateModel) this).collectParts(random, parts);
+		this.collectParts(level, pos, state, random, parts);
 		final int partCount = parts.size();
 
 		for (int i = 0; i < partCount; i++) {
