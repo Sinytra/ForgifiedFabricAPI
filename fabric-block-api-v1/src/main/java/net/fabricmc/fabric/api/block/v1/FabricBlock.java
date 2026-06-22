@@ -18,7 +18,6 @@ package net.fabricmc.fabric.api.block.v1;
 
 import java.util.Objects;
 
-import net.neoforged.neoforge.common.extensions.IBlockExtension;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -37,7 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 // Note to maintainers: Functions should only be added to this interface if they are general-purpose enough,
 // to be evaluated on a case-by-case basis. Otherwise, they are better suited for more specialized APIs.
-public interface FabricBlock extends IBlockExtension {
+public interface FabricBlock {
 	/**
 	 * Return the current appearance of the block, i.e. which block state this block reports to look like on a given side.
 	 *
