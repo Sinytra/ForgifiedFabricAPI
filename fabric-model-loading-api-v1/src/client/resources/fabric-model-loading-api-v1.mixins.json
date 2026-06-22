@@ -6,8 +6,9 @@
     "ModelManagerMixin",
     "ModelBakeryBakingResultMixin",
     "ModelBakeryMixin",
-    "BlockStateModelUnbakedMixin",
-    "UnbakedModelParserDeserializerMixin"
+    "UnbakedModelParserDeserializerMixin",
+    "BlockStateModelHooksAccessor",
+    "BlockStateModelHooksMixin"
   ],
   "injectors": {
     "defaultRequire": 1
