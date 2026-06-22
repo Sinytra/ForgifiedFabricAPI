@@ -51,7 +51,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 		ItemStack stack = PlayerPickItemEvents.BLOCK.invoker().onPickItemFromBlock(this.player, pos, state, packet.includeData());
 
 		if (stack == null) {
-			return operation.call(state, level, pos, includeData);
+			return operation.call(state, pos, level, includeData, player);
 		} else if (!stack.isEmpty()) {
 			this.tryPickItem(stack);
 		}
