@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.api.client.model.loading.v1.wrapper;
 
+import net.minecraft.util.context.ContextMap.Builder;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -71,5 +73,15 @@ public abstract class WrapperUnbakedModel implements UnbakedModel {
 	@Nullable
 	public Identifier parent() {
 		return wrapped.parent();
+	}
+
+	@Override
+	public void fillAdditionalProperties(Builder propertiesBuilder) {
+		wrapped.fillAdditionalProperties(propertiesBuilder);
+	}
+
+	@Override
+	public void resolveDependencies(Resolver resolver) {
+		wrapped.resolveDependencies(resolver);
 	}
 }
