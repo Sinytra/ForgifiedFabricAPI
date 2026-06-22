@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BlockBehaviourPropertiesMixin",
-    "BlockMixin",
+    "IBlockExtensionMixin",
     "IBlockStateExtensionMixin",
     "LivingEntityMixin"
   ],
