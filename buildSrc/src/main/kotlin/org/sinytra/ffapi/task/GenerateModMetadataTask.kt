@@ -6,18 +6,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
-import kotlin.io.path.bufferedReader
-import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.name
-import kotlin.io.path.notExists
-import kotlin.text.split
+import kotlin.io.path.*
 
 abstract class GenerateModMetadataTask : DefaultTask() {
     @get:SkipWhenEmpty
@@ -31,9 +22,11 @@ abstract class GenerateModMetadataTask : DefaultTask() {
     abstract val loaderVersionString: Property<String>
 
     @get:Input
+    @get:Optional
     abstract val forgeVersionString: Property<String>
 
     @get:Input
+    @get:Optional
     abstract val minecraftVersionString: Property<String>
 
     private fun normalizeModid(modid: String): String {
@@ -97,9 +90,6 @@ abstract class GenerateModMetadataTask : DefaultTask() {
 
             val originalModid = json.get("id").asString
             val normalModid = normalizeModid(originalModid)
-            val parts = minecraftVersionString.get().split(".")
-            val currentMajor = parts[0]
-            val nextMinor = (minecraftVersionString.get().split('.')[1].toInt()) + 1
             val excludedDeps = listOf("fabricloader", "java", "minecraft")
             val modDependencies =
                 (json.getAsJsonObject("depends")?.entrySet() ?: emptySet()).filter { !excludedDeps.contains(it.key) }.map {
@@ -112,22 +102,38 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                         "BOTH"
                     )
                 }
-            val allDependencies: List<ModDependency> = listOf(
-                ModDependency(
+            val baseDependencies: MutableList<ModDependency> = mutableListOf()
+
+            if (forgeVersionString.isPresent) {
+                val parts = forgeVersionString.get().split(".")
+                val neoMajor = parts[0]
+                val neoMinor = parts[1]
+                val nextMajor = neoMajor.toInt() + 1
+                
+                baseDependencies += ModDependency(
                     "neoforge",
                     "required",
-                    "[${forgeVersionString.get()},)",
-                    "NONE",
-                    "BOTH"
-                ),
-                ModDependency(
-                    "minecraft",
-                    "required",
-                    "[${minecraftVersionString.get()},$currentMajor.$nextMinor)",
+                    "[$neoMajor.$neoMinor,$nextMajor)",
                     "NONE",
                     "BOTH"
                 )
-            ) + modDependencies
+            }
+            if (minecraftVersionString.isPresent) {
+                val parts = minecraftVersionString.get().split(".")
+                val mcMajor = parts[0]
+                val mcMinor = parts[1]
+                val nextMajor = mcMajor.toInt() + 1
+
+                baseDependencies += ModDependency(
+                    "minecraft",
+                    "required",
+                    "[$mcMajor.$mcMinor,$nextMajor)",
+                    "NONE",
+                    "BOTH"
+                )
+            }
+
+            val allDependencies: List<ModDependency> = baseDependencies + modDependencies
             val displayTest = when (json.get("environment")?.asString) {
                 "client" -> "IGNORE_ALL_VERSION"
                 "server" -> "IGNORE_SERVER_VERSION"
@@ -162,13 +168,13 @@ abstract class GenerateModMetadataTask : DefaultTask() {
             }
             val allowedEntrypoints = listOf("fabric-client-gametest", "fabric-gametest", "fabric-datagen")
             val modproperties = mutableMapOf<String, Any>();
-            
+
             if (isTestMod) {
                 modproperties["sinytra:use_default_fluid_type"] = true
             }
 
             json.getAsJsonObject("entrypoints")
-                ?.let { 
+                ?.let {
                     val entrypoints = mutableMapOf<String, List<String>>()
                     allowedEntrypoints.forEach { key ->
                         it.get(key)?.let { entrypoints[key] = it.asJsonArray.map { it.asString } }
