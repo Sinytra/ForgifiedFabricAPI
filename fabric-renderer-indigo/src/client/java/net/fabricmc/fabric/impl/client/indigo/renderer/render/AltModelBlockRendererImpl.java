@@ -140,7 +140,7 @@ public class AltModelBlockRendererImpl implements AltModelBlockRenderer, QuadTra
 			cacheValid |= cacheMask;
 			BlockState neighborState = level.getBlockState(scratchPos.setWithOffset(pos, direction));
 
-			if (!Block.shouldRenderFace(blockState, neighborState, direction)) {
+			if (!Block.shouldRenderFace(level, pos, blockState, neighborState, direction)) {
 				shouldCullFaceCache |= cacheMask;
 				return true;
 			} else {

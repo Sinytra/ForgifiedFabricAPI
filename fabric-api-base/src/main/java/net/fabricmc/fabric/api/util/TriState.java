@@ -159,6 +159,14 @@ public enum TriState implements StringRepresentable {
 		return DEFAULT;
 	}
 
+	public static TriState fromVanilla(net.minecraft.util.TriState state) {
+		return switch (state) {
+			case TRUE -> TRUE;
+			case FALSE -> FALSE;
+			case DEFAULT -> DEFAULT;
+		};
+	}
+
 	/**
 	 * Value of this enum as string.
 	 *
