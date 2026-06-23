@@ -36,7 +36,7 @@ import net.fabricmc.fabric.api.util.TriState;
 public class VanillaBlockModelPartEncoder {
 	public static void emitQuads(BlockStateModelPart part, QuadEmitter emitter, Predicate<@Nullable Direction> cullTest) {
 		// This does not exactly match vanilla, but doing so requires hiding state all over the FRAPI impl.
-		final TriState ao = part.useAmbientOcclusion() ? TriState.DEFAULT : TriState.FALSE;
+		final TriState ao = TriState.fromVanilla(part.ambientOcclusion());
 
 		for (int i = 0; i <= ModelHelper.NULL_FACE_ID; i++) {
 			final Direction cullFace = ModelHelper.faceFromIndex(i);
@@ -51,9 +51,10 @@ public class VanillaBlockModelPartEncoder {
 
 			for (int j = 0; j < quadCount; j++) {
 				final BakedQuad q = quads.get(j);
+				final boolean neoAo = q.materialInfo().ambientOcclusion();
 				emitter.cullFace(cullFace);
 				emitter.fromBakedQuad(q);
-				emitter.ambientOcclusion(ao);
+				emitter.ambientOcclusion(neoAo ? ao : TriState.FALSE);
 				emitter.shadeMode(ShadeMode.VANILLA);
 				emitter.emit();
 			}

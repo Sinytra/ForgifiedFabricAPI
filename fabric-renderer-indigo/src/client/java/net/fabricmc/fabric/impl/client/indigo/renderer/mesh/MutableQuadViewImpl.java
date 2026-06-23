@@ -29,6 +29,8 @@ import static net.fabricmc.fabric.impl.client.indigo.renderer.mesh.EncodingForma
 import java.util.Objects;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.neoforged.neoforge.client.model.quad.BakedNormals;
+import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.model.geom.builders.UVPair;
@@ -283,7 +285,9 @@ public abstract class MutableQuadViewImpl extends QuadViewImpl implements QuadEm
 		pos(2, quad.position2());
 		pos(3, quad.position3());
 
-		color(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF);
+		for (int i = 0; i < 4; i++) {
+			color(i, quad.bakedColors().color(i));
+		}
 
 		long packedUV0 = quad.packedUV0();
 		long packedUV1 = quad.packedUV1();
@@ -315,6 +319,14 @@ public abstract class MutableQuadViewImpl extends QuadViewImpl implements QuadEm
 		tintIndex(materialInfo.tintIndex());
 		diffuseShade(materialInfo.shade());
 		emissive(lightEmission == 15);
+		
+		if (quad.bakedNormals() != BakedNormals.UNSPECIFIED) {
+			for (int i = 0; i < 4; i++) {
+				Vector3f vec = BakedNormals.unpack(quad.bakedNormals().normal(i), null);
+				normal(i, vec);
+			}
+		}
+		
 		return this;
 	}
 
