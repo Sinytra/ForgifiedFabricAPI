@@ -31,7 +31,6 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.resources.FileToIdConverter;
@@ -44,9 +43,6 @@ import net.fabricmc.fabric.impl.resource.conditions.ResourceConditionsImpl;
 
 @Mixin(SimpleJsonResourceReloadListener.class)
 public class SimpleJsonResourceReloadListenerMixin {
-	@Unique
-	private static final Object SKIP_DATA_MARKER = new Object();
-
 	@Shadow
 	@Final
 	private FileToIdConverter lister;
