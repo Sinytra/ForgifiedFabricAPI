@@ -27,6 +27,7 @@ import java.util.Set;
 import io.netty.channel.ChannelFutureListener;
 import net.neoforged.neoforge.network.payload.MinecraftRegisterPayload;
 import net.neoforged.neoforge.network.payload.MinecraftUnregisterPayload;
+import net.neoforged.neoforge.network.registration.ChannelAttributes;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.network.Connection;
@@ -64,7 +65,7 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 	}
 
 	protected void registerPendingChannels(ChannelInfoHolder holder, ConnectionProtocol state) {
-		final Collection<Identifier> pending = holder.fabric_getPendingChannelsNames(state);
+		final Collection<Identifier> pending = ChannelAttributes.getOrCreateCommonChannels(this.connection, state);
 
 		if (!pending.isEmpty()) {
 			register(new ArrayList<>(pending));

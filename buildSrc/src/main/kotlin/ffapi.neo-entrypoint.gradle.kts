@@ -76,13 +76,13 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
 
         val commonEntrypoints =
             modMetadata.getEntrypoints("main").map(EntrypointMetadata::getValue).filter(::entryPointExists)
-                .map { "new $it().onInitialize();" }
+                .map { createEntrypointCall(it, "onInitialize") }
         val clientEntrypoints =
             modMetadata.getEntrypoints("client").map(EntrypointMetadata::getValue).filter(::entryPointExists)
-                .map { "new $it().onInitializeClient();" }
+                .map { createEntrypointCall(it, "onInitializeClient") }
         val serverEntrypoints =
             modMetadata.getEntrypoints("server").map(EntrypointMetadata::getValue).filter(::entryPointExists)
-                .map { "new $it().onInitializeServer();" }
+                .map { createEntrypointCall(it, "onInitializeServer") }
         val separator = "\n                    "
         val nestedSeparator = "\n                        "
 
@@ -136,7 +136,20 @@ abstract class GenerateForgeModEntrypoint : DefaultTask() {
     }
 
     private fun entryPointExists(path: String): Boolean {
-        return sourceRoots.any { root -> root.resolve(path.replace('.', '/') + ".java").exists() }
+        return sourceRoots.any { root ->
+            val className = path.split("::").first().replace('.', '/')
+            root.resolve(className + ".java").exists()
+        }
+    }
+
+    private fun createEntrypointCall(entrypoint: String, method: String): String {
+        val parts = entrypoint.split("::")
+        if (parts.size == 1) {
+            return "new ${parts[0]}().$method();"
+        } else if (parts.size == 2) {
+            return "${parts[0]}.${parts[1]}();"
+        }
+        throw IllegalStateException("invalid entrypoint: $entrypoint");
     }
 
     private fun normalizeModid(modid: String): String {

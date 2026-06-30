@@ -16,10 +16,6 @@
     "FabricMC"
   ],
   "entrypoints": {
-    "main": [
-      "net.fabricmc.fabric.impl.networking.CommonPacketsImpl::init",
-      "net.fabricmc.fabric.impl.networking.NetworkingImpl::init"
-    ],
     "client": [
       "net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl::clientInit"
     ]
