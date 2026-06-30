@@ -20,7 +20,7 @@ public class CommonHooksMixin {
 		boolean useDefault = FabricLoader.getInstance().getModContainer(fluid.builtInRegistryHolder().getKey().identifier().getNamespace())
 				.map(c -> c.getMetadata().getCustomValue("sinytra:use_default_fluid_type"))
 				.map(c -> c != null && c.getAsBoolean())
-				.orElse(null);
+				.orElse(false);
 
 		if (useDefault) {
 			cir.setReturnValue(NeoForgeMod.EMPTY_TYPE.value());
