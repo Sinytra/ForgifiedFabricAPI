@@ -13,6 +13,7 @@ val implementationVersion: String by project
 val versionMc: String by project
 val versionNeoForge: String by project
 val versionForgifiedFabricLoader: String by project
+val curseforge_minecraft_versions: String by project
 
 val curseForgeId: String by project
 val modrinthId: String by project
@@ -202,6 +203,8 @@ publishMods {
     modLoaders.add("neoforge")
     dryRun.set(!providers.environmentVariable("CI").isPresent)
     displayName.set("[$versionMc] Forgified Fabric API ${project.version}")
+    
+    val compatibleVersions = curseforge_minecraft_versions.split(",")
 
     github {
         accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))
@@ -211,14 +214,14 @@ publishMods {
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
         projectId.set(curseForgeId)
-        minecraftVersions.add(versionMc)
+        minecraftVersions = compatibleVersions
         client.set(true)
         server.set(true)
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
         projectId.set(modrinthId)
-        minecraftVersions.add(versionMc)
+        minecraftVersions = compatibleVersions
     }
 }
 
