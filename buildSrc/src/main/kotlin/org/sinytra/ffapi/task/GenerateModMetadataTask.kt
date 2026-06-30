@@ -61,7 +61,6 @@ abstract class GenerateModMetadataTask : DefaultTask() {
         val logoFile: String?,
         val authors: String?,
         val description: String?,
-        val provides: List<String>?,
         val displayURL: String
     )
 
@@ -153,7 +152,6 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                     logoFile = json.get("icon")?.asString,
                     authors = (listOf("Sinytra") + (json.getAsJsonArray("authors")?.map { it.asString } ?: emptyList())).joinToString(separator = ", "),
                     description = json.get("description")?.asString,
-                    provides = providedMods,
                     displayURL = "https://github.com/Sinytra/ForgifiedFabricAPI"
                 )
             )
@@ -171,6 +169,10 @@ abstract class GenerateModMetadataTask : DefaultTask() {
 
             if (isTestMod) {
                 modproperties["sinytra:use_default_fluid_type"] = true
+            }
+
+            if (normalModid != originalModid) {
+                modproperties["fabric:provides"] = listOf(originalModid);
             }
 
             json.getAsJsonObject("entrypoints")
