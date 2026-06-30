@@ -38,12 +38,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworkin
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.impl.networking.CommonPacketsImpl;
-import net.fabricmc.fabric.impl.networking.CommonRegisterPayload;
-import net.fabricmc.fabric.impl.networking.CommonVersionPayload;
 import net.fabricmc.fabric.impl.networking.GlobalReceiverRegistry;
-import net.fabricmc.fabric.impl.networking.NetworkingImpl;
 import net.fabricmc.fabric.impl.networking.PacketListenerExtensions;
 import net.fabricmc.fabric.impl.networking.PayloadTypeRegistryImpl;
 import net.fabricmc.fabric.mixin.networking.client.accessor.ConnectScreenAccessor;
@@ -142,43 +137,5 @@ public final class ClientNetworkingImpl {
 		ClientConfigurationConnectionEvents.DISCONNECT.register((listener, client) -> {
 			currentConfigurationAddon = null;
 		});
-
-		// Version packet
-		ClientConfigurationNetworking.registerGlobalReceiver(CommonVersionPayload.TYPE, (listener, context) -> {
-			int negotiatedVersion = handleVersionPacket(listener, context.responseSender());
-			ClientNetworkingImpl.getClientConfigurationAddon().onCommonVersionPacket(negotiatedVersion);
-		});
-
-		// Register packet
-		ClientConfigurationNetworking.registerGlobalReceiver(CommonRegisterPayload.TYPE, (listener, context) -> {
-			ClientConfigurationNetworkAddon addon = ClientNetworkingImpl.getClientConfigurationAddon();
-
-			if (CommonRegisterPayload.PLAY_PROTOCOL.equals(listener.protocol())) {
-				if (listener.version() != addon.getNegotiatedVersion()) {
-					throw new IllegalStateException("Negotiated common packet version: %d but received packet with version: %d".formatted(addon.getNegotiatedVersion(), listener.version()));
-				}
-
-				addon.getChannelInfoHolder().fabric_getPendingChannelsNames(ConnectionProtocol.PLAY).addAll(listener.channels());
-				NetworkingImpl.LOGGER.debug("Received accepted channels from the server");
-				context.responseSender().sendPacket(new CommonRegisterPayload(addon.getNegotiatedVersion(), CommonRegisterPayload.PLAY_PROTOCOL, ClientPlayNetworking.getGlobalReceivers()));
-			} else {
-				addon.onCommonRegisterPacket(listener);
-				context.responseSender().sendPacket(addon.createRegisterPayload());
-			}
-		});
-	}
-
-	// Disconnect if there are no commonly supported versions.
-	// Client responds with the intersection of supported versions.
-	// Return the highest supported version
-	private static int handleVersionPacket(CommonVersionPayload payload, PacketSender packetSender) {
-		int version = CommonPacketsImpl.getHighestCommonVersion(payload.versions(), CommonPacketsImpl.SUPPORTED_COMMON_PACKET_VERSIONS);
-
-		if (version <= 0) {
-			throw new UnsupportedOperationException("Client does not support any requested versions from server");
-		}
-
-		packetSender.sendPacket(new CommonVersionPayload(new int[]{ version }));
-		return version;
 	}
 }

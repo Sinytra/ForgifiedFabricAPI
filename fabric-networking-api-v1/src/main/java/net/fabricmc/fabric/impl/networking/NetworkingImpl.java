@@ -29,8 +29,6 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-
 public final class NetworkingImpl {
 	public static final String MOD_ID = "fabric-networking-api-v1";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -51,18 +49,6 @@ public final class NetworkingImpl {
 		return channelName.equals(REGISTER_CHANNEL) || channelName.equals(UNREGISTER_CHANNEL);
 	}
 
-	public static void init() {
-		// Legacy register / unregister packets
-		PayloadTypeRegistry.clientboundConfiguration().register(RegistrationPayload.REGISTER, RegistrationPayload.REGISTER_CODEC);
-		PayloadTypeRegistry.clientboundConfiguration().register(RegistrationPayload.UNREGISTER, RegistrationPayload.UNREGISTER_CODEC);
-		PayloadTypeRegistry.serverboundConfiguration().register(RegistrationPayload.REGISTER, RegistrationPayload.REGISTER_CODEC);
-		PayloadTypeRegistry.serverboundConfiguration().register(RegistrationPayload.UNREGISTER, RegistrationPayload.UNREGISTER_CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(RegistrationPayload.REGISTER, RegistrationPayload.REGISTER_CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(RegistrationPayload.UNREGISTER, RegistrationPayload.UNREGISTER_CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(RegistrationPayload.REGISTER, RegistrationPayload.REGISTER_CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(RegistrationPayload.UNREGISTER, RegistrationPayload.UNREGISTER_CODEC);
-	}
-	
 	public static CustomPacketPayload.@Nullable TypeAndCodec<? extends FriendlyByteBuf, ? extends CustomPacketPayload> getCodec(Identifier id, ConnectionProtocol protocol, PacketFlow flow) {
 		if (flow == PacketFlow.CLIENTBOUND) {
 			if (protocol == ConnectionProtocol.PLAY) {
