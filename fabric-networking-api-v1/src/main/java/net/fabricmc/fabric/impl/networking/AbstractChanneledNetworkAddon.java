@@ -69,7 +69,6 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 
 		if (!pending.isEmpty()) {
 			register(new ArrayList<>(pending));
-			pending.clear();
 		}
 	}
 
