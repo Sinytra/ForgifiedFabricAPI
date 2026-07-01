@@ -19,7 +19,7 @@ package net.fabricmc.fabric.test.object.builder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 
@@ -37,10 +37,10 @@ public class FabricDefaultAttributeRegistryTest implements ModInitializer {
 			context.modifyAll((_, builder) -> {
 				builder.add(TEST_ATTRIBUTE);
 			});
-			context.modify(EntityTypes.PIG, (_, builder) -> {
+			context.modify(EntityType.PIG, (_, builder) -> {
 				builder.add(TEST_ATTRIBUTE, PIG_TEST_ATTRIBUTE_BASE_VALUE);
 			});
-			context.modify(EntityTypes.CHICKEN, (_, builder) -> {
+			context.modify(EntityType.CHICKEN, (_, builder) -> {
 				builder.add(TEST_CHICKEN_ONLY_ATTRIBUTE);
 			});
 		});

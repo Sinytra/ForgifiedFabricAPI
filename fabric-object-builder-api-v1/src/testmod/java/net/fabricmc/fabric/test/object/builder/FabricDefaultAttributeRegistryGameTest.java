@@ -17,7 +17,7 @@
 package net.fabricmc.fabric.test.object.builder;
 
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.cow.Cow;
@@ -28,7 +28,7 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 public class FabricDefaultAttributeRegistryGameTest {
 	@GameTest
 	public void pigHasTestAttribute(GameTestHelper helper) {
-		Pig pig = helper.spawn(EntityTypes.PIG, 0, 0, 0);
+		Pig pig = helper.spawn(EntityType.PIG, 0, 0, 0);
 
 		helper.assertTrue(pig.getAttributes().hasAttribute(FabricDefaultAttributeRegistryTest.TEST_ATTRIBUTE), "Pig does not have test attribute");
 
@@ -43,7 +43,7 @@ public class FabricDefaultAttributeRegistryGameTest {
 
 	@GameTest
 	public void cowHasTestAttribute(GameTestHelper helper) {
-		Cow cow = helper.spawn(EntityTypes.COW, 0, 0, 0);
+		Cow cow = helper.spawn(EntityType.COW, 0, 0, 0);
 
 		helper.assertTrue(cow.getAttributes().hasAttribute(FabricDefaultAttributeRegistryTest.TEST_ATTRIBUTE), "Cow does not have test attribute");
 
@@ -58,7 +58,7 @@ public class FabricDefaultAttributeRegistryGameTest {
 
 	@GameTest
 	public void pigDoesNotHavePlayerTestAttribute(GameTestHelper helper) {
-		Pig pig = helper.spawn(EntityTypes.PIG, 0, 0, 0);
+		Pig pig = helper.spawn(EntityType.PIG, 0, 0, 0);
 
 		helper.assertFalse(pig.getAttributes().hasAttribute(FabricDefaultAttributeRegistryTest.TEST_CHICKEN_ONLY_ATTRIBUTE), "Pig has the chicken-only test attribute");
 
@@ -67,7 +67,7 @@ public class FabricDefaultAttributeRegistryGameTest {
 
 	@GameTest
 	public void chickenHasChickenOnlyTestAttribute(GameTestHelper helper) {
-		Chicken chicken = helper.spawn(EntityTypes.CHICKEN, 0, 0, 0);
+		Chicken chicken = helper.spawn(EntityType.CHICKEN, 0, 0, 0);
 
 		helper.assertTrue(chicken.getAttributes().hasAttribute(FabricDefaultAttributeRegistryTest.TEST_CHICKEN_ONLY_ATTRIBUTE), "Chicken does not have the chicken-only test attribute");
 
@@ -82,7 +82,7 @@ public class FabricDefaultAttributeRegistryGameTest {
 
 	@GameTest
 	public void pigStillHasItsVanillaAttributes(GameTestHelper helper) {
-		Pig pig = helper.spawn(EntityTypes.PIG, 0, 0, 0);
+		Pig pig = helper.spawn(EntityType.PIG, 0, 0, 0);
 
 		helper.assertTrue(pig.getAttributes().hasAttribute(Attributes.MAX_HEALTH), "Pig does not have max health attribute");
 		helper.assertTrue(pig.getAttributes().hasAttribute(Attributes.FOLLOW_RANGE), "Pig does not have follow range attribute");
