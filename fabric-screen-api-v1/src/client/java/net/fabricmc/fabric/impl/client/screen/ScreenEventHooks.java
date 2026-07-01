@@ -120,4 +120,20 @@ public class ScreenEventHooks {
 		Screen screen = event.getScreen();
 		ScreenMouseEvents.afterMouseDrag(screen).invoker().afterMouseDrag(screen, event.getMouseButtonEvent(), event.getDragX(), event.getDragY(), false);
 	}
+	
+	@SubscribeEvent
+	public static void beforeCharTyped(ScreenEvent.CharacterTyped.Pre event) {
+		Screen screen = event.getScreen();
+		if (!ScreenKeyboardEvents.allowCharType(screen).invoker().allowCharType(screen, event.getCharacterEvent())) {
+			event.setCanceled(true);
+		} else {
+			ScreenKeyboardEvents.beforeCharType(screen).invoker().beforeCharType(screen, event.getCharacterEvent());
+		}
+	}
+	
+	@SubscribeEvent
+	public static void afterCharTypes(ScreenEvent.CharacterTyped.Post event) {
+		Screen screen = event.getScreen();
+		ScreenKeyboardEvents.afterCharType(screen).invoker().afterCharType(screen, event.getCharacterEvent());
+	}
 }
