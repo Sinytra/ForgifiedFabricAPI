@@ -23,8 +23,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.mixin.object.builder.AttributeSupplierAccessor;
-import net.fabricmc.fabric.mixin.object.builder.AttributeSupplierBuilderAccessor;
 import net.fabricmc.fabric.mixin.object.builder.DefaultAttributesAccessor;
 
 public final class FabricDefaultAttributeRegistryImpl {
@@ -34,18 +32,12 @@ public final class FabricDefaultAttributeRegistryImpl {
 		FabricDefaultAttributeRegistry.MODIFY.invoker().modify(new ModifyContextImpl());
 	}
 
-	private static AttributeSupplier.Builder createFromExistingSupplier(AttributeSupplier supplier) {
-		AttributeSupplier.Builder builder = AttributeSupplier.builder();
-		((AttributeSupplierBuilderAccessor) builder).getBuilder().putAll(((AttributeSupplierAccessor) supplier).getInstances());
-		return builder;
-	}
-
 	static class ModifyContextImpl implements FabricDefaultAttributeRegistry.ModifyContext {
 		@Override
 		public void modify(Predicate<EntityType<? extends LivingEntity>> entityTypePredicate, FabricDefaultAttributeRegistry.ModifyConsumer consumer) {
 			DefaultAttributesAccessor.getRegistry().forEach((type, supplier) -> {
 				if (entityTypePredicate.test(type)) {
-					AttributeSupplier.Builder builder = createFromExistingSupplier(supplier);
+					AttributeSupplier.Builder builder = new AttributeSupplier.Builder(supplier);
 					consumer.accept(type, builder);
 					DefaultAttributesAccessor.getRegistry().put(type, builder.build());
 				}
