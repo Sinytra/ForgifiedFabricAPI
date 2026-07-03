@@ -54,7 +54,7 @@ public class FabricRegistryInit implements ModInitializer {
 
 	public static void injectCallbacks(ModifyRegistriesEvent event) {
 		event.getRegistries().forEach(registry -> {
-			REMAP_CALLBACKS.put(registry, (Event) getRemapCallbackEvent(registry));
+			getRemapCallbackEvent(registry);
 			registry.addCallback(new FapiRemapBridge<>());
 		});
 	}

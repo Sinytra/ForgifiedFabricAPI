@@ -1,6 +1,8 @@
 import me.modmuss50.mpp.ReleaseType
 import org.apache.commons.codec.digest.DigestUtils
 import org.eclipse.jgit.api.Git
+import org.sinytra.ffapi.task.MergeInterfaceInjectionTask
+import org.sinytra.ffapi.task.MergeAccessTransformersTask
 
 plugins {
     java
@@ -51,6 +53,8 @@ ext["upstreamVersion"] = upstreamVersion
 
 version = "$upstreamVersion+$implementationVersion+$versionMc${(if (System.getenv("GITHUB_RUN_NUMBER") == null) "+local" else "")}"
 println("Version: $version")
+
+val injectedInterfaces = configurations.create("injectedInterfaces")
 
 allprojects {
     apply(plugin = "maven-publish")
@@ -106,13 +110,13 @@ allprojects {
             url = uri("https://maven.su5ed.dev/releases")
         }
     }
-    
+
     neoForge {
         enable {
             version = versionNeoForge
             isDisableRecompilation = true
         }
-    
+
         runs {
             create("client") {
                 client()
@@ -140,6 +144,8 @@ dependencies {
             prefer(versionForgifiedFabricLoader)
         }
     }
+    
+    accessTransformers(project(":fabric-transitive-access-wideners-v1"))
 }
 
 // Subprojects
@@ -189,10 +195,31 @@ allprojects {
         neoForge.runs {
             listOf("client", "server").forEach { run ->
                 named(run) {
-                    loadedMods = neoForge.mods.filterNot { it.name.contains("test") } 
-                }   
+                    loadedMods = neoForge.mods.filterNot { it.name.contains("test") }
+                }
             }
         }
+
+        rootProject.dependencies.add("interfaceInjectionData", project(project.path))
+    }
+}
+
+val mergeInterfaces = tasks.register("mergeInterfaces", MergeInterfaceInjectionTask::class) {
+    inputFiles.from(configurations.interfaceInjectionData)
+    outputFile = file("build/$name/merged.json")
+}
+
+val mergeAccessTransformers = tasks.register("mergeAccessTransformers", MergeAccessTransformersTask::class) {
+    inputFiles.from(configurations.accessTransformers)
+    outputFile = file("build/$name/merged.accesstransformer")
+}
+
+neoForge {
+    interfaceInjectionData {
+        publish(mergeInterfaces)
+    }
+    accessTransformers {
+        publish(mergeAccessTransformers)
     }
 }
 
@@ -203,7 +230,7 @@ publishMods {
     modLoaders.add("neoforge")
     dryRun.set(!providers.environmentVariable("CI").isPresent)
     displayName.set("[$versionMc] Forgified Fabric API ${project.version}")
-    
+
     val compatibleVersions = curseforge_minecraft_versions.split(",")
 
     github {
@@ -226,16 +253,16 @@ publishMods {
 }
 
 dependencies {
-	afterEvaluate {
-		subprojects.forEach { proj ->
-			if (proj.name in META_PROJECTS) {
-				return@forEach
-			}
+    afterEvaluate {
+        subprojects.forEach { proj ->
+            if (proj.name in META_PROJECTS) {
+                return@forEach
+            }
 
-			jarJar(api(project(proj.path))!!)
-			"testmodImplementation"(proj.sourceSets.getByName("testmod").output)
-		}
-	}
+            jarJar(api(project(proj.path))!!)
+            "testmodImplementation"(proj.sourceSets.getByName("testmod").output)
+        }
+    }
 }
 
 val git: Git? = runCatching { Git.open(rootDir) }.getOrNull()
@@ -264,6 +291,7 @@ fun moduleDependencies(project: Project, depNames: List<String>) {
         deps.forEach {
             api(it)
             add("accessTransformers", it)
+            add("interfaceInjectionData", it)
         }
     }
 }
@@ -283,9 +311,9 @@ neoForge.runs {
         named(run) {
             sourceSet = sourceSets.named("main")
             loadedMods.set(loadedMods.map { it.filterNot { it.name.contains("testmod") } }.get())
-        }  
+        }
     }
-    
+
 //    named("testmodServer") {
 //        loadedMods.set(loadedMods.map { it.filter { it.name.contains("recipe") || !it.name.contains("testmod") } }.get())
 //    }
