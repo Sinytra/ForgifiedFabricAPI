@@ -8,7 +8,8 @@
     "AttachmentTypeAccessor",
     "BaseMappedRegistryAccessor",
     "IAttachmentHolderMixin",
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "MappedRegistryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
