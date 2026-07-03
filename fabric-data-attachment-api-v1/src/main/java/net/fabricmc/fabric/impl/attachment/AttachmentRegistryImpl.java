@@ -22,6 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
+
+import net.fabricmc.fabric.mixin.attachment.MappedRegistryAccessor;
+
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -51,9 +54,14 @@ public final class AttachmentRegistryImpl {
 		if (deferRegistration) {
 			NEO_ATTACHMENT_TYPES.put(id, attachmentType);
 		} else {
-			((BaseMappedRegistryAccessor) NeoForgeRegistries.ATTACHMENT_TYPES).invokeUnfreeze(false);
+			boolean frozen = ((MappedRegistryAccessor) NeoForgeRegistries.ATTACHMENT_TYPES).getFrozen();
+			if (frozen) {
+				((BaseMappedRegistryAccessor) NeoForgeRegistries.ATTACHMENT_TYPES).invokeUnfreeze(false);
+			}
 			Registry.register(NeoForgeRegistries.ATTACHMENT_TYPES, id, attachmentType);
-			NeoForgeRegistries.ATTACHMENT_TYPES.freeze();
+			if (frozen) {
+				NeoForgeRegistries.ATTACHMENT_TYPES.freeze();
+			}
 		}
 		return attachmentType;
 	}
