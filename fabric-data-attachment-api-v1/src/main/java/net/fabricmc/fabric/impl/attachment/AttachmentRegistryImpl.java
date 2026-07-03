@@ -22,9 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
-
-import net.fabricmc.fabric.mixin.attachment.MappedRegistryAccessor;
-
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -32,7 +29,6 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
@@ -44,6 +40,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.mixin.attachment.BaseMappedRegistryAccessor;
+import net.fabricmc.fabric.mixin.attachment.MappedRegistryAccessor;
 
 public final class AttachmentRegistryImpl {
 	private static final Map<net.neoforged.neoforge.attachment.AttachmentType<?>, AttachmentType<?>> FABRIC_ATTACHMENT_TYPES = new ConcurrentHashMap<>();
@@ -174,16 +171,16 @@ public final class AttachmentRegistryImpl {
 		}
 	}
 
-	private static class DummyAttachmentSerializer implements IAttachmentSerializer<Tag> {
+	private static class DummyAttachmentSerializer implements IAttachmentSerializer<Object> {
 		private static final DummyAttachmentSerializer INSTANCE = new DummyAttachmentSerializer();
 
 		@Override
-		public Tag read(IAttachmentHolder holder, ValueInput input) {
+		public Object read(IAttachmentHolder holder, ValueInput input) {
 			return null;
 		}
 
 		@Override
-		public boolean write(Tag attachment, ValueOutput output) {
+		public boolean write(Object attachment, ValueOutput output) {
 			return false;
 		}
 	}
