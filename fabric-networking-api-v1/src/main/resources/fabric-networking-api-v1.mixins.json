@@ -24,7 +24,6 @@
     "accessor.ServerCommonPacketListenerImplAccessor",
     "accessor.ServerLoginPacketListenerImplAccessor",
     "NetworkRegistryMixin",
-    "NetworkFiltersMixin",
     "CommonRegisterTaskMixin"
   ],
   "injectors": {
