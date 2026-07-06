@@ -4,9 +4,11 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BaseMappedRegistryAccessor",
+    "BaseMappedRegistryMixin",
     "MappedRegistryAccessor",
     "RegistryDataLoaderMixin",
-    "RegistryManagerAccessor"
+    "RegistryManagerAccessor",
+    "RegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
