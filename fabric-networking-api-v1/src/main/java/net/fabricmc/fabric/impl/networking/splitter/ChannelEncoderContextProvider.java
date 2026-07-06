@@ -5,16 +5,15 @@ import java.util.List;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import net.neoforged.neoforge.network.filters.DynamicChannelHandler;
 
-import net.minecraft.network.Connection;
 import net.minecraft.network.HandlerNames;
 import net.minecraft.network.protocol.Packet;
 
 import net.fabricmc.fabric.impl.networking.context.PacketContextImpl;
 import net.fabricmc.fabric.impl.networking.context.PacketContextSetter;
 
-public class ChannelEncoderContextProvider extends MessageToMessageEncoder<Packet<?>> implements DynamicChannelHandler {
+public class ChannelEncoderContextProvider extends MessageToMessageEncoder<Packet<?>> {
+	public static final String ID = "fabric:context";
 
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
@@ -35,10 +34,5 @@ public class ChannelEncoderContextProvider extends MessageToMessageEncoder<Packe
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Packet<?> msg, List<Object> out) {
 		out.add(msg);
-	}
-
-	@Override
-	public boolean isNecessary(Connection manager) {
-		return true;
 	}
 }

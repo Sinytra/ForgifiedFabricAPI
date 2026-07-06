@@ -21,12 +21,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-
-import net.minecraft.network.HandlerNames;
-
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.HandlerNames;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.ProtocolInfo;
 import net.minecraft.network.UnconfiguredPipelineHandler;
@@ -52,6 +51,7 @@ import net.fabricmc.fabric.impl.networking.PacketCallbackListener;
 import net.fabricmc.fabric.impl.networking.PacketListenerExtensions;
 import net.fabricmc.fabric.impl.networking.context.PacketContextImpl;
 import net.fabricmc.fabric.impl.networking.context.PacketContextSetter;
+import net.fabricmc.fabric.impl.networking.splitter.ChannelEncoderContextProvider;
 
 @Mixin(Connection.class)
 abstract class ConnectionMixin implements ChannelInfoHolder, PacketContextProvider {
@@ -107,14 +107,19 @@ abstract class ConnectionMixin implements ChannelInfoHolder, PacketContextProvid
 		return transitioner;
 	}
 
-	@ModifyArg(method = "setupOutboundProtocol", at = @At(value = "INVOKE", target = "Lio/netty/channel/Channel;writeAndFlush(Ljava/lang/Object;)Lio/netty/channel/ChannelFuture;"))
-	private Object injectFabricPacketSlitterHandlerOutbound(Object transitioner, @Local(argsOnly = true) ProtocolInfo<?> protocolInfo) {
-		transitioner = ((UnconfiguredPipelineHandler.OutboundConfigurationTask) transitioner).andThen((context) -> {
+	@ModifyExpressionValue(method = "setupOutboundProtocol", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/UnconfiguredPipelineHandler;setupOutboundProtocol(Lnet/minecraft/network/ProtocolInfo;)Lnet/minecraft/network/UnconfiguredPipelineHandler$OutboundConfigurationTask;"))
+	private UnconfiguredPipelineHandler.OutboundConfigurationTask injectFabricPacketSlitterHandlerOutbound(UnconfiguredPipelineHandler.OutboundConfigurationTask transitioner) {
+		transitioner = transitioner.andThen((context) -> {
 			if (context.pipeline().get(HandlerNames.ENCODER) instanceof PacketContextSetter setter) {
 				setter.fabric_setPacketContext(this.packetContext);
 			}
 		});
-		return transitioner;
+		return transitioner.andThen((context) -> {
+			if (context.pipeline().get(ChannelEncoderContextProvider.ID) != null) {
+				context.pipeline().remove(ChannelEncoderContextProvider.ID);
+			}
+			context.pipeline().addAfter(HandlerNames.ENCODER, ChannelEncoderContextProvider.ID, new ChannelEncoderContextProvider());
+		});
 	}
 
 	@Override
