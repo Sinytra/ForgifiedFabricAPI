@@ -53,11 +53,11 @@ public class NeoFluidSingleSlotStorage implements SingleSlotStorage<FluidVariant
 
 	@Override
 	public long getAmount() {
-		return this.inner.getAmountAsLong(this.slot);
+		return TransferCompatUtil.toFabricBucketLong(this.inner.getAmountAsLong(this.slot));
 	}
 
 	@Override
 	public long getCapacity() {
-		return this.inner.getCapacityAsLong(this.slot, this.inner.getResource(this.slot));
+		return TransferCompatUtil.toFabricBucketLong(this.inner.getCapacityAsLong(this.slot, this.inner.getResource(this.slot)));
 	}
 }

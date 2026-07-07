@@ -1,6 +1,5 @@
 package net.fabricmc.fabric.impl.transfer.compat;
 
-import com.google.common.primitives.Ints;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -40,13 +39,13 @@ public class FabricFluidResourceHandler implements ResourceHandler<FluidResource
 	@Override
 	public long getAmountAsLong(int index) {
 		if (index >= slots.size()) return 0;
-		return slots.get(index).getAmount();
+		return TransferCompatUtil.toNeoBucketLong(slots.get(index).getAmount());
 	}
 
 	@Override
 	public long getCapacityAsLong(int index, FluidResource resource) {
 		if (index >= slots.size()) return 0;
-		return slots.get(index).getCapacity();
+		return TransferCompatUtil.toNeoBucketLong(slots.get(index).getCapacity());
 	}
 
 	@Override
@@ -61,23 +60,21 @@ public class FabricFluidResourceHandler implements ResourceHandler<FluidResource
 
 	@Override
 	public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-		return Ints.saturatedCast(
-				this.inner.insert(
-						TransferCompatUtil.toVariant(resource),
-						TransferCompatUtil.toFabricBucket(amount),
-						TransferCompatUtil.toFabricCtx(transaction)
-				)
+		long inserted = this.inner.insert(
+				TransferCompatUtil.toVariant(resource),
+				TransferCompatUtil.toFabricBucket(amount),
+				TransferCompatUtil.toFabricCtx(transaction)
 		);
+		return TransferCompatUtil.toNeoBucket(inserted);
 	}
 
 	@Override
 	public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-		return Ints.saturatedCast(
-				this.inner.extract(
-						TransferCompatUtil.toVariant(resource),
-						TransferCompatUtil.toFabricBucket(amount),
-						TransferCompatUtil.toFabricCtx(transaction)
-				)
+		long extracted = this.inner.extract(
+				TransferCompatUtil.toVariant(resource),
+				TransferCompatUtil.toFabricBucket(amount),
+				TransferCompatUtil.toFabricCtx(transaction)
 		);
+		return TransferCompatUtil.toNeoBucket(extracted);
 	}
 }
