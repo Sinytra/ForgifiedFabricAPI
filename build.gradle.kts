@@ -144,7 +144,10 @@ dependencies {
             prefer(versionForgifiedFabricLoader)
         }
     }
-    
+
+    // Make FFLoader available to consumers
+    api("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+
     accessTransformers(project(":fabric-transitive-access-wideners-v1"))
 }
 
