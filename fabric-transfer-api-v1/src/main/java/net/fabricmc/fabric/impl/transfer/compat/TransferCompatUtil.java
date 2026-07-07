@@ -37,10 +37,18 @@ public final class TransferCompatUtil {
 	}
 
 	public static int toNeoBucket(long amount) {
-		return (int) (Ints.saturatedCast(amount) / (double) FluidConstants.BUCKET * FluidType.BUCKET_VOLUME);
+		return (int) toNeoBucketLong(amount);
 	}
 
-	public static int toFabricBucket(int amount) {
-		return (int) (amount / (double) FluidType.BUCKET_VOLUME * FluidConstants.BUCKET);
+	public static long toNeoBucketLong(long amount) {
+		return (long) (Ints.saturatedCast(amount) / (double) FluidConstants.BUCKET * FluidType.BUCKET_VOLUME);
+	}
+
+	public static int toFabricBucket(long amount) {
+		return (int) toFabricBucketLong(amount);
+	}
+
+	public static long toFabricBucketLong(long amount) {
+		return (long) (amount / (double) FluidType.BUCKET_VOLUME * FluidConstants.BUCKET);
 	}
 }

@@ -1,6 +1,5 @@
 package net.fabricmc.fabric.impl.transfer.compat;
 
-import com.google.common.primitives.Ints;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
@@ -28,12 +27,12 @@ public class FabricSlottedFluidResourceHandler implements ResourceHandler<FluidR
 
 	@Override
 	public long getAmountAsLong(int index) {
-		return this.inner.getSlot(index).getAmount();
+		return TransferCompatUtil.toNeoBucketLong(this.inner.getSlot(index).getAmount());
 	}
 
 	@Override
 	public long getCapacityAsLong(int index, FluidResource resource) {
-		return this.inner.getSlot(index).getCapacity();
+		return TransferCompatUtil.toNeoBucketLong(this.inner.getSlot(index).getCapacity());
 	}
 
 	@Override
@@ -48,23 +47,21 @@ public class FabricSlottedFluidResourceHandler implements ResourceHandler<FluidR
 
 	@Override
 	public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-		return Ints.saturatedCast(
-				this.inner.getSlot(index).insert(
-						TransferCompatUtil.toVariant(resource),
-						TransferCompatUtil.toFabricBucket(amount),
-						TransferCompatUtil.toFabricCtx(transaction)
-				)
+		long inserted = this.inner.getSlot(index).insert(
+				TransferCompatUtil.toVariant(resource),
+				TransferCompatUtil.toFabricBucket(amount),
+				TransferCompatUtil.toFabricCtx(transaction)
 		);
+		return TransferCompatUtil.toNeoBucket(inserted);
 	}
 
 	@Override
 	public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-		return Ints.saturatedCast(
-				this.inner.getSlot(index).extract(
-						TransferCompatUtil.toVariant(resource),
-						TransferCompatUtil.toFabricBucket(amount),
-						TransferCompatUtil.toFabricCtx(transaction)
-				)
+		long extracted = this.inner.getSlot(index).extract(
+				TransferCompatUtil.toVariant(resource),
+				TransferCompatUtil.toFabricBucket(amount),
+				TransferCompatUtil.toFabricCtx(transaction)
 		);
+		return TransferCompatUtil.toNeoBucket(extracted);
 	}
 }
