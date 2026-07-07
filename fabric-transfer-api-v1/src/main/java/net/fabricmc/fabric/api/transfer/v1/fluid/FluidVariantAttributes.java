@@ -18,6 +18,8 @@ package net.fabricmc.fabric.api.transfer.v1.fluid;
 
 import java.util.Optional;
 
+import net.fabricmc.fabric.impl.transfer.compat.FabricFluidTypes;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
@@ -50,6 +52,11 @@ public final class FluidVariantAttributes {
 	 * Register an attribute handler for the passed fluid.
 	 */
 	public static void register(Fluid fluid, FluidVariantAttributeHandler handler) {
+		registerInternal(fluid, handler);
+		FabricFluidTypes.register(fluid, handler);
+	}
+
+	private static void registerInternal(Fluid fluid, FluidVariantAttributeHandler handler) {
 		if (HANDLERS.putIfAbsent(fluid, handler) != null) {
 			throw new IllegalArgumentException("Duplicate handler registration for fluid " + fluid);
 		}
@@ -163,7 +170,7 @@ public final class FluidVariantAttributes {
 	}
 
 	static {
-		register(Fluids.WATER, new FluidVariantAttributeHandler() {
+		registerInternal(Fluids.WATER, new FluidVariantAttributeHandler() {
 			@Override
 			public Component getName(FluidVariant fluidVariant) {
 				if (coloredVanillaFluidNames) {
@@ -178,7 +185,7 @@ public final class FluidVariantAttributes {
 				return Optional.of(SoundEvents.BUCKET_EMPTY);
 			}
 		});
-		register(Fluids.LAVA, new FluidVariantAttributeHandler() {
+		registerInternal(Fluids.LAVA, new FluidVariantAttributeHandler() {
 			@Override
 			public Component getName(FluidVariant fluidVariant) {
 				if (coloredVanillaFluidNames) {

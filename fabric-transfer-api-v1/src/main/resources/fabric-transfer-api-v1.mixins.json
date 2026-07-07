@@ -3,6 +3,9 @@
   "package": "net.fabricmc.fabric.mixin.transfer",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "registry.BaseMappedRegistryAccessor",
+    "registry.MappedRegistryAccessor",
+    "CommonHooksMixin",
     "CompoundContainerAccessor",
     "FluidMixin",
     "ItemContainerContentsAccessor",
