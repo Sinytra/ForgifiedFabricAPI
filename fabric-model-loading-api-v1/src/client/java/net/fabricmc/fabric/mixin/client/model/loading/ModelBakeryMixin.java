@@ -64,7 +64,7 @@ abstract class ModelBakeryMixin {
 	@Nullable
 	private ModelLoadingEventDispatcher fabric_eventDispatcher;
 
-	@Inject(method = "<init>", at = @At("RETURN"))
+	@Inject(method = "<init>(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lnet/minecraft/client/renderer/PlayerSkinRenderCache;Ljava/util/Map;Ljava/util/Map;Ljava/util/Map;Lnet/minecraft/client/resources/model/ResolvedModel;Lnet/neoforged/neoforge/client/model/standalone/StandaloneModelLoader$LoadedModels;Lnet/neoforged/neoforge/client/entity/animation/json/AnimationLoader$PendingAnimations;)V", at = @At("RETURN"))
 	private void onReturnInit(CallbackInfo ci) {
 		fabric_eventDispatcher = ModelLoadingEventDispatcher.CURRENT.get();
 	}
