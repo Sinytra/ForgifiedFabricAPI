@@ -63,6 +63,10 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 		this.receiver = receiver;
 		this.sendableChannels = Collections.synchronizedSet(new HashSet<>());
 	}
+	
+	public @Nullable PayloadTypeRegistryImpl<?> getPayloadTypeRegistry() {
+		return this.receiver.getPayloadTypeRegistry();
+	}
 
 	protected void registerPendingChannels(ChannelInfoHolder holder, ConnectionProtocol state) {
 		final Collection<Identifier> pending = ChannelAttributes.getOrCreateCommonChannels(this.connection, state);
@@ -93,11 +97,6 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 		@Nullable H handler = this.getHandler(channelName);
 
 		if (handler == null) {
-			// FFAPI: Prevent Neo from panicking
-			if (this.receiver.getPayloadTypeRegistry().get(channelName) != null) {
-				return true;
-			}
-			
 			return false;
 		}
 

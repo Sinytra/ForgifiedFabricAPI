@@ -53,9 +53,14 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 		this.listener = listener;
 		this.server = server;
 		this.context = new ContextImpl(server, listener, this);
+	}
 
+	@Override
+	public void lateInit() {
 		// Must register pending channels via lateinit
 		this.registerPendingChannels((ChannelInfoHolder) this.connection, ConnectionProtocol.PLAY);
+
+		super.lateInit();
 	}
 
 	@Override
