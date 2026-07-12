@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.networking.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,6 +30,7 @@ import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.RunningOnDifferentThreadException;
 
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
@@ -68,6 +71,18 @@ public abstract class ClientCommonPacketListenerImplMixin implements PacketListe
 			this.minecraft.packetProcessor().scheduleIfPossible((ClientCommonPacketListenerImpl) (Object) this, packet);
 			ci.cancel();
 		}
+	}
+
+	@WrapOperation(method = "handleCustomPayload", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/registration/NetworkRegistry;isModdedPayload(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;)Z"))
+	private boolean cancelNeoHandling(CustomPacketPayload payload, Operation<Boolean> original) {
+		if (this.getAddon() instanceof ClientPlayNetworkAddon addon) {
+			final Identifier channelName = payload.type().id();
+
+			if (addon.getPayloadTypeRegistry().get(channelName) != null) {
+				return false;
+			}
+		}
+		return original.call(payload);
 	}
 
 	@Override

@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.networking;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RunningOnDifferentThreadException;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
@@ -34,6 +37,7 @@ import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContextProvider;
 import net.fabricmc.fabric.impl.networking.PacketListenerExtensions;
 import net.fabricmc.fabric.impl.networking.server.ServerConfigurationNetworkAddon;
+import net.fabricmc.fabric.impl.networking.server.ServerPlayNetworkAddon;
 
 @Mixin(ServerCommonPacketListenerImpl.class)
 public abstract class ServerCommonPacketListenerImplMixin implements PacketListenerExtensions, PacketContextProvider {
@@ -67,6 +71,18 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 			this.server.packetProcessor().scheduleIfPossible((ServerCommonPacketListenerImpl) (Object) this, packet);
 			ci.cancel();
 		}
+	}
+
+	@WrapOperation(method = "handleCustomPayload", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/registration/NetworkRegistry;isModdedPayload(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;)Z"))
+	private boolean cancelNeoHandling(CustomPacketPayload payload, Operation<Boolean> original) {
+		if (this.getAddon() instanceof ServerPlayNetworkAddon addon) {
+			final Identifier channelName = payload.type().id();
+
+			if (addon.getPayloadTypeRegistry().get(channelName) != null) {
+				return false;
+			}
+		}
+		return original.call(payload);
 	}
 
 	@Override
