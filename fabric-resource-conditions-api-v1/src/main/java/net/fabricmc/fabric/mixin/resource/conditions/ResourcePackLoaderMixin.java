@@ -26,7 +26,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.server.packs.OverlayMetadataSection;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
 
 import net.fabricmc.fabric.impl.resource.conditions.OverlayConditionsMetadata;
 
@@ -39,10 +43,16 @@ public class ResourcePackLoaderMixin {
 					target = "Ljava/util/List;addAll(Ljava/util/Collection;)Z"
 			)
 	)
-	private static void applyOverlayConditions(CallbackInfoReturnable<?> cir,
-											   @Local(name = "overlays") List<String> overlays,
-											   @Local(name = "primaryResources") PackResources pack
+	private static void applyOverlayConditions(PackType type, PackLocationInfo location, Pack.ResourcesSupplier resources, CallbackInfoReturnable<?> cir,
+	                                           @Local(name = "overlays") List<String> overlays,
+	                                           @Local(name = "primaryResources") PackResources pack
 	) throws IOException {
+		// Avoid trying to load Fabric overlays for xplat mods that define both.
+		// The condition registry entries would be missing.
+		if (pack.getMetadataSection(OverlayMetadataSection.forPackTypeNeoForge(type)) != null) {
+			return;
+		}
+		
 		OverlayConditionsMetadata overlayMetadata = pack.getMetadataSection(OverlayConditionsMetadata.SERIALIZER);
 
 		if (overlayMetadata != null) {
