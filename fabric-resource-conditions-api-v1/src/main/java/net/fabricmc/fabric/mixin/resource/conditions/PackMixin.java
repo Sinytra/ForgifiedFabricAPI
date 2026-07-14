@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.llamalad7.mixinextras.sugar.Local;
+
+import net.minecraft.server.packs.OverlayMetadataSection;
+
+import net.minecraft.server.packs.PackType;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -33,7 +38,16 @@ import net.fabricmc.fabric.impl.resource.conditions.OverlayConditionsMetadata;
 @Mixin(Pack.class)
 public class PackMixin {
 	@ModifyVariable(method = "readPackMetadata", at = @At(value = "STORE", ordinal = 0), name = "overlaySet")
-	private static List<String> applyOverlayConditions(List<String> overlays, @Local(name = "pack") PackResources pack) throws IOException {
+	private static List<String> applyOverlayConditions(List<String> overlays,
+													   @Local(argsOnly = true) PackType type,
+													   @Local(name = "pack") PackResources pack
+	) throws IOException {
+		// Avoid trying to load Fabric overlays for xplat mods that define both.
+		// The condition registry entries would be missing.
+		if (pack.getMetadataSection(OverlayMetadataSection.forPackTypeNeoForge(type)) != null) {
+			return overlays;
+		}
+
 		List<String> appliedOverlays = new ArrayList<>(overlays);
 		OverlayConditionsMetadata overlayMetadata = pack.getMetadataSection(OverlayConditionsMetadata.SERIALIZER);
 
