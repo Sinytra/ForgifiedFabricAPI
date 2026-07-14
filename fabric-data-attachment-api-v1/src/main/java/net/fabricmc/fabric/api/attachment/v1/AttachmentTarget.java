@@ -195,6 +195,9 @@ public interface AttachmentTarget {
 	 */
 	@Nullable
 	default <A> A setAttached(AttachmentType<A> type, @Nullable A value) {
+		if (value == null) {
+			return ((IAttachmentHolder) this).removeData(((AttachmentTypeImpl<A>) type).internalType());
+		}
 		return ((IAttachmentHolder) this).setData(((AttachmentTypeImpl<A>) type).internalType(), value);
 	}
 
