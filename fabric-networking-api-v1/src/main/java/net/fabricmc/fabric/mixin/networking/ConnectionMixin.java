@@ -115,10 +115,9 @@ abstract class ConnectionMixin implements ChannelInfoHolder, PacketContextProvid
 			}
 		});
 		return transitioner.andThen((context) -> {
-			if (context.pipeline().get(ChannelEncoderContextProvider.ID) != null) {
-				context.pipeline().remove(ChannelEncoderContextProvider.ID);
+			if (context.pipeline().get(ChannelEncoderContextProvider.ID) == null) {
+				context.pipeline().addAfter(HandlerNames.ENCODER, ChannelEncoderContextProvider.ID, new ChannelEncoderContextProvider());
 			}
-			context.pipeline().addAfter(HandlerNames.ENCODER, ChannelEncoderContextProvider.ID, new ChannelEncoderContextProvider());
 		});
 	}
 
