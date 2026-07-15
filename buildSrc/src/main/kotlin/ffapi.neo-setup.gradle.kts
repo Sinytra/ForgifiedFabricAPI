@@ -35,7 +35,8 @@ dependencies {
     "runtimeOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 
     "testmodImplementation"(mainSourceSet.output)
-    "testmodImplementation"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+    "testmodCompileOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader")
+    "testmodRuntimeOnly"("org.sinytra:forgified-fabric-loader:$versionForgifiedFabricLoader:full")
 
     if (project.name != "fabric-gametest-api-v1") {
         "testmodImplementation"(project(":fabric-gametest-api-v1", "namedElements"))

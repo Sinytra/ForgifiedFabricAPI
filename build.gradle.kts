@@ -165,8 +165,6 @@ allprojects {
         return@allprojects
     }
 
-    val modDependencies: Configuration by configurations.creating
-
     tasks.register("generate") {
         group = "sinytra"
     }
