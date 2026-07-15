@@ -18,6 +18,7 @@ package net.fabricmc.fabric.mixin.entity.event;
 
 import java.util.List;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.datafixers.util.Either;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -116,9 +117,8 @@ abstract class ServerPlayerEntityMixin extends LivingEntityMixin {
 		return result != InteractionResult.PASS ? result.consumesAction() : vanillaResult;
 	}
 
-	@Redirect(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
-	private boolean redirectDaySleepCheck(Level world, BlockPos pos) {
-		boolean day = world.isDay();
+	@ModifyExpressionValue(method = "lambda$startSleepInBed$13", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isDay()Z"))
+	private boolean redirectDaySleepCheck(boolean day, BlockPos pos) {
 		InteractionResult result = EntitySleepEvents.ALLOW_SLEEP_TIME.invoker().allowSleepTime((Player) (Object) this, pos, !day);
 
 		if (result != InteractionResult.PASS) {
