@@ -1,14 +1,20 @@
 package net.fabricmc.fabric.mixin.networking.client;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.neoforged.neoforge.client.network.registration.ClientNetworkRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.resources.Identifier;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.impl.networking.NetworkingImpl;
 
 @Mixin(ClientNetworkRegistry.class)
@@ -18,5 +24,12 @@ public class ClientNetworkRegistryMixin {
 		if (NetworkingImpl.getCodec(packet.payload().type().id(), listener.protocol(), listener.flow()) != null) {
 			ci.cancel();
 		}
+	}
+
+	@ModifyVariable(method = "sendInitialListeningChannels", at = @At(value = "STORE"))
+	private static Set<Identifier> sendInitialFabricChannels(Set<Identifier> nowListeningOn) {
+		Set<Identifier> withFabricChannels = new HashSet<>(nowListeningOn);
+		withFabricChannels.addAll(ClientConfigurationNetworking.getGlobalReceivers());
+		return withFabricChannels;
 	}
 }
