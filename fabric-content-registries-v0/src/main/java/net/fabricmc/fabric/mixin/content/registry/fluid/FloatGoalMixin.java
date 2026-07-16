@@ -17,28 +17,33 @@
 package net.fabricmc.fabric.mixin.content.registry.fluid;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.sugar.Local;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.behavior.Swim;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.level.material.Fluid;
 
 import net.fabricmc.fabric.impl.content.registry.fluid.EntityFluidInteractionRegistryImpl;
 import net.fabricmc.fabric.impl.content.registry.fluid.InternalEntityFluidExtension;
 
-@Mixin(Swim.class)
-public class SwimMixin {
-	@ModifyReturnValue(method = "shouldSwim", at = @At("RETURN"))
-	private static boolean floatInCustomFluids(boolean original, @Local(argsOnly = true) Mob mob) {
+@Mixin(FloatGoal.class)
+public class FloatGoalMixin {
+	@Shadow
+	@Final
+	private Mob mob;
+
+	@ModifyReturnValue(method = "canUse", at = @At("RETURN"))
+	private boolean floatInCustomFluids(boolean original) {
 		if (original) {
 			return true;
 		}
 
 		for (TagKey<Fluid> tagKey : ((InternalEntityFluidExtension) mob).fabric_api$getTouchedCustomFluids()) {
-			if (EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).shouldTryFloatingInFluid(tagKey, mob)) {
+			if (EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).shouldTryFloatingInFluid(tagKey, this.mob)) {
 				return true;
 			}
 		}

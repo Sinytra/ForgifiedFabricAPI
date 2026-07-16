@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.content.registry.fluid;
+package net.fabricmc.fabric.impl.content.registry.fluid;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import java.util.Set;
 
-import net.minecraft.world.entity.Entity;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.Fluid;
 
-@Mixin(Entity.class)
-public interface EntityAccessor {
-	@Invoker
-	void callDoWaterSplashEffect();
+/**
+ * Internal fluid extension.
+ */
+public interface InternalEntityFluidExtension {
+	Set<TagKey<Fluid>> fabric_api$getTouchedCustomFluids();
 }

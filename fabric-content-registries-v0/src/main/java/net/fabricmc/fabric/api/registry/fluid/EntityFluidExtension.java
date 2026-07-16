@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.content.registry.fluid;
+package net.fabricmc.fabric.api.registry.fluid;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.Fluid;
 
-import net.minecraft.world.entity.Entity;
-
-@Mixin(Entity.class)
-public interface EntityAccessor {
-	@Invoker
-	void callDoWaterSplashEffect();
+/**
+ * Entity extensions related to fluid interaction handling.
+ */
+public interface EntityFluidExtension {
+	/**
+	 * Checks if entity is in a specific fluid type.
+	 * The fluid must be fist registered within the {@link EntityFluidInteractionRegistry}.
+	 *
+	 * @param type tag representing the fluid type
+	 * @return true if entity is in specific fluid, false otherwise
+	 */
+	default boolean isInFluid(TagKey<Fluid> type) {
+		throw new AssertionError("Implemented in Mixin");
+	}
 }
