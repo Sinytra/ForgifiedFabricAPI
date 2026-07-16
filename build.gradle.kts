@@ -9,7 +9,7 @@ plugins {
     java
     `maven-publish`
     id("dev.architectury.loom") // Version declared in buildSrc
-    id("me.modmuss50.mod-publish-plugin") version "0.5.+"
+    id("me.modmuss50.mod-publish-plugin") version "2.1.1"
 }
 
 val implementationVersion: String by project
@@ -238,6 +238,8 @@ publishMods {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
         projectId.set(curseForgeId)
         minecraftVersions.add(versionMc)
+        client.set(true)
+        server.set(true)
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
