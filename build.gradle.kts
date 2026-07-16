@@ -51,7 +51,7 @@ val upstreamVersion = version
 
 ext["upstreamVersion"] = upstreamVersion
 
-version = "$upstreamVersion+$implementationVersion+$versionMc${(if (System.getenv("GITHUB_RUN_NUMBER") == null) "+local" else "")}"
+version = "$upstreamVersion+$versionMc+$implementationVersion${(if (System.getenv("GITHUB_RUN_NUMBER") == null) "+local" else "")}"
 println("Version: $version")
 
 val injectedInterfaces = configurations.create("injectedInterfaces")
