@@ -26,6 +26,7 @@ import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_I
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DATAGEN_DYNAMIC_REGISTRY_KEY;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DYNAMIC_REGISTRY_EXTRA_ITEM_KEY;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DYNAMIC_REGISTRY_ITEM_KEY;
+import static net.minecraft.data.advancements.AdvancementSubProvider.createPlaceholder;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -65,7 +66,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.models.BlockModelGenerators;
@@ -76,7 +76,6 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
-import net.minecraft.references.Blocks;
 import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -90,6 +89,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -173,7 +173,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 			ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.DIAMOND_ORE, 4).requires(Items.ITEM_FRAME)
 					.unlockedBy("has_frame", has(Items.ITEM_FRAME))
-					.save(withConditions(exporter, ResourceConditions.registryContains(Registries.ITEM, BuiltInRegistries.ITEM.getKey(Items.DIAMOND_BLOCK))));
+					.save(withConditions(exporter, ResourceConditions.registryContains(Registries.ITEM, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(Items.DIAMOND_BLOCK))));
 			ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.EMERALD, 4).requires(Items.ITEM_FRAME, 2)
 					.unlockedBy("has_frame", has(Items.ITEM_FRAME))
 					.save(withConditions(exporter, ResourceConditions.registryContains(Biomes.PLAINS, Biomes.BADLANDS)));
@@ -320,6 +320,21 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 			tag(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK.value());
 			tag(BlockTags.DIRT).add(SIMPLE_BLOCK.value());
 			tag(BlockTags.ACACIA_LOGS).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
+
+			tag(BlockTags.AZALEA_ROOT_REPLACEABLE)
+					.remove(Blocks.RED_SAND.builtInRegistryHolder().key())
+					.removeTag(BlockTags.DIRT);
+
+			tag(BlockTags.NEEDS_DIAMOND_TOOL)
+					.remove(
+							Blocks.ANCIENT_DEBRIS.builtInRegistryHolder().key(),
+							Blocks.NETHERITE_BLOCK.builtInRegistryHolder().key(),
+							Blocks.OBSIDIAN.builtInRegistryHolder().key()
+					);
+			tag(BlockTags.CLIMBABLE)
+					.add(Blocks.BLUE_GLAZED_TERRACOTTA.builtInRegistryHolder().key())
+					.add(Blocks.BROWN_GLAZED_TERRACOTTA.builtInRegistryHolder().key())
+					.remove(Blocks.BLUE_GLAZED_TERRACOTTA.builtInRegistryHolder().key());
 		}
 	}
 
@@ -386,6 +401,17 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 							false, false, false)
 					.addCriterion("killed_something", KilledTrigger.TriggerInstance.playerKilledEntity())
 					.save(withConditions(consumer, NEVER_LOADED), MOD_ID + ":test/root_not_loaded");
+			AdvancementHolder adventureChild = Advancement.Builder.advancement()
+					.display(SIMPLE_BLOCK,
+							Component.translatable("advancements.test.adventure_child.title"),
+							Component.translatable("advancements.test.adventure_child.description"),
+							ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/end.png"),
+							AdvancementType.GOAL,
+							false, false, false
+					)
+					.addCriterion("killed_something", KilledTrigger.TriggerInstance.playerKilledEntity())
+					.parent(createPlaceholder("minecraft:adventure/root"))
+					.save(consumer, MOD_ID + ":test/adventure_child");
 		}
 	}
 
@@ -471,7 +497,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		protected void configure(BiConsumer<ResourceLocation, LootItemCondition> provider, HolderLookup.Provider lookup) {
 			HolderGetter<Block> blocks = lookup.asGetterLookup().lookupOrThrow(Registries.BLOCK);
 			provider.accept(ResourceLocation.fromNamespaceAndPath(MOD_ID, "predicate_test"), LootItemBlockStatePropertyCondition.hasBlockStateProperties(
-					blocks.getOrThrow(Blocks.MELON).value()).build()); // Pretend this actually does something and we cannot access the blocks directly
+					blocks.getOrThrow(net.minecraft.references.Blocks.MELON).value()).build()); // Pretend this actually does something and we cannot access the blocks directly
 		}
 
 		@Override

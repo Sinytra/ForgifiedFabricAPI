@@ -27,6 +27,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
 public class ClientTagsImpl {
@@ -60,13 +61,19 @@ public class ClientTagsImpl {
 		}
 
 		// Recursively search the entries contained with the tag
-		ClientTagsLoader.LoadedTag wt = ClientTagsImpl.getOrCreatePartiallySyncedTag(tagKey);
+		ClientTagsLoader.LoadedTag loadedTag = ClientTagsImpl.getOrCreatePartiallySyncedTag(tagKey);
 
-		if (wt.immediateChildIds().contains(registryEntry.unwrapKey().get().location())) {
+		ResourceLocation id = registryEntry.unwrapKey().get().location();
+
+		if (loadedTag.removeIds().contains(id)) {
+			return false;
+		}
+
+		if (loadedTag.immediateChildIds().contains(id)) {
 			return true;
 		}
 
-		for (TagKey<?> key : wt.immediateChildTags()) {
+		for (TagKey<?> key : loadedTag.immediateChildTags()) {
 			if (isInWithLocalFallback((TagKey<T>) key, registryEntry, checked)) {
 				return true;
 			}

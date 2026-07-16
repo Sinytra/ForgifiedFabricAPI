@@ -1,0 +1,3 @@
+accessWidener	v2	named
+transitive-accessible	class	net/minecraft/tags/TagLoader$SortingEntry
+accessible	field	net/minecraft/core/HolderSet$Named	contents	Ljava/util/List;

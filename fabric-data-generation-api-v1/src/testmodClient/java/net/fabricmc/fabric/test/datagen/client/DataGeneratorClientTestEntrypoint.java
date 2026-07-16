@@ -42,7 +42,7 @@ public class DataGeneratorClientTestEntrypoint implements DataGeneratorEntrypoin
 
 	@Override
 	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-		final FabricDataGenerator.Pack pack = dataGenerator.createBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MOD_ID, "example_builtin"));
+		final FabricDataGenerator.Pack pack = dataGenerator.createBuiltinResourcePack(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MOD_ID, "example_builtin"));
 		pack.addProvider(TestAtlasSourceProvider::new);
 	}
 

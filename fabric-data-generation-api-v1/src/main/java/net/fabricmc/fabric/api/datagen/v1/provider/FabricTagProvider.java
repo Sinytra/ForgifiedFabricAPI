@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.api.datagen.v1.provider;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.impl.datagen.ForcedTagEntry;
+import net.fabricmc.fabric.impl.datagen.TagBuilderHooks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -229,7 +231,7 @@ public abstract class FabricTagProvider<T> extends TagsProvider<T> {
 	/**
 	 * An extension to {@link TagAppender} that provides additional functionality.
 	 */
-	public final class FabricTagBuilder extends TagAppender<T> {
+	public final class FabricTagBuilder extends TagAppender<T> implements FabricProvidedTagBuilder<T> {
 		private final TagsProvider.TagAppender<T> parent;
 
 		private FabricTagBuilder(TagAppender<T> parent) {
@@ -391,6 +393,86 @@ public abstract class FabricTagProvider<T> extends TagsProvider<T> {
 				add(registryKey);
 			}
 
+			return this;
+		}
+
+		/**
+		 * Remove an element from the tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		public FabricTagBuilder remove(T element) {
+			remove(reverseLookup(element));
+			return this;
+		}
+
+		/**
+		 * Remove multiple elements from the tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		@SafeVarargs
+		public final FabricTagBuilder remove(T... elements) {
+			Stream.of(elements).map(FabricTagProvider.this::reverseLookup).forEach(this::remove);
+			return this;
+		}
+
+		/**
+		 * Remove an element from the tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		@Override
+		public FabricTagBuilder remove(ResourceKey<T> registryKey) {
+			((TagBuilderHooks) this.builder).fabric_removeElement(registryKey.location());
+			return this;
+		}
+
+		/**
+		 * Remove multiple elements from the tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		@SafeVarargs
+		@Override
+		public final FabricTagBuilder remove(ResourceKey<T>... registryKeys) {
+			for (ResourceKey<T> registryKey : registryKeys) {
+				remove(registryKey);
+			}
+
+			return this;
+		}
+
+		/**
+		 * Remove multiple elements from the tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		@Override
+		public FabricTagBuilder removeAll(final Collection<ResourceKey<T>> registryKeys) {
+			registryKeys.forEach(this::remove);
+			return this;
+		}
+
+		/**
+		 * Remove multiple elements from the tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		@Override
+		public FabricTagBuilder removeAll(final Stream<ResourceKey<T>> registryKeys) {
+			registryKeys.forEach(this::remove);
+			return this;
+		}
+
+		/**
+		 * Remove another tag from this tag.
+		 *
+		 * @return the {@link FabricTagBuilder} instance
+		 */
+		@Override
+		public FabricTagBuilder removeTag(TagKey<T> tag) {
+			((TagBuilderHooks) this.builder).fabric_removeTag(tag.location());
 			return this;
 		}
 	}

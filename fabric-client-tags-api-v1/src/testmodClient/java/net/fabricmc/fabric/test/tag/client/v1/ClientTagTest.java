@@ -37,13 +37,24 @@ import net.minecraft.world.level.block.Blocks;
 
 public class ClientTagTest implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClientTagTest.class);
-	private static final String MODID = "fabric-clients-tags-api-v1-testmod";
+
+	private static final String MOD_ID = "fabric-clients-tags-api-v1-testmod";
+	protected static final ResourceLocation BUILT_IN_PACK_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "test");
+	protected static final ResourceLocation ADD_BACK_MELON_PACK_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "add_back_melon");
 
 	@Override
 	public void onInitializeClient() {
-		final ModContainer container = FabricLoader.getInstance().getModContainer(MODID).get();
+		final ModContainer container = FabricLoader.getInstance().getModContainer(MOD_ID).get();
 
-		if (!ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MODID, "test2"),
+		if (!ResourceManagerHelper.registerBuiltinResourcePack(BUILT_IN_PACK_ID, container, ResourcePackActivationType.ALWAYS_ENABLED)) {
+			throw new IllegalStateException("Could not register '%s' built-in resource pack.".formatted(BUILT_IN_PACK_ID));
+		}
+
+		if (!ResourceManagerHelper.registerBuiltinResourcePack(ADD_BACK_MELON_PACK_ID, container, ResourcePackActivationType.NORMAL)) {
+			throw new IllegalStateException("Could not register '%s' built-in resource pack.".formatted(ADD_BACK_MELON_PACK_ID));
+		}
+
+		if (!ResourceManagerHelper.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(MOD_ID, "test2"),
 				container, ResourcePackActivationType.ALWAYS_ENABLED)) {
 			throw new IllegalStateException("Could not register built-in resource pack.");
 		}
