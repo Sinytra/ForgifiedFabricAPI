@@ -99,6 +99,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.neoforged.neoforge.common.extensions.ITagAppenderExtension;
 
 public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 	private static final ResourceCondition ALWAYS_LOADED = ResourceConditions.alwaysTrue();
@@ -325,7 +326,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.remove(Blocks.RED_SAND.builtInRegistryHolder().key())
 					.removeTag(BlockTags.DIRT);
 
-			tag(BlockTags.NEEDS_DIAMOND_TOOL)
+			((ITagAppenderExtension<Block>) tag(BlockTags.NEEDS_DIAMOND_TOOL))
 					.remove(
 							Blocks.ANCIENT_DEBRIS.builtInRegistryHolder().key(),
 							Blocks.NETHERITE_BLOCK.builtInRegistryHolder().key(),
@@ -402,7 +403,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.addCriterion("killed_something", KilledTrigger.TriggerInstance.playerKilledEntity())
 					.save(withConditions(consumer, NEVER_LOADED), MOD_ID + ":test/root_not_loaded");
 			AdvancementHolder adventureChild = Advancement.Builder.advancement()
-					.display(SIMPLE_BLOCK,
+					.display(SIMPLE_BLOCK.value(),
 							Component.translatable("advancements.test.adventure_child.title"),
 							Component.translatable("advancements.test.adventure_child.description"),
 							ResourceLocation.withDefaultNamespace("textures/gui/advancements/backgrounds/end.png"),

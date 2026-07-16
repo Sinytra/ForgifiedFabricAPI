@@ -16,17 +16,23 @@
 
 package net.fabricmc.fabric.api.datagen.v1.provider;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
+
+import net.fabricmc.fabric.impl.datagen.ForcedTagEntry;
 import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.data.tags.TagsProvider.TagAppender;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
+import net.neoforged.neoforge.common.extensions.ITagAppenderExtension;
 
 /**
  * Interface-injected to {@link TagsProvider.TagAppender}.
  */
 @SuppressWarnings("unchecked")
-public interface FabricProvidedTagBuilder<T> {
+public interface FabricProvidedTagBuilder<T> extends ITagAppenderExtension<T> {
 	/**
 	 * Sets the value of the {@code replace} flag. When set to {@code true}
 	 * this tag will replace contents of any other tag.
@@ -34,7 +40,8 @@ public interface FabricProvidedTagBuilder<T> {
 	 * @return this, for chaining
 	 */
 	default FabricProvidedTagBuilder<T> setReplace(boolean replace) {
-		throw new AssertionError("Implemented via mixin");
+        replace(replace);
+        return this;
 	}
 
 	/**
@@ -44,16 +51,18 @@ public interface FabricProvidedTagBuilder<T> {
 	 * @return this, for chaining
 	 */
 	default FabricProvidedTagBuilder<T> forceAddTag(TagKey<T> tag) {
-		throw new AssertionError("Implemented via mixin");
+        self().add(new ForcedTagEntry(TagEntry.element(tag.location())));
+        return this;
 	}
 
 	/**
-	 * Removes an entry from the tag.
-	 * @param element The entry to remove from the contents of the tag
-	 * @return this, for chaining
-	 */
-	default FabricProvidedTagBuilder<T> remove(ResourceKey<T> element) {
-		throw new AssertionError("Implemented via mixin");
+     * Removes an entry from the tag.
+     *
+     * @param element The entry to remove from the contents of the tag
+     * @return this, for chaining
+     */
+	default TagAppender<T> remove(ResourceKey<T> element) {
+		return ITagAppenderExtension.super.remove(element);
 	}
 
 	/**
@@ -62,7 +71,8 @@ public interface FabricProvidedTagBuilder<T> {
 	 * @return this, for chaining
 	 */
 	default FabricProvidedTagBuilder<T> remove(final ResourceKey<T>... elements) {
-		throw new AssertionError("Implemented via mixin");
+        removeAll(Arrays.asList(elements));
+        return this;
 	}
 
 	/**
@@ -71,7 +81,10 @@ public interface FabricProvidedTagBuilder<T> {
 	 * @return this, for chaining
 	 */
 	default FabricProvidedTagBuilder<T> removeAll(final Collection<ResourceKey<T>> elements) {
-		throw new AssertionError("Implemented via mixin");
+        for (ResourceKey<T> element : elements) {
+            remove(element);
+        }
+        return this;
 	}
 
 	/**
@@ -80,7 +93,8 @@ public interface FabricProvidedTagBuilder<T> {
 	 * @return this, for chaining
 	 */
 	default FabricProvidedTagBuilder<T> removeAll(final Stream<ResourceKey<T>> elements) {
-		throw new AssertionError("Implemented via mixin");
+		elements.forEach(this::remove);
+        return this;
 	}
 
 	/**
@@ -89,6 +103,11 @@ public interface FabricProvidedTagBuilder<T> {
 	 * @return this, for chaining
 	 */
 	default FabricProvidedTagBuilder<T> removeTag(TagKey<T> tag) {
-		throw new AssertionError("Implemented via mixin");
+        remove(tag);
+        return this;
 	}
+
+    private TagsProvider.TagAppender<T> self() {
+        return (TagsProvider.TagAppender<T>) this;
+    }
 }

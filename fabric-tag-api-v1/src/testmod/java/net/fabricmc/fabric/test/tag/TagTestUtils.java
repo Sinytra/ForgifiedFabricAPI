@@ -84,7 +84,7 @@ public class TagTestUtils {
 			HolderSet.Named<T> registryEntryList = lookup.getOrThrow(tag);
 			Set<ResourceKey<T>> actual = registryEntryList.contents
 					.stream()
-					.map(entry -> entry.getKey().orElseThrow())
+					.map(entry -> entry.unwrapKey().orElseThrow())
 					.collect(Collectors.toSet());
 
 			for (ResourceKey<T> key : expected) {
@@ -123,7 +123,7 @@ public class TagTestUtils {
 			HolderSet.Named<T> registryEntryList = lookup.getOrThrow(tag);
 			Set<ResourceKey<T>> actual = registryEntryList.contents
 					.stream()
-					.map(entry -> entry.getKey().orElseThrow())
+					.map(entry -> entry.unwrapKey().orElseThrow())
 					.collect(Collectors.toSet());
 
 			if (!actual.equals(expected)) {

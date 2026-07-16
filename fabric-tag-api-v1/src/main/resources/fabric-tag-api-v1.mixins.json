@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "net.fabricmc.fabric.mixin.tag",
+  "package": "net.fabricmc.fabric.mixin.tags",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "TagFileMixin"
