@@ -16,19 +16,20 @@
 
 package net.fabricmc.fabric.mixin.client.renderer.block.render;
 
+import java.util.List;
 import java.util.function.Function;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.QuadInstance;
-import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -53,12 +54,10 @@ import net.minecraft.client.renderer.feature.BlockFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.OptionsRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
@@ -69,7 +68,7 @@ import net.fabricmc.fabric.api.client.renderer.v1.render.FabricSubmitNodeCollect
 import net.fabricmc.fabric.impl.client.renderer.BlockModelBufferCache;
 import net.fabricmc.fabric.impl.client.renderer.QuadConsumers;
 
-@Mixin(BlockFeatureRenderer.class)
+@Mixin(value = BlockFeatureRenderer.class, priority = 1500)
 abstract class BlockFeatureRendererMixin {
 	@Shadow
 	@Final
@@ -156,19 +155,40 @@ abstract class BlockFeatureRendererMixin {
 		}
 	}
 
-	@Overwrite
-	private void renderBreakingBlockModelSubmits(final SubmitNodeCollection nodeCollection, final MultiBufferSource.BufferSource bufferSource) {
+	// FFAPI: Replace @Overwrite with non-delegating WrapOp to fix compat with Aether II 
+	@Inject(
+			method = "renderBreakingBlockModelSubmits",
+			at = @At("HEAD")
+	)
+	private void prepareBreakingBlockModelEmitter(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, CallbackInfo ci,
+	                                              @Share("quadConsumer") LocalRef<QuadConsumers.BreakingBlockModel> quadConsumerRef,
+	                                              @Share("emitter") LocalRef<QuadEmitter> outputRef
+	) {
 		QuadConsumers.BreakingBlockModel quadConsumer = new QuadConsumers.BreakingBlockModel();
 		QuadEmitter output = Renderer.get().quadEmitter(quadConsumer);
 
-		for (SubmitNodeStorage.BreakingBlockModelSubmit submit : nodeCollection.getBreakingBlockModelSubmits()) {
-			VertexConsumer buffer = new SheetedDecalTextureGenerator(bufferSource.getBuffer(ModelBakery.DESTROY_TYPES.get(submit.progress())), submit.pose(), 1.0F);
-			quadConsumer.pose = submit.pose();
-			quadConsumer.buffer = buffer;
-			output.clear();
-			random.setSeed(submit.seed());
-			// TODO 26.1: somehow pass the level, pos, and state here when available? maybe via extended submit type?
-			submit.model().emitQuads(output, BlockAndTintGetter.EMPTY, BlockPos.ZERO, Blocks.AIR.defaultBlockState(), random, _ -> false);
-		}
+		quadConsumerRef.set(quadConsumer);
+		outputRef.set(output);
+	}
+
+	@WrapOperation(
+			method = "renderBreakingBlockModelSubmits",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;collectParts(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;Ljava/util/List;)V"
+			)
+	)
+	private void emitBreakingModelQuads(BlockStateModel model, BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts, Operation<Void> original,
+	                                    @Local SubmitNodeStorage.BreakingBlockModelSubmit submit, @Local VertexConsumer buffer,
+	                                    @Share("quadConsumer") LocalRef<QuadConsumers.BreakingBlockModel> quadConsumerRef,
+	                                    @Share("emitter") LocalRef<QuadEmitter> emitterRef
+	) {
+		QuadConsumers.BreakingBlockModel quadConsumer = quadConsumerRef.get();
+		QuadEmitter output = emitterRef.get();
+
+		quadConsumer.pose = submit.pose();
+		quadConsumer.buffer = buffer;
+		output.clear();
+		model.emitQuads(output, level, pos, state, random, cullFace -> false);
 	}
 }
