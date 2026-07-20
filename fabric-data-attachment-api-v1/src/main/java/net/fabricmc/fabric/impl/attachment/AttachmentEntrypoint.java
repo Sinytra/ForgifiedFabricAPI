@@ -63,6 +63,9 @@ public class AttachmentEntrypoint implements ModInitializer {
 		for (Map.Entry<AttachmentType<?>, ?> entry : attachments.entrySet()) {
 			AttachmentType type = entry.getKey();
 			net.fabricmc.fabric.api.attachment.v1.AttachmentType<?> fabricType = AttachmentRegistryImpl.getFabricAttachmentType(type);
+			if (fabricType == null) {
+				continue;
+			}
 
 			if (!isDeath || fabricType.copyOnDeath()) {
 				target.setData(type, entry.getValue());
