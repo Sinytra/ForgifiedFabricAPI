@@ -24,7 +24,8 @@
     "accessor.ServerCommonPacketListenerImplAccessor",
     "accessor.ServerLoginPacketListenerImplAccessor",
     "NetworkRegistryMixin",
-    "CommonRegisterTaskMixin"
+    "CommonRegisterTaskMixin",
+    "FakePlayerNetHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

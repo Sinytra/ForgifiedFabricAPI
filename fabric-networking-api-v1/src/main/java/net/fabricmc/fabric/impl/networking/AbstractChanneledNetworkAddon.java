@@ -69,6 +69,10 @@ public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAd
 	}
 
 	protected void registerPendingChannels(ChannelInfoHolder holder, ConnectionProtocol state) {
+		if (this.connection.channel() == null) {
+			return;
+		}
+
 		final Collection<Identifier> pending = ChannelAttributes.getOrCreateCommonChannels(this.connection, state);
 
 		if (!pending.isEmpty()) {
