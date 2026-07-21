@@ -22,7 +22,6 @@ import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.impl.recipe.ingredient.compat.NeoCustomIngredientWrapper;
-import net.fabricmc.fabric.impl.recipe.sync.ClientboundRecipeSyncPayload;
 import net.fabricmc.fabric.impl.recipe.sync.RecipeSyncImpl;
 import net.fabricmc.fabric.impl.recipe.sync.ServerboundSupportedRecipeSerializersPayload;
 
@@ -38,7 +37,6 @@ public class FabricRecipeApiV1 {
 		bus.addListener(RegisterPayloadHandlersEvent.class, event -> {
 			PayloadRegistrar registrar = event.registrar("1").optional();
 
-			registrar.playToClient(ClientboundRecipeSyncPayload.TYPE, ClientboundRecipeSyncPayload.CODEC);
 			registrar.configurationToServer(
 					ServerboundSupportedRecipeSerializersPayload.TYPE,
 					ServerboundSupportedRecipeSerializersPayload.CODEC,
