@@ -7,6 +7,7 @@
     "RecipeManagerMixin",
     "ingredient.IngredientMixin",
     "ingredient.IngredientCodecsMixin",
+    "sync.CommonHooksMixin",
     "sync.ConnectionMixin",
     "sync.RecipeMapMixin",
     "sync.RecipeManagerAccessor"
