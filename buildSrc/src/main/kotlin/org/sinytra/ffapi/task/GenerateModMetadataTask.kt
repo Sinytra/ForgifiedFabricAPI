@@ -107,12 +107,13 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                 val parts = forgeVersionString.get().split(".")
                 val neoMajor = parts[0]
                 val neoMinor = parts[1]
+                val neoPatch = 84 // Hardcoded
                 val nextMajor = neoMajor.toInt() + 1
-                
+
                 baseDependencies += ModDependency(
                     "neoforge",
                     "required",
-                    "[$neoMajor.$neoMinor,$nextMajor)",
+                    "[$neoMajor.$neoMinor.$neoPatch,$nextMajor)",
                     "NONE",
                     "BOTH"
                 )
