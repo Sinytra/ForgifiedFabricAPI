@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.neoforged:moddev-gradle:2.0.141")
+    implementation("net.neoforged:moddev-gradle:2.0.142")
 
     implementation("net.fabricmc:fabric-loader:0.15.10")
     implementation("net.fabricmc:class-tweaker:0.3.0-beta.2")
