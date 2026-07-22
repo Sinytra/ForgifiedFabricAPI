@@ -30,7 +30,7 @@ abstract class GenerateInjectedInterfacesTask : DefaultTask() {
             // Process injected interfaces
             val interfaces = ctPath.bufferedReader().use(InterfaceInjection::toInjectedInterfaces)
             if (!interfaces.isEmpty()) {
-                val gson = GsonBuilder().setPrettyPrinting().create()
+                val gson = GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create()
                 val text = gson.toJson(interfaces)
 
                 output.parent.createDirectories()
