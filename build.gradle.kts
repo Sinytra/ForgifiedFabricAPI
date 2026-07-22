@@ -204,6 +204,7 @@ allprojects {
         }
 
         rootProject.dependencies.add("interfaceInjectionData", project(project.path))
+        rootProject.dependencies.add("accessTransformers", project(project.path))
     }
 }
 
