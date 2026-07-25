@@ -94,6 +94,8 @@ public final class InteractionEventHooks {
 	public static void onBlockBreak(BreakBlockEvent event) {
 		Player player = event.getPlayer();
 		Level level = player.level();
+		if (level.isClientSide()) return;
+
 		BlockPos pos = event.getPos();
 		BlockState state = event.getState();
 		BlockEntity be = level.getBlockEntity(pos);
