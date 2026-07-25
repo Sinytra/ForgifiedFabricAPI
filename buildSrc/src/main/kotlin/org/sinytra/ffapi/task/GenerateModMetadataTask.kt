@@ -19,9 +19,6 @@ abstract class GenerateModMetadataTask : DefaultTask() {
     abstract val outputFile: RegularFileProperty
 
     @get:Input
-    abstract val loaderVersionString: Property<String>
-
-    @get:Input
     @get:Optional
     abstract val forgeVersionString: Property<String>
 
@@ -71,7 +68,6 @@ abstract class GenerateModMetadataTask : DefaultTask() {
     @TaskAction
     fun run() {
         val output = outputFile.get().asFile.toPath()
-        val containsCode = sourceRoots.any { File(it.parentFile, "java").exists() }
         for (sourceRoot in sourceRoots) {
             if (!sourceRoot.isDirectory()) {
                 continue
@@ -187,8 +183,8 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                 }
 
             val modsToml = ModsToml(
-                modLoader = if (containsCode) "javafml" else "lowcodefml",
-                loaderVersion = "[${loaderVersionString.get()},)",
+                modLoader = "javafml",
+                loaderVersion = "*",
                 license = json.get("license")?.asString ?: "All Rights Reserved",
                 displayTest,
                 issueTrackerURL = "https://github.com/Sinytra/ForgifiedFabricAPI/issues",
