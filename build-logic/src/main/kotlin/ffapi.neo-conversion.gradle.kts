@@ -37,7 +37,6 @@ extensions.getByType<SourceSetContainer>().configureEach {
         // sources to the source set.
         sourceRoots.from(resourceRoots)
         outputFile = file("src/generated/$sourceSetName/resources/${Constants.modMetadataPath}")
-        loaderVersionString = "1"
         forgeVersionString = versionNeoForge
         minecraftVersionString = versionMc
     }
