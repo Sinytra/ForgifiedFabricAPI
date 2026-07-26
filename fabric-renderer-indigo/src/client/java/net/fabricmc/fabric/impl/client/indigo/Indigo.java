@@ -98,7 +98,7 @@ public class Indigo implements ClientModInitializer {
 			}
 		}
 
-		AMBIENT_OCCLUSION_MODE = asEnum((String) properties.computeIfAbsent("ambient-occlusion-mode", _ -> "hybrid"), AoConfig.HYBRID);
+		AMBIENT_OCCLUSION_MODE = asEnum((String) properties.computeIfAbsent("ambient-occlusion-mode", _ -> "enhanced"), AoConfig.ENHANCED);
 		DEBUG_COMPARE_LIGHTING = asBoolean((String) properties.computeIfAbsent("debug-compare-lighting", _ -> "auto"), false);
 		FIX_SMOOTH_LIGHTING_OFFSET = asBoolean((String) properties.computeIfAbsent("fix-smooth-lighting-offset", _ -> "auto"), true);
 		boolean fixMeanLightCalculation = asBoolean((String) properties.computeIfAbsent("fix-mean-light-calculation", _ -> "auto"), true);
