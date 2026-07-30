@@ -3,6 +3,7 @@ package net.fabricmc.fabric.impl.event.interaction;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.embedded.EmbeddedChannel;
+import net.fabricmc.fabric.impl.networking.UntrackedNetworkHandler;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.PacketSendListener;
@@ -14,7 +15,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
-public final class FakePlayerNetworkHandler extends ServerGamePacketListenerImpl {
+public final class FakePlayerNetworkHandler extends ServerGamePacketListenerImpl implements UntrackedNetworkHandler {
 	private static final Connection FAKE_CONNECTION = new FakeClientConnection();
 
 	public FakePlayerNetworkHandler(ServerPlayer player) {
