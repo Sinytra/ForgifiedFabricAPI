@@ -53,7 +53,9 @@ public class FluidStorageFluidHandler implements IFluidHandler {
     @Override
     public int getTankCapacity(int tank) {
         StorageView<FluidVariant> view = slots.get(tank);
-        return view != null ? (int) view.getCapacity() : 0;
+        // Fabric Storage capacity is in droplets; convert via toForgeBucket to mB,
+        // otherwise the Forge-side capacity reads 81x too large (1 mB = 81 droplets).
+        return view != null ? ForgeCompatUtil.toForgeBucket((int) view.getCapacity()) : 0;
     }
 
     @Override
