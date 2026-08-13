@@ -1,12 +1,15 @@
-plugins {
-	id 'fabric-api.module'
+version = getSubprojectVersion(project)
+
+loom {
+	accessWidenerPath = file("src/main/resources/fabric-content-registries-v0.classtweaker")
 }
 
-fabricApiModule {
-	moduleDependencies(
-		'fabric-api-base',
-		'fabric-lifecycle-events-v1',
-		'fabric-resource-loader-v1',
-		'fabric-item-api-v1'
-	)
-}
+moduleDependencies(project, [
+	'fabric-api-base',
+	'fabric-lifecycle-events-v1',
+	'fabric-resource-loader-v1'
+])
+
+testDependencies(project, [
+	'internal:ffapi-fluid-types'
+])

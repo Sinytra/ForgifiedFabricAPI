@@ -19,12 +19,7 @@ package net.fabricmc.fabric.mixin.content.registry.fluid;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,10 +32,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityFluidInteraction;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidState;
 
 import net.fabricmc.fabric.api.registry.fluid.EntityFluidExtension;
 import net.fabricmc.fabric.api.registry.fluid.FluidBehavior;
+import net.fabricmc.fabric.impl.content.registry.ContentRegistriesImpl;
 import net.fabricmc.fabric.impl.content.registry.fluid.EntityFluidInteractionRegistryImpl;
 import net.fabricmc.fabric.impl.content.registry.fluid.InternalEntityFluidExtension;
 
@@ -82,7 +77,7 @@ public abstract class EntityMixin implements EntityFluidExtension, InternalEntit
 		final boolean isPushedByFluid = this.isPushedByFluid();
 
 		for (TagKey<Fluid> tagKey : EntityFluidInteractionRegistryImpl.getTrackedFluids()) {
-			boolean inFluid = this.fluidInteraction.isInFluid(tagKey);
+			boolean inFluid = ContentRegistriesImpl.isInFluid(this.fluidInteraction, tagKey);
 			boolean wasInFluid = this.wasTouchingCustomFluid.contains(tagKey);
 
 			if (inFluid) {
@@ -102,82 +97,6 @@ public abstract class EntityMixin implements EntityFluidExtension, InternalEntit
 		}
 
 		return hasInteracted;
-	}
-
-	@ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isInWater()Z"))
-	private boolean checkIfInSwimmableFluid(boolean original) {
-		if (original) {
-			return true;
-		}
-
-		for (TagKey<Fluid> tagKey : this.wasTouchingCustomFluid) {
-			boolean inFluid = this.fluidInteraction.isInFluid(tagKey);
-
-			if (inFluid && EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).canSwimInFluid(tagKey, (Entity) (Object) this)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
-	private boolean checkIfUnderSwimmableFluid(boolean original, @Share("successfulFluids") LocalRef<Set<TagKey<Fluid>>> successfulFluids) {
-		var set = new HashSet<TagKey<Fluid>>();
-		successfulFluids.set(set);
-
-		for (TagKey<Fluid> tagKey : this.wasTouchingCustomFluid) {
-			boolean inFluid = this.fluidInteraction.isEyeInFluid(tagKey);
-
-			if (inFluid && EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).canSwimInFluid(tagKey, (Entity) (Object) this)) {
-				original = true;
-				set.add(tagKey);
-			}
-		}
-
-		return original;
-	}
-
-	@WrapOperation(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;is(Lnet/minecraft/tags/TagKey;)Z"))
-	private boolean checkIfStandingInSwimmableFluid(FluidState instance, TagKey<Fluid> waterFluidKey, Operation<Boolean> original,
-													@Share("successfulFluids") LocalRef<Set<TagKey<Fluid>>> successfulFluids) {
-		if (original.call(instance, waterFluidKey)) {
-			return true;
-		}
-
-		for (TagKey<Fluid> tagKey : successfulFluids.get()) {
-			if (instance.is(tagKey)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@ModifyExpressionValue(method = "isVisuallyCrawling", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isInWater()Z"))
-	private boolean checkCustomFluids(boolean original) {
-		if (original) {
-			return true;
-		}
-
-		for (TagKey<Fluid> tagKey : this.wasTouchingCustomFluid) {
-			boolean inFluid = this.fluidInteraction.isInFluid(tagKey);
-
-			if (inFluid && EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).canSwimInFluid(tagKey, (Entity) (Object) this)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@ModifyReturnValue(method = "canSpawnSprintParticle", at = @At("RETURN"))
-	private boolean preventParticlesInFluids(boolean original) {
-		if (!original) {
-			return false;
-		}
-
-		return this.wasTouchingCustomFluid.isEmpty();
 	}
 
 	@Override

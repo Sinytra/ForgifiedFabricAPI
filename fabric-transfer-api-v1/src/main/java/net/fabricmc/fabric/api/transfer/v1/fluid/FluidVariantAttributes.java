@@ -18,8 +18,6 @@ package net.fabricmc.fabric.api.transfer.v1.fluid;
 
 import java.util.Optional;
 
-import net.fabricmc.fabric.impl.transfer.compat.FabricFluidTypes;
-
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
@@ -42,7 +40,7 @@ import net.fabricmc.fabric.impl.transfer.TransferApiImpl;
  */
 public final class FluidVariantAttributes {
 	private static final ApiProviderMap<Fluid, FluidVariantAttributeHandler> HANDLERS = ApiProviderMap.create();
-	private static final FluidVariantAttributeHandler DEFAULT_HANDLER = new FluidVariantAttributeHandler() { };
+	public static final FluidVariantAttributeHandler DEFAULT_HANDLER = new FluidVariantAttributeHandler() { };
 	private static volatile boolean coloredVanillaFluidNames = false;
 
 	private FluidVariantAttributes() {
@@ -53,7 +51,6 @@ public final class FluidVariantAttributes {
 	 */
 	public static void register(Fluid fluid, FluidVariantAttributeHandler handler) {
 		registerInternal(fluid, handler);
-		FabricFluidTypes.register(fluid, handler);
 	}
 
 	private static void registerInternal(Fluid fluid, FluidVariantAttributeHandler handler) {

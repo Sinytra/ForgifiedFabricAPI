@@ -62,7 +62,7 @@ public class TransferApiNeoCompat {
 
 	private static final String POLYFILL_FLUID_TYPES = "sinytra:polyfill_fluid_types";
 
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.LOW)
 	private static void commonSetup(FMLCommonSetupEvent event) {
 		for (Entry<ResourceKey<Fluid>, Fluid> entry : BuiltInRegistries.FLUID.entrySet()) {
 			ResourceKey<Fluid> key = entry.getKey();

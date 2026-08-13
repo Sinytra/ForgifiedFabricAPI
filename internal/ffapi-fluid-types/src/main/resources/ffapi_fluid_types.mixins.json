@@ -1,16 +1,14 @@
 {
   "required": true,
-  "package": "net.fabricmc.fabric.mixin.content.registry.client.fluid",
+  "package": "org.sinytra.ffapi.mixin.fluids",
   "compatibilityLevel": "JAVA_25",
-  "client": [
-    "LocalPlayerMixin"
+  "mixins": [
+    "CommonHooksMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  },
-  "mixins": [
-  ]
+  }
 }

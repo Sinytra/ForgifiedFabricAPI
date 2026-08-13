@@ -7,7 +7,6 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
-import java.io.File
 import kotlin.io.path.*
 
 abstract class GenerateModMetadataTask : DefaultTask() {
@@ -104,7 +103,7 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                 val neoMajorMC = parts[0]
                 val neoMinorMC = parts[1]
                 val neoPatchMC = parts[2]
-                val neoBuild = 84 // Hardcoded
+                val neoBuild = 95 // Hardcoded
                 val nextMajor = neoMajorMC.toInt() + 1
 
                 baseDependencies += ModDependency(

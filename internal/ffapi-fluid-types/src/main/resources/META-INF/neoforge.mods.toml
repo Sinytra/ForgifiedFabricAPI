@@ -1,0 +1,44 @@
+modLoader = "javafml"
+loaderVersion = "*"
+license = "Apache-2.0"
+issueTrackerURL = "https://github.com/Sinytra/ForgifiedFabricAPI/issues"
+
+[[mods]]
+modId = "ffapi_fluid_types"
+version = "${file.jarVersion}"
+displayName = "Forgified Fabric API Fluid Types"
+logoFile = "assets/ffapi-fluid-types/icon.png"
+authors = "Sinytra"
+description = "Handles Fluid Type behavior"
+displayURL = "https://github.com/Sinytra/ForgifiedFabricAPI"
+
+[[dependencies.ffapi_fluid_types]]
+modId = "neoforge"
+type = "required"
+versionRange = "[26.1.2,27)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ffapi_fluid_types]]
+modId = "minecraft"
+type = "required"
+versionRange = "[26.1,27)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ffapi_fluid_types]]
+modId = "fabric_content_registries_v0"
+type = "required"
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ffapi_fluid_types]]
+modId = "fabric_transfer_api_v1"
+type = "required"
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "ffapi_fluid_types.mixins.json"

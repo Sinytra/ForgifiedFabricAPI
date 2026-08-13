@@ -1,5 +1,3 @@
-import org.gradle.api.publish.maven.MavenPublication
-
 plugins {
 	id "version-catalog"
 	id "fabric-api.base-publishing"
@@ -44,12 +42,18 @@ def doConfigureCatalog() {
 			catalogName = 'deprecated-fabric-api'
 		} else if (catalogName == 'fabric-api') {
 			catalogName = 'fabric-api'
+		} else if (catalogName == 'internal') {
+			catalogName = 'internal-forgified-fabric-api'	
 		} else {
 			catalogName = catalogName.substring('fabric-'.length())
 		}
 
 		if (proj.parent != null && proj.parent.name == 'deprecated') {
 			catalogName = 'deprecated-' + catalogName
+		}
+
+		if (proj.parent != null && proj.parent.name == 'internal') {
+			catalogName = 'internal-' + catalogName
 		}
 
 		catalog {

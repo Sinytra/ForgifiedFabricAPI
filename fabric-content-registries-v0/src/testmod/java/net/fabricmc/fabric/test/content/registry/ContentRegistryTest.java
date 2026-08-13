@@ -62,6 +62,7 @@ import net.fabricmc.fabric.api.registry.VibrationFrequencyRegistry;
 import net.fabricmc.fabric.api.registry.VillagerInteractionRegistries;
 import net.fabricmc.fabric.api.registry.fluid.EntityFluidInteractionRegistry;
 import net.fabricmc.fabric.api.registry.fluid.FluidBehavior;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 
 public final class ContentRegistryTest implements ModInitializer {
 	public static final String MOD_ID = "fabric-content-registries-v0-testmod";
@@ -182,6 +183,11 @@ public final class ContentRegistryTest implements ModInitializer {
 			// expected behavior
 			LOGGER.info("VibrationFrequencyRegistry test passed!");
 		}
+
+		FluidVariantAttributes.register(TEST_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
+		FluidVariantAttributes.register(TEST_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
+		FluidVariantAttributes.register(WATER_LIKE_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
+		FluidVariantAttributes.register(WATER_LIKE_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
 
 		EntityFluidInteractionRegistry.register(TEST_FLUID_KEY, FluidBehavior.simple()
 				.allowBoats(true).allowMovingDown(true).allowSwimming(false).enableDrowning(false)
