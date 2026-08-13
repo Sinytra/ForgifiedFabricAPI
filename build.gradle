@@ -792,7 +792,7 @@ publishMods {
     }
     modrinth {
         accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
-        projectId.set("forgified-fabric-api")
+        projectId.set("Aqlf1Shp")
         minecraftVersions = [project.minecraft_version]
     }
 }
