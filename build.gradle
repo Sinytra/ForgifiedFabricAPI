@@ -752,28 +752,14 @@ dependencies {
 //			clientImplementation project("${it.path}:").sourceSets.client.output
 
 			testmodImplementation project("${it.path}:").sourceSets.testmod.output
-//			testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
 		}
 	}
 }
 
-//remapJar {
-//	afterEvaluate {
-//		subprojects.each {
-//			if (it.name in devOnlyModules || it.name == "deprecated") {
-//				return
-//			}
-//
-//			// Include the signed or none signed jar from the sub project.
-//			nestedJars.from project("${it.path}").tasks.getByName(signingEnabled ? "signRemapJar" : "remapJar")
-//		}
-//	}
-//}
-
 publishMods {
     file.set(remapJar.archiveFile)
     changelog.set(providers.environmentVariable("CHANGELOG").orElse("# ${project.version}"))
-    type.set(project.prerelease ? me.modmuss50.mpp.ReleaseType.BETA : me.modmuss50.mpp.ReleaseType.RELEASE)
+    type.set(me.modmuss50.mpp.ReleaseType.STABLE)
     modLoaders.add("forge")
     dryRun.set(!providers.environmentVariable("CI").present)
     displayName.set("[$project.minecraft_version] Forgified Fabric API ${project.version}")
