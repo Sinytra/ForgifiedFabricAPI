@@ -19,6 +19,8 @@ package net.fabricmc.fabric.impl.content.registry.fluid;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+import net.fabricmc.fabric.impl.content.registry.ContentRegistriesImpl;
+
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ToFloatFunction;
