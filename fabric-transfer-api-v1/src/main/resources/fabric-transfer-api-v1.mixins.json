@@ -5,7 +5,6 @@
   "mixins": [
     "registry.BaseMappedRegistryAccessor",
     "registry.MappedRegistryAccessor",
-    "CommonHooksMixin",
     "CompoundContainerAccessor",
     "FluidMixin",
     "ItemContainerContentsAccessor",

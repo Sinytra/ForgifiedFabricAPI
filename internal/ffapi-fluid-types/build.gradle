@@ -1,0 +1,12 @@
+version = getSubprojectVersion(project)
+
+moduleDependencies(project, [
+	'fabric-api-base',
+	'fabric-content-registries-v0',
+	'fabric-transfer-api-v1',
+])
+
+testDependencies(project, [
+	'fabric-content-registries-v0',
+	'fabric-transfer-api-v1'
+])

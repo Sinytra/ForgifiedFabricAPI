@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.test.content.registry;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,6 +236,11 @@ public final class ContentRegistryTest implements ModInitializer {
 				builder.registerPotionRecipe(Potions.AWKWARD, Ingredient.of(Items.BUNDLE), Potions.LUCK);
 			}
 		});
+
+		FluidVariantAttributes.register(TEST_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
+		FluidVariantAttributes.register(TEST_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
+		FluidVariantAttributes.register(WATER_LIKE_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
+		FluidVariantAttributes.register(WATER_LIKE_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
 
 		EntityFluidInteractionRegistry.register(TEST_FLUID_KEY, FluidBehavior.simple()
 				.allowBoats(true).allowMovingDown(true).allowSwimming(false).enableDrowning(false)

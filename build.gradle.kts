@@ -280,7 +280,8 @@ fun getSubprojectVersion(project: Project): String {
         return "$version+nogit"
     }
 
-    val latestCommits = git.log().addPath(project.name).setMaxCount(1).call().toList()
+    val dirPath = project.projectDir.relativeTo(rootProject.projectDir)
+    val latestCommits = git.log().addPath(dirPath.path).setMaxCount(1).call().toList()
     if (latestCommits.isEmpty()) {
         return "$version+uncommited"
     }

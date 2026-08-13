@@ -16,17 +16,9 @@
 
 package net.fabricmc.fabric.mixin.content.registry.fluid;
 
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.tags.TagKey;
@@ -46,25 +38,6 @@ public abstract class LivingEntityMixin extends Entity {
 		super(type, level);
 	}
 
-	@ModifyExpressionValue(method = "shouldTravelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInLava()Z"))
-	private boolean isInCustomFluid(boolean original) {
-		if (original) {
-			return true;
-		}
-
-		return !((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids().isEmpty();
-	}
-
-	@WrapWithCondition(method = "travelInFluid(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/level/material/FluidState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;travelInLava(Lnet/minecraft/world/phys/Vec3;DZD)V"))
-	private boolean travelInCustomFluid(LivingEntity instance, Vec3 vec3, double input, boolean baseGravity, double isFalling) {
-		for (TagKey<Fluid> tagKey : ((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids()) {
-			EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).travelInFluid(tagKey, (LivingEntity) (Object) this, vec3, input, baseGravity, isFalling);
-			return false;
-		}
-
-		return true;
-	}
-
 	@Inject(method = "travelFlying(Lnet/minecraft/world/phys/Vec3;FFF)V", at = @At("HEAD"), cancellable = true)
 	private void travelFlyingInCustomFluid(Vec3 input, float waterSpeed, float lavaSpeed, float airSpeed, CallbackInfo ci) {
 		for (TagKey<Fluid> tagKey : ((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids()) {
@@ -72,68 +45,4 @@ public abstract class LivingEntityMixin extends Entity {
 			ci.cancel();
 		}
 	}
-
-	@Definition(id = "WATER", field = "Lnet/minecraft/tags/FluidTags;WATER:Lnet/minecraft/tags/TagKey;")
-	@Definition(id = "getFluidHeight", method = "Lnet/minecraft/world/entity/LivingEntity;getFluidHeight(Lnet/minecraft/tags/TagKey;)D")
-	@Expression("this.getFluidHeight(WATER)")
-	@ModifyExpressionValue(method = "aiStep", at = @At("MIXINEXTRAS:EXPRESSION"))
-	private double tryOtherFluidsForFluidJumping(double original, @Share("fluid") LocalRef<TagKey<Fluid>> fluid) {
-		if (original != 0) {
-			return original;
-		}
-
-		for (TagKey<Fluid> tagKey : ((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids()) {
-			fluid.set(tagKey);
-			return this.getFluidHeight(tagKey);
-		}
-
-		return 0;
-	}
-
-	@ModifyExpressionValue(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isEyeInFluid(Lnet/minecraft/tags/TagKey;)Z"))
-	private boolean customFluidDrowning(boolean original) {
-		if (original) {
-			return true;
-		}
-
-		for (TagKey<Fluid> tagKey : ((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids()) {
-			boolean inFluid = this.isEyeInFluid(tagKey);
-
-			if (inFluid && EntityFluidInteractionRegistryImpl.getFluidBehavior(tagKey).canDrownInFluid(tagKey, (LivingEntity) (Object) this)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	// This looks to be a vanilla bug or some sort of leftover?
-	// Causes fluids to apply their push twice if they aren't water (so in case of vanilla, lava only).
-	// This is not desired effect for mods through, as it will cause push value to functionally double (and fluid update stuff applying twice).
-	// So I decided to just skip it for modded ones, while keeping vanilla/lava as is.
-	@ModifyExpressionValue(method = "checkFallDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInWater()Z"))
-	private boolean fixDoubleUpdateForCustomFluids(boolean original) {
-		if (original) {
-			return true;
-		}
-
-		return !((InternalEntityFluidExtension) this).fabric_api$getTouchedCustomFluids().isEmpty();
-	}
-
-	@ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInLava()Z"),
-			slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getFluidJumpThreshold()D"))
-	)
-	private boolean jumpInCustomFluid(boolean original, @Share("fluid") LocalRef<TagKey<Fluid>> fluid) {
-		return original || fluid.get() != null;
-	}
-
-	// FIXME
-//	@Definition(id = "LAVA", field = "Lnet/minecraft/tags/FluidTags;LAVA:Lnet/minecraft/tags/TagKey;")
-//	@Definition(id = "jumpInLiquid", method = "Lnet/minecraft/world/entity/LivingEntity;jumpInLiquid(Lnet/minecraft/tags/TagKey;)V")
-//	@Expression("this.jumpInLiquid(LAVA)")
-//	@ModifyArg(method = "aiStep", at = @At("MIXINEXTRAS:EXPRESSION"))
-//	private TagKey<Fluid> swapFluidTag(TagKey<Fluid> fluidTagKey, @Share("fluid") LocalRef<TagKey<Fluid>> fluid) {
-//		TagKey<Fluid> custom = fluid.get();
-//		return custom != null ? custom : fluidTagKey;
-//	}
 }
