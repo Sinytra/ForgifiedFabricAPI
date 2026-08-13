@@ -53,7 +53,7 @@ public class FluidStorageFluidHandler implements IFluidHandler {
     @Override
     public int getTankCapacity(int tank) {
         StorageView<FluidVariant> view = slots.get(tank);
-        return view != null ? (int) view.getCapacity() : 0;
+		return view != null ? ForgeCompatUtil.toForgeBucket((int) view.getCapacity()) : 0;
     }
 
     @Override
