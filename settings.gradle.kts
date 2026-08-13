@@ -83,6 +83,6 @@ include("deprecated:fabric-convention-tags-v1")
 //include 'deprecated:fabric-events-lifecycle-v0'
 //include 'deprecated:fabric-keybindings-v0'
 //include 'deprecated:fabric-models-v0'
-//include 'deprecated:fabric-renderer-registries-v1'
+include("deprecated:fabric-renderer-registries-v1")
 include("deprecated:fabric-rendering-data-attachment-v1")
 //include 'deprecated:fabric-rendering-v0'
