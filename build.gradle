@@ -14,8 +14,7 @@ plugins {
 	id "dev.architectury.loom" version "1.3-SNAPSHOT" apply false
 	id "com.diffplug.spotless" version "6.18.0"
 	id "org.ajoberstar.grgit" version "3.1.0"
-	id "com.matthewprenger.cursegradle" version "1.4.0"
-	id "com.modrinth.minotaur" version "2.4.3"
+	id "me.modmuss50.mod-publish-plugin" version "0.7.4"
 	id "me.modmuss50.remotesign" version "0.4.0" apply false
 }
 
@@ -771,35 +770,34 @@ dependencies {
 //	}
 //}
 
-curseforge {
-	if (ENV.CURSEFORGE_API_KEY) {
-		apiKey = ENV.CURSEFORGE_API_KEY
-	}
+publishMods {
+    file.set(remapJar.archiveFile)
+    changelog.set(providers.environmentVariable("CHANGELOG").orElse("# ${project.version}"))
+    type.set(project.prerelease ? me.modmuss50.mpp.ReleaseType.BETA : me.modmuss50.mpp.ReleaseType.RELEASE)
+    modLoaders.add("forge")
+    dryRun.set(!providers.environmentVariable("CI").present)
+    displayName.set("[$project.minecraft_version] Forgified Fabric API ${project.version}")
 
-	project {
-		id = "889079"
-		changelog = ENV.CHANGELOG ?: "No changelog provided"
-		releaseType = project.prerelease == "true" ? "beta" : "release"
-		addGameVersion "1.20.1"
-		addGameVersion "Forge"
-
-		mainArtifact(signingEnabled ? signRemapJar.output : remapJar) {
-			displayName = "[$project.minecraft_version] Forgified Fabric API $project.version"
-		}
-
-		afterEvaluate {
-			uploadTask.dependsOn("remapJar")
-		}
-	}
-
-	options {
-		forgeGradleIntegration = false
-	}
+    github {
+        accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))
+        repository.set(providers.environmentVariable("GITHUB_REPOSITORY").orElse("Sinytra/ForgifiedFabricAPI"))
+        commitish.set("1.20.1")
+    }
+    curseforge {
+        accessToken.set(providers.environmentVariable("CURSEFORGE_API_KEY"))
+        projectId.set("889079")
+        minecraftVersions = [project.minecraft_version]
+        clientRequired.set(true)
+        serverRequired.set(true)
+    }
+    modrinth {
+        accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
+        projectId.set("forgified-fabric-api")
+        minecraftVersions = [project.minecraft_version]
+    }
 }
 
 if (signingEnabled) {
-	project.tasks.curseforge.dependsOn signRemapJar
-	project.tasks.modrinth.dependsOn signRemapJar
 	build.dependsOn signRemapJar
 }
 
@@ -829,17 +827,6 @@ tasks.register('github') {
 	}
 }
 
-modrinth {
-	projectId = "forgified-fabric-api"
-	versionName = "[$project.minecraft_version] Forgified Fabric API $project.version"
-	versionType = project.prerelease == "true" ? "beta" : "release"
-	changelog = ENV.CHANGELOG ?: "No changelog provided"
-	loaders = ["forge"]
-	gameVersions = ["1.20.1"]
-
-	uploadFile = signingEnabled ? signRemapJar.output : remapJar
-}
-
 // A task to ensure that the version being released has not already been released.
 tasks.register('checkVersion') {
 	doFirst {
@@ -860,9 +847,8 @@ tasks.register('checkVersion') {
 }
 
 github.mustRunAfter checkVersion
-project.tasks.modrinth.mustRunAfter checkVersion
+project.tasks.publishMods.mustRunAfter checkVersion
 publish.mustRunAfter checkVersion
-project.tasks.curseforge.mustRunAfter checkVersion
 
 ext {
 	DEV_ONLY_MODULES = devOnlyModules
