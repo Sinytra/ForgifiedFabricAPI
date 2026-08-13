@@ -29,4 +29,7 @@ public interface ScreenAccessor {
 
 	@Accessor
 	Minecraft getMinecraft();
+
+    @Accessor("minecraft")
+    Minecraft getClient();
 }
