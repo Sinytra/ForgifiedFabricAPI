@@ -16,14 +16,26 @@
 
 package net.fabricmc.fabric.api.entity;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stat;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.scores.PlayerTeam;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.OptionalInt;
+import java.util.UUID;
 
 /**
  * A "fake player" is a {@link ServerPlayer} that is not a human player.
@@ -47,46 +59,99 @@ import net.minecraft.server.level.ServerPlayer;
  * This can be done with an {@code instanceof} check: {@code player instanceof FakePlayer}.
  */
 public class FakePlayer extends net.neoforged.neoforge.common.util.FakePlayer {
-	/**
-	 * Default UUID, for fake players not associated with a specific (human) player.
-	 */
-	public static final UUID DEFAULT_UUID = UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C99CAE77");
-	private static final GameProfile DEFAULT_PROFILE = new GameProfile(DEFAULT_UUID, "[Minecraft]");
+    /**
+     * Default UUID, for fake players not associated with a specific (human) player.
+     */
+    public static final UUID DEFAULT_UUID = UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C99CAE77");
+    private static final GameProfile DEFAULT_PROFILE = new GameProfile(DEFAULT_UUID, "[Minecraft]");
 
-	/**
-	 * Retrieves a fake player for the specified world, using the {@link #DEFAULT_UUID default UUID}.
-	 * This is suitable when the fake player is not associated with a specific (human) player.
-	 * Otherwise, the UUID of the owning (human) player should be used (see class javadoc).
-	 *
-	 * <p>Instances are reused for the same world parameter.
-	 *
-	 * <p>Caution should be exerted when storing the returned value,
-	 * as strong references to the fake player will keep the world loaded.
-	 */
-	public static FakePlayer get(ServerLevel world) {
-		return get(world, DEFAULT_PROFILE);
-	}
+    /**
+     * Retrieves a fake player for the specified world, using the {@link #DEFAULT_UUID default UUID}.
+     * This is suitable when the fake player is not associated with a specific (human) player.
+     * Otherwise, the UUID of the owning (human) player should be used (see class javadoc).
+     *
+     * <p>Instances are reused for the same world parameter.
+     *
+     * <p>Caution should be exerted when storing the returned value,
+     * as strong references to the fake player will keep the world loaded.
+     */
+    public static FakePlayer get(ServerLevel world) {
+        return get(world, DEFAULT_PROFILE);
+    }
 
-	/**
-	 * Retrieves a fake player for the specified world and game profile.
-	 * See class javadoc for more information on fake player game profiles.
-	 *
-	 * <p>Instances are reused for the same parameters.
-	 *
-	 * <p>Caution should be exerted when storing the returned value,
-	 * as strong references to the fake player will keep the world loaded.
-	 */
-	public static FakePlayer get(ServerLevel world, GameProfile profile) {
-		Objects.requireNonNull(world, "World may not be null.");
-		Objects.requireNonNull(profile, "Game profile may not be null.");
+    /**
+     * Retrieves a fake player for the specified world and game profile.
+     * See class javadoc for more information on fake player game profiles.
+     *
+     * <p>Instances are reused for the same parameters.
+     *
+     * <p>Caution should be exerted when storing the returned value,
+     * as strong references to the fake player will keep the world loaded.
+     */
+    public static FakePlayer get(ServerLevel world, GameProfile profile) {
+        Objects.requireNonNull(world, "World may not be null.");
+        Objects.requireNonNull(profile, "Game profile may not be null.");
 
-		return FAKE_PLAYER_MAP.computeIfAbsent(new FakePlayerKey(world, profile), key -> new FakePlayer(key.world, key.profile));
-	}
+        return FAKE_PLAYER_MAP.computeIfAbsent(new FakePlayerKey(world, profile), key -> new FakePlayer(key.world, key.profile));
+    }
 
-	private record FakePlayerKey(ServerLevel world, GameProfile profile) { }
-	private static final Map<FakePlayerKey, FakePlayer> FAKE_PLAYER_MAP = new MapMaker().weakValues().makeMap();
+    private record FakePlayerKey(ServerLevel world, GameProfile profile) {
+    }
 
-	protected FakePlayer(ServerLevel world, GameProfile profile) {
-		super(world, profile);
-	}
+    private static final Map<FakePlayerKey, FakePlayer> FAKE_PLAYER_MAP = new MapMaker().weakValues().makeMap();
+
+    protected FakePlayer(ServerLevel world, GameProfile profile) {
+        super(world, profile);
+    }
+
+    @Override
+    public void tick() {
+    }
+
+    @Override
+    public void updateOptions(ClientInformation settings) {
+    }
+
+    @Override
+    public void awardStat(Stat<?> stat, int amount) {
+    }
+
+    @Override
+    public void resetStat(Stat<?> stat) {
+    }
+
+    @Override
+    public boolean isInvulnerableTo(DamageSource damageSource) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public PlayerTeam getTeam() {
+        // Scoreboard team is checked using the gameprofile name by default, which we don't want.
+        return null;
+    }
+
+    @Override
+    public void startSleeping(BlockPos pos) {
+        // Don't lock bed forever.
+    }
+
+    @Override
+    public boolean startRiding(Entity entity, boolean force) {
+        return false;
+    }
+
+    @Override
+    public void openTextEdit(SignBlockEntity sign, boolean front) {
+    }
+
+    @Override
+    public OptionalInt openMenu(@Nullable MenuProvider factory) {
+        return OptionalInt.empty();
+    }
+
+    @Override
+    public void openHorseInventory(AbstractHorse horse, Container inventory) {
+    }
 }
