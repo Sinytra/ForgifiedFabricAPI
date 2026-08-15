@@ -24,6 +24,7 @@ val publishBranch: String by project
 
 val META_PROJECTS: List<String> = listOf(
     "deprecated",
+    "internal",
     "fabric-api-bom",
     "fabric-api-catalog"
 )
