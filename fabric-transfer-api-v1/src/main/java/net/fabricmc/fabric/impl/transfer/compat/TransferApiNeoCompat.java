@@ -2,15 +2,12 @@ package net.fabricmc.fabric.impl.transfer.compat;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.common.base.Suppliers;
-import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -21,7 +18,6 @@ import org.sinytra.fabric.transfer_api.generated.GeneratedEntryPoint;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -31,13 +27,10 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.metadata.CustomValue;
 
 @EventBusSubscriber(modid = GeneratedEntryPoint.MOD_ID)
 public class TransferApiNeoCompat {
@@ -59,30 +52,6 @@ public class TransferApiNeoCompat {
 	public static final ThreadLocal<Boolean> COMPUTING_CAPABILITY_LOCK = ThreadLocal.withInitial(() -> false);
 
 	public static final ThreadLocal<Boolean> WAS_ABORTED = ThreadLocal.withInitial(() -> null);
-
-	private static final String POLYFILL_FLUID_TYPES = "sinytra:polyfill_fluid_types";
-
-	@SubscribeEvent(priority = EventPriority.LOW)
-	private static void commonSetup(FMLCommonSetupEvent event) {
-		for (Entry<ResourceKey<Fluid>, Fluid> entry : BuiltInRegistries.FLUID.entrySet()) {
-			ResourceKey<Fluid> key = entry.getKey();
-			Fluid fluid = entry.getValue();
-
-			boolean polyfill = FabricLoader.getInstance().getModContainer(key.identifier().getNamespace())
-					.map(c -> c.getMetadata().getCustomValue(POLYFILL_FLUID_TYPES))
-					.map(CustomValue::getAsBoolean)
-					.orElse(false);
-			if (!polyfill) {
-				continue;
-			}
-
-			if (FluidVariantAttributes.getHandler(fluid) != null || definesCustomFluidType(fluid)) {
-				continue;
-			}
-
-			FluidVariantAttributes.register(fluid, FluidVariantAttributes.getHandlerOrDefault(fluid));
-		}
-	}
 
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent

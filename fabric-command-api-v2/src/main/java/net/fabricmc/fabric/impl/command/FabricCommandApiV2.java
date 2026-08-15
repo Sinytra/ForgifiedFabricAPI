@@ -30,6 +30,9 @@ public class FabricCommandApiV2 implements ModInitializer {
 				event.register(Registries.COMMAND_ARGUMENT_TYPE, helper -> {
 					ARGUMENT_TYPE_CLASSES.forEach(ArgumentTypeInfos::registerByClass);
 					ARGUMENT_TYPES.forEach(helper::register);
+
+					ARGUMENT_TYPE_CLASSES.clear();
+					ARGUMENT_TYPES.clear();
 				}));
 		NeoForge.EVENT_BUS.addListener(
 				RegisterCommandsEvent.class,
