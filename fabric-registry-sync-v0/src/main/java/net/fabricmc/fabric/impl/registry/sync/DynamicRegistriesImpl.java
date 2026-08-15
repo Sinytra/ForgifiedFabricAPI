@@ -75,5 +75,6 @@ public final class DynamicRegistriesImpl {
 			Codec networkCodec = NETWORK_CODECS.get(dynamicRegistry.key());
 			event.dataPackRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec(), networkCodec);
 		}
+		DYNAMIC_REGISTRIES.clear();
 	}
 }
