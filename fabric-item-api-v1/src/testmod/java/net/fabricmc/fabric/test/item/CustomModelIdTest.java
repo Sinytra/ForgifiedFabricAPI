@@ -37,7 +37,7 @@ public class CustomModelIdTest implements ModInitializer {
 
 	private static Item.Properties buildProperties() {
 		Item.Properties props = new Item.Properties().setId(NOT_A_DIAMOND_KEY);
-		((FabricItem.Properties) props).modelId(Identifier.withDefaultNamespace("diamond"));
+		props.modelId(Identifier.withDefaultNamespace("diamond"));
 		return props;
 	}
 }
