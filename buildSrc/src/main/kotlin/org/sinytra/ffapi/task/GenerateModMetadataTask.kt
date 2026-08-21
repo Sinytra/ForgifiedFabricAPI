@@ -104,7 +104,7 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                 val neoMajorMC = parts[0]
                 val neoMinorMC = parts[1]
                 val neoPatchMC = parts[2]
-                val neoBuild = 95 // Hardcoded
+                val neoBuild = parts[3]
                 val nextMajor = neoMajorMC.toInt() + 1
 
                 baseDependencies += ModDependency(
