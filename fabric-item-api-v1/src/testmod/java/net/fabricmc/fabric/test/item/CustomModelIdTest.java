@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.test.item;
 
-import net.fabricmc.fabric.api.item.v1.FabricItem;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -38,7 +36,7 @@ public class CustomModelIdTest implements ModInitializer {
 
 	private static Item.Properties buildProperties() {
 		Item.Properties props = new Item.Properties().setId(NOT_A_DIAMOND_KEY);
-		((FabricItem.Properties) props).modelId(Identifier.withDefaultNamespace("diamond"));
+		props.modelId(Identifier.withDefaultNamespace("diamond"));
 		return props;
 	}
 }
