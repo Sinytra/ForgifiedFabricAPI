@@ -34,6 +34,6 @@ public interface SoundInstanceMixin extends FabricSoundInstance {
 	// Override the Neo method in SoundInstance
 	@Overwrite
 	default CompletableFuture<AudioStream> getStream(SoundBufferLibrary soundBuffers, Sound sound, boolean looping) {
-		return getAudioStream(soundBuffers, sound.getLocation(), looping);
+		return getAudioStream(soundBuffers, sound.getPath(), looping);
 	}
 }
