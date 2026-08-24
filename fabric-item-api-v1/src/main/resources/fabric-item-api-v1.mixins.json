@@ -16,7 +16,7 @@
     "ItemStackMixin",
     "LivingEntityMixin",
     "RegistryLoaderMixin",
-    "TooltipTypeMixin"
+    "TooltipFlagExtensionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

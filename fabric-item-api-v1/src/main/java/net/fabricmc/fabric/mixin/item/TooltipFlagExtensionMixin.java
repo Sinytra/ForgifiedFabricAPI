@@ -16,10 +16,10 @@
 
 package net.fabricmc.fabric.mixin.item;
 
-import org.spongepowered.asm.mixin.Mixin;
 import net.fabricmc.fabric.api.item.v1.FabricTooltipType;
-import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.neoforge.common.extensions.TooltipFlagExtension;
+import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(TooltipFlag.class)
-public interface TooltipTypeMixin extends FabricTooltipType {
+@Mixin(TooltipFlagExtension.class)
+public interface TooltipFlagExtensionMixin extends FabricTooltipType {
 }
