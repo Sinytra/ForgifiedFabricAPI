@@ -16,7 +16,8 @@
     "ItemPropertiesMixin",
     "ItemStackMixin",
     "ResourceManagerRegistryLoadTaskMixin",
-    "IItemExtensionMixin"
+    "IItemExtensionMixin",
+    "TooltipFlagExtensionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
