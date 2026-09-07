@@ -6,6 +6,7 @@
     "BlockBehaviourPropertiesMixin",
     "IBlockExtensionMixin",
     "IBlockStateExtensionMixin",
+    "EnchantmentMenuMixin",
     "FlowingFluidMixin",
     "LavaFluidMixin",
     "LiquidBlockMixin",
