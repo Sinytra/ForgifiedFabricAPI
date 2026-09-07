@@ -6,6 +6,9 @@
     "BlockBehaviourPropertiesMixin",
     "IBlockExtensionMixin",
     "IBlockStateExtensionMixin",
+    "FlowingFluidMixin",
+    "LavaFluidMixin",
+    "LiquidBlockMixin",
     "LivingEntityMixin"
   ],
   "injectors": {
