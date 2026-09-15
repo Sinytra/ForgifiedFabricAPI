@@ -93,7 +93,7 @@ public abstract class MinecraftServerMixin implements MinecraftServerHooks {
 	}
 
 	@Inject(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;close()V"))
-	private void onUnloadWorldAtShutdown(CallbackInfo ci, @Local(name = "levelx") ServerLevel level) {
+	private void onUnloadWorldAtShutdown(CallbackInfo ci, @Local(name = "level") ServerLevel level) {
 		ServerLevelEvents.UNLOAD.invoker().onLevelUnload((MinecraftServer) (Object) this, level);
 	}
 

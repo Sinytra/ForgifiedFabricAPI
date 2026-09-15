@@ -17,6 +17,7 @@
     "GameRendererMixin",
     "GuiGraphicsExtractorMixin",
     "GuiLayerManagerAccessor",
+    "GuiRendererDrawAccessor",
     "GuiRendererMixin",
     "HudAccessor",
     "HumanoidArmorLayerMixin",

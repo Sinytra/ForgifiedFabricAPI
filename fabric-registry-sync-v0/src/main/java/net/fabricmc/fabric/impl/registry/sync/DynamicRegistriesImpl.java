@@ -36,17 +36,14 @@ import net.minecraft.resources.ResourceKey;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 
 public final class DynamicRegistriesImpl {
-	private static final List<RegistryDataLoader.RegistryData<?>> WORLD_REGISTRIES;
-	private static final List<RegistryDataLoader.RegistryData<?>> BOOTSTRAPPING_REGISTRIES = new ArrayList<>(RegistryDataLoader.WORLD_REGISTRIES);
+	private static final List<RegistryDataLoader.RegistryData<?>> WORLD_REGISTRIES = new ArrayList<>();
+	private static final List<RegistryDataLoader.RegistryData<?>> BOOTSTRAPPING_REGISTRIES = new ArrayList<>();
 	private static final Set<ResourceKey<? extends Registry<?>>> VANILLA_DYNAMIC_REGISTRY_KEYS;
 	public static final Set<ResourceKey<? extends Registry<?>>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Map<ResourceKey<? extends Registry<?>>, Codec<?>> NETWORK_CODECS = new HashMap<>();
 
 
 	static {
-		WORLD_REGISTRIES = new ArrayList<>(RegistryDataLoader.WORLD_REGISTRIES);
-		WORLD_REGISTRIES.addAll(RegistryDataLoader.DIMENSION_REGISTRIES);
-		WORLD_REGISTRIES.addAll(RegistryDataLoader.RELOADABLE_REGISTRIES);
 		Set<ResourceKey<? extends Registry<?>>> vanillaDynamicRegistryKeys = new HashSet<>();
 
 		for (RegistryDataLoader.RegistryData<?> worldgenEntry : RegistryDataLoader.WORLD_REGISTRIES) {
