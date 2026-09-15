@@ -55,6 +55,7 @@ abstract class GenerateModMetadataTask : DefaultTask() {
         val version: String,
         val displayName: String,
         val logoFile: String?,
+        val iconFile: String?,
         val authors: String?,
         val description: String?,
         val displayURL: String
@@ -146,7 +147,8 @@ abstract class GenerateModMetadataTask : DefaultTask() {
                     modId = normalModid,
                     version = "\${file.jarVersion}",
                     displayName = "Forgified " + json.get("name").asString,
-                    logoFile = json.get("icon")?.asString,
+                    logoFile = json.get("icon")?.asString, // used because otherwise some launchers can't parse the logo
+                    iconFile = json.get("icon")?.asString,
                     authors = (listOf("Sinytra") + (json.getAsJsonArray("authors")?.map { it.asString } ?: emptyList())).joinToString(separator = ", "),
                     description = json.get("description")?.asString,
                     displayURL = "https://github.com/Sinytra/ForgifiedFabricAPI"
