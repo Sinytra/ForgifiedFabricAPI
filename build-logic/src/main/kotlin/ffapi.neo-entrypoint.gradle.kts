@@ -1,5 +1,6 @@
 import net.fabricmc.loader.impl.metadata.*
 import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 
 val versionMc: String by rootProject
 val versionNeoForge: String by rootProject
