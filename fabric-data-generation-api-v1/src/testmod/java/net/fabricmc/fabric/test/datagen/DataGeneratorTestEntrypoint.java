@@ -334,7 +334,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.remove(BlockItemIds.SOUL_SOIL.block())
 					.removeTag(BlockTags.DIRT);
 
-			builder(BlockTags.NEEDS_DIAMOND_TOOL)
+			((ITagAppenderExtension<Block>) builder(BlockTags.NEEDS_DIAMOND_TOOL))
 					.remove(
 							BlockItemIds.ANCIENT_DEBRIS.block(),
 							BlockItemIds.NETHERITE_BLOCK.block(),
