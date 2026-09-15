@@ -41,7 +41,6 @@ import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
-import net.fabricmc.fabric.mixin.client.rendering.GuiAccessor;
 import net.fabricmc.fabric.mixin.client.rendering.GuiLayerManagerAccessor;
 
 public class HudElementRegistryImpl {
@@ -94,7 +93,7 @@ public class HudElementRegistryImpl {
 	
 	private static void addLateLayer(Consumer<RegisterGuiLayersEvent> consumer) {
 		if (registered) {
-			GuiLayerManager manager = ((GuiAccessor) Minecraft.getInstance().gui).fabric$getLayerManager();
+			GuiLayerManager manager = ((HudAccessor) Minecraft.getInstance().gui.hud).fabric$getLayerManager();
 			List<NamedLayer> layers = ((GuiLayerManagerAccessor) manager).getLayers();
 
 			RegisterGuiLayersEvent event = new RegisterGuiLayersEvent(layers);

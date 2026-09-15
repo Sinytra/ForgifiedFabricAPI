@@ -18,7 +18,6 @@ package net.fabricmc.fabric.mixin.command.client;
 
 import net.neoforged.neoforge.client.ClientCommandSourceStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.ChatFormatting;
@@ -32,7 +31,10 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.impl.command.client.ClientSuggestionProviderExtensions;
 
 @Mixin({ClientSuggestionProvider.class, ClientCommandSourceStack.class})
-abstract class ClientSuggestionProviderMixin implements FabricClientCommandSource {
+abstract class ClientSuggestionProviderMixin implements FabricClientCommandSource, ClientSuggestionProviderExtensions {
+	@Unique
+	private boolean attended = false;
+
 	@Override
 	public void sendFeedback(Component message) {
 		getClient().gui.hud.getChat().addClientSystemMessage(message);

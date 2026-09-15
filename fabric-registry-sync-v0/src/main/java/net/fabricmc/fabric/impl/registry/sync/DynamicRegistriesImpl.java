@@ -40,7 +40,6 @@ public final class DynamicRegistriesImpl {
 	private static final List<RegistryDataLoader.RegistryData<?>> BOOTSTRAPPING_REGISTRIES = new ArrayList<>(RegistryDataLoader.WORLD_REGISTRIES);
 	private static final Set<ResourceKey<? extends Registry<?>>> VANILLA_DYNAMIC_REGISTRY_KEYS;
 	public static final Set<ResourceKey<? extends Registry<?>>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
-	public static final Set<ResourceKey<? extends Registry<?>>> SKIP_EMPTY_SYNC_REGISTRIES = new HashSet<>();
 	public static final Map<ResourceKey<? extends Registry<?>>, Codec<?>> NETWORK_CODECS = new HashMap<>();
 
 

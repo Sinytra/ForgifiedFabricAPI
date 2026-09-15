@@ -17,20 +17,18 @@
 package net.fabricmc.fabric.mixin.command.client;
 
 import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
 
@@ -39,8 +37,17 @@ import net.fabricmc.fabric.impl.command.client.ClientSuggestionProviderExtension
 
 @Mixin(ClientPacketListener.class)
 abstract class ClientPacketListenerMixin implements ClientCommandInternals.LastReceivedCommandsPacketAccessor {
+	@Shadow
+	@Final
+	private ClientSuggestionProvider suggestionsProvider;
+
 	@Unique
 	private @Nullable ClientboundCommandsPacket lastReceivedCommandsPacket = null;
+
+	@Inject(method = "<init>", at = @At("RETURN"))
+	private void init(Minecraft minecraft, Connection connection, CommonListenerCookie cookie, CallbackInfo ci) {
+		((ClientSuggestionProviderExtensions) this.suggestionsProvider).fabric_markAttended();
+	}
 
 	@Inject(method = "handleCommands", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/network/PacketProcessor;)V", shift = At.Shift.AFTER))
 	private void setLastReceivedCommandsPacket(ClientboundCommandsPacket packet, CallbackInfo ci) {

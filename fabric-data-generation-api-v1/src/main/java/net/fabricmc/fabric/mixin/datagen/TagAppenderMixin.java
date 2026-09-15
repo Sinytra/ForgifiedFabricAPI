@@ -26,6 +26,6 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagAppender;
  * Extends TagAppender to support setting the {@code replace} and {@code fabric:remove} fields.
  */
 @Mixin(TagAppender.class)
-interface TagAppenderMixin<E, T> extends FabricTagAppender<E, T> {
+interface TagAppenderMixin<T> extends FabricTagAppender<T> {
 
 }

@@ -31,19 +31,10 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 public final class InteractionEventHooks {
 
 	@SubscribeEvent
-	public static void onEntityInteractAt(PlayerInteractEvent.EntityInteractSpecific event) {
+	public static void onEntityInteractAt(PlayerInteractEvent.EntityInteract event) {
 		Entity entity = event.getTarget();
-		EntityHitResult hitResult = new EntityHitResult(entity, event.getLocalPos().add(entity.position()));
+		EntityHitResult hitResult = new EntityHitResult(entity, event.getLocation().add(entity.position()));
 		InteractionResult result = UseEntityCallback.EVENT.invoker().interact(event.getEntity(), event.getLevel(), event.getHand(), entity, hitResult);
-		if (result != InteractionResult.PASS) {
-			event.setCanceled(true);
-			event.setCancellationResult(result);
-		}
-	}
-
-	@SubscribeEvent
-	public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-		InteractionResult result = UseEntityCallback.EVENT.invoker().interact(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget(), null);
 		if (result != InteractionResult.PASS) {
 			event.setCanceled(true);
 			event.setCancellationResult(result);

@@ -5,7 +5,8 @@
   "mixins": [
     "DimensionTypeAccessor",
     "MappedRegistryAccessor",
-    "RegistryAccessImmutableRegistryAccessMixin"
+    "RegistryAccessImmutableRegistryAccessMixin",
+    "WorldDimensionsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

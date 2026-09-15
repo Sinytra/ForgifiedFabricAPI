@@ -23,8 +23,6 @@ import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEven
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry.Context;
@@ -49,16 +47,14 @@ public final class PictureInPictureRendererRegistryImpl {
 		frozen = true;
 
 		for (PictureInPictureRendererRegistry.Factory factory : FACTORIES) {
-			PictureInPictureRenderer<?> elementRenderer = factory.createRenderer(new ContextImpl(null, null, null));
-			event.register((Class) elementRenderer.getRenderStateClass(), src -> {
-				SubmitNodeCollector collector = Minecraft.getInstance().gameRenderer.getSubmitNodeStorage();
-				Context context = new ContextImpl(Minecraft.getInstance(), src, collector);
+			PictureInPictureRenderer<?> elementRenderer = factory.createRenderer(new ContextImpl(null));
+			event.register((Class) elementRenderer.getRenderStateClass(), () -> {
+				Context context = new ContextImpl(Minecraft.getInstance());
 				return factory.createRenderer(context);
 			});
 		}
 	}
 
-	public record ContextImpl(Minecraft minecraft, MultiBufferSource.BufferSource bufferSource,
-	                          SubmitNodeCollector submitNodeCollector) implements PictureInPictureRendererRegistry.Context {
+	public record ContextImpl(Minecraft minecraft) implements PictureInPictureRendererRegistry.Context {
 	}
 }

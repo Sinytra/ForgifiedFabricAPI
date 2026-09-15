@@ -93,7 +93,7 @@ public final class DynamicRegistries {
 	 * <br>Those registries are loaded by the game at different times, and some are not patched.
 	 */
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getWorldRegistries() {
-		return DynamicRegistriesImpl.getWorldRegistries();
+		return DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().toList();
 	}
 
 	/**
@@ -108,7 +108,7 @@ public final class DynamicRegistries {
 	 * <br>For example, it does not include the <code>minecraft:dimension</code> registry.
 	 */
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getBootstrappingRegistries() {
-		return DynamicRegistriesImpl.getBootstrappingRegistries();
+		return DataPackRegistriesHooks.getDataPackRegistries();
 	}
 
 	/**
