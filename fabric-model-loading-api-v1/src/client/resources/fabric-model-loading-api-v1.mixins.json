@@ -5,7 +5,6 @@
   "client": [
     "BlockStateModelHooksAccessor",
     "BlockStateModelHooksMixin",
-    "BlockStateModelUnbakedMixin",
     "ModelBakeryBakingResultMixin",
     "ModelBakeryMixin",
     "ModelManagerMixin",
