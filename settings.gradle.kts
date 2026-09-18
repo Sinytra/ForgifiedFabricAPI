@@ -34,8 +34,8 @@ gradle.beforeProject {
 include("fabric-api-bom")
 include("fabric-api-catalog")
 
+include("fabric-advancement-api-v1")
 include("fabric-api-base")
-
 include("fabric-api-lookup-api-v1")
 include("fabric-biome-api-v1")
 include("fabric-block-api-v1")
