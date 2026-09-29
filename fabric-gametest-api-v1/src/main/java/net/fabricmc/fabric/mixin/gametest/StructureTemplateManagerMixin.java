@@ -62,9 +62,8 @@ public abstract class StructureTemplateManagerMixin {
 						CompoundTag tag = NbtUtils.snbtToStructure(snbt);
 
 						// Replicate readStructure logic from TemplateSource
-						StructureTemplate structureTemplate = new StructureTemplate();
 						int version = NbtUtils.getDataVersion(tag, 500);
-						structureTemplate.load(blockLookup, DataFixTypes.STRUCTURE.updateToCurrentVersion(dataFixer, tag, version));
+						StructureTemplate structureTemplate = StructureTemplate.load(blockLookup, DataFixTypes.STRUCTURE.updateToCurrentVersion(dataFixer, tag, version));
 
 						return Optional.of(structureTemplate);
 					} catch (IOException | CommandSyntaxException e) {

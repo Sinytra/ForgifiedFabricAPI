@@ -19,6 +19,7 @@ package net.fabricmc.fabric.impl.client.renderer;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.gui.components.debug.DebugEntryCategory;
+import net.minecraft.client.gui.components.debug.DebugGroups;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
@@ -39,7 +40,7 @@ public class DebugOverlayClient implements ClientModInitializer {
 	private static class ActiveRendererDebugOverlayEntry implements DebugScreenEntry {
 		@Override
 		public void display(DebugScreenDisplayer lines, @Nullable Level level, @Nullable LevelChunk clientChunk, @Nullable LevelChunk chunk) {
-			lines.addLine("[Fabric] Active renderer: " + Renderer.get().getClass().getSimpleName());
+			lines.addToGroup(DebugGroups.MISC, "[Fabric] Active renderer: " + Renderer.get().getClass().getSimpleName());
 		}
 
 		@Override

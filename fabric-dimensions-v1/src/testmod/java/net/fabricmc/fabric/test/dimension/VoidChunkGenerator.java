@@ -16,9 +16,9 @@
 
 package net.fabricmc.fabric.test.dimension;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -86,6 +86,6 @@ public class VoidChunkGenerator extends ChunkGenerator {
 	}
 
 	@Override
-	public void addDebugScreenInfo(List<String> list, RandomState randomState, BlockPos blockPos, SamplerContext samplerContext) {
+	public void addDebugScreenInfo(BiConsumer<String, String> addFact, RandomState randomState, BlockPos blockPos, SamplerContext samplerContext) {
 	}
 }

@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
+import net.minecraft.client.gui.components.debug.DebugGroups;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.resources.Identifier;
@@ -26,7 +27,7 @@ public class DebugOptionsTests implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		DebugScreenEntries.register(Identifier.fromNamespaceAndPath("fabric-rendering", "example"), (lines, level, clientChunk, chunk) -> {
-			lines.addLine("Very important debug information");
+			lines.addToGroup(DebugGroups.MISC, "Very important debug information");
 		});
 
 		DebugScreenEntry nope = (lines, level, clientChunk, chunk) -> {
