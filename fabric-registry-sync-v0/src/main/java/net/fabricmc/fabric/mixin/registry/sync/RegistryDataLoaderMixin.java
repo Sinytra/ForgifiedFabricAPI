@@ -48,7 +48,7 @@ public class RegistryDataLoaderMixin {
 	@Unique
 	private static final ScopedValue<Boolean> IS_SERVER = ScopedValue.newInstance();
 
-	@WrapOperation(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/RegistryDataLoader;load(Lnet/minecraft/resources/RegistryDataLoader$LoaderFactory;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;Z)Ljava/util/concurrent/CompletableFuture;"))
+	@WrapOperation(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/List;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/RegistryDataLoader;load(Lnet/minecraft/resources/RegistryDataLoader$LoaderFactory;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;Z)Ljava/util/concurrent/CompletableFuture;"))
 	private static CompletableFuture<RegistryAccess.Frozen> wrapIsServerCall(@Coerce Object loaderFactory, List<HolderLookup.RegistryLookup<?>> contextRegistries, List<RegistryDataLoader.RegistryData<?>> registriesToLoad, Executor executor, boolean fromResources, Operation<CompletableFuture<RegistryAccess.Frozen>> original) {
 		return ScopedValue.where(IS_SERVER, true).call(() -> original.call(loaderFactory, contextRegistries, registriesToLoad, executor, fromResources));
 	}
