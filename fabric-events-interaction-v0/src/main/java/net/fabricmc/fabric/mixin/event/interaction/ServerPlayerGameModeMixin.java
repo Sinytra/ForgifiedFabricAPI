@@ -59,6 +59,7 @@ public class ServerPlayerGameModeMixin {
 	@Inject(at = @At("HEAD"), method = "handleBlockBreakAction", cancellable = true)
 	public void startBlockBreak(BlockPos pos, ServerboundPlayerActionPacket.Action playerAction, Direction direction, int worldHeight, int i, CallbackInfo info) {
 		if (playerAction != ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) return;
+		if (!this.player.isWithinBlockInteractionRange(pos, 1.0) || !this.level.isInWorldBounds(pos)) return;
 		InteractionResult result = AttackBlockCallback.EVENT.invoker().interact(player, level, InteractionHand.MAIN_HAND, pos, direction);
 
 		if (result != InteractionResult.PASS) {

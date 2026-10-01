@@ -51,6 +51,21 @@ public class FabricPacketMerger extends MessageToMessageDecoder<Packet<?>> {
 	}
 
 	protected void decode(ChannelHandlerContext channelHandlerContext, Packet<?> packet, List<Object> list) throws Exception {
+		FabricSplitPacketPayload splitPayload = packet instanceof GenericPayloadAccessor accessor && accessor.fabric_payload() instanceof FabricSplitPacketPayload payload ? payload : null;
+
+		try {
+			decodePacket(channelHandlerContext, packet, list);
+		} catch (Exception ex) {
+			clearMerger();
+			throw ex;
+		} finally {
+			if (splitPayload != null) {
+				splitPayload.byteBuf().release();
+			}
+		}
+	}
+
+	private void decodePacket(ChannelHandlerContext channelHandlerContext, Packet<?> packet, List<Object> list) throws Exception {
 		if (this.packetMerger != null) {
 			ensureNotTransitioning(packet);
 
@@ -65,7 +80,7 @@ public class FabricPacketMerger extends MessageToMessageDecoder<Packet<?>> {
 			}
 
 			if (this.packetMerger.add(channelHandlerContext, splitPacketPayload, list)) {
-				this.packetMerger = null;
+				clearMerger();
 			}
 		} else if (packet instanceof GenericPayloadAccessor accessor && accessor.fabric_payload() instanceof FabricSplitPacketPayload payload) {
 			ensureNotTransitioning(packet);
@@ -101,6 +116,26 @@ public class FabricPacketMerger extends MessageToMessageDecoder<Packet<?>> {
 			if (packet.isTerminal()) {
 				channelHandlerContext.pipeline().remove(channelHandlerContext.name());
 			}
+		}
+	}
+
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		clearMerger();
+		super.channelInactive(ctx);
+	}
+
+	@Override
+	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+		clearMerger();
+		super.handlerRemoved(ctx);
+	}
+
+	private void clearMerger() {
+		if (this.packetMerger != null) {
+			Merger merger = this.packetMerger;
+			this.packetMerger = null;
+			merger.byteBuf.release();
 		}
 	}
 

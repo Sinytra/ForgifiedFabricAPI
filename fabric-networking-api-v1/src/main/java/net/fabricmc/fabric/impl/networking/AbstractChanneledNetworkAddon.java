@@ -44,9 +44,9 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
  */
 public abstract class AbstractChanneledNetworkAddon<H> extends AbstractNetworkAddon<H> implements PacketSender, CommonPacketHandler {
 	// The maximum number of channels that a connecting client can register.
-	private static final int MAX_CHANNELS = Integer.getInteger("fabric.networking.maxChannels", 8192);
-	// The maximum length of a channel name a connecting client can use, 128 is the default and minimum value.
-	private static final int MAX_CHANNEL_NAME_LENGTH = Math.max(Integer.getInteger("fabric.networking.maxChannelNameLength", GlobalReceiverRegistry.DEFAULT_CHANNEL_NAME_MAX_LENGTH), GlobalReceiverRegistry.DEFAULT_CHANNEL_NAME_MAX_LENGTH);
+	static final int MAX_CHANNELS = Integer.getInteger("fabric.networking.maxChannels", 8192);
+	// The maximum length of a channel name a connecting client can use, defaults to 128.
+	static final int MAX_CHANNEL_NAME_LENGTH = Integer.getInteger("fabric.networking.maxChannelNameLength", GlobalReceiverRegistry.DEFAULT_CHANNEL_NAME_MAX_LENGTH);
 
 	protected final Connection connection;
 	protected final GlobalReceiverRegistry<H> receiver;

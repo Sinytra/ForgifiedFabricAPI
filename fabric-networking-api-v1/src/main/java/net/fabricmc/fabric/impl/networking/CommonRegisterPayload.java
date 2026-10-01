@@ -30,7 +30,7 @@ import net.minecraft.resources.Identifier;
 public record CommonRegisterPayload(int version, String protocol, Set<Identifier> channels) implements CustomPacketPayload {
 	public static final CustomPacketPayload.Type<CommonRegisterPayload> TYPE = new Type<>(Identifier.parse("c:register"));
 	public static final StreamCodec<FriendlyByteBuf, CommonRegisterPayload> CODEC = CustomPacketPayload.codec(CommonRegisterPayload::write, CommonRegisterPayload::new);
-	private static final StreamCodec<ByteBuf, Set<Identifier>> CHANNELS_CODEC = Identifier.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new));
+	private static final StreamCodec<ByteBuf, Set<Identifier>> CHANNELS_CODEC = Identifier.STREAM_CODEC.apply(ByteBufCodecs.collection(HashSet::new, AbstractChanneledNetworkAddon.MAX_CHANNELS));
 
 	public static final String PLAY_PROTOCOL = "play";
 	public static final String CONFIGURATION_PROTOCOL = "configuration";

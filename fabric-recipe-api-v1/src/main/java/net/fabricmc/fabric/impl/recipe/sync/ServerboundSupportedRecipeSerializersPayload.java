@@ -29,8 +29,10 @@ import net.minecraft.resources.Identifier;
  * Used to notify server which recipes can be synced to the client.
  */
 public record ServerboundSupportedRecipeSerializersPayload(Set<Identifier> synchronizedSerializers) implements CustomPacketPayload {
+	private static final int MAX_SYNCHRONIZED_SERIALIZERS = 8192;
+
 	public static final StreamCodec<FriendlyByteBuf, ServerboundSupportedRecipeSerializersPayload> CODEC = StreamCodec.composite(
-			ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC), ServerboundSupportedRecipeSerializersPayload::synchronizedSerializers,
+			ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC, MAX_SYNCHRONIZED_SERIALIZERS), ServerboundSupportedRecipeSerializersPayload::synchronizedSerializers,
 			ServerboundSupportedRecipeSerializersPayload::new
 	);
 	public static final Type<ServerboundSupportedRecipeSerializersPayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath("fabric", "recipe_sync/supported_serializers"));
