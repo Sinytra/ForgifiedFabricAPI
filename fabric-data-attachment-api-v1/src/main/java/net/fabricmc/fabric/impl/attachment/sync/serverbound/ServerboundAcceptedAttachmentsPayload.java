@@ -26,8 +26,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 public record ServerboundAcceptedAttachmentsPayload(Set<Identifier> acceptedAttachments) implements CustomPacketPayload {
+	private static final int MAX_ACCEPTED_ATTACHMENTS = 8192;
+
 	public static final StreamCodec<FriendlyByteBuf, ServerboundAcceptedAttachmentsPayload> CODEC = StreamCodec.composite(
-			ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC), ServerboundAcceptedAttachmentsPayload::acceptedAttachments,
+			ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC, MAX_ACCEPTED_ATTACHMENTS), ServerboundAcceptedAttachmentsPayload::acceptedAttachments,
 			ServerboundAcceptedAttachmentsPayload::new
 	);
 	public static final Identifier PACKET_ID = Identifier.fromNamespaceAndPath("fabric", "accepted_attachments_v1");

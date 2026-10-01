@@ -22,15 +22,14 @@ import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 
 public class PayloadHelper {
 	public static void write(FriendlyByteBuf byteBuf, FriendlyByteBuf data) {
-		byteBuf.writeBytes(data.copy());
+		byteBuf.writeBytes(data, data.readerIndex(), data.readableBytes());
 	}
 
 	public static FriendlyByteBuf read(FriendlyByteBuf byteBuf, int maxSize) {
 		assertSize(byteBuf, maxSize);
 
 		FriendlyByteBuf newBuf = FriendlyByteBufs.create();
-		newBuf.writeBytes(byteBuf.copy());
-		byteBuf.skipBytes(byteBuf.readableBytes());
+		newBuf.writeBytes(byteBuf);
 		return newBuf;
 	}
 

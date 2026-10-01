@@ -26,9 +26,11 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 public record ServerboundCustomIngredientPayload(int protocolVersion, Set<Identifier> registeredSerializers) implements CustomPacketPayload {
+	private static final int MAX_REGISTERED_SERIALIZERS = 8192;
+
 	public static final StreamCodec<FriendlyByteBuf, ServerboundCustomIngredientPayload> CODEC = StreamCodec.composite(
 			ByteBufCodecs.VAR_INT, ServerboundCustomIngredientPayload::protocolVersion,
-			ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC), ServerboundCustomIngredientPayload::registeredSerializers,
+			ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC, MAX_REGISTERED_SERIALIZERS), ServerboundCustomIngredientPayload::registeredSerializers,
 			ServerboundCustomIngredientPayload::new
 	);
 	public static final CustomPacketPayload.Type<ServerboundCustomIngredientPayload> TYPE = new Type<>(CustomIngredientSync.PACKET_ID);
