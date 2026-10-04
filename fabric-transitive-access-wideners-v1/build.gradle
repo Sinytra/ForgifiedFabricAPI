@@ -5,7 +5,6 @@ loom {
 }
 
 testDependencies(project, [
-	':fabric-rendering-v1',
 	':fabric-object-builder-api-v1'
 ])
 

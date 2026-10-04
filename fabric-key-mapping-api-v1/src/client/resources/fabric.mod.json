@@ -24,5 +24,10 @@
   ],
   "custom": {
     "fabric-api:module-lifecycle": "stable"
+  },
+  "entrypoints": {
+    "client": [
+      "net.fabricmc.fabric.impl.client.keymapping.FabricKeyMappingImpl"
+    ]
   }
 }

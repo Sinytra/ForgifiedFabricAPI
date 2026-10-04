@@ -16,9 +16,10 @@
 
 package net.fabricmc.fabric.mixin.item;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
@@ -29,11 +30,11 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 
 @Mixin(EnchantRandomlyFunction.class)
 abstract class EnchantRandomlyFunctionMixin {
-	@Redirect(
+	@WrapOperation(
 			method = "lambda$run$1",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/Enchantment;canEnchant(Lnet/minecraft/world/item/ItemStack;)Z")
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;supportsEnchantment(Lnet/minecraft/core/Holder;)Z")
 	)
-	private static boolean callAllowEnchantingEvent(Enchantment enchantment, ItemStack stack, boolean bl, ItemStack itemStack, Holder<Enchantment> holder) {
-		return stack.canBeEnchantedWith(holder, EnchantingContext.ACCEPTABLE);
+	private static boolean callAllowEnchantingEvent(ItemStack stack, Holder<Enchantment> registryEntry, Operation<Boolean> original) {
+		return stack.canBeEnchantedWith(registryEntry, EnchantingContext.ACCEPTABLE) || original.call(stack, registryEntry);
 	}
 }

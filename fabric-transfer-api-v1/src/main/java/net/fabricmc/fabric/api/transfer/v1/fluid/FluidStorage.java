@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.api.transfer.v1.fluid;
 
+import net.fabricmc.fabric.impl.transfer.compat.TransferApiNeoCompat;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Direction;
@@ -42,7 +44,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.impl.transfer.fluid.CombinedProvidersImpl;
 import net.fabricmc.fabric.impl.transfer.fluid.EmptyBucketStorage;
 import net.fabricmc.fabric.impl.transfer.fluid.WaterPotionStorage;
-import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 
 /**
  * Access to {@link Storage Storage&lt;FluidVariant&gt;} instances.
@@ -132,22 +133,22 @@ public final class FluidStorage {
 		CauldronFluidContent.getForFluid(Fluids.WATER);
 
 		// Support for SidedStorageBlockEntity.
-		FluidStorage.SIDED.registerFallback((level, pos, state, blockEntity, direction) -> {
+		FluidStorage.SIDED.registerFallback(TransferApiNeoCompat.wrapProviderSafely((level, pos, state, blockEntity, direction) -> {
 			if (blockEntity instanceof SidedStorageBlockEntity sidedStorageBlockEntity) {
 				return sidedStorageBlockEntity.getFluidStorage(direction);
 			}
 
 			return null;
-		});
+		}));
 
 		// Register combined fallback
-		FluidStorage.ITEM.registerFallback((stack, context) -> GENERAL_COMBINED_PROVIDER.invoker().find(context));
+		FluidStorage.ITEM.registerFallback(TransferApiNeoCompat.wrapProviderSafely((stack, context) -> GENERAL_COMBINED_PROVIDER.invoker().find(context)));
 		// Register empty bucket storage
 		combinedItemApiProvider(Items.BUCKET).register(EmptyBucketStorage::new);
 		// Register full bucket storage
 		GENERAL_COMBINED_PROVIDER.register(context -> {
 			if (context.getItemVariant().getItem() instanceof BucketItem bucketItem) {
-				Fluid bucketFluid = ((BucketItemAccessor) bucketItem).fabric_getContent();
+				Fluid bucketFluid = bucketItem.getContent();
 
 				// Make sure the mapping is bidirectional.
 				if (bucketFluid != null && bucketFluid.getBucket() == bucketItem) {
@@ -167,5 +168,7 @@ public final class FluidStorage {
 		});
 		// Register water potion storage
 		combinedItemApiProvider(Items.POTION).register(WaterPotionStorage::find);
+
+		TransferApiNeoCompat.registerTransferApiFluidNeoBridge();
 	}
 }

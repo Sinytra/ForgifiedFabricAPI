@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.networking;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,8 +27,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.ServerboundPongPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RunningOnDifferentThreadException;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
@@ -35,6 +37,7 @@ import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContextProvider;
 import net.fabricmc.fabric.impl.networking.PacketListenerExtensions;
 import net.fabricmc.fabric.impl.networking.server.ServerConfigurationNetworkAddon;
+import net.fabricmc.fabric.impl.networking.server.ServerPlayNetworkAddon;
 
 @Mixin(ServerCommonPacketListenerImpl.class)
 public abstract class ServerCommonPacketListenerImplMixin implements PacketListenerExtensions, PacketContextProvider {
@@ -51,13 +54,14 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 		final CustomPacketPayload payload = packet.payload();
 
 		try {
-			boolean handled;
+			boolean handled = false;
 
 			if (getAddon() instanceof ServerConfigurationNetworkAddon addon) {
 				handled = addon.handle(payload);
 			} else {
 				// Play should be handled in ServerGamePacketListenerImplMixin
-				throw new IllegalStateException("Unknown addon");
+				// Disabled: Neo will take care of this
+//				throw new IllegalStateException("Unknown addon");
 			}
 
 			if (handled) {
@@ -69,11 +73,16 @@ public abstract class ServerCommonPacketListenerImplMixin implements PacketListe
 		}
 	}
 
-	@Inject(method = "handlePong", at = @At("HEAD"))
-	private void onPlayPong(ServerboundPongPacket packet, CallbackInfo ci) {
-		if (getAddon() instanceof ServerConfigurationNetworkAddon addon) {
-			addon.onPong(packet.getId());
+	@WrapOperation(method = "handleCustomPayload", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/network/registration/NetworkRegistry;isModdedPayload(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload;)Z"))
+	private boolean cancelNeoHandling(CustomPacketPayload payload, Operation<Boolean> original) {
+		if (this.getAddon() instanceof ServerPlayNetworkAddon addon) {
+			final Identifier channelName = payload.type().id();
+
+			if (addon.getPayloadTypeRegistry().get(channelName) != null) {
+				return false;
+			}
 		}
+		return original.call(payload);
 	}
 
 	@Override

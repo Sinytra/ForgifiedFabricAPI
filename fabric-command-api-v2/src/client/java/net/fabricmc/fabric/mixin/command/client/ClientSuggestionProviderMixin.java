@@ -16,9 +16,8 @@
 
 package net.fabricmc.fabric.mixin.command.client;
 
-import org.spongepowered.asm.mixin.Final;
+import net.neoforged.neoforge.client.ClientCommandSourceStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.ChatFormatting;
@@ -31,19 +30,15 @@ import net.minecraft.network.chat.Component;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.impl.command.client.ClientSuggestionProviderExtensions;
 
-@Mixin(ClientSuggestionProvider.class)
+@Mixin({ClientSuggestionProvider.class, ClientCommandSourceStack.class})
 abstract class ClientSuggestionProviderMixin implements FabricClientCommandSource, ClientSuggestionProviderExtensions {
-	@Shadow
-	@Final
-	private Minecraft minecraft;
-
 	@Unique
 	private boolean attended = false;
 
 	@Override
 	public void sendFeedback(Component message) {
-		this.minecraft.gui.hud.getChat().addClientSystemMessage(message);
-		this.minecraft.getNarrator().saySystemChatQueued(message);
+		getClient().gui.hud.getChat().addClientSystemMessage(message);
+		getClient().getNarrator().saySystemChatQueued(message);
 	}
 
 	@Override
@@ -53,17 +48,17 @@ abstract class ClientSuggestionProviderMixin implements FabricClientCommandSourc
 
 	@Override
 	public Minecraft getClient() {
-		return minecraft;
+		return Minecraft.getInstance();
 	}
 
 	@Override
 	public LocalPlayer getPlayer() {
-		return minecraft.player;
+		return getClient().player;
 	}
 
 	@Override
 	public ClientLevel getLevel() {
-		return minecraft.level;
+		return getClient().level;
 	}
 
 	@Override

@@ -18,6 +18,8 @@ package net.fabricmc.fabric.test.particle.client;
 
 import java.util.List;
 
+import net.fabricmc.fabric.test.particle.ParticleTintTestBlock;
+
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,7 +35,7 @@ public final class ParticleRenderEventTests implements ClientModInitializer {
 		BlockTintSource tintSource = new BlockTintSource() {
 			@Override
 			public int color(BlockState state) {
-				return -1;
+				return ((ParticleTintTestBlock) state.getBlock()).color;
 			}
 		};
 

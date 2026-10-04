@@ -9,3 +9,7 @@ moduleDependencies(project, [
 	'fabric-lifecycle-events-v1',
 	'fabric-resource-loader-v1'
 ])
+
+testDependencies(project, [
+	'internal:ffapi-fluid-types'
+])

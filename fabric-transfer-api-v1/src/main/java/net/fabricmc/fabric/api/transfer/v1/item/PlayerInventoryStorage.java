@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.api.transfer.v1.item;
 
+import net.fabricmc.fabric.impl.transfer.compat.FabricPlayerInventoryStorage;
+
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.world.InteractionHand;
@@ -54,7 +56,7 @@ public interface PlayerInventoryStorage extends ContainerStorage {
 	 * Return an instance for the passed player inventory.
 	 */
 	static PlayerInventoryStorage of(Inventory playerInventory) {
-		return (PlayerInventoryStorage) ContainerStorage.of(playerInventory, null);
+		return FabricPlayerInventoryStorage.of(playerInventory);
 	}
 
 	/**

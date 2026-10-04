@@ -16,13 +16,19 @@
 
 package net.fabricmc.fabric.test.object.builder.client;
 
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.test.object.builder.EntityDataAccessorTest;
 
 public class EntityDataAccessorClientTest implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		EntityRendererRegistry.register(EntityDataAccessorTest.TRACK_STACK_ENTITY, TrackStackEntityRenderer::new);
+		IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+		bus.addListener(EntityRenderersEvent.RegisterRenderers.class, event -> {
+			event.registerEntityRenderer(EntityDataAccessorTest.TRACK_STACK_ENTITY.get(), TrackStackEntityRenderer::new);
+		});
 	}
 }

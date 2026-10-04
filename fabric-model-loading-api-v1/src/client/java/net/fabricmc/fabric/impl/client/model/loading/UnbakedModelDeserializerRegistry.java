@@ -16,22 +16,16 @@
 
 package net.fabricmc.fabric.impl.client.model.loading;
 
-import java.io.Reader;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.gson.JsonParseException;
-
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.GsonHelper;
 
 import net.fabricmc.fabric.api.client.model.loading.v1.UnbakedModelDeserializer;
-import net.fabricmc.fabric.mixin.client.model.loading.CuboidModelAccessor;
 
 public class UnbakedModelDeserializerRegistry {
-	private static final Map<Identifier, UnbakedModelDeserializer> DESERIALIZERS = new HashMap<>();
+	private static final Map<Identifier, UnbakedModelDeserializer> DESERIALIZERS = new ConcurrentHashMap<>();
 
 	public static void register(Identifier id, UnbakedModelDeserializer deserializer) {
 		Objects.requireNonNull(id, "id cannot be null");
@@ -46,9 +40,5 @@ public class UnbakedModelDeserializerRegistry {
 		Objects.requireNonNull(id, "id cannot be null");
 
 		return DESERIALIZERS.get(id);
-	}
-
-	public static UnbakedModel deserialize(Reader reader) throws JsonParseException {
-		return GsonHelper.fromJson(CuboidModelAccessor.fabric_getGson(), reader, UnbakedModel.class);
 	}
 }

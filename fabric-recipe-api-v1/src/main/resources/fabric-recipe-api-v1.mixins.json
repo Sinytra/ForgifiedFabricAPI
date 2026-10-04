@@ -5,12 +5,12 @@
   "mixins": [
     "RecipeAccessMixin",
     "RecipeManagerMixin",
+    "ingredient.IngredientCodecsMixin",
     "ingredient.IngredientMixin",
-    "ingredient.ShapelessRecipeMixin",
+    "sync.CommonHooksMixin",
     "sync.ConnectionMixin",
-    "sync.RecipeMapMixin",
-    "sync.ServerCommonPacketListenerImplAccessor",
-    "sync.RecipeManagerAccessor"
+    "sync.RecipeManagerAccessor",
+    "sync.RecipeMapMixin"
   ],
   "injectors": {
     "defaultRequire": 1

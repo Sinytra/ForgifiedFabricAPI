@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -42,6 +43,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -117,8 +119,8 @@ abstract class SubmitNodeCollectionMixin implements OrderedSubmitNodeCollector {
 		}
 	}
 
-	@Redirect(method = "submitMovingBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;hasMaterialFlag(I)Z"))
-	private boolean hasMaterialFlagProxy(BlockStateModel model, @BakedQuad.MaterialFlags int flag, @Local(name = "movingBlockRenderState") MovingBlockRenderState movingBlockRenderState) {
+	@Redirect(method = "submitMovingBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;hasMaterialFlag(Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+	private boolean hasMaterialFlagProxy(BlockStateModel model, BlockAndTintGetter tintGetter, BlockPos blockPos, BlockState state, int flag, @Local(name = "movingBlockRenderState") MovingBlockRenderState movingBlockRenderState) {
 		BlockState blockState = movingBlockRenderState.blockState;
 		long randomSeed = blockState.getSeed(movingBlockRenderState.randomSeedPos);
 		RandomSource random = RandomSource.createThreadLocalInstance(randomSeed);

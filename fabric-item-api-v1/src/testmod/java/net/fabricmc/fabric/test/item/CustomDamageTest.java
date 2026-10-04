@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.test.item;
 
+import net.fabricmc.fabric.api.item.v1.FabricItem;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Holder;
@@ -79,7 +81,13 @@ public class CustomDamageTest implements ModInitializer {
 
 	public static class WeirdPick extends Item {
 		protected WeirdPick(ResourceKey<Item> resourceKey) {
-			super(new Item.Properties().pickaxe(ToolMaterial.GOLD, 3f, 5f).customDamage(WEIRD_DAMAGE_HANDLER).setId(resourceKey));
+			super(buildProperties(resourceKey));
+		}
+		
+		private static Item.Properties buildProperties(ResourceKey<Item> resourceKey) {
+			Item.Properties props = new Item.Properties().pickaxe(ToolMaterial.GOLD, 3f, 5f).setId(resourceKey);
+			((FabricItem.Properties) props).customDamage(WEIRD_DAMAGE_HANDLER);
+			return props;
 		}
 
 		@Override

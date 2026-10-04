@@ -4,8 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "ClientPacketListenerAccessor",
-    "ClientSuggestionProviderMixin",
-    "ClientPacketListenerMixin"
+    "ClientPacketListenerMixin",
+    "ClientSuggestionProviderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

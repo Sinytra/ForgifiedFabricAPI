@@ -5,12 +5,13 @@ moduleDependencies(project, [
 	'fabric-api-lookup-api-v1',
 	'fabric-lifecycle-events-v1',
 	// transitive dependency of API Lookup
-	'fabric-rendering-fluids-v1',
+	'fabric-rendering-fluids-v1'
 ])
 
 testDependencies(project, [
 	':fabric-object-builder-api-v1',
 	':fabric-rendering-v1',
 	':fabric-resource-loader-v1',
-	':fabric-command-api-v2'
+	':fabric-command-api-v2',
+	':internal:ffapi-fluid-types'
 ])

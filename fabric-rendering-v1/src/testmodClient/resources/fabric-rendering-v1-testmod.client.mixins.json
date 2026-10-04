@@ -5,7 +5,6 @@
   "client": [
     "AvatarRendererMixin",
     "GameRendererAccessor",
-    "GuiRendererAccessor",
     "LecternRendererMixin",
     "PigRendererMixin"
   ],

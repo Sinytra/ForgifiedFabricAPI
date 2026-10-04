@@ -16,24 +16,33 @@
 
 package net.fabricmc.fabric.api.registry;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.mojang.datafixers.util.Pair;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.event.level.BlockEvent;
 
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-import net.fabricmc.fabric.mixin.content.registry.HoeItemAccessor;
-
 /**
  * A registry for hoe tilling interactions. A vanilla example is turning dirt to dirt paths.
  */
+@EventBusSubscriber
 public final class TillableBlockRegistry {
+	private static final Map<Block, Pair<Predicate<UseOnContext>, Consumer<UseOnContext>>> TILLABLES = new IdentityHashMap<>();
+
 	private TillableBlockRegistry() {
 	}
 
@@ -55,7 +64,7 @@ public final class TillableBlockRegistry {
 	 */
 	public static void register(Block input, Predicate<UseOnContext> usagePredicate, Consumer<UseOnContext> tillingAction) {
 		Objects.requireNonNull(input, "input block cannot be null");
-		HoeItemAccessor.getTillables().put(input, Pair.of(usagePredicate, tillingAction));
+		TILLABLES.put(input, Pair.of(usagePredicate, tillingAction));
 	}
 
 	/**
@@ -82,5 +91,32 @@ public final class TillableBlockRegistry {
 		Objects.requireNonNull(tilled, "tilled block state cannot be null");
 		Objects.requireNonNull(droppedItem, "dropped item cannot be null");
 		register(input, usagePredicate, HoeItem.changeIntoStateAndDropItem(tilled, droppedItem));
+	}
+
+	@SubscribeEvent
+	static void modify(BlockEvent.BlockToolModificationEvent event) {
+		if (event.getItemAbility() == ItemAbilities.HOE_TILL
+				&& event.getHeldItemStack().canPerformAction(ItemAbilities.HOE_TILL)
+		) {
+			var modified = TILLABLES.get(event.getState().getBlock());
+			if (modified != null && modified.getFirst().test(event.getContext())) {
+				if (!event.isSimulated() && !event.getLevel().isClientSide()) {
+					modified.getSecond().accept(event.getContext());
+					if (event.getContext().getPlayer() != null) {
+						event.getContext().getItemInHand()
+								.hurtAndBreak(
+										1,
+										event.getPlayer(),
+										getSlotForHand(event.getContext().getHand())
+								);
+					}
+				}
+				event.setCanceled(true);
+			}
+		}
+	}
+
+	private static EquipmentSlot getSlotForHand(InteractionHand arg) {
+		return arg == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
 	}
 }

@@ -18,25 +18,13 @@ package net.fabricmc.fabric.api.entity;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.UUID;
 
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
-import org.jspecify.annotations.Nullable;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stat;
-import net.minecraft.world.Container;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.scores.PlayerTeam;
 
 import net.fabricmc.fabric.impl.event.interaction.FakePlayerPacketListener;
 
@@ -61,7 +49,7 @@ import net.fabricmc.fabric.impl.event.interaction.FakePlayerPacketListener;
  * In some edge cases, or for gameplay considerations, it might be necessary to check whether a {@link ServerPlayer} is a fake player.
  * This can be done with an {@code instanceof} check: {@code player instanceof FakePlayer}.
  */
-public class FakePlayer extends ServerPlayer {
+public class FakePlayer extends net.neoforged.neoforge.common.util.FakePlayer {
 	/**
 	 * Default UUID, for fake players not associated with a specific (human) player.
 	 */
@@ -102,53 +90,8 @@ public class FakePlayer extends ServerPlayer {
 	private static final Map<FakePlayerKey, FakePlayer> FAKE_PLAYER_MAP = new MapMaker().weakValues().makeMap();
 
 	protected FakePlayer(ServerLevel level, GameProfile profile) {
-		super(level.getServer(), level, profile, ClientInformation.createDefault());
+		super(level, profile);
 
 		this.connection = new FakePlayerPacketListener(this);
 	}
-
-	@Override
-	public void tick() { }
-
-	@Override
-	public void updateOptions(ClientInformation settings) { }
-
-	@Override
-	public void awardStat(Stat<?> stat, int amount) { }
-
-	@Override
-	public void resetStat(Stat<?> stat) { }
-
-	@Override
-	public boolean isInvulnerableTo(ServerLevel level, DamageSource damageSource) {
-		return true;
-	}
-
-	@Nullable
-	@Override
-	public PlayerTeam getTeam() {
-		// Scoreboard team is checked using the gameprofile name by default, which we don't want.
-		return null;
-	}
-
-	@Override
-	public void startSleeping(BlockPos pos) {
-		// Don't lock bed forever.
-	}
-
-	@Override
-	public boolean startRiding(Entity entity, boolean force, boolean emitEvent) {
-		return false;
-	}
-
-	@Override
-	public void openTextEdit(SignBlockEntity sign, boolean front) { }
-
-	@Override
-	public OptionalInt openMenu(@Nullable MenuProvider factory) {
-		return OptionalInt.empty();
-	}
-
-	@Override
-	public void openHorseInventory(AbstractHorse horse, Container inventory) { }
 }

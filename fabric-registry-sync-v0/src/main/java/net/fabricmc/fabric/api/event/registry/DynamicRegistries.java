@@ -19,6 +19,7 @@ package net.fabricmc.fabric.api.event.registry;
 import java.util.List;
 
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
 import org.jetbrains.annotations.Unmodifiable;
 
 import net.minecraft.core.Registry;
@@ -92,7 +93,7 @@ public final class DynamicRegistries {
 	 * <br>Those registries are loaded by the game at different times, and some are not patched.
 	 */
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getWorldRegistries() {
-		return DynamicRegistriesImpl.getWorldRegistries();
+		return DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().toList();
 	}
 
 	/**
@@ -107,7 +108,7 @@ public final class DynamicRegistries {
 	 * <br>For example, it does not include the <code>minecraft:dimension</code> registry.
 	 */
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getBootstrappingRegistries() {
-		return DynamicRegistriesImpl.getBootstrappingRegistries();
+		return DataPackRegistriesHooks.getDataPackRegistries();
 	}
 
 	/**
@@ -116,7 +117,7 @@ public final class DynamicRegistries {
 	 */
 	@Deprecated
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getDynamicRegistries() {
-		return DynamicRegistriesImpl.getBootstrappingRegistries();
+		return DataPackRegistriesHooks.getDataPackRegistries();
 	}
 
 	/**

@@ -52,7 +52,7 @@ public abstract class AbstractNetworkAddon<H> {
 		this.logger = LoggerFactory.getLogger(description);
 	}
 
-	public final void lateInit() {
+	public void lateInit() {
 		this.receiver.startSession(this);
 		invokeInitEvent();
 	}

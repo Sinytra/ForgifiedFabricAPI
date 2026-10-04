@@ -6,9 +6,7 @@
     "AbstractContainerScreenMixin",
     "AbstractRecipeBookScreenMixin",
     "GuiMixin",
-    "KeyboardHandlerMixin",
     "MinecraftMixin",
-    "MouseHandlerMixin",
     "ScreenAccessor",
     "ScreenMixin"
   ],

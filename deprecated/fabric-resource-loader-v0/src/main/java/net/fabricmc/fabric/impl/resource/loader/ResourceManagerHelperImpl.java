@@ -16,9 +16,9 @@
 
 package net.fabricmc.fabric.impl.resource.loader;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 
@@ -32,7 +32,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 
 public class ResourceManagerHelperImpl implements ResourceManagerHelper {
-	private static final Map<PackType, ResourceManagerHelperImpl> registryMap = new HashMap<>();
+	private static final Map<PackType, ResourceManagerHelperImpl> registryMap = new ConcurrentHashMap<>();
 
 	private final ResourceLoader resourceLoader;
 

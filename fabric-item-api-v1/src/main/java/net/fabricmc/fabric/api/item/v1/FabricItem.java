@@ -19,6 +19,9 @@ package net.fabricmc.fabric.api.item.v1;
 import java.util.Optional;
 import java.util.Set;
 
+import net.fabricmc.fabric.impl.item.RecursivityHelper;
+
+import net.neoforged.neoforge.common.extensions.IItemExtension;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jspecify.annotations.Nullable;
 
@@ -63,7 +66,7 @@ public interface FabricItem {
 	 * @return true to run the vanilla animation, false to cancel it.
 	 */
 	default boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
-		return true;
+		return !RecursivityHelper.allowForgeCall() || ((IItemExtension) this).shouldCauseReequipAnimation(oldStack, newStack, false);
 	}
 
 	/**
@@ -109,7 +112,7 @@ public interface FabricItem {
 	 * @return the leftover item stack
 	 */
 	default @Nullable ItemStackTemplate getCraftingRemainder(ItemStack stack) {
-		return ((Item) this).getCraftingRemainder();
+		return RecursivityHelper.allowForgeCall() ? stack.getCraftingRemainder() : null;
 	}
 
 	/**
@@ -129,6 +132,8 @@ public interface FabricItem {
 	 * @return whether the enchantment is allowed to apply to the stack
 	 */
 	default boolean canBeEnchantedWith(ItemStack stack, Holder<Enchantment> enchantment, EnchantingContext context) {
+		if (!RecursivityHelper.allowForgeCall()) return false;
+
 		return context == EnchantingContext.PRIMARY
 				? enchantment.value().isPrimaryItem(stack)
 				: enchantment.value().canEnchant(stack);

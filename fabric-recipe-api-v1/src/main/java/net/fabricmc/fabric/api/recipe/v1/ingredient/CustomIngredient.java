@@ -26,7 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 
-import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
+import net.fabricmc.fabric.impl.recipe.ingredient.compat.NeoCustomIngredientWrapper;
 
 /**
  * Interface that modders can implement to create new behaviors for {@link Ingredient}s.
@@ -107,6 +107,6 @@ public interface CustomIngredient {
 	 */
 	@ApiStatus.NonExtendable
 	default Ingredient toVanilla() {
-		return new CustomIngredientImpl(this);
+		return new NeoCustomIngredientWrapper(this).toVanilla();
 	}
 }

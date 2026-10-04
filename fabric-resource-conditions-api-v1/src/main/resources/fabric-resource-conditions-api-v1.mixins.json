@@ -10,7 +10,8 @@
     "ResourceManagerRegistryLoadTaskMixin",
     "RegistryOpsAccessor",
     "FileToIdConverterAccessor",
-    "PackMixin"
+    "PackMixin",
+    "ResourcePackLoaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -26,6 +26,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
+
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -94,6 +97,6 @@ public class SerializationTests {
 		// Make sure that we can deserialize it
 		Ingredient deserialized = Ingredient.CODEC.parse(registryOps, json).getOrThrow(JsonParseException::new);
 		assertNotNull(deserialized.getCustomIngredient(), "Custom ingredient was not deserialized");
-		assertSame(deserialized.getCustomIngredient().getSerializer(), ingredient.getCustomIngredient().getSerializer(), "Serializer did not match");
+		assertSame(((FabricIngredient) deserialized).getCustomIngredient().getSerializer(), ((FabricIngredient) ingredient).getCustomIngredient().getSerializer(), "Serializer did not match");
 	}
 }

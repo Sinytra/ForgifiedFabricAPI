@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "org.sinytra.ffapi.mixin.fluids",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "CommonHooksMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

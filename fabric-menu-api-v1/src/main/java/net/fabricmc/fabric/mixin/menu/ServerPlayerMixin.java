@@ -16,23 +16,19 @@
 
 package net.fabricmc.fabric.mixin.menu;
 
-import java.util.Objects;
-import java.util.OptionalInt;
+import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -41,59 +37,29 @@ import net.minecraft.world.level.Level;
 
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
-import net.fabricmc.fabric.impl.menu.Networking;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player {
-	@Shadow
-	private int containerCounter;
-
 	private ServerPlayerMixin(Level level, GameProfile gameProfile) {
 		super(level, gameProfile);
 	}
 
-	@Shadow
-	public abstract void closeContainer();
-
-	@Redirect(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;closeContainer()V"))
-	private void fabric_closeContainerScreenIfAllowed(ServerPlayer player, MenuProvider factory) {
-		if (factory.shouldCloseCurrentScreen()) {
-			this.closeContainer();
-		} else {
-			// Called by closeContainer in vanilla
-			this.doCloseContainer();
+	@ModifyArg(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;openMenu(Lnet/minecraft/world/MenuProvider;Ljava/util/function/Consumer;)Ljava/util/OptionalInt;"), index = 0)
+	private MenuProvider fabric_replaceMenuProvider(@Nullable MenuProvider arg) {
+		if (arg instanceof SimpleMenuProvider simpleFactory && simpleFactory.menuConstructor instanceof ExtendedMenuProvider<?> extendedFactory) {
+			return extendedFactory;
 		}
+		return arg;
 	}
 
-	@Inject(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"))
-	private void fabric_storeOpenedMenu(MenuProvider factory, CallbackInfoReturnable<OptionalInt> info, @Local(name = "menu") AbstractContainerMenu menu) {
-		if (factory instanceof ExtendedMenuProvider || (factory instanceof SimpleMenuProvider simpleFactory && simpleFactory.menuConstructor instanceof ExtendedMenuProvider)) {
-			// Set the menu, so the factory method can access it through the player.
-			containerMenu = menu;
-		} else if (menu.getType() instanceof ExtendedMenuType<?, ?>) {
-			Identifier id = BuiltInRegistries.MENU.getKey(menu.getType());
-			throw new IllegalArgumentException("[Fabric] Extended menu " + id + " must be opened with an ExtendedMenuProvider!");
+	@ModifyVariable(method = "openMenu(Lnet/minecraft/world/MenuProvider;Ljava/util/function/Consumer;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/MenuProvider;createMenu(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/inventory/AbstractContainerMenu;"), argsOnly = true)
+	private Consumer<RegistryFriendlyByteBuf> fabric_replaceExtraDataWriter(@Nullable Consumer<RegistryFriendlyByteBuf> extraDataWriter, MenuProvider arg, @Local @Nullable AbstractContainerMenu menu) {
+		if (menu != null && arg instanceof ExtendedMenuProvider<?> extendedFactory && menu.getType() instanceof ExtendedMenuType extendedType) {
+			return buf -> {
+				Object data = extendedFactory.getScreenOpeningData((ServerPlayer) (Object) this);
+				extendedType.getStreamCodec().encode(buf, data);
+			};
 		}
-	}
-
-	@Redirect(method = "openMenu(Lnet/minecraft/world/MenuProvider;)Ljava/util/OptionalInt;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V"))
-	private void fabric_replaceVanillaScreenPacket(ServerGamePacketListenerImpl networkHandler, Packet<?> packet, MenuProvider factory) {
-		if (factory instanceof SimpleMenuProvider simpleProvider && simpleProvider.menuConstructor instanceof ExtendedMenuProvider<?> extendedProvider) {
-			factory = extendedProvider;
-		}
-
-		if (factory instanceof ExtendedMenuProvider<?> extendedFactory) {
-			AbstractContainerMenu handler = Objects.requireNonNull(containerMenu);
-
-			if (handler.getType() instanceof ExtendedMenuType<?, ?>) {
-				Networking.sendOpenPacket((ServerPlayer) (Object) this, extendedFactory, handler, containerCounter);
-			} else {
-				Identifier id = BuiltInRegistries.MENU.getKey(handler.getType());
-				throw new IllegalArgumentException("[Fabric] Non-extended menu " + id + " must not be opened with an ExtendedMenuProvider!");
-			}
-		} else {
-			// Use vanilla logic for non-extended menus
-			networkHandler.send(packet);
-		}
+		return extraDataWriter;
 	}
 }

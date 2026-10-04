@@ -51,8 +51,8 @@ final class TestAnnotationLocator {
 
 	private List<TestMethod> testMethods = null;
 
-	TestAnnotationLocator(FabricLoader fabricLoader) {
-		this.fabricLoader = fabricLoader;
+	TestAnnotationLocator() {
+		this.fabricLoader = FabricLoader.getInstance();
 	}
 
 	public List<TestMethod> getTestMethods() {

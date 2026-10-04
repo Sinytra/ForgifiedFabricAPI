@@ -88,6 +88,16 @@ public class CompositeBlockStateModelImpl implements CompositeBlockStateModel {
 	}
 
 	@Override
+	public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+		long seed = random.nextLong();
+		
+		for (BlockStateModel model : models) {
+			random.setSeed(seed);
+			model.collectParts(level, pos, state, random, parts);
+		}
+	}
+
+	@Override
 	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, Predicate<@Nullable Direction> cullTest) {
 		long seed = random.nextLong();
 

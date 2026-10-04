@@ -3,13 +3,10 @@
   "package": "net.fabricmc.fabric.mixin.datagen",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "HashCacheProviderCacheMixin",
-    "HashCacheMixin",
-    "BlockItemTagAppenderMixin",
     "DataProviderMixin",
+    "HashCacheMixin",
+    "HashCacheProviderCacheMixin",
     "TagAppenderMixin",
-    "TagAppenderMixin$TagAppender1Mixin",
-    "TagBuilderMixin",
     "TagsProviderMixin",
     "advancement.AdvancementBuilderMixin",
     "loot.BlockLootSubProviderAccessor",
@@ -18,10 +15,10 @@
     "loot.EntityLootSubProviderMixin",
     "recipe.AllCraftingRecipeJsonBuildersMixin",
     "recipe.RecipeOutputMixin",
-    "recipe.SpecialRecipeBuilderMixin",
+    "recipe.RecipeProviderMixin",
     "recipe.SmithingTransformRecipeBuilderMixin",
     "recipe.SmithingTrimRecipeBuilderMixin",
-    "recipe.RecipeProviderMixin"
+    "recipe.SpecialRecipeBuilderMixin"
   ],
   "server": [
     "server.MainMixin"

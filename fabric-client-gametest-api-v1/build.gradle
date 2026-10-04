@@ -8,25 +8,29 @@ moduleDependencies(project, [
 	':fabric-networking-api-v1'
 ])
 
+testDependencies(project, [
+	':fabric-screen-api-v1',
+])
+
 sourceSets {
-	mixinConfig {
-		compileClasspath += configurations.loaderLibraries
-	}
-	client {
-		compileClasspath += mixinConfig.output
-		runtimeClasspath += mixinConfig.output
+	main {
+		java {
+			srcDir 'src/mixinConfig/java'
+		}
 	}
 }
 
-configurations {
-	clientImplementation.extendsFrom mixinConfigImplementation
-	clientRuntimeOnly.extendsFrom mixinConfigRuntimeOnly
+neoForge {
+	runs {
+		clientGametest {
+			client()
+			systemProperty 'fabric.client.gametest', 'true'
+		}
+	}
 }
 
-dependencies {
-	mixinConfigImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-}
-
-jar {
-	from sourceSets.mixinConfig.output
+neoForge.mods {
+	screenTestMod {
+		sourceSet project(':fabric-screen-api-v1').sourceSets.testmod
+	}
 }

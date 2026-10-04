@@ -62,6 +62,7 @@ public final class DedicatedServerImplUtil {
 	public static Path saveLevelDataTo = null;
 	@Nullable
 	public static CompletableFuture<DedicatedServer> serverFuture = null;
+	public static boolean isRunningServer = false;
 
 	private DedicatedServerImplUtil() {
 	}
@@ -70,6 +71,7 @@ public final class DedicatedServerImplUtil {
 		setupServer(serverProperties);
 		serverFuture = new CompletableFuture<>();
 
+		isRunningServer = true;
 		new Thread(() -> Main.main(new String[]{})).start();
 
 		DedicatedServer server;

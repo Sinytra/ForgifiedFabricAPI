@@ -17,14 +17,9 @@
   ],
   "depends": {
     "fabricloader": ">=0.18.4",
-    "fabric-api-base": "*",
-    "fabric-networking-api-v1": "*"
+    "fabric-api-base": "*"
   },
   "entrypoints": {
-    "main": ["net.fabricmc.fabric.impl.menu.Networking"],
-    "client": [
-      "net.fabricmc.fabric.impl.menu.client.ClientNetworking"
-    ]
   },
   "description": "Hooks and extensions for creating menus.",
   "mixins": [

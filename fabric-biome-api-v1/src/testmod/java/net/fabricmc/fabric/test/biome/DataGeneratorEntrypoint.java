@@ -45,9 +45,9 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+//import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint {
+public class DataGeneratorEntrypoint {
 	public static final ResourceKey<ConfiguredFeature<?, ?>> COMMON_DESERT_WELL = ResourceKey.create(
 			Registries.CONFIGURED_FEATURE,
 			Identifier.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "fab_desert_well")
@@ -69,65 +69,65 @@ public class DataGeneratorEntrypoint implements net.fabricmc.fabric.api.datagen.
 			Identifier.fromNamespaceAndPath(FabricBiomeTest.MOD_ID, "test")
 	);
 
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
-		FabricDataGenerator.Pack pack = dataGenerator.createPack();
-		pack.addProvider(WorldgenProvider::new);
-		pack.addProvider(TestBiomeTagsProvider::new);
-	}
-
-	@Override
-	public void buildRegistry(RegistrySetBuilder registryBuilder) {
-		registryBuilder.add(Registries.CONFIGURED_FEATURE, this::bootstrapConfiguredFeatures);
-		registryBuilder.add(Registries.PLACED_FEATURE, this::bootstrapPlacedFeatures);
-		registryBuilder.add(Registries.BIOME, TestBiomes::bootstrap);
-		registryBuilder.add(Registries.LEVEL_STEM, this::bootstrapLevelStems);
-	}
-
-	private void bootstrapConfiguredFeatures(BootstrapContext<ConfiguredFeature<?, ?>> context) {
-		FeatureUtils.register(context, COMMON_DESERT_WELL, Feature.DESERT_WELL);
-
-		OreConfiguration featureConfig = new OreConfiguration(new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Blocks.DIAMOND_BLOCK.defaultBlockState(), 5);
-		FeatureUtils.register(context, COMMON_ORE, Feature.ORE, featureConfig);
-	}
-
-	private void bootstrapPlacedFeatures(BootstrapContext<PlacedFeature> context) {
-		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
-		Holder<ConfiguredFeature<?, ?>> commonDesertWell = configuredFeatures.getOrThrow(COMMON_DESERT_WELL);
-
-		// The placement config is taken from the vanilla desert well, but no randomness
-		PlacementUtils.register(context, PLACED_COMMON_DESERT_WELL, commonDesertWell,
-				InSquarePlacement.spread(),
-				PlacementUtils.HEIGHTMAP,
-				BiomeFilter.biome()
-		);
-
-		PlacementUtils.register(context, PLACED_COMMON_ORE, configuredFeatures.getOrThrow(COMMON_ORE),
-				CountPlacement.of(25),
-				HeightRangePlacement.uniform(
-					VerticalAnchor.BOTTOM,
-					VerticalAnchor.TOP
-				)
-		);
-	}
-
-	private void bootstrapLevelStems(BootstrapContext<LevelStem> context) {
-		HolderGetter<DimensionType> dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);
-		HolderGetter<Biome> biomes = context.lookup(Registries.BIOME);
-		HolderGetter<StructureSet> structureSets = context.lookup(Registries.STRUCTURE_SET);
-		HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
-		context.register(
-				TEST_LEVEL_STEM,
-				new LevelStem(
-						dimensionTypes.getOrThrow(BuiltinDimensionTypes.OVERWORLD),
-						new FlatLevelSource(
-								FlatLevelGeneratorSettings.getDefault(
-										biomes,
-										structureSets,
-										placedFeatures
-								)
-						)
-				)
-		);
-	}
+//	@Override
+//	public void onInitializeDataGenerator(FabricDataGenerator dataGenerator) {
+//		FabricDataGenerator.Pack pack = dataGenerator.createPack();
+//		pack.addProvider(WorldgenProvider::new);
+//		pack.addProvider(TestBiomeTagsProvider::new);
+//	}
+//
+//	@Override
+//	public void buildRegistry(RegistrySetBuilder registryBuilder) {
+//		registryBuilder.add(Registries.CONFIGURED_FEATURE, this::bootstrapConfiguredFeatures);
+//		registryBuilder.add(Registries.PLACED_FEATURE, this::bootstrapPlacedFeatures);
+//		registryBuilder.add(Registries.BIOME, TestBiomes::bootstrap);
+//		registryBuilder.add(Registries.LEVEL_STEM, this::bootstrapLevelStems);
+//	}
+//
+//	private void bootstrapConfiguredFeatures(BootstrapContext<ConfiguredFeature<?, ?>> context) {
+//		FeatureUtils.register(context, COMMON_DESERT_WELL, Feature.DESERT_WELL);
+//
+//		OreConfiguration featureConfig = new OreConfiguration(new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Blocks.DIAMOND_BLOCK.defaultBlockState(), 5);
+//		FeatureUtils.register(context, COMMON_ORE, Feature.ORE, featureConfig);
+//	}
+//
+//	private void bootstrapPlacedFeatures(BootstrapContext<PlacedFeature> context) {
+//		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
+//		Holder<ConfiguredFeature<?, ?>> commonDesertWell = configuredFeatures.getOrThrow(COMMON_DESERT_WELL);
+//
+//		// The placement config is taken from the vanilla desert well, but no randomness
+//		PlacementUtils.register(context, PLACED_COMMON_DESERT_WELL, commonDesertWell,
+//				InSquarePlacement.spread(),
+//				PlacementUtils.HEIGHTMAP,
+//				BiomeFilter.biome()
+//		);
+//
+//		PlacementUtils.register(context, PLACED_COMMON_ORE, configuredFeatures.getOrThrow(COMMON_ORE),
+//				CountPlacement.of(25),
+//				HeightRangePlacement.uniform(
+//					VerticalAnchor.BOTTOM,
+//					VerticalAnchor.TOP
+//				)
+//		);
+//	}
+//
+//	private void bootstrapLevelStems(BootstrapContext<LevelStem> context) {
+//		HolderGetter<DimensionType> dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);
+//		HolderGetter<Biome> biomes = context.lookup(Registries.BIOME);
+//		HolderGetter<StructureSet> structureSets = context.lookup(Registries.STRUCTURE_SET);
+//		HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
+//		context.register(
+//				TEST_LEVEL_STEM,
+//				new LevelStem(
+//						dimensionTypes.getOrThrow(BuiltinDimensionTypes.OVERWORLD),
+//						new FlatLevelSource(
+//								FlatLevelGeneratorSettings.getDefault(
+//										biomes,
+//										structureSets,
+//										placedFeatures
+//								)
+//						)
+//				)
+//		);
+//	}
 }

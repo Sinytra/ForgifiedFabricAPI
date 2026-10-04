@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.configuration.ClientboundSelectKnownPacks;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.impl.recipe.sync.RecipeSyncImpl;
 import net.fabricmc.fabric.impl.recipe.sync.ServerboundSupportedRecipeSerializersPayload;
 
@@ -37,10 +37,6 @@ import net.fabricmc.fabric.impl.recipe.sync.ServerboundSupportedRecipeSerializer
 public class ClientConfigurationPacketListenerImplMixin {
 	@Inject(method = "handleSelectKnownPacks", at = @At("TAIL"))
 	private void sendSupportedRecipeSerializers(ClientboundSelectKnownPacks packet, CallbackInfo ci) {
-		if (!ClientConfigurationNetworking.canSend(ServerboundSupportedRecipeSerializersPayload.TYPE)) {
-			return;
-		}
-
 		var ids = new HashSet<Identifier>();
 
 		for (RecipeSerializer<?> serializer : RecipeSyncImpl.getSyncedSerializers()) {
@@ -52,6 +48,6 @@ public class ClientConfigurationPacketListenerImplMixin {
 			return;
 		}
 
-		ClientConfigurationNetworking.send(new ServerboundSupportedRecipeSerializersPayload(ids));
+		((ClientCommonPacketListenerImpl) (Object) this).send(new ServerboundSupportedRecipeSerializersPayload(ids));
 	}
 }

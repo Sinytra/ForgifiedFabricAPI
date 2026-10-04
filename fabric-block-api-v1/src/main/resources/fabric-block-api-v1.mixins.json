@@ -4,10 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "BlockBehaviourPropertiesMixin",
-    "BlockMixin",
-    "BlockStateMixin",
-    "ChunkSectionBlockStateCounterMixin",
-    "LevelChunkSectionMixin",
+    "IBlockExtensionMixin",
+    "IBlockStateExtensionMixin",
     "LivingEntityMixin"
   ],
   "injectors": {

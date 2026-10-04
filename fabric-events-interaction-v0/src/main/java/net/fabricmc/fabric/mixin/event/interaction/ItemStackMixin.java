@@ -26,7 +26,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 import net.fabricmc.fabric.api.event.player.ItemEvents;
@@ -42,16 +41,5 @@ public class ItemStackMixin {
 		}
 
 		return original.call(instance, level, player, interactionHand);
-	}
-
-	@WrapOperation(method = "useOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;"))
-	private InteractionResult handleUseOnEvent(Item instance, UseOnContext useOnContext, Operation<InteractionResult> original) {
-		InteractionResult result = ItemEvents.USE_ON.invoker().useOn(useOnContext);
-
-		if (result != null) {
-			return result;
-		}
-
-		return original.call(instance, useOnContext);
 	}
 }

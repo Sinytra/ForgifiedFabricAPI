@@ -63,9 +63,4 @@ abstract class SingleVariantMixin implements BlockStateModel {
 			emitter.popTransform();
 		}
 	}
-
-	@Override
-	public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
-		return this;
-	}
 }

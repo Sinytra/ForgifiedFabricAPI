@@ -19,6 +19,7 @@ package net.fabricmc.fabric.impl.networking.server;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
@@ -52,9 +53,14 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 		this.listener = listener;
 		this.server = server;
 		this.context = new ContextImpl(server, listener, this);
+	}
 
+	@Override
+	public void lateInit() {
 		// Must register pending channels via lateinit
 		this.registerPendingChannels((ChannelInfoHolder) this.connection, ConnectionProtocol.PLAY);
+
+		super.lateInit();
 	}
 
 	@Override
@@ -105,7 +111,7 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 	protected void handleRegistration(Identifier channelName) {
 		// If we can already send packets, immediately send the register packet for this channel
 		if (this.sentInitialRegisterPacket) {
-			RegistrationPayload registrationPayload = this.createRegistrationPayload(RegistrationPayload.REGISTER, Collections.singleton(channelName));
+			CustomPacketPayload registrationPayload = this.createRegistrationPayload(RegistrationPayload.REGISTER, Collections.singleton(channelName));
 
 			if (registrationPayload != null) {
 				this.sendPacket(registrationPayload);
@@ -117,7 +123,7 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 	protected void handleUnregistration(Identifier channelName) {
 		// If we can already send packets, immediately send the unregister packet for this channel
 		if (this.sentInitialRegisterPacket) {
-			RegistrationPayload registrationPayload = this.createRegistrationPayload(RegistrationPayload.UNREGISTER, Collections.singleton(channelName));
+			CustomPacketPayload registrationPayload = this.createRegistrationPayload(RegistrationPayload.UNREGISTER, Collections.singleton(channelName));
 
 			if (registrationPayload != null) {
 				this.sendPacket(registrationPayload);
@@ -133,6 +139,12 @@ public final class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<
 	@Override
 	protected boolean isReservedChannel(Identifier channelName) {
 		return NetworkingImpl.isReservedCommonChannel(channelName);
+	}
+
+	@Override
+	protected void onUpdateSendableChannels() {
+		super.onUpdateSendableChannels();
+		this.listener.getConnection().channel().attr(NetworkingImpl.SENDABLE_CHANNELS).set(Set.copyOf(this.sendableChannels));
 	}
 
 	public void reconfigure() {

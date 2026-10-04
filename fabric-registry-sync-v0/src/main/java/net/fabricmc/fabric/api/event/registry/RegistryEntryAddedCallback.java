@@ -23,7 +23,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.impl.registry.sync.ListenableRegistry;
+import net.fabricmc.fabric.impl.registry.sync.FabricRegistryInit;
 
 /**
  * An event for when an entry is added to a registry.
@@ -48,7 +48,7 @@ public interface RegistryEntryAddedCallback<T> {
 	 * @return the event
 	 */
 	static <T> Event<RegistryEntryAddedCallback<T>> event(Registry<T> registry) {
-		return ListenableRegistry.get(registry).fabric_getAddObjectEvent();
+		return FabricRegistryInit.objectAddedEvent(registry);
 	}
 
 	/**

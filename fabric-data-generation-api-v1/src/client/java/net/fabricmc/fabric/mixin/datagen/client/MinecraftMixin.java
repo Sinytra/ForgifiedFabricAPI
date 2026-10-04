@@ -16,6 +16,9 @@
 
 package net.fabricmc.fabric.mixin.datagen.client;
 
+import net.minecraft.client.ClientBootstrap;
+import net.minecraft.server.Bootstrap;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,6 +33,9 @@ public class MinecraftMixin {
 	@Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getBackendDescription()Ljava/lang/String;"))
 	private void main(CallbackInfo info) {
 		if (FabricDataGenHelper.ENABLED) {
+			Bootstrap.bootStrap();
+			ClientBootstrap.bootstrap();
+			
 			FabricDataGenHelper.run();
 
 			// Exit gracefully.

@@ -6,7 +6,7 @@ loom {
 
 moduleDependencies(project, [
 	':fabric-lifecycle-events-v1',
-	'fabric-networking-api-v1',
+//	'fabric-networking-api-v1',
 ])
 
 testDependencies(project, [

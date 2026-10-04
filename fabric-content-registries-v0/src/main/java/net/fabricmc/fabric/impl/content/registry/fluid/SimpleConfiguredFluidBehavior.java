@@ -19,6 +19,8 @@ package net.fabricmc.fabric.impl.content.registry.fluid;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+import net.fabricmc.fabric.impl.content.registry.ContentRegistriesImpl;
+
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ToFloatFunction;
@@ -84,7 +86,7 @@ public record SimpleConfiguredFluidBehavior(ToFloatFunction<LivingEntity> moveme
 				return entity.getFluidFallingAdjustedMovement(baseGravity, isFalling, movement);
 			}).fallDistanceModifier(0).flowingPushScale(0.014).gravityMultiplier(0).makeMobsFloat(true)
 			.makeRiddenMobsFloat(true).enableDrowning(true).allowSwimming(true).allowMovingDown(true)
-			.allowBoats(true).allowSprinting((fluid, entity) -> entity.isEyeInFluid(fluid))
+			.allowBoats(true).allowSprinting((fluid, entity) -> ContentRegistriesImpl.isEyeInFluid(entity.getFluidInteraction(), fluid))
 			.onEnteredFluid((entity, firstTick) -> {
 				if (!firstTick) ((EntityAccessor) entity).callDoWaterSplashEffect();
 			}).build();
@@ -92,7 +94,7 @@ public record SimpleConfiguredFluidBehavior(ToFloatFunction<LivingEntity> moveme
 	@Override
 	public void handleFluidInteractionUpdate(TagKey<Fluid> fluid, Entity entity, EntityFluidInteraction interaction, boolean canPushEntity) {
 		if (canPushEntity) {
-			interaction.applyCurrentTo(fluid, entity, this.flowingPushScale);
+			ContentRegistriesImpl.applyCurrentTo(interaction, fluid, entity, this.flowingPushScale);
 		}
 
 		entity.fallDistance *= this.fallDistanceMultiplier;
@@ -113,7 +115,7 @@ public record SimpleConfiguredFluidBehavior(ToFloatFunction<LivingEntity> moveme
 		float speed = this.movementSpeed.applyAsFloat(entity);
 		entity.moveRelative(speed, input);
 		entity.move(MoverType.SELF, entity.getDeltaMovement());
-		entity.setDeltaMovement(this.movementSlowdown.apply(entity, entity.getDeltaMovement(), entity.getFluidHeight(fluid) <= entity.getFluidJumpThreshold(), baseGravity, isFalling));
+		entity.setDeltaMovement(this.movementSlowdown.apply(entity, entity.getDeltaMovement(), ContentRegistriesImpl.getFluidHeight(entity.getFluidInteraction(), fluid) <= entity.getFluidJumpThreshold(), baseGravity, isFalling));
 
 		if (baseGravity != 0.0F && this.gravityMultiplier != 0.0F) {
 			entity.setDeltaMovement(entity.getDeltaMovement().add(0.0F, -baseGravity * this.gravityMultiplier, 0.0F));
@@ -124,7 +126,7 @@ public record SimpleConfiguredFluidBehavior(ToFloatFunction<LivingEntity> moveme
 		if (this.makeRiddenMobsFloat) {
 			boolean canEntityFloatInWater = entity.is(EntityTypeTags.CAN_FLOAT_WHILE_RIDDEN);
 
-			if (canEntityFloatInWater && entity.isVehicle() && entity.getFluidHeight(fluid) > entity.getFluidJumpThreshold()) {
+			if (canEntityFloatInWater && entity.isVehicle() && ContentRegistriesImpl.getFluidHeight(entity.getFluidInteraction(), fluid) > entity.getFluidJumpThreshold()) {
 				entity.setDeltaMovement(entity.getDeltaMovement().add(0.0F, 0.04F, 0.0F));
 			}
 		}

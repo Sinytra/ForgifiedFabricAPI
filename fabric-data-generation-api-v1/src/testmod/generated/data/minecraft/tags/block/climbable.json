@@ -1,5 +1,5 @@
 {
-  "fabric:remove": [
+  "remove": [
     "minecraft:blue_glazed_terracotta"
   ],
   "values": [

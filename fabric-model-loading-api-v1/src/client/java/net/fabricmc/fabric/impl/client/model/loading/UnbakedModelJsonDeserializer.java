@@ -33,6 +33,8 @@ import net.minecraft.util.GsonHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.UnbakedModelDeserializer;
 
 public class UnbakedModelJsonDeserializer implements JsonDeserializer<UnbakedModel> {
+	public static UnbakedModelJsonDeserializer INSTANCE = new UnbakedModelJsonDeserializer(); 
+	
 	private static final String TYPE_KEY = "fabric:type";
 	private static final String TYPE_ID_KEY = "id";
 	private static final String TYPE_OPTIONAL_KEY = "optional";
@@ -67,6 +69,6 @@ public class UnbakedModelJsonDeserializer implements JsonDeserializer<UnbakedMod
 			}
 		}
 
-		return context.deserialize(jsonElement, CuboidModel.class);
+		return null;
 	}
 }

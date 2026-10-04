@@ -19,6 +19,7 @@ package net.fabricmc.fabric.impl.content.registry;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -30,7 +31,7 @@ import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 public class FlammableBlockRegistryImpl implements FlammableBlockRegistry {
 	private static final FlammableBlockRegistry.Entry REMOVED = new FlammableBlockRegistry.Entry(0, 0);
-	private static final Map<Block, FlammableBlockRegistryImpl> REGISTRIES = new HashMap<>();
+	private static final Map<Block, FlammableBlockRegistryImpl> REGISTRIES = new ConcurrentHashMap<>();
 
 	private final Map<Block, FlammableBlockRegistry.Entry> registeredEntriesBlock = new HashMap<>();
 	private final Map<TagKey<Block>, FlammableBlockRegistry.Entry> registeredEntriesTag = new HashMap<>();

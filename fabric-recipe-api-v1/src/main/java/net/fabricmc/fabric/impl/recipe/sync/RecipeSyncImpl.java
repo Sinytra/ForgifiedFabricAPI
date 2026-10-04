@@ -17,80 +17,82 @@
 package net.fabricmc.fabric.impl.recipe.sync;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.payload.RecipeContentPayload;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.mixin.recipe.sync.RecipeManagerAccessor;
-import net.fabricmc.fabric.mixin.recipe.sync.ServerCommonPacketListenerImplAccessor;
 
 public class RecipeSyncImpl implements ModInitializer {
-	// Recipe packet might contain a lot of data depending on mods, so it's best to increase it's max size to 64 MB.
-	private static final int RECIPE_PAYLOAD_MAX_SIZE = 64 * 1024 * 1024;
 	private static final Set<RecipeSerializer<?>> SYNCED_SERIALIZERS = new ReferenceOpenHashSet<>();
 
 	public static final Identifier RECIPE_SYNC_EVENT_PHASE = Identifier.fromNamespaceAndPath("fabric", "recipe_sync");
 
 	@Override
 	public void onInitialize() {
-		PayloadTypeRegistry.serverboundConfiguration().register(ServerboundSupportedRecipeSerializersPayload.TYPE, ServerboundSupportedRecipeSerializersPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().registerLarge(ClientboundRecipeSyncPayload.TYPE, ClientboundRecipeSyncPayload.CODEC, RECIPE_PAYLOAD_MAX_SIZE);
-
-		ServerConfigurationNetworking.registerGlobalReceiver(ServerboundSupportedRecipeSerializersPayload.TYPE, RecipeSyncImpl::onRecipeSyncRequest);
-
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.addPhaseOrdering(Event.DEFAULT_PHASE, RECIPE_SYNC_EVENT_PHASE);
-		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(RECIPE_SYNC_EVENT_PHASE, RecipeSyncImpl::sendRecipes);
 	}
 
-	private static void onRecipeSyncRequest(ServerboundSupportedRecipeSerializersPayload payload, ServerConfigurationNetworking.Context context) {
+	public static void onRecipeSyncRequest(ServerboundSupportedRecipeSerializersPayload payload, IPayloadContext context) {
 		var set = new ReferenceOpenHashSet<RecipeSerializer<?>>();
 
 		for (Identifier identifier : payload.synchronizedSerializers()) {
 			BuiltInRegistries.RECIPE_SERIALIZER.getOptional(identifier).ifPresent(set::add);
 		}
 
-		((SyncedSerializerAwareConnection) ((ServerCommonPacketListenerImplAccessor) context.packetListener()).getConnection())
+		((SyncedSerializerAwareConnection) context.listener().getConnection())
 				.fabric_setSyncedRecipeSerializers(set);
 	}
 
-	private static void sendRecipes(ServerPlayer player, boolean exist) {
-		if (!ServerPlayNetworking.canSend(player, ClientboundRecipeSyncPayload.TYPE)) {
-			return;
+	public static RecipeContentPayload appendSyncedRecipes(RecipeContentPayload payload, ServerPlayer player) {
+		List<RecipeHolder<?>> combined = new ArrayList<>(payload.recipes());
+		Collection<ResourceKey<Recipe<?>>> keys = combined.stream()
+			.map(RecipeHolder::id)
+			.collect(Collectors.toUnmodifiableSet());
+
+		List<RecipeHolder<?>> recipes = getRecipesToSend(player);
+		for (RecipeHolder<?> recipe : recipes) {
+			if (!keys.contains(recipe.id())) {
+				combined.add(recipe);
+			}
 		}
 
-		Set<RecipeSerializer<?>> serializers = ((SyncedSerializerAwareConnection) ((ServerCommonPacketListenerImplAccessor) player.connection).getConnection()).fabric_getSyncedRecipeSerializers();
+		return new RecipeContentPayload(payload.recipeTypes(), combined);
+	}
+
+	private static List<RecipeHolder<?>> getRecipesToSend(ServerPlayer player) {
+		Set<RecipeSerializer<?>> serializers = ((SyncedSerializerAwareConnection) player.connection.getConnection()).fabric_getSyncedRecipeSerializers();
 
 		SyncedSerializerAwarePreparedRecipe accessor = (SyncedSerializerAwarePreparedRecipe) ((RecipeManagerAccessor) player.level().recipeAccess()).getRecipes();
 
-		var list = new ArrayList<ClientboundRecipeSyncPayload.Entry>();
+		List<RecipeHolder<?>> list = new ArrayList<>();
 
 		for (RecipeSerializer<?> serializer : serializers) {
 			List<RecipeHolder<?>> recipes = accessor.fabric_getRecipesBySyncedSerializer(serializer);
 
 			if (recipes != null && !recipes.isEmpty()) {
-				list.add(new ClientboundRecipeSyncPayload.Entry(serializer, recipes));
+				list.addAll(recipes);
 			}
 		}
 
-		if (list.isEmpty()) {
-			return;
-		}
-
-		ServerPlayNetworking.send(player, new ClientboundRecipeSyncPayload(list));
+		return list;
 	}
 
 	public static void addSynchronizedSerializer(RecipeSerializer<?> serializer) {

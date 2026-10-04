@@ -6,8 +6,6 @@
     "BlockParticleOptionMixin",
     "BreezeMixin",
     "BrushItemMixin",
-    "EntityMixin",
-    "LivingEntityMixin",
     "ParticleUtilsMixin",
     "ServerPlayerMixin",
     "WardenMixin"

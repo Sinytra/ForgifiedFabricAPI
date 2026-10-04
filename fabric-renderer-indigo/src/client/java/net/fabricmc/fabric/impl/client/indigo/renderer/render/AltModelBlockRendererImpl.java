@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.neoforged.neoforge.client.extensions.common.IClientBlockExtensions;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
@@ -96,7 +97,7 @@ public class AltModelBlockRendererImpl implements AltModelBlockRenderer, QuadTra
 		this.level = level;
 		this.pos = pos;
 		this.blockState = blockState;
-		defaultAo = ambientOcclusion && blockState.getLightEmission() == 0;
+		defaultAo = ambientOcclusion && blockState.getLightEmission(level, pos) == 0;
 
 		cacheValid = 0;
 		shouldCullFaceCache = 0;
@@ -140,7 +141,7 @@ public class AltModelBlockRendererImpl implements AltModelBlockRenderer, QuadTra
 			cacheValid |= cacheMask;
 			BlockState neighborState = level.getBlockState(scratchPos.setWithOffset(pos, direction));
 
-			if (!Block.shouldRenderFace(blockState, neighborState, direction)) {
+			if (!Block.shouldRenderFace(level, pos, blockState, neighborState, direction)) {
 				shouldCullFaceCache |= cacheMask;
 				return true;
 			} else {
@@ -187,8 +188,8 @@ public class AltModelBlockRendererImpl implements AltModelBlockRenderer, QuadTra
 	}
 
 	private void configureTintCache(final BlockState blockState,
-			final BlockAndTintGetter level,
-			final BlockPos pos) {
+	                                final BlockAndTintGetter level,
+	                                final BlockPos pos) {
 		List<BlockTintSource> tintSources = blockColors.getTintSources(blockState);
 		int tintSourceCount = tintSources.size();
 
@@ -217,6 +218,15 @@ public class AltModelBlockRendererImpl implements AltModelBlockRenderer, QuadTra
 		if (!tintSourcesInitialized) {
 			configureTintCache(state, level, pos);
 			tintSourcesInitialized = true;
+		}
+
+		if (this.tintSources.isEmpty()) {
+			IClientBlockExtensions.of(state).collectDynamicTintValues(state, level, pos, this.computedTintValues);
+			if (!this.computedTintValues.isEmpty()) {
+				for (int i = 0; i < this.computedTintValues.size(); ++i) {
+					this.tintSources.add(null);
+				}
+			}
 		}
 
 		if (tintIndex >= tintSources.size()) {

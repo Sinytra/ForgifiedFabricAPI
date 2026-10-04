@@ -12,6 +12,5 @@
     "requireAnnotations": true
   },
   "mixins": [
-    "HudMixin"
   ]
 }
