@@ -22,7 +22,6 @@ import java.util.function.Function;
 
 import com.google.common.base.Preconditions;
 
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 
 /**
@@ -56,7 +55,7 @@ public final class WeightedPicker<T> {
 	}
 
 	public T pickFromNoise(PerlinNoise sampler, double x, double y, double z) {
-		double target = Mth.clamp(Math.abs(sampler.get(x, y, z)), 0, 1) * getCurrentWeightTotal();
+		double target = Math.clamp(Math.abs(sampler.get(x, y, z)), 0, 1) * getCurrentWeightTotal();
 
 		return search(target).entry();
 	}

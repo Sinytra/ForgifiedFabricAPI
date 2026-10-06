@@ -30,7 +30,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Compostable;
 import net.minecraft.world.level.Level;
@@ -136,7 +135,7 @@ public class ComposterWrapper extends SnapshotParticipant<ComposterWrapper.Pendi
 
 			if (increaseSuccessful) {
 				// Mimic ComposterBlock#addToComposter logic.
-				int newLevel = Mth.clamp(state.getValue(ComposterBlock.LEVEL) + layersToAdd, 0, 7);
+				int newLevel = Math.clamp(state.getValue(ComposterBlock.LEVEL) + layersToAdd, 0, 7);
 				BlockState newState = state.setValue(ComposterBlock.LEVEL, newLevel);
 				location.setBlockState(newState);
 				location.level.gameEvent(GameEvent.BLOCK_CHANGE, location.pos, GameEvent.Context.of(newState));

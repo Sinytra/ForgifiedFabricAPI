@@ -17,7 +17,6 @@
 package net.fabricmc.fabric.test.item;
 
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.BlockTransformer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -53,7 +52,7 @@ public class CustomBlockTransformsTest implements ModInitializer {
 									BlockTransformer.BlockTransformData.builder(
 											BlockPredicate.matchesBlocks(Blocks.NETHER_BRICKS),
 											Blocks.CRACKED_NETHER_BRICKS
-									).sound(Holder.direct(SoundEvents.NETHER_BRICKS_HIT)).build()
+									).sound(SoundEvents.NETHER_BRICKS_HIT).build()
 							);
 						}
 					}

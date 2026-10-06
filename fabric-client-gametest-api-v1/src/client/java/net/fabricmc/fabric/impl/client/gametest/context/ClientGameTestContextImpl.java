@@ -51,9 +51,9 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractCycleButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
@@ -76,7 +76,7 @@ import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotCompari
 import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotOptionsImpl;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.fabricmc.fabric.impl.client.gametest.world.TestWorldBuilderImpl;
-import net.fabricmc.fabric.mixin.client.gametest.gui.CycleButtonAccessor;
+import net.fabricmc.fabric.mixin.client.gametest.gui.AbstractCycleButtonAccessor;
 import net.fabricmc.fabric.mixin.client.gametest.gui.ScreenAccessor;
 import net.fabricmc.fabric.mixin.client.gametest.lifecycle.OptionsAccessor;
 import net.fabricmc.fabric.mixin.client.gametest.screenshot.DeltaTrackerDefaultValueAccessor;
@@ -285,8 +285,8 @@ public final class ClientGameTestContextImpl implements ClientGameTestContext {
 			}
 		}
 
-		if (widget instanceof CycleButton<?> button) {
-			CycleButtonAccessor accessor = (CycleButtonAccessor) button;
+		if (widget instanceof AbstractCycleButton<?> button) {
+			AbstractCycleButtonAccessor accessor = (AbstractCycleButtonAccessor) button;
 
 			if (text.equals(accessor.getName().getString())) {
 				button.onPress(clickEvent);
