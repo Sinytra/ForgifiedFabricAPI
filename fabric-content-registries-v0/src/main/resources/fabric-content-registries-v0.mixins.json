@@ -27,6 +27,8 @@
     "WeatheringCopperMixin",
     "WorkAtComposterAccessor",
     "fluid.EntityAccessor",
+    "fluid.EntityFluidInteractionAccessor",
+    "fluid.EntityFluidInteractionTrackerAccessor",
     "fluid.EntityMixin",
     "fluid.FloatGoalMixin",
     "fluid.LivingEntityAccessor",
