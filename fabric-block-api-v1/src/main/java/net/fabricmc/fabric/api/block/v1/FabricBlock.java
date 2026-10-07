@@ -31,6 +31,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.fabricmc.fabric.impl.block.EnchantmentPowerBridge;
+
 /**
  * General-purpose Fabric-provided extensions for {@link Block} subclasses.
  *
@@ -123,7 +125,11 @@ public interface FabricBlock {
 	 * @return the bookshelf equivalent for this state
 	 */
 	default float getProvidedEnchantmentPower(BlockState state, BlockGetter level, BlockPos pos) {
-		return 1.0f;
+		if (EnchantmentPowerBridge.isNeoCall()) {
+			return EnchantmentPowerBridge.FABRIC_DEFAULT_POWER;
+		}
+
+		return EnchantmentPowerBridge.callNeo(() -> ((Block) this).getEnchantPowerBonus(state, level, pos));
 	}
 
 	/**

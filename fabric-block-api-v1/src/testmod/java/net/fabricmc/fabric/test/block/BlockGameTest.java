@@ -22,7 +22,9 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
+import net.fabricmc.fabric.api.block.v1.FabricBlockState;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
 public class BlockGameTest {
@@ -188,5 +190,27 @@ public class BlockGameTest {
 		}
 
 		assertFluidFlowInteraction(helper, 100, center, Blocks.BASALT);
+	}
+
+	@GameTest
+	public void enchantmentPowerIsBridged(GameTestHelper helper) {
+		// When neither API is implemented, each keeps its own default
+		assertEnchantmentPower(helper, Blocks.BOOKSHELF, 1F, 1F);
+		assertEnchantmentPower(helper, Blocks.STONE, 1F, 0F);
+		// Fabric API implemented by ChiseledBookShelfBlockMixin
+		assertEnchantmentPower(helper, Blocks.CHISELED_BOOKSHELF, -15F, -15F);
+		// NeoForge API implemented by override
+		assertEnchantmentPower(helper, BlockTest.neoEnchantPowerBlock, 2.5F, 2.5F);
+		helper.succeed();
+	}
+
+	private static void assertEnchantmentPower(GameTestHelper helper, Block block, float expectedFabric, float expectedNeo) {
+		BlockPos pos = new BlockPos(0, 1, 0);
+		helper.setBlock(pos, block);
+		BlockState state = helper.getBlockState(pos);
+		BlockPos absolutePos = helper.absolutePos(pos);
+
+		helper.assertValueEqual(expectedFabric, ((FabricBlockState) state).getProvidedEnchantmentPower(helper.getLevel(), absolutePos), "Fabric enchantment power of " + state);
+		helper.assertValueEqual(expectedNeo, state.getEnchantPowerBonus(helper.getLevel(), absolutePos), "NeoForge enchantment power of " + state);
 	}
 }

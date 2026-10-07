@@ -56,6 +56,7 @@ public final class BlockTest implements ModInitializer {
 
 	public static Block customLadderBlock;
 	public static Block customNonLadderBlock;
+	public static Block neoEnchantPowerBlock;
 
 	public static final FlowingFluid TEST_FLUID = Registry.register(BuiltInRegistries.FLUID, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid"), new TestFluid.Source());
 	public static final FlowingFluid TEST_FLUID_FLOWING = Registry.register(BuiltInRegistries.FLUID, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid_flowing"), new TestFluid.Flowing());
@@ -68,6 +69,12 @@ public final class BlockTest implements ModInitializer {
 	public void onInitialize() {
 		customLadderBlock = registerBlock("custom_ladder", settings -> new LadderBlock(settings) { });
 		customNonLadderBlock = registerBlock("custom_non_ladder", NonLadderBlock::new);
+		neoEnchantPowerBlock = registerBlock("neo_enchant_power", settings -> new Block(settings) {
+			@Override
+			public float getEnchantPowerBonus(BlockState state, BlockGetter level, BlockPos pos) {
+				return 2.5f;
+			}
+		});
 
 		FluidFlowEvents.ALLOW.register((fluid, level, position) -> {
 			// Check we are the test fluid
