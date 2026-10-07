@@ -47,11 +47,18 @@ public final class ClimbableTrapdoorTest implements ModInitializer {
 
 	public static Block customLadderBlock;
 	public static Block customNonLadderBlock;
+	public static Block neoEnchantPowerBlock;
 
 	@Override
 	public void onInitialize() {
 		customLadderBlock = registerBlock("custom_ladder", settings -> new LadderBlock(settings) { });
 		customNonLadderBlock = registerBlock("custom_non_ladder", NonLadderBlock::new);
+		neoEnchantPowerBlock = registerBlock("neo_enchant_power", settings -> new Block(settings) {
+			@Override
+			public float getEnchantPowerBonus(BlockState state, BlockGetter level, BlockPos pos) {
+				return 2.5f;
+			}
+		});
 	}
 
 	private static Block registerBlock(String name, Function<BlockBehaviour.Properties, Block> blockFactory) {
