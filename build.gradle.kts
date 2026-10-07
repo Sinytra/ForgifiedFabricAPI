@@ -56,6 +56,11 @@ version = "$upstreamVersion+$versionMc+$implementationVersion${(if (System.geten
 println("Version: $version")
 
 val injectedInterfaces = configurations.create("injectedInterfaces")
+val ENABLE_RECOMP_FOR = listOf(
+    "fabric-data-attachment-api-v1",
+    "fabric-object-builder-api-v1",
+    "fabric-rendering-v1"
+)
 
 allprojects {
     apply(plugin = "maven-publish")
@@ -115,7 +120,7 @@ allprojects {
     neoForge {
         enable {
             version = versionNeoForge
-            isDisableRecompilation = true
+            isDisableRecompilation = !ENABLE_RECOMP_FOR.contains(project.name)
         }
 
         runs {

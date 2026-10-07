@@ -13,3 +13,21 @@ fabricApiModule {
 		':fabric-client-gametest-api-v1'
 	)
 }
+
+neoForge {
+	runs {
+		clientGametest {
+			client()
+			systemProperty 'fabric.client.gametest', 'true'
+		}
+	}
+}
+
+neoForge.mods {
+	clientGameTest {
+		sourceSet project(':fabric-client-gametest-api-v1').sourceSets.main
+	}
+	networking {
+		sourceSet project(':fabric-networking-api-v1').sourceSets.main
+	}
+}

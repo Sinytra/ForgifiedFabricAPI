@@ -30,6 +30,9 @@ neoForge {
 }
 
 neoForge.mods {
+	screenMod {
+		sourceSet project(':fabric-screen-api-v1').sourceSets.main
+	}
 	screenTestMod {
 		sourceSet project(':fabric-screen-api-v1').sourceSets.testmod
 	}
