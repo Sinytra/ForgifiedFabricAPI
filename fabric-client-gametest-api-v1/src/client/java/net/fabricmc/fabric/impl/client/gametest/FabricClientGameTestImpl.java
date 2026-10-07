@@ -25,6 +25,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.fabricmc.fabric.impl.client.gametest.util.GameTestSyncPayload;
 
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+
 public class FabricClientGameTestImpl implements ClientModInitializer {
 	public static final String MOD_ID = "fabric-client-gametest-api-v1";
 
@@ -34,7 +38,10 @@ public class FabricClientGameTestImpl implements ClientModInitializer {
 			return;
 		}
 
-		ThreadingImpl.unsafeClientInstance = Minecraft.getInstance();
+		IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+		bus.addListener(FMLClientSetupEvent.class, e -> {
+			ThreadingImpl.unsafeClientInstance = Minecraft.getInstance();
+		});
 
 		PayloadTypeRegistry.serverboundPlay().register(GameTestSyncPayload.TYPE, GameTestSyncPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(GameTestSyncPayload.TYPE, GameTestSyncPayload.CODEC);
