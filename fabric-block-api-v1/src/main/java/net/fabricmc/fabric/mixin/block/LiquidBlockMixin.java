@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.block;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,5 +43,13 @@ public abstract class LiquidBlockMixin extends Block {
 		if (!FluidFlowEvents.ALLOW.invoker().allowFlow(level.getFluidState(pos), level, pos)) {
 			cir.setReturnValue(false);
 		}
+	}
+
+	@WrapOperation(method = "neighborChanged", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/fluids/FluidInteractionRegistry;canInteract(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Z"))
+	private boolean canInteract(Level level, BlockPos pos, Operation<Boolean> original) {
+		if (!FluidFlowEvents.ALLOW.invoker().allowFlow(level.getFluidState(pos), level, pos)) {
+			return true;
+		}
+		return original.call(level, pos);
 	}
 }

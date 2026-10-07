@@ -29,6 +29,9 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.LavaFluid;
 
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.fluids.FluidType;
+
 public abstract class TestFluid extends LavaFluid {
 	public TestFluid() {
 	}
@@ -66,6 +69,11 @@ public abstract class TestFluid extends LavaFluid {
 	@Override
 	public int getTickDelay(LevelReader level) {
 		return 5;
+	}
+
+	@Override
+	public FluidType getFluidType() {
+		return NeoForgeMod.EMPTY_TYPE.value();
 	}
 
 	public static class Flowing extends TestFluid {
