@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type;
 import net.minecraft.resources.Identifier;
@@ -91,5 +92,12 @@ public class NetworkRegistryMixin {
 			}
 		}
 		return channel;
+	}
+
+	@Inject(method = "handleModdedPayload", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z"), cancellable = true)
+	private static void preventDisconnect(ServerCommonPacketListener listener, ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
+		if (NetworkingImpl.getCodec(packet.payload().type().id(), listener.protocol(), listener.flow()) != null) {
+			ci.cancel();
+		}
 	}
 }

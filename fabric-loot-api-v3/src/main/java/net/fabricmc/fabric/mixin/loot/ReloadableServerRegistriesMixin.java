@@ -16,18 +16,11 @@
 
 package net.fabricmc.fabric.mixin.loot;
 
-import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.function.Function;
 
 import com.google.gson.JsonElement;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.serialization.DynamicOps;
+import net.neoforged.neoforge.common.CommonHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,14 +28,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.storage.loot.LootDataType;
@@ -60,27 +51,6 @@ import net.fabricmc.fabric.impl.loot.LootUtil;
  */
 @Mixin(ReloadableServerRegistries.class)
 abstract class ReloadableServerRegistriesMixin {
-	/**
-	 * Due to possible cross-thread handling, this uses WeakHashMap instead of ThreadLocal.
-	 */
-	@Unique
-	private static final WeakHashMap<RegistryOps<JsonElement>, HolderLookup.Provider> WRAPPERS = new WeakHashMap<>();
-
-	@WrapOperation(method = "reload", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/HolderLookup$Provider;createSerializationContext(Lcom/mojang/serialization/DynamicOps;)Lnet/minecraft/resources/RegistryOps;"))
-	private static RegistryOps<JsonElement> storeOps(HolderLookup.Provider holder, DynamicOps<JsonElement> ops, Operation<RegistryOps<JsonElement>> original) {
-		RegistryOps<JsonElement> created = original.call(holder, ops);
-		WRAPPERS.put(created, holder);
-		return created;
-	}
-
-	@WrapOperation(method = "reload", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/CompletableFuture;thenApplyAsync(Ljava/util/function/Function;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-	private static CompletableFuture<LayeredRegistryAccess<RegistryLayer>> removeOps(CompletableFuture<List<WritableRegistry<?>>> future, Function<? super List<WritableRegistry<?>>, ? extends LayeredRegistryAccess<RegistryLayer>> fn, Executor executor, Operation<CompletableFuture<LayeredRegistryAccess<RegistryLayer>>> original, @Local(name = "ops") RegistryOps<JsonElement> ops) {
-		return original.call(future.thenApply(v -> {
-			WRAPPERS.remove(ops);
-			return v;
-		}), fn, executor);
-	}
-
 	@Inject(method = "lambda$scheduleRegistryLoad$0", at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
 	private static <T extends Validatable> void modifyLootTable(LootDataType<T> lootDataType, RegistryOps<JsonElement> registryOps, ResourceManager resourceManager, CallbackInfoReturnable<WritableRegistry<?>> cir, @Local(name = "elements") Map<Identifier, T> elements) {
 		elements.replaceAll((identifier, t) -> modifyLootTable(t, identifier, registryOps));
@@ -91,8 +61,8 @@ abstract class ReloadableServerRegistriesMixin {
 		if (!(value instanceof LootTable table)) return value;
 
 		ResourceKey<LootTable> key = ResourceKey.create(Registries.LOOT_TABLE, id);
-		// Populated above.
-		HolderLookup.Provider provider = WRAPPERS.get(ops);
+		// Extract original ops from ConditionalOps
+		HolderLookup.Provider provider = CommonHooks.extractLookupProvider(ops);
 		// Populated inside SimpleJsonResourceReloadListenerMixin
 		LootTableSource source = LootUtil.SOURCES.get().getOrDefault(id, LootTableSource.DATA_PACK);
 		// Invoke the REPLACE event for the current loot table.
