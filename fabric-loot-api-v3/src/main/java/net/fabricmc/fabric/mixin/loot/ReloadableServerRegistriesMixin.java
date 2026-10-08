@@ -44,11 +44,11 @@ import net.fabricmc.fabric.impl.loot.LootUtil;
  */
 @Mixin(ReloadableServerRegistries.class)
 abstract class ReloadableServerRegistriesMixin {
-	@WrapOperation(method = "reload", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/RegistryDataLoader;load(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-	private static CompletableFuture<RegistryAccess.Frozen> modifyLootTables(ResourceManager resourceManager, List<HolderLookup.RegistryLookup<?>> contextRegistries, List<RegistryDataLoader.RegistryData<?>> registriesToLoad, Executor executor, Operation<CompletableFuture<RegistryAccess.Frozen>> original, @Local(name = "loadingContextWithTags") HolderLookup.Provider provider) {
+	@WrapOperation(method = "reload", at = @At(value = "INVOKE", target = "Lnet/minecraft/resources/RegistryDataLoader;load(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Ljava/util/List;Ljava/util/concurrent/Executor;Ljava/util/List;)Ljava/util/concurrent/CompletableFuture;"))
+	private static CompletableFuture<RegistryAccess.Frozen> modifyLootTables(ResourceManager resourceManager, List<HolderLookup.RegistryLookup<?>> contextRegistries, List<RegistryDataLoader.RegistryData<?>> registriesToLoad, Executor executor, List<Registry.PendingTags<?>> pendingTags, Operation<CompletableFuture<RegistryAccess.Frozen>> original, @Local(name = "loadingContextWithTags") HolderLookup.Provider provider) {
 		LootUtil.startReload(resourceManager, provider);
 
-		return original.call(resourceManager, contextRegistries, registriesToLoad, executor)
+		return original.call(resourceManager, contextRegistries, registriesToLoad, executor, pendingTags)
 				.thenApply(registries -> {
 					Registry<LootTable> lootTableRegistry = registries.lookupOrThrow(Registries.LOOT_TABLE);
 					LootTableEvents.ALL_LOADED.invoker().onLootTablesLoaded(resourceManager, lootTableRegistry);

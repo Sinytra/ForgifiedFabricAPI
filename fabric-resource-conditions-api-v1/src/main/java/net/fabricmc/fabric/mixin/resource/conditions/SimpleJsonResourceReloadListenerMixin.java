@@ -47,8 +47,9 @@ public class SimpleJsonResourceReloadListenerMixin {
 	@Final
 	private FileToIdConverter lister;
 
-	@WrapOperation(method = "prepare", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/DynamicOps;Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;"))
-	private DataResult<Optional<?>> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<Optional<?>>> original,
+	@WrapOperation(method = "scanDirectory", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/Codec;parse(Lcom/mojang/serialization/DynamicOps;Ljava/lang/Object;)Lcom/mojang/serialization/DataResult;"))
+	private static DataResult<Optional<?>> applyResourceConditions(Codec<?> instance, DynamicOps<JsonElement> dynamicOps, Object object, Operation<DataResult<Optional<?>>> original,
+													@Local(name = "lister", argsOnly = true) FileToIdConverter lister,
 													@Local(name = "entry") Map.Entry<Identifier, Resource> entry) {
 		final JsonElement resourceData = (JsonElement) object;
 		RegistryOps.@Nullable RegistryInfoLookup registryInfo = null;
@@ -60,7 +61,7 @@ public class SimpleJsonResourceReloadListenerMixin {
 		if (resourceData.isJsonObject()) {
 			JsonObject obj = resourceData.getAsJsonObject();
 
-			final String dataType = this.lister.prefix();
+			final String dataType = lister.prefix();
 
 			if (!ResourceConditionsImpl.applyResourceConditions(obj, dataType, entry.getKey(), registryInfo)) {
 				return DataResult.success(Optional.empty());

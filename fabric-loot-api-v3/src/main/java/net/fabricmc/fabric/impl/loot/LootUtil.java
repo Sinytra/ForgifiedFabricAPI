@@ -24,6 +24,7 @@ import java.util.function.Function;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.repository.PackSource;
@@ -69,7 +70,16 @@ public final class LootUtil {
 
 		LootTable.Builder builder = FabricLootTableBuilder.copyOf(table);
 		LootTableEvents.MODIFY.invoker().modifyLootTable(key, builder, source, provider);
-		return builder.build();
+		LootTable builtTable = builder.build();
+
+		try { // TODO 26.3 FFAPI - is this correct?
+			Identifier lootTableId = table.getLootTableId();
+			if (lootTableId != null) {
+				builtTable.setLootTableId(table.getLootTableId());
+			}
+		} catch (NullPointerException ignored) {}
+
+		return builtTable;
 	}
 
 	public static LootTableSource determineSource(Resource resource) {

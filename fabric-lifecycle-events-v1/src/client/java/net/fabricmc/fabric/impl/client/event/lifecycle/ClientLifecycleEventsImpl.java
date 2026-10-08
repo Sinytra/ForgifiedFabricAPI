@@ -16,11 +16,16 @@
 
 package net.fabricmc.fabric.impl.client.event.lifecycle;
 
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
+
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.impl.event.lifecycle.LoadedChunksCache;
 
 public final class ClientLifecycleEventsImpl implements ClientModInitializer {
@@ -40,5 +45,12 @@ public final class ClientLifecycleEventsImpl implements ClientModInitializer {
 				ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(blockEntity, level);
 			}
 		});
+
+		NeoForge.EVENT_BUS.addListener(ClientLifecycleEventsImpl::onClientTagsLoaded);
+	}
+
+	@SubscribeEvent
+	public static void onClientTagsLoaded(TagsUpdatedEvent.ClientPacketReceived event) {
+		CommonLifecycleEvents.TAGS_LOADED.invoker().onTagsLoaded(event.getRegistries(), true);
 	}
 }

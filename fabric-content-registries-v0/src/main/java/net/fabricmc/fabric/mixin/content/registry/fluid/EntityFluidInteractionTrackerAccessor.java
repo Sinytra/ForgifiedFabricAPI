@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.world.phys.Vec3;
 
-@Mixin(targets = "net.minecraft.world.entity.EntityFluidInteraction$Tracker")
+@Mixin(targets = "net.minecraft.world.entity.EntityFluidInteraction$CurrentAccumulator")
 public interface EntityFluidInteractionTrackerAccessor {
 	@Accessor
 	Vec3 getAccumulatedCurrent();

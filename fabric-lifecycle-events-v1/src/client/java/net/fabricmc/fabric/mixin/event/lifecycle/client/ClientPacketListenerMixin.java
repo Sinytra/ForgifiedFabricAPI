@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.protocol.common.ClientboundUpdateTagsPacket;
 import net.minecraft.network.protocol.game.ClientboundLoginPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.world.entity.Entity;
@@ -35,7 +34,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.impl.event.lifecycle.LoadedChunksCache;
 
 @Mixin(ClientPacketListener.class)
@@ -100,10 +98,5 @@ abstract class ClientPacketListenerMixin {
 				}
 			}
 		}
-	}
-
-	@Inject(method = "handleUpdateTags", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTabs;searchTab()Lnet/minecraft/world/item/CreativeModeTab;"))
-	private void invokeTagsLoaded(ClientboundUpdateTagsPacket packet, CallbackInfo ci) {
-		CommonLifecycleEvents.TAGS_LOADED.invoker().onTagsLoaded(registryAccess, true);
 	}
 }

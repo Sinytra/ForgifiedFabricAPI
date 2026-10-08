@@ -34,7 +34,7 @@ public class ContentRegistriesImpl {
 	}
 
 	public static void applyCurrentTo(EntityFluidInteraction interaction, TagKey<Fluid> fluid, Entity entity, double scale) {
-		Map<FluidType, Object> trackers = ((EntityFluidInteractionAccessor) interaction).getTrackerByFluid();
+		Map<FluidType, Object> trackers = ((EntityFluidInteractionAccessor) interaction).getCurrentAccumulators();
 		Vec3 current = Vec3.ZERO;
 		int allCurrentCount = 0;
 

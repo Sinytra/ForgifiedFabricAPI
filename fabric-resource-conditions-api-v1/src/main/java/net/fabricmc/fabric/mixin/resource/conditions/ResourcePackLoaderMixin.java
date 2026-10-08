@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.packs.OverlayMetadataSection;
 import net.minecraft.server.packs.PackLocationInfo;
-import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackMetadataResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 
@@ -45,7 +45,7 @@ public class ResourcePackLoaderMixin {
 	)
 	private static void applyOverlayConditions(PackType type, PackLocationInfo location, Pack.ResourcesSupplier resources, CallbackInfoReturnable<?> cir,
 	                                           @Local(name = "overlays") List<String> overlays,
-	                                           @Local(name = "primaryResources") PackResources pack
+	                                           @Local(name = "primaryResources") PackMetadataResources pack
 	) throws IOException {
 		// Avoid trying to load Fabric overlays for xplat mods that define both.
 		// The condition registry entries would be missing.

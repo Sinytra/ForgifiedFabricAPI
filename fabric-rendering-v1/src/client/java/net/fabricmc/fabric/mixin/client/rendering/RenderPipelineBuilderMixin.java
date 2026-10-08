@@ -31,7 +31,6 @@ import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.pipeline.ShaderType;
 import com.mojang.renderpearl.api.vertex.VertexFormat;
-import net.neoforged.neoforge.client.stencil.StencilTest;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -90,11 +89,10 @@ class RenderPipelineBuilderMixin implements FabricRenderPipeline.Builder {
 			Optional<Boolean> cull,
 			@Nullable VertexFormat[] vertexFormatPerBuffer,
 			Optional<PrimitiveTopology> vertexFormatMode,
-			Optional<StencilTest> stencilTest,
 			int pushConstantSize,
 			Operation<RenderPipeline.Snippet> original
 	) {
-		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(shaders, shaderDefines, bindGroupLayouts, colorTargetStates, activeColorTargetStateCount, depthStencilState, polygonMode, cull, vertexFormatPerBuffer, vertexFormatMode, stencilTest, pushConstantSize), usePipelineDrawModeForGui);
+		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(shaders, shaderDefines, bindGroupLayouts, colorTargetStates, activeColorTargetStateCount, depthStencilState, polygonMode, cull, vertexFormatPerBuffer, vertexFormatMode, pushConstantSize), usePipelineDrawModeForGui);
 	}
 
 	@ModifyReturnValue(
