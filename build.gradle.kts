@@ -20,7 +20,6 @@ val curseforge_minecraft_versions: String by project
 val curseForgeId: String by project
 val modrinthId: String by project
 val githubRepository: String by project
-val publishBranch: String by project
 
 val META_PROJECTS: List<String> = listOf(
     "deprecated",
@@ -246,7 +245,7 @@ publishMods {
     github {
         accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))
         repository.set(githubRepository)
-        commitish.set(publishBranch)
+        commitish.set(providers.environmentVariable("GITHUB_SHA"))
     }
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
