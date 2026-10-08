@@ -18,6 +18,11 @@ package net.fabricmc.fabric.impl.content.registry;
 
 import java.util.Objects;
 
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
+import net.neoforged.neoforge.registries.datamaps.builtin.Oxidizable;
+import net.neoforged.neoforge.registries.datamaps.builtin.Waxable;
+
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.WeatheringCopper;
@@ -35,6 +40,7 @@ public final class OxidizableBlocksRegistryImpl {
 		Objects.requireNonNull(from, "Oxidizable block cannot be null!");
 		Objects.requireNonNull(to, "Oxidizable block cannot be null!");
 		WeatheringCopper.NEXT_BY_BLOCK.get().put(from, to);
+		BuiltInRegistries.BLOCK.getDataMap(NeoForgeDataMaps.OXIDIZABLES).put(from.builtInRegistryHolder().key(), new Oxidizable(to));
 		// Fix #4371
 		refreshRandomTickCache(from);
 		refreshRandomTickCache(to);
@@ -46,6 +52,7 @@ public final class OxidizableBlocksRegistryImpl {
 		Objects.requireNonNull(unwaxed, "Unwaxed block cannot be null!");
 		Objects.requireNonNull(waxed, "Waxed block cannot be null!");
 		HoneycombItem.WAXABLES.get().put(unwaxed, waxed);
+		BuiltInRegistries.BLOCK.getDataMap(NeoForgeDataMaps.WAXABLES).put(unwaxed.builtInRegistryHolder().key(), new Waxable(waxed));
 
 		BlockTransformerHelperImpl.registerWaxScraping(BlockPredicate.matchesBlocks(waxed), BlockStateProvider.of(unwaxed));
 	}

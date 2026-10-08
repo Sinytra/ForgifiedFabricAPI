@@ -117,6 +117,10 @@ public abstract class LivingEntityMixin extends Entity {
 			return;
 		}
 
+		if (effect == null) {
+			return;
+		}
+
 		ServerMobEffectEvents.BEFORE_REMOVE.invoker()
 				.beforeRemove(effect, this.fabric$self(), MobEffectUtil.getCommandContext());
 	}

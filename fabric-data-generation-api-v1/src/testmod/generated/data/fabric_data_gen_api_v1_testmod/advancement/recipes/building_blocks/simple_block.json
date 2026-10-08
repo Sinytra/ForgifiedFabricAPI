@@ -14,7 +14,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipes": "fabric-data-gen-api-v1-testmod:simple_block"
+        "recipes": "fabric_data_gen_api_v1_testmod:simple_block"
       }
     }
   },
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:simple_block"
+      "fabric_data_gen_api_v1_testmod:simple_block"
     ]
   }
 }

@@ -14,7 +14,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipes": "fabric-data-gen-api-v1-testmod:simple_block_from_glass_stonecutting"
+        "recipes": "fabric_data_gen_api_v1_testmod:simple_block_from_glass_stonecutting"
       }
     }
   },
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:simple_block_from_glass_stonecutting"
+      "fabric_data_gen_api_v1_testmod:simple_block_from_glass_stonecutting"
     ]
   }
 }

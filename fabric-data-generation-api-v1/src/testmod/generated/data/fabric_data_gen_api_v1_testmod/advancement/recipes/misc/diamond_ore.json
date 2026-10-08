@@ -23,7 +23,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipes": "fabric-data-gen-api-v1-testmod:diamond_ore"
+        "recipes": "fabric_data_gen_api_v1_testmod:diamond_ore"
       }
     }
   },
@@ -35,7 +35,7 @@
   ],
   "rewards": {
     "recipes": [
-      "fabric-data-gen-api-v1-testmod:diamond_ore"
+      "fabric_data_gen_api_v1_testmod:diamond_ore"
     ]
   }
 }

@@ -78,7 +78,7 @@ public final class EntityEventHooks {
 	
 	@SubscribeEvent
 	public static void tryRemoveEffect(MobEffectEvent.Remove event) {
-		if (!ServerMobEffectEvents.ALLOW_EARLY_REMOVE.invoker().allowEarlyRemove(event.getEffectInstance(), event.getEntity(), MobEffectUtil.getCommandContext())) {
+		if (event.getEffectInstance() != null && !ServerMobEffectEvents.ALLOW_EARLY_REMOVE.invoker().allowEarlyRemove(event.getEffectInstance(), event.getEntity(), MobEffectUtil.getCommandContext())) {
 			event.setCanceled(true);
 		}
 	}
