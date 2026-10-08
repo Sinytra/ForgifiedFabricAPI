@@ -21,6 +21,7 @@ import java.util.List;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Cancellable;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.datafixers.util.Either;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -84,7 +85,7 @@ abstract class ServerPlayerMixin extends LivingEntityMixin {
 	}
 
 	@WrapOperation(method = "lambda$startSleepInBed$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getValue(Lnet/minecraft/world/level/block/state/properties/Property;)Ljava/lang/Comparable;"))
-	private Comparable<?> redirectSleepDirection(BlockState instance, Property<Direction> property, Operation<Comparable<Direction>> original, BlockPos pos, @Cancellable CallbackInfoReturnable<Either<Player.BedSleepingProblem, Unit>> cir) {
+	private Comparable<?> redirectSleepDirection(BlockState instance, Property<Direction> property, Operation<Comparable<Direction>> original, @Local(argsOnly = true, name = "pos") BlockPos pos, @Cancellable CallbackInfoReturnable<Either<Player.BedSleepingProblem, Unit>> cir) {
 		Direction initial = (Direction) (instance.hasProperty(property) ? original.call(instance, property) : null);
 		Direction dir = EntitySleepEvents.MODIFY_SLEEPING_DIRECTION.invoker().modifySleepDirection((LivingEntity) (Object) this, pos, initial);
 
@@ -103,7 +104,7 @@ abstract class ServerPlayerMixin extends LivingEntityMixin {
 	}
 
 	@Redirect(method = "lambda$startSleepInBed$0", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"))
-	private boolean hasNoMonstersNearby(List<Monster> monsters, BlockPos pos) {
+	private boolean hasNoMonstersNearby(List<Monster> monsters, @Local(argsOnly = true, name = "pos") BlockPos pos) {
 		boolean vanillaResult = monsters.isEmpty();
 		EventResult result = EntitySleepEvents.ALLOW_NEARBY_MONSTERS.invoker().allowNearbyMonsters((Player) (Object) this, pos, vanillaResult);
 		return result.allowAction(vanillaResult);

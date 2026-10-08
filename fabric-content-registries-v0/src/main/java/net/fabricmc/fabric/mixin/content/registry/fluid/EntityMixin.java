@@ -18,12 +18,8 @@ package net.fabricmc.fabric.mixin.content.registry.fluid;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.neoforged.neoforge.fluids.FluidType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -69,11 +65,6 @@ public abstract class EntityMixin implements EntityFluidExtension, InternalEntit
 		var result = new HashSet<>(fluids);
 		result.addAll(EntityFluidInteractionRegistryImpl.getTrackedFluids());
 		return result;
-	}
-
-	@WrapOperation(method = "updateFluidInteraction", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityFluidInteraction;update(Lnet/minecraft/world/entity/Entity;Ljava/util/function/Predicate;)V"))
-	private void applyCustomFluidCurrent(EntityFluidInteraction interaction, Entity entity, Predicate<FluidType> typePushPredicate, Operation<Void> original) {
-		original.call(interaction, entity, typePushPredicate.or(type -> this.isPushedByFluid() && ContentRegistriesImpl.isCustomFluidType(type)));
 	}
 
 	@ModifyReturnValue(method = "isInLiquid", at = @At("RETURN"))
