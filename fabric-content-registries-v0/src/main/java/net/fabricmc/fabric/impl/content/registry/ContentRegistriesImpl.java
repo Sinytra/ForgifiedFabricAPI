@@ -13,7 +13,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityFluidInteraction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
+
+import net.fabricmc.fabric.impl.content.registry.fluid.EntityFluidInteractionRegistryImpl;
+import net.fabricmc.fabric.mixin.content.registry.fluid.EntityFluidInteractionAccessor;
+import net.fabricmc.fabric.mixin.content.registry.fluid.EntityFluidInteractionTrackerAccessor;
 
 @Mod(GeneratedEntryPoint.MOD_ID)
 public class ContentRegistriesImpl {
@@ -28,17 +34,55 @@ public class ContentRegistriesImpl {
 	}
 
 	public static void applyCurrentTo(EntityFluidInteraction interaction, TagKey<Fluid> fluid, Entity entity, double scale) {
+		Map<FluidType, Object> trackers = ((EntityFluidInteractionAccessor) interaction).getTrackerByFluid();
+		Vec3 accumulatedCurrent = Vec3.ZERO;
+		int currentCount = 0;
+
 		for (FluidType type : getFluidTypes(fluid)) {
-			interaction.applyCurrentTo(type, entity, scale);
-			return;
+			if (trackers.get(type) instanceof EntityFluidInteractionTrackerAccessor tracker) {
+				accumulatedCurrent = accumulatedCurrent.add(tracker.getAccumulatedCurrent());
+				currentCount += tracker.getCurrentCount();
+			}
+		}
+
+		// From EntityFluidInteraction.Tracker#applyCurrentTo
+		if (currentCount != 0 && !(accumulatedCurrent.lengthSqr() < 1.0E-5F)) {
+			Vec3 impulse;
+
+			if (!(entity instanceof Player)) {
+				impulse = accumulatedCurrent.normalize();
+			} else {
+				impulse = accumulatedCurrent.scale(1.0 / currentCount);
+			}
+
+			Vec3 oldMovement = entity.getDeltaMovement();
+			impulse = impulse.scale(scale);
+
+			if (Math.abs(oldMovement.x) < 0.003 && Math.abs(oldMovement.z) < 0.003 && impulse.length() < 0.0045000000000000005) {
+				impulse = impulse.normalize().scale(0.0045000000000000005);
+			}
+
+			entity.addDeltaMovement(impulse);
 		}
 	}
 
 	public static double getFluidHeight(EntityFluidInteraction interaction, TagKey<Fluid> fluid) {
+		double height = 0;
+
 		for (FluidType type : getFluidTypes(fluid)) {
-			return interaction.getFluidHeight(type);
+			height = Math.max(height, interaction.getFluidHeight(type));
 		}
-		return 0;
+
+		return height;
+	}
+
+	public static boolean isCustomFluidType(FluidType type) {
+		for (TagKey<Fluid> tagKey : EntityFluidInteractionRegistryImpl.getTrackedFluids()) {
+			if (getFluidTypes(tagKey).contains(type)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static Collection<FluidType> getFluidTypes(TagKey<Fluid> tagKey) {
