@@ -9,6 +9,7 @@
     "BaseRegistryMixin",
     "BlockBehaviourAccessor",
     "BlockBehaviourBlockStateBaseMixin",
+    "DataMapHooksMixin",
     "FireBlockMixin",
     "GiveGiftToHeroAccessor",
     "GiveGiftToHeroMixin",
