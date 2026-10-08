@@ -13,12 +13,13 @@ sourceSets.configureEach {
         // otherwise it'll just be whatever the last source set is in the list.
         val sourceSetName = name
         val taskName = getTaskName("generate", "ImplPackageInfos")
+        val headerFile = rootProject.file("HEADER")
         val task = project.tasks.register<GenerateImplPackageInfos>(taskName) {
             group = "sinytra"
             description = "Generates package-info files for $sourceSetName implementation packages."
             // Only apply to default source directory since we also add the generated 
             // sources to the source set.
-            header.set(rootProject.file("HEADER"))
+            header.set(headerFile)
             sourceRoots.from(this@configureEach.java.srcDirs)
             outputDir.set(file("src/generated/$sourceSetName/java"))
         }
@@ -40,6 +41,10 @@ open class GenerateImplPackageInfos : DefaultTask() {
     companion object {
         val INTERNAL_DIRS = setOf("impl", "mixin")
         const val PACKAGE_INFO = "package-info.java"
+    }
+
+    init {
+        notCompatibleWithConfigurationCache("project access")
     }
 
     @InputFile

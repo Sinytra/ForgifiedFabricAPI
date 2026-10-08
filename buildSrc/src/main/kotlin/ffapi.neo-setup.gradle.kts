@@ -67,10 +67,11 @@ tasks {
         isEnabled = false
     }
 
+    val iconFile = rootProject.file("src/main/resources/assets/fabric/icon.png")
     named<ProcessResources>("processResources") {
         filesMatching("assets/*/icon.png") {
             exclude()
-            rootProject.file("src/main/resources/assets/fabric/icon.png").copyTo(destinationDir.resolve(path))
+            iconFile.copyTo(destinationDir.resolve(path))
         }
     }
 }

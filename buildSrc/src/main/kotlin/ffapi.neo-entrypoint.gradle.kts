@@ -43,6 +43,10 @@ masterSourceSets.forEach { sourceSet ->
 }
 
 abstract class GenerateForgeModEntrypoint : DefaultTask() {
+    init {
+        notCompatibleWithConfigurationCache("project access")
+    }
+
     @get:SkipWhenEmpty
     @get:InputFiles
     val sourceRoots: ConfigurableFileCollection = project.objects.fileCollection()
