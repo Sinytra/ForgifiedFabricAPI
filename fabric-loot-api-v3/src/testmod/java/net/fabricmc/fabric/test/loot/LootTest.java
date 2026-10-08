@@ -142,7 +142,7 @@ public class LootTest implements ModInitializer {
 				return;
 			}
 
-			ItemInstance tool = Objects.requireNonNull(context.getOptionalParameter(LootContextParams.TOOL), "LootContext contains tool, but it was null");
+			ItemInstance tool = Objects.requireNonNull(context.getOptional(LootContextParams.TOOL), "LootContext contains tool, but it was null");
 
 			if (!tool.is(Items.DIAMOND_PICKAXE)) {
 				return;

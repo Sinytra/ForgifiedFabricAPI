@@ -3,7 +3,8 @@ version = getSubprojectVersion(project)
 moduleDependencies(project, [
 	'fabric-api-base',
 	'fabric-lifecycle-events-v1',
-	'fabric-resource-loader-v1'
+	'fabric-resource-loader-v1',
+	'fabric-item-api-v1'
 ])
 
 testDependencies(project, [

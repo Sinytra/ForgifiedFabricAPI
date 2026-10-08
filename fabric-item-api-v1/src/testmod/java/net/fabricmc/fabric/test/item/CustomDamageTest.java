@@ -80,9 +80,9 @@ public class CustomDamageTest implements ModInitializer {
 		}
 
 		private static Item.Properties buildProperties(ResourceKey<Item> resourceKey) {
-			Item.Properties props = new Item.Properties().pickaxe(ToolMaterial.GOLD, 3f, 5f).setId(resourceKey);
+			Item.Properties props = new Item.Properties().pickaxe(ToolMaterial.GOLD, 3f, 5f).setId(resourceKey)
+					.cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE);
 			((FabricItem.Properties) props).customDamage(WEIRD_DAMAGE_HANDLER);
-			((FabricItem.Properties) props).cookingFuel(ContextIntProviders.COOKING_TIME_WOOD_ITEMS_LARGE);
 			return props;
 		}
 
