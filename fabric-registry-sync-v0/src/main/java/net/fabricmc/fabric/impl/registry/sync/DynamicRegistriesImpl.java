@@ -26,7 +26,7 @@ import java.util.Set;
 
 import com.mojang.serialization.Codec;
 import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
@@ -37,6 +37,7 @@ import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 
 public final class DynamicRegistriesImpl {
 	private static final List<RegistryDataLoader.RegistryData<?>> DYNAMIC_REGISTRIES = new ArrayList<>();
+	private static final List<RegistryDataLoader.RegistryData<?>> RELOADABLE_REGISTRIES = new ArrayList<>();
 	public static final Set<ResourceKey<?>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Set<ResourceKey<? extends Registry<?>>> DYNAMIC_REGISTRY_KEYS = new HashSet<>();
 	public static final Map<ResourceKey<? extends Registry<?>>, Codec<?>> NETWORK_CODECS = new HashMap<>();
@@ -48,7 +49,7 @@ public final class DynamicRegistriesImpl {
 		Objects.requireNonNull(key, "Registry key cannot be null");
 		Objects.requireNonNull(serverCodec, "Server codec cannot be null");
 
-		if (DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().anyMatch(d -> d.key().equals(key))
+		if (DataPackRegistriesHooks.getWorldRegistriesWithDimensions().anyMatch(d -> d.key().equals(key))
 				|| DYNAMIC_REGISTRY_KEYS.contains(key)
 		) {
 			throw new IllegalArgumentException("Dynamic registry " + key + " has already been registered!");
@@ -69,12 +70,30 @@ public final class DynamicRegistriesImpl {
 		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
 	}
 
+	public static <T> void registerReloadable(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec) {
+		Objects.requireNonNull(key, "Registry key cannot be null");
+		Objects.requireNonNull(serverCodec, "Server codec cannot be null");
+
+		if (DataPackRegistriesHooks.getReloadableRegistries().stream().anyMatch(d -> d.key().equals(key)) || FABRIC_DYNAMIC_REGISTRY_KEYS.contains(key)) {
+			throw new IllegalArgumentException("Dynamic registry " + key + " has already been registered!");
+		}
+
+		var entry = new RegistryDataLoader.RegistryData<>(key, serverCodec, RegistryValidator.none());
+		RELOADABLE_REGISTRIES.add(entry);
+		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
+	}
+
 	@SuppressWarnings({"rawtypes", "unchecked"})
-	static void onNewDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+	static void onNewDatapackRegistries(NewDatapackRegistryEvent event) {
 		for (RegistryDataLoader.RegistryData dynamicRegistry : DYNAMIC_REGISTRIES) {
 			Codec networkCodec = NETWORK_CODECS.get(dynamicRegistry.key());
-			event.dataPackRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec(), networkCodec);
+			event.worldRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec(), networkCodec);
 		}
+
+		for (RegistryDataLoader.RegistryData dynamicRegistry : RELOADABLE_REGISTRIES) {
+			event.reloadableRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec());
+		}
+
 		DYNAMIC_REGISTRIES.clear();
 	}
 }

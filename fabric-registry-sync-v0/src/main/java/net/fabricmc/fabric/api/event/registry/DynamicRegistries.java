@@ -93,7 +93,7 @@ public final class DynamicRegistries {
 	 * <br>Those registries are loaded by the game at different times, and some are not patched.
 	 */
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getWorldRegistries() {
-		return DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().toList();
+		return DataPackRegistriesHooks.getWorldRegistriesWithDimensions().toList();
 	}
 
 	/**
@@ -108,7 +108,7 @@ public final class DynamicRegistries {
 	 * <br>For example, it does not include the <code>minecraft:dimension</code> registry.
 	 */
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getBootstrappingRegistries() {
-		return DataPackRegistriesHooks.getDataPackRegistries();
+		return DataPackRegistriesHooks.getReloadableRegistries();
 	}
 
 	/**
@@ -117,7 +117,7 @@ public final class DynamicRegistries {
 	 */
 	@Deprecated
 	public static @Unmodifiable List<RegistryDataLoader.RegistryData<?>> getDynamicRegistries() {
-		return DataPackRegistriesHooks.getDataPackRegistries();
+		return DataPackRegistriesHooks.getWorldRegistries();
 	}
 
 	/**
@@ -178,6 +178,23 @@ public final class DynamicRegistries {
 	public static <T> void registerSynced(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec, Codec<T> clientCodec, SyncOption... options) {
 		DynamicRegistriesImpl.register(key, serverCodec);
 		DynamicRegistriesImpl.addSyncedRegistry(key, clientCodec, options);
+	}
+
+	/**
+	 * Registers a reloadable dynamic registry.
+	 *
+	 * <p>The entries of the registry will be loaded from data packs at the file path
+	 * {@code data/<entry namespace>/<registry namespace>/<registry path>/<entry path>.json}, and
+	 * will be refreshed when datapacks are uploaded.
+	 *
+	 * <p>Reloadable registries are <strong>NOT</strong> synced to the client.
+	 *
+	 * @param key   the unique key of the registry
+	 * @param codec the codec used to load registry entries from data packs
+	 * @param <T>   the entry type of the registry
+	 */
+	public static <T> void registerReloadable(ResourceKey<? extends Registry<T>> key, Codec<T> codec) {
+		DynamicRegistriesImpl.registerReloadable(key, codec);
 	}
 
 	/**

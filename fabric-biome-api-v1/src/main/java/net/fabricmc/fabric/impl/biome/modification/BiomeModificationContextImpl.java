@@ -127,7 +127,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		@Override
 		public void addAll(EnvironmentAttributeMap map) {
 			if (map.contains(EnvironmentAttributes.NATURAL_MOB_SPAWNS)) {
-				updateSpawnSettings(() -> addAllRaw(map));
+//				updateSpawnSettings(() -> addAllRaw(map)); // TODO 26.3 FFAPI
 				return;
 			}
 
@@ -143,7 +143,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		@Override
 		public <T> void set(EnvironmentAttribute<T> key, T value) {
 			if (key.equals(EnvironmentAttributes.NATURAL_MOB_SPAWNS)) {
-				updateSpawnSettings(() -> setRaw(key, value));
+//				updateSpawnSettings(() -> setRaw(key, value)); // TODO 26.3 FFAPI
 				return;
 			}
 
@@ -159,7 +159,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		@Override
 		public <T, M> void setModifier(EnvironmentAttribute<T> key, AttributeModifier<T, M> modifier, M value) {
 			if (key.equals(EnvironmentAttributes.NATURAL_MOB_SPAWNS)) {
-				updateSpawnSettings(() -> setModifierRaw(key, modifier, value));
+//				updateSpawnSettings(() -> setModifierRaw(key, modifier, value)); // TODO 26.3 FFAPI
 				return;
 			}
 
@@ -170,12 +170,6 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 			EnvironmentAttributeMap.Builder attributes = EnvironmentAttributeMap.builder().putAll(biome.getAttributes());
 			attributes.modify(key, modifier, value);
 			biome.attributes = attributes.build();
-		}
-
-		private void updateSpawnSettings(Runnable update) {
-			spawnSettings.applyPendingChanges();
-			update.run();
-			spawnSettings.reload();
 		}
 	}
 
@@ -252,8 +246,8 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		}
 
 		@Override
-		public boolean removeCarver(ResourceKey<ConfiguredWorldCarver<?>> configuredCarverKey) {
-			ConfiguredWorldCarver<?> carver = getHolder(carvers, configuredCarverKey).value();
+		public boolean removeCarver(ResourceKey<WorldCarver> configuredCarverKey) {
+			WorldCarver carver = getHolder(carvers, configuredCarverKey).value();
 			return generationSettings.getCarvers().removeIf(holder -> holder.value() == carver);
 		}
 
@@ -287,7 +281,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 
 		@Override
 		public void setCreatureGenerationProbability(float probability) {
-			spawnSettings.creatureGenerationProbability(probability);
+			builder.getAttributes().set(EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY, probability);
 		}
 
 		@Override
@@ -302,7 +296,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 			Objects.requireNonNull(category);
 			Objects.requireNonNull(data);
 
-			spawnSettings.addSpawn(category, weight, data);
+			spawnSettings.addSpawn(data.type(), weight, data.count());
 		}
 
 		@Override
@@ -317,14 +311,13 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 				}
 			}
 
-			rebuildSpawnSettings |= anyRemoved;
 			return anyRemoved;
 		}
 
 		@Override
 		public void addMobCharge(EntityType<?> entityType, double charge, double energyBudget) {
 			Objects.requireNonNull(entityType);
-			spawnSettings.addMobCharge(entityType, charge, energyBudget);
+			spawnSettings.addMobSpawnCost(entityType, charge, energyBudget);
 		}
 
 		@Override

@@ -89,7 +89,7 @@ public abstract class FabricRecipeProvider implements DataProvider {
 			public void accept(ResourceKey<Recipe<?>> key, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... forgeConditions) {
 				FabricDataGenHelper.addConditions(recipe, conditions);
 
-				if (advancementHolder != null) {
+				if (advancement != null) {
 					FabricDataGenHelper.addConditions(advancement.value(), conditions);
 				}
 

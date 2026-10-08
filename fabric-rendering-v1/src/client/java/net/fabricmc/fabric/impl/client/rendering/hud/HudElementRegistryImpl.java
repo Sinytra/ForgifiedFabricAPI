@@ -42,6 +42,7 @@ import net.minecraft.resources.Identifier;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.mixin.client.rendering.GuiLayerManagerAccessor;
+import net.fabricmc.fabric.mixin.client.rendering.HudAccessor;
 
 public class HudElementRegistryImpl {
 	@VisibleForTesting

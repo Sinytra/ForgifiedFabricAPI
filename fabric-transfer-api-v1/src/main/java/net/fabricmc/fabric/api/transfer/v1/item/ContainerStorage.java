@@ -19,6 +19,21 @@ package net.fabricmc.fabric.api.transfer.v1.item;
 import java.util.List;
 import java.util.Objects;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.Nullable;
+
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
+
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.impl.transfer.compat.FabricContainerStorage;
+
 /**
  * An implementation of {@code Storage<ItemVariant>} for vanilla's {@link Container}, {@link WorldlyContainer} and {@link Inventory}.
  *

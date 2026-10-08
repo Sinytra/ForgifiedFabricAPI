@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.ModifyRegistriesEvent;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 import net.neoforged.neoforge.registries.callback.AddCallback;
 
 import net.minecraft.core.RegistrationInfo;
@@ -48,7 +48,7 @@ public class FabricRegistryInit implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
-		bus.addListener(DataPackRegistryEvent.NewRegistry.class, DynamicRegistriesImpl::onNewDatapackRegistries);
+		bus.addListener(NewDatapackRegistryEvent.class, DynamicRegistriesImpl::onNewDatapackRegistries);
 		bus.addListener(ModifyRegistriesEvent.class, FabricRegistryInit::injectCallbacks);
 	}
 

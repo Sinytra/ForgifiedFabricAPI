@@ -71,7 +71,6 @@ import net.minecraft.network.protocol.game.ServerboundSetCreativeModeSlotPacket;
 import net.minecraft.network.protocol.game.ServerboundSetJigsawBlockPacket;
 import net.minecraft.network.protocol.game.ServerboundSetStructureBlockPacket;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
-import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.network.protocol.game.ServerboundTeleportToEntityPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
@@ -225,10 +224,6 @@ public final class FakePlayerPacketListener extends ServerGamePacketListenerImpl
 
 	@Override
 	public void handleChat(ServerboundChatPacket packet) {
-	}
-
-	@Override
-	public void handleAnimate(ServerboundSwingPacket packet) {
 	}
 
 	@Override

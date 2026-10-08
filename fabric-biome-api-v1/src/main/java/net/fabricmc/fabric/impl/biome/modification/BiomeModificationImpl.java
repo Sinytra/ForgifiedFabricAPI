@@ -27,7 +27,6 @@ import java.util.function.Predicate;
 import com.mojang.serialization.MapCodec;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.TestOnly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,8 +102,7 @@ public class BiomeModificationImpl {
 
 	public record FabricBiomeModifier(List<ModifierRecord> modifiers) implements BiomeModifier {
 		@Override
-		public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-			RegistryAccess.Frozen registryAccess = ServerLifecycleHooks.getCurrentServer().registryAccess();
+		public void modify(RegistryAccess registryAccess, Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
 			ResourceKey<Biome> key = biome.unwrapKey().orElseThrow();
 			Biome biomeValue = biome.value();
 			BiomeSelectionContext selectionContext = new BiomeSelectionContextImpl(registryAccess, key, biome);

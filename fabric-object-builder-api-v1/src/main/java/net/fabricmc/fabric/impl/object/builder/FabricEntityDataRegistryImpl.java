@@ -32,6 +32,7 @@ import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.event.registry.RegistryIdRemapCallback;
 import net.fabricmc.fabric.mixin.object.builder.EntityDataSerializersAccessor;
 
 public final class FabricEntityDataRegistryImpl {
