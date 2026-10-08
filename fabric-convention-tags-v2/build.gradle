@@ -1,21 +1,17 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file('src/main/resources/fabric-convention-tags-v2.classtweaker')
 }
 
-fabricApiModule {
-	moduleDependencies(
-		'fabric-api-base',
-		'fabric-lifecycle-events-v1'
-	)
+moduleDependencies(project, [
+	'fabric-api-base',
+	'fabric-lifecycle-events-v1'
+])
 
-	testDependencies(
-		':fabric-lifecycle-events-v1',
-	)
-}
+testDependencies(project, [
+	':fabric-lifecycle-events-v1',
+])
 
 sourceSets {
 	main {

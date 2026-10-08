@@ -1,3 +1,0 @@
-import net.fabricmc.fabric.impl.build.FabricApiBuildUtils
-
-version = FabricApiBuildUtils.moduleVersion(project)

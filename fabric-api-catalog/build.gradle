@@ -1,6 +1,5 @@
 plugins {
-	id "version-catalog"
-	id "fabric-api.base-publishing"
+	id 'version-catalog'
 }
 
 version = rootProject.version
@@ -11,14 +10,12 @@ publishing.publications {
 	}
 }
 
-remoteSign {
-	sign publishing.publications.mavenJava
-}
-
-tasks.withType(GenerateModuleMetadata).configureEach {
+tasks.withType(GenerateModuleMetadata) {
+	// todo: RemoteSignJar fails when this is false (as set by parent build script)
 	enabled = true
 }
 
+// Avoid configuration ordering issues by creating the catalog entries during task execution time
 tasks.register('configureCatalog') {
 	doConfigureCatalog()
 }
@@ -29,7 +26,7 @@ tasks.named('generateCatalogAsToml') {
 
 def doConfigureCatalog() {
 	for (proj in rootProject.allprojects) {
-		if (proj == project) {
+		if (proj == project) { // the catalog itself
 			continue
 		}
 
@@ -43,7 +40,7 @@ def doConfigureCatalog() {
 		} else if (catalogName == 'fabric-api') {
 			catalogName = 'fabric-api'
 		} else if (catalogName == 'internal') {
-			catalogName = 'internal-forgified-fabric-api'	
+			catalogName = 'internal-forgified-fabric-api'
 		} else {
 			catalogName = catalogName.substring('fabric-'.length())
 		}

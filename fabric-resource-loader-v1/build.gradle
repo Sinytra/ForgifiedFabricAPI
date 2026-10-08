@@ -1,23 +1,21 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabric-resource-loader-v1.classtweaker")
 }
 
-fabricApiModule {
-	moduleDependencies(
+//fabricApiModule {
+	moduleDependencies(project, [
 		'fabric-api-base'
-	)
+	])
 
-	testDependencies(
+	testDependencies(project, [
 		':fabric-lifecycle-events-v1',
 		':fabric-api-base',
 		':fabric-gametest-api-v1',
 		':fabric-resource-loader-v1'
-	)
-}
+	])
+//}
 
 // Setup 3 test mods used for testing resource sorting
 sourceSets {

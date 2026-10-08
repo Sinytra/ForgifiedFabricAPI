@@ -1,19 +1,17 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
 loom {
 	accessWidenerPath = file("src/main/resources/fabric-game-rule-api-v1.classtweaker")
 }
 
-fabricApiModule {
-	moduleDependencies(
+//fabricApiModule {
+	moduleDependencies(project, [
 		'fabric-api-base'
-	)
+	])
 
-	testDependencies(
+	testDependencies(project, [
 		':fabric-api-base',
 		':fabric-lifecycle-events-v1',
 		':fabric-resource-loader-v1'
-	)
-}
+	])
+//}

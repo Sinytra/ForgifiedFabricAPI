@@ -1,13 +1,9 @@
-plugins {
-	id 'fabric-api.module'
-}
+version = getSubprojectVersion(project)
 
-fabricApiModule {
-	moduleDependencies(
-		'fabric-api-base',
-		'fabric-resource-loader-v1'
-	)
-}
+moduleDependencies(project, [
+	'fabric-api-base',
+	'fabric-resource-loader-v1'
+])
 
 loom {
 	accessWidenerPath = file('src/main/resources/fabric-creative-tab-api-v1.classtweaker')
