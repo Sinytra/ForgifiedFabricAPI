@@ -240,8 +240,8 @@ publishMods {
 
     github {
         accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))
-        repository.set(githubRepository)
-        commitish.set(publishBranch)
+        repository.set(providers.environmentVariable("GITHUB_REPOSITORY").orElse(""))
+        commitish.set(providers.environmentVariable("GITHUB_SHA").orElse(""))
     }
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
