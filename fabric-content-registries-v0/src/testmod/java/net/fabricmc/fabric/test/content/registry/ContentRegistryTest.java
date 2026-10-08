@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.test.content.registry;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,11 +183,6 @@ public final class ContentRegistryTest implements ModInitializer {
 			// expected behavior
 			LOGGER.info("VibrationFrequencyRegistry test passed!");
 		}
-
-		FluidVariantAttributes.register(TEST_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
-		FluidVariantAttributes.register(TEST_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
-		FluidVariantAttributes.register(WATER_LIKE_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
-		FluidVariantAttributes.register(WATER_LIKE_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
 
 		FluidVariantAttributes.register(TEST_FLUID, FluidVariantAttributes.DEFAULT_HANDLER);
 		FluidVariantAttributes.register(TEST_FLUID_FLOWING, FluidVariantAttributes.DEFAULT_HANDLER);
