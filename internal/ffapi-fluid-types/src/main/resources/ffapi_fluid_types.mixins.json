@@ -3,7 +3,8 @@
   "package": "org.sinytra.ffapi.mixin.fluids",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "CommonHooksMixin"
+    "CommonHooksMixin",
+    "EntityFluidInteractionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
