@@ -143,7 +143,7 @@ public class DataGeneratorClientTestEntrypoint implements DataGeneratorEntrypoin
 					.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
 						.volume(0.7F), 1)
 					.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle2")))
-					.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL_HIT))
+					.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL.hitSound().orElseThrow()))
 					.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ARMOR_EQUIP_GENERIC))
 					.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
 						.volume(0.3F).pitch(0.5F).stream(true).preload(true).attenuationDistance(8)

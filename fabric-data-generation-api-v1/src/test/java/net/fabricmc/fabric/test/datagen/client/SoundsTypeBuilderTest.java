@@ -48,7 +48,7 @@ public class SoundsTypeBuilderTest {
 						new SoundTypeBuilderImpl.Entry(Identifier.withDefaultNamespace("mob/parrot/idle2"),
 								SoundTypeBuilder.RegistrationType.FILE, 1.0F, 1.0F, 1,
 								16, false, false),
-						new SoundTypeBuilderImpl.Entry(SoundEvents.ANVIL_HIT.value().location(),
+						new SoundTypeBuilderImpl.Entry(SoundEvents.ANVIL.hitSound().orElseThrow().value().location(),
 								SoundTypeBuilder.RegistrationType.SOUND_EVENT, 1.0F, 1.0F, 100,
 								16, false, false),
 						new SoundTypeBuilderImpl.Entry(SoundEvents.ARMOR_EQUIP_GENERIC.value().location(),
@@ -66,7 +66,7 @@ public class SoundsTypeBuilderTest {
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
 						.volume(0.7F), 1)
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle2")))
-				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL_HIT)
+				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL.hitSound().orElseThrow())
 						.weight(100))
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ARMOR_EQUIP_GENERIC))
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
@@ -83,7 +83,7 @@ public class SoundsTypeBuilderTest {
 						new SoundTypeBuilderImpl.Entry(Identifier.withDefaultNamespace("mob/creeper/hurt"),
 								SoundTypeBuilder.RegistrationType.FILE, 1.0F, 2.0F, 1,
 								16, false, false),
-						new SoundTypeBuilderImpl.Entry(SoundEvents.STONE_BREAK.value().location(),
+						new SoundTypeBuilderImpl.Entry(SoundEvents.STONE.breakSound().orElseThrow().value().location(),
 								SoundTypeBuilder.RegistrationType.SOUND_EVENT, 1.0F, 1.0F, 1,
 								16, false, false),
 						new SoundTypeBuilderImpl.Entry(Identifier.withDefaultNamespace("block/beacon/power"),
@@ -97,7 +97,7 @@ public class SoundsTypeBuilderTest {
 		SoundTypeBuilderImpl.SoundType soundType = ((SoundTypeBuilderImpl) SoundTypeBuilder.of()
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/creeper/hurt"))
 						.volume(1.0F).pitch(2.0F))
-				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.STONE_BREAK)
+				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.STONE.breakSound().orElseThrow())
 						.weight(1))
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("block/beacon/power"))
 						.volume(Float.MIN_VALUE).pitch(0.5F).stream(false).preload(false).attenuationDistance(0)

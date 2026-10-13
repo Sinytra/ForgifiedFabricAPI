@@ -1,6 +1,5 @@
 {
   "values": [
-    "fabric-block-api-v1-testmod:test_fluid",
-    "fabric-block-api-v1-testmod:test_fluid_flowing"
+    "fabric-block-api-v1-testmod:test_fluid"
   ]
 }

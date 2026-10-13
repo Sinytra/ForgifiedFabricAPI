@@ -52,7 +52,7 @@ public class CustomBlockTransformsTest implements ModInitializer {
 									BlockTransformer.BlockTransformData.builder(
 											BlockPredicate.matchesBlocks(Blocks.NETHER_BRICKS),
 											Blocks.CRACKED_NETHER_BRICKS
-									).sound(SoundEvents.NETHER_BRICKS_HIT).build()
+									).sound(SoundEvents.NETHER_BRICKS.hitSound().orElseThrow()).build()
 							);
 						}
 					}

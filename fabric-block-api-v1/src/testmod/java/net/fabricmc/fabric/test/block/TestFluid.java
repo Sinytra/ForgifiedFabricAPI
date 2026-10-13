@@ -24,23 +24,11 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.LavaFluid;
 
-public abstract class TestFluid extends LavaFluid {
+public class TestFluid extends LavaFluid {
 	public TestFluid() {
-	}
-
-	@Override
-	public Fluid getFlowing() {
-		return BlockTest.TEST_FLUID_FLOWING;
-	}
-
-	@Override
-	public Fluid getSource() {
-		return BlockTest.TEST_FLUID;
 	}
 
 	@Override
@@ -54,47 +42,12 @@ public abstract class TestFluid extends LavaFluid {
 	}
 
 	@Override
-	public boolean isSame(Fluid fluid) {
-		return fluid.is(BlockTest.TEST_FLUID_KEY);
-	}
-
-	@Override
-	public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, Fluid fluid, Direction direction) {
+	public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, FluidState fluid, Direction direction) {
 		return direction == Direction.DOWN;
 	}
 
 	@Override
 	public int getTickDelay(LevelReader level) {
 		return 5;
-	}
-
-	public static class Flowing extends TestFluid {
-		@Override
-		protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
-			super.createFluidStateDefinition(builder);
-			builder.add(LEVEL);
-		}
-
-		@Override
-		public int getAmount(FluidState state) {
-			return state.getValue(LEVEL);
-		}
-
-		@Override
-		public boolean isSource(FluidState state) {
-			return false;
-		}
-	}
-
-	public static class Source extends TestFluid {
-		@Override
-		public int getAmount(FluidState state) {
-			return 8;
-		}
-
-		@Override
-		public boolean isSource(FluidState state) {
-			return true;
-		}
 	}
 }

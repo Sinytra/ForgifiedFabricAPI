@@ -19,11 +19,15 @@ package net.fabricmc.fabric.impl.client.particle;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import net.minecraft.client.core.registries.BuiltInClientRegistries;
+import net.minecraft.client.core.registries.ClientRegistries;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleResources;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 
 import net.fabricmc.fabric.api.client.particle.v1.ParticleProviderRegistry;
 
@@ -60,18 +64,22 @@ public final class ParticleProviderRegistryImpl implements ParticleProviderRegis
 		}
 	}
 
-	record DirectParticleProviderRegistry(ParticleResources particleResources) implements ParticleProviderRegistry {
+	static class DirectParticleProviderRegistry implements ParticleProviderRegistry {
 		@Override
 		public <T extends ParticleOptions> void register(ParticleType<T> type, ParticleProvider<T> provider) {
-			particleResources.providers.put(BuiltInRegistries.PARTICLE_TYPE.getId(type), provider);
+			Registry.register(BuiltInClientRegistries.PARTICLE_PROVIDER, key(type), provider);
 		}
 
 		@Override
 		public <T extends ParticleOptions> void register(ParticleType<T> type, PendingParticleProvider<T> constructor) {
 			var delegate = new ParticleResources.MutableSpriteSet();
 			var fabricSpriteSet = new FabricSpriteSetImpl(delegate);
-			particleResources.spriteSets.put(BuiltInRegistries.PARTICLE_TYPE.getKey(type), delegate);
+			ParticleResources.SPRITE_SETS.put(key(type), delegate);
 			register(type, constructor.create(fabricSpriteSet));
+		}
+
+		private static ResourceKey<ParticleProvider<?>> key(ParticleType<?> type) {
+			return ResourceKey.create(ClientRegistries.PARTICLE_PROVIDER, BuiltInRegistries.PARTICLE_TYPE.getKey(type));
 		}
 	}
 
@@ -89,8 +97,8 @@ public final class ParticleProviderRegistryImpl implements ParticleProviderRegis
 		internalRegistry.register(type, constructor);
 	}
 
-	public void initialize(ParticleResources particleResources) {
-		ParticleProviderRegistry newRegistry = new DirectParticleProviderRegistry(particleResources);
+	public void initialize() {
+		ParticleProviderRegistry newRegistry = new DirectParticleProviderRegistry();
 		DeferredParticleProviderRegistry oldRegistry = (DeferredParticleProviderRegistry) internalRegistry;
 		oldRegistry.applyTo(newRegistry);
 		internalRegistry = newRegistry;

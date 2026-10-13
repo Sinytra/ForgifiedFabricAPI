@@ -34,6 +34,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundEventRegistration;
 import net.minecraft.client.resources.sounds.SoundEventRegistrationSerializer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.sounds.SoundEvents;
@@ -73,7 +74,7 @@ public class SoundsTypeCodecTest {
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
 						.volume(0.7F), 1)
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle2")))
-				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL_HIT)
+				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL.hitSound().orElseThrow())
 						.weight(100))
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ARMOR_EQUIP_GENERIC))
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
@@ -91,7 +92,7 @@ public class SoundsTypeCodecTest {
 		SoundTypeBuilder builder = SoundTypeBuilder.of()
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/creeper/hurt"))
 						.volume(1.0F).pitch(2.0F))
-				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.STONE_BREAK)
+				.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.STONE.breakSound().orElseThrow())
 						.weight(1))
 				.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("block/beacon/power"))
 						.volume(Float.MIN_VALUE).pitch(0.5F).stream(false).preload(false).attenuationDistance(0)
@@ -130,7 +131,7 @@ public class SoundsTypeCodecTest {
 			SoundTypeBuilderImpl.SoundType soundType = inputData.get(identifier);
 
 			Assertions.assertEquals(soundType.replace(), soundEventRegistration.isReplace());
-			Assertions.assertEquals(soundType.subtitle().orElse(null), soundEventRegistration.getSubtitle());
+			Assertions.assertEquals(soundType.subtitle().map(Component::translatable).orElse(null), soundEventRegistration.getSubtitle());
 
 			List<SoundTypeBuilderImpl.Entry> entryList = soundType.sounds();
 			List<Sound> soundList = soundEventRegistration.getSounds();

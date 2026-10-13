@@ -27,7 +27,7 @@ import net.fabricmc.fabric.impl.object.builder.FabricDefaultAttributeRegistryImp
 
 @Mixin(BuiltInRegistries.class)
 public class BuiltInRegistriesMixin {
-	@Inject(method = "freeze", at = @At("HEAD"))
+	@Inject(method = "bootStrap", at = @At("TAIL"))
 	private static void modifyAttributes(CallbackInfo ci) {
 		FabricDefaultAttributeRegistryImpl.invokeModify();
 	}

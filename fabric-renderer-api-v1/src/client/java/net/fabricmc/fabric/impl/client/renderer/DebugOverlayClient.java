@@ -18,12 +18,15 @@ package net.fabricmc.fabric.impl.client.renderer;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.client.core.registries.BuiltInClientRegistries;
+import net.minecraft.client.core.registries.ClientRegistries;
 import net.minecraft.client.gui.components.debug.DebugEntryCategory;
 import net.minecraft.client.gui.components.debug.DebugGroups;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
@@ -31,10 +34,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
 
 public class DebugOverlayClient implements ClientModInitializer {
-	public static Identifier ACTIVE_RENDERER = DebugScreenEntries.register(Identifier.fromNamespaceAndPath("fabric", "active_renderer"), new ActiveRendererDebugOverlayEntry());
+	public static final ResourceKey<DebugScreenEntry> ACTIVE_RENDERER = ResourceKey.create(ClientRegistries.DEBUG_SCREEN_ENTRY, Identifier.fromNamespaceAndPath("fabric", "active_renderer"));
 
 	@Override
 	public void onInitializeClient() {
+		Registry.register(BuiltInClientRegistries.DEBUG_SCREEN_ENTRY, ACTIVE_RENDERER, new ActiveRendererDebugOverlayEntry());
 	}
 
 	private static class ActiveRendererDebugOverlayEntry implements DebugScreenEntry {

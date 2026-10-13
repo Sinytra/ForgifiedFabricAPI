@@ -57,8 +57,7 @@ public final class BlockTest implements ModInitializer {
 	public static Block customLadderBlock;
 	public static Block customNonLadderBlock;
 
-	public static final FlowingFluid TEST_FLUID = Registry.register(BuiltInRegistries.FLUID, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid"), new TestFluid.Source());
-	public static final FlowingFluid TEST_FLUID_FLOWING = Registry.register(BuiltInRegistries.FLUID, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid_flowing"), new TestFluid.Flowing());
+	public static final FlowingFluid TEST_FLUID = Registry.register(BuiltInRegistries.FLUID, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid"), new TestFluid());
 	public static final LiquidBlock TEST_FLUID_BLOCK = Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid"), new LiquidBlock(TEST_FLUID, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MOD_ID, "test_fluid")))) {
 	});
 
@@ -75,7 +74,7 @@ public final class BlockTest implements ModInitializer {
 
 			if (level.getBlockState(position.below()).is(Blocks.BLUE_ICE)) { // Check we are above blue ice
 				level.setBlockAndUpdate(position, Blocks.ICE.defaultBlockState());
-				level.playSound(null, position, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1, 1);
+				level.playSound(null, position, SoundEvents.GLASS.placeSound().orElseThrow().value(), SoundSource.BLOCKS, 1, 1);
 				return false;
 			} else if (level.getBlockState(position.below()).is(Blocks.MAGMA_BLOCK)) { // Check we are above magma block
 				level.playSound(null, position, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1, 1);
@@ -83,7 +82,7 @@ public final class BlockTest implements ModInitializer {
 				return false;
 			} else if (level.getFluidState(position).is(FluidTags.WATER)) { // Check we are in water
 				level.setBlockAndUpdate(position, Blocks.BLACKSTONE.defaultBlockState());
-				level.playSound(null, position, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1, 1);
+				level.playSound(null, position, SoundEvents.STONE.placeSound().orElseThrow().value(), SoundSource.BLOCKS, 1, 1);
 				return false;
 			}
 

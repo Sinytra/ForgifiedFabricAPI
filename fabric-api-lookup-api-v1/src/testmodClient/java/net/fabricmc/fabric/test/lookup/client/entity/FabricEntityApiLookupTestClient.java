@@ -16,11 +16,23 @@
 
 package net.fabricmc.fabric.test.lookup.client.entity;
 
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.core.registries.BuiltInClientRegistries;
+import net.minecraft.client.core.registries.ClientRegistries;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.animal.pig.Pig;
+
 import net.fabricmc.fabric.test.lookup.entity.FabricEntityApiLookupTest;
 
 public class FabricEntityApiLookupTestClient {
 	public static void onInitializeClient() {
-		EntityRendererRegistry.register(FabricEntityApiLookupTest.INSPECTABLE_PIG, InspectablePigRenderer::new);
+		ResourceKey<EntityRendererProvider<?>> key = ResourceKey.create(
+				ClientRegistries.ENTITY_RENDERER,
+				BuiltInRegistries.ENTITY_TYPE.getKey(FabricEntityApiLookupTest.INSPECTABLE_PIG)
+		);
+		EntityRendererProvider<Pig> provider = InspectablePigRenderer::new;
+		Registry.register(BuiltInClientRegistries.ENTITY_RENDERER, key, provider);
 	}
 }

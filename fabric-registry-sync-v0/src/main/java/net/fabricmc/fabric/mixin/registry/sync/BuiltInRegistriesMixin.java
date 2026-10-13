@@ -19,22 +19,30 @@ package net.fabricmc.fabric.mixin.registry.sync;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.BuiltinRegistryBuilder;
 
 @Mixin(BuiltInRegistries.class)
 public class BuiltInRegistriesMixin {
 	@Unique
-	private static boolean hasInitialised = false;
+	private static boolean hasInitialised;
 
-	@Inject(method = "createContents", at = @At("HEAD"), cancellable = true)
-	private static void init(CallbackInfo ci) {
-		if (hasInitialised) {
-			ci.cancel();
+	@Redirect(method = "bootStrap", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/registries/BuiltinRegistryBuilder;bootStrap()V"))
+	private static void delayRegistryFreeze(BuiltinRegistryBuilder builder) {
+		if (!hasInitialised) {
+			hasInitialised = true;
+			builder.createContents();
+
+			for (Registry<?> registry : BuiltInRegistries.REGISTRY) {
+				((MappedRegistry<?>) registry).bindAllTagsToEmpty();
+			}
+		} else {
+			builder.freeze();
+			BuiltinRegistryBuilder.validate(builder.registry);
 		}
-
-		hasInitialised = true;
 	}
 }

@@ -60,8 +60,8 @@ public class FabricFluidRenderingTestModClient implements ClientModInitializer {
 		// Red stained glass will have falling fluid textures to the side
 		FluidRenderingRegistry.setBlockTransparency(Blocks.STAINED_GLASS.red(), false);
 
-		FluidRenderingRegistry.register(TestFluids.NO_OVERLAY, TestFluids.NO_OVERLAY_FLOWING, NO_OVERLAY_MODEL);
-		FluidRenderingRegistry.register(TestFluids.OVERLAY, TestFluids.OVERLAY_FLOWING, OVERLAY_MODEL);
-		FluidRenderingRegistry.register(TestFluids.CUSTOM, TestFluids.CUSTOM_FLOWING, CUSTOM_MODEL, new CustomizedFluidRenderer());
+		FluidRenderingRegistry.register(TestFluids.NO_OVERLAY, NO_OVERLAY_MODEL);
+		FluidRenderingRegistry.register(TestFluids.OVERLAY, OVERLAY_MODEL);
+		FluidRenderingRegistry.register(TestFluids.CUSTOM, CUSTOM_MODEL, new CustomizedFluidRenderer());
 	}
 }

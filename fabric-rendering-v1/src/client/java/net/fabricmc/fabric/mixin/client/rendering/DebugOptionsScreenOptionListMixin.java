@@ -16,8 +16,6 @@
 
 package net.fabricmc.fabric.mixin.client.rendering;
 
-import java.util.Map;
-
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -26,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.impl.client.rendering.DebugOptionsComparator;
@@ -38,8 +37,8 @@ public class DebugOptionsScreenOptionListMixin {
 	}
 
 	@WrapOperation(method = "updateSearch", at = @At(value = "INVOKE", target = "Ljava/lang/String;contains(Ljava/lang/CharSequence;)Z"))
-	private boolean searchPath(String instance, CharSequence searchStrings, Operation<Boolean> original, @Local(name = "entry") Map.Entry<Identifier, DebugScreenEntry> entry) {
-		final String namespace = entry.getKey().getNamespace();
+	private boolean searchPath(String instance, CharSequence searchStrings, Operation<Boolean> original, @Local(name = "holder") Holder.Reference<DebugScreenEntry> holder) {
+		final String namespace = holder.key().identifier().getNamespace();
 		return original.call(instance, searchStrings)
 				|| (!Identifier.DEFAULT_NAMESPACE.equals(namespace) && namespace.contains(searchStrings));
 	}

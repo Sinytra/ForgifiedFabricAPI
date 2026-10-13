@@ -26,7 +26,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.core.registries.BuiltInClientRegistries;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.main.GameConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -59,6 +61,11 @@ public class MinecraftMixin {
 		BuiltInRegistries.bootStrap();
 		BlockInitTracker.postFreeze();
 		CreativeModeTabs.validate();
+	}
+
+	@Inject(method = "<init>", at = @At("RETURN"))
+	private void afterClientSetup(GameConfig gameConfig, CallbackInfo ci) {
+		BuiltInClientRegistries.bootStrap();
 	}
 
 	@Unique

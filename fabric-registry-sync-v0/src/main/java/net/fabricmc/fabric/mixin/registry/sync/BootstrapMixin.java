@@ -19,7 +19,6 @@ package net.fabricmc.fabric.mixin.registry.sync;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -54,10 +53,5 @@ public class BootstrapMixin {
 		BlockItemTracker.register(BuiltInRegistries.ITEM);
 
 		RegistrySyncManager.bootstrapRegistries();
-	}
-
-	@Redirect(method = "bootStrap", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/registries/BuiltInRegistries;bootStrap()V"))
-	private static void delayRegistryFreeze() {
-		BuiltInRegistries.createContents();
 	}
 }

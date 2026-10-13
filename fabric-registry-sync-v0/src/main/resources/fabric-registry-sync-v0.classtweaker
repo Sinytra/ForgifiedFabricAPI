@@ -1,7 +1,11 @@
 classTweaker	v1	official
+accessible	field	net/minecraft/core/registries/BuiltInRegistries	BUILDER	Lnet/minecraft/core/registries/BuiltinRegistryBuilder;
+accessible	field	net/minecraft/core/registries/BuiltinRegistryBuilder	registry	Lnet/minecraft/core/WritableRegistry;
+accessible	method	net/minecraft/core/registries/BuiltinRegistryBuilder	createContents	()V
+accessible	method	net/minecraft/core/registries/BuiltinRegistryBuilder	freeze	()V
+accessible	method	net/minecraft/core/registries/BuiltinRegistryBuilder	validate	(Lnet/minecraft/core/Registry;)V
 accessible	field	net/minecraft/core/MappedRegistry	frozen	Z
 accessible	method	net/minecraft/core/Holder$Reference	bindValue	(Ljava/lang/Object;)V
-accessible	method	net/minecraft/core/registries/BuiltInRegistries	createContents	()V
 accessible	field	net/minecraft/resources/RegistryDataLoader	SYNCHRONIZED_REGISTRIES	Ljava/util/List;
 mutable	field	net/minecraft/resources/RegistryDataLoader	SYNCHRONIZED_REGISTRIES	Ljava/util/List;
 accessible	field	net/minecraft/core/RegistrySynchronization	NETWORKABLE_REGISTRIES	Ljava/util/Set;

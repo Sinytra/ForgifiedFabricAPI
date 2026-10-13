@@ -5,7 +5,6 @@
   "mixins": [
     "BlocksMixin",
     "BootstrapMixin",
-    "BuiltInRegistriesAccessor",
     "BuiltInRegistriesMixin",
     "DebugLevelSourceAccessor",
     "RegistriesDatapackGeneratorMixin",

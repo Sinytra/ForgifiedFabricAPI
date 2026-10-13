@@ -289,6 +289,7 @@ transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerato
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createLantern	(Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createCopperLantern	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createCopperChain	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
+transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createCrackingIce	(Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createGrassLikeBlock	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createWeightedPressurePlate	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	copyModel	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V

@@ -49,7 +49,7 @@ public class TrackStackEntity extends Mob {
 
 	@Override
 	protected SoundEvent getAmbientSound() {
-		return SoundEvents.CAT_AMBIENT_BABY.value();
+		return SoundEvents.BABY_CAT_SOUND_SET.ambientSound().orElseThrow().value();
 	}
 
 	public Iterable<Component> getLabelLines() {

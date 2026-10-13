@@ -26,10 +26,9 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-
-import net.fabricmc.fabric.mixin.registry.sync.BuiltInRegistriesAccessor;
 
 /**
  * Used to create custom registries, with specified registry attributes.
@@ -146,7 +145,7 @@ public final class FabricRegistryBuilder<T, R extends WritableRegistry<T>> {
 		}
 
 		//noinspection unchecked
-		BuiltInRegistriesAccessor.getWRITABLE_REGISTRY().register((ResourceKey<WritableRegistry<?>>) key, registry, RegistrationInfo.BUILT_IN);
+		BuiltInRegistries.BUILDER.registry.register((ResourceKey<WritableRegistry<?>>) key, registry, RegistrationInfo.BUILT_IN);
 
 		return registry;
 	}

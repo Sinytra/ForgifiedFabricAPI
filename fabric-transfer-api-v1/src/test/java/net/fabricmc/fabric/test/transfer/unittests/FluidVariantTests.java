@@ -39,10 +39,10 @@ class FluidVariantTests extends AbstractTransferApiTest {
 
 	@Test
 	public void testFlowing() {
-		assertFluidEquals(Fluids.WATER, FluidVariant.of(Fluids.WATER), FluidVariant.of(Fluids.FLOWING_WATER));
-		assertFluidEquals(Fluids.LAVA, FluidVariant.of(Fluids.LAVA), FluidVariant.of(Fluids.FLOWING_LAVA));
-		assertEquals(FluidVariant.of(Fluids.WATER), FluidVariant.of(Fluids.FLOWING_WATER));
-		assertEquals(FluidVariant.of(Fluids.LAVA), FluidVariant.of(Fluids.FLOWING_LAVA));
+		assertFluidEquals(Fluids.WATER, FluidVariant.of(Fluids.WATER), FluidVariant.of(Fluids.WATER.getFlowing(3).getType()));
+		assertFluidEquals(Fluids.LAVA, FluidVariant.of(Fluids.LAVA), FluidVariant.of(Fluids.LAVA.getFlowing(3).getType()));
+		assertEquals(FluidVariant.of(Fluids.WATER), FluidVariant.of(Fluids.WATER.getFlowing(3).getType()));
+		assertEquals(FluidVariant.of(Fluids.LAVA), FluidVariant.of(Fluids.LAVA.getFlowing(3).getType()));
 	}
 
 	@Test

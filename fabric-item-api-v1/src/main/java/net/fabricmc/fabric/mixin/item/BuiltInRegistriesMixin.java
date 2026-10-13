@@ -25,7 +25,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 
 @Mixin(BuiltInRegistries.class)
 public abstract class BuiltInRegistriesMixin {
-	@Inject(method = "freeze", at = @At("HEAD"))
+	@Inject(method = "bootStrap", at = @At("HEAD"))
 	private static void modifyDefaultItemComponents(CallbackInfo ci) {
 		// TODO 26.1 patch in DataComponentInitializers.BakedEntry
 		//DefaultItemComponentImpl.modifyItemComponents();

@@ -3,8 +3,8 @@
   "package": "net.fabricmc.fabric.mixin.registry.sync.client",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "BuiltInClientRegistriesMixin",
     "MinecraftMixin",
-    "ParticleResourcesMixin",
     "RegistryDataCollectorContentsCollectorAccessor",
     "RegistryDataCollectorMixin",
     "WorldOpenFlowsMixin"

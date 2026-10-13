@@ -16,19 +16,23 @@
 
 package net.fabricmc.fabric.mixin.client.particle;
 
+import java.util.Map;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleResources;
+import net.minecraft.core.particles.ParticleType;
 
 import net.fabricmc.fabric.impl.client.particle.ParticleProviderRegistryImpl;
 
 @Mixin(ParticleResources.class)
 public abstract class ParticleResourcesMixin {
-	@Inject(method = "registerProviders", at = @At("RETURN"))
-	private void onRegisterDefaultFactories(CallbackInfo info) {
-		ParticleProviderRegistryImpl.INSTANCE.initialize((ParticleResources) (Object) this);
+	@Inject(method = "buildProviderLookup", at = @At("HEAD"))
+	private static void onBuildProviderLookup(CallbackInfoReturnable<Map<ParticleType<?>, ParticleProvider<?>>> info) {
+		ParticleProviderRegistryImpl.INSTANCE.initialize();
 	}
 }

@@ -1,6 +1,5 @@
 {
   "values": [
-    "fabric-content-registries-v0-testmod:test_fluid",
-    "fabric-content-registries-v0-testmod:test_fluid_flowing"
+    "fabric-content-registries-v0-testmod:test_fluid"
   ]
 }

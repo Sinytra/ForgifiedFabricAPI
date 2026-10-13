@@ -82,15 +82,13 @@ public final class ContentRegistryTest implements ModInitializer {
 	public static final ResourceKey<Block> TEST_OXIDIZING_BLOCK_KEY = ResourceKey.create(Registries.BLOCK, id("test_oxidizing"));
 	public static final ResourceKey<Block> EXPOSED_TEST_OXIDIZING_BLOCK_KEY = ResourceKey.create(Registries.BLOCK, id("exposed_test_oxidizing"));
 
-	public static final FlowingFluid TEST_FLUID = Registry.register(BuiltInRegistries.FLUID, id("test_fluid"), new TestFluid.Still());
-	public static final FlowingFluid TEST_FLUID_FLOWING = Registry.register(BuiltInRegistries.FLUID, id("test_fluid_flowing"), new TestFluid.Flowing());
+	public static final FlowingFluid TEST_FLUID = Registry.register(BuiltInRegistries.FLUID, id("test_fluid"), new TestFluid());
 	public static final LiquidBlock TEST_FLUID_BLOCK = Registry.register(BuiltInRegistries.BLOCK, id("test_fluid"), new LiquidBlock(TEST_FLUID, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).setId(ResourceKey.create(Registries.BLOCK, id("test_fluid")))) {
 	});
 
 	public static final TagKey<Fluid> TEST_FLUID_KEY = TagKey.create(Registries.FLUID, id("test_fluid"));
 
-	public static final FlowingFluid WATER_LIKE_FLUID = Registry.register(BuiltInRegistries.FLUID, id("water_like_fluid"), new WaterLikeFluid.Still());
-	public static final FlowingFluid WATER_LIKE_FLUID_FLOWING = Registry.register(BuiltInRegistries.FLUID, id("water_like_fluid_flowing"), new WaterLikeFluid.Flowing());
+	public static final FlowingFluid WATER_LIKE_FLUID = Registry.register(BuiltInRegistries.FLUID, id("water_like_fluid"), new WaterLikeFluid());
 	public static final LiquidBlock WATER_LIKE_FLUID_BLOCK = Registry.register(BuiltInRegistries.BLOCK, id("water_like_fluid"), new LiquidBlock(WATER_LIKE_FLUID, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).setId(ResourceKey.create(Registries.BLOCK, id("test_fluid")))) {
 	});
 

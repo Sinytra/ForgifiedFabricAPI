@@ -43,7 +43,7 @@ public class FluidVariantImpl implements FluidVariant {
 
 			if (fluid instanceof FlowingFluid flowable) {
 				// Normalize FlowingFluids to their still variants.
-				fluid = flowable.getSource();
+				fluid = flowable.getSource().getType();
 			} else {
 				// If not a FlowingFluid, we don't know how to convert -> crash.
 				Identifier id = BuiltInRegistries.FLUID.getKey(fluid);

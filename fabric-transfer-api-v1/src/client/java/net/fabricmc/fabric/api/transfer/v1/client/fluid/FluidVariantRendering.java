@@ -55,7 +55,6 @@ public final class FluidVariantRendering {
 		};
 
 		register(Fluids.WATER, waterRenderHandler);
-		register(Fluids.FLOWING_WATER, waterRenderHandler);
 	}
 
 	private FluidVariantRendering () {

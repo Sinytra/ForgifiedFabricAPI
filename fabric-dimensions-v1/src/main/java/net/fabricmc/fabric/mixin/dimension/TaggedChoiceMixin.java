@@ -17,8 +17,8 @@
 package net.fabricmc.fabric.mixin.dimension;
 
 import com.mojang.datafixers.types.Type;
+import com.mojang.datafixers.types.families.TypeFamily;
 import com.mojang.datafixers.types.templates.TaggedChoice;
-import com.mojang.datafixers.util.Pair;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,7 +45,7 @@ public class TaggedChoiceMixin implements TaggedChoiceExtension {
 	@Inject(
 			method = "lambda$apply$0", at = @At("RETURN")
 	)
-	private void onApply(Pair key, CallbackInfoReturnable<Type> cir) {
+	private void onApply(TypeFamily family, int index, CallbackInfoReturnable<Type> cir) {
 		if (failSoft) {
 			Type returnValue = cir.getReturnValue();
 

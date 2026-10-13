@@ -16,13 +16,25 @@
 
 package net.fabricmc.fabric.test.object.builder.client;
 
+import net.minecraft.client.core.registries.BuiltInClientRegistries;
+import net.minecraft.client.core.registries.ClientRegistries;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.test.object.builder.EntityDataAccessorTest;
+import net.fabricmc.fabric.test.object.builder.TrackStackEntity;
 
 public class EntityDataAccessorClientTest implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		EntityRendererRegistry.register(EntityDataAccessorTest.TRACK_STACK_ENTITY, TrackStackEntityRenderer::new);
+		ResourceKey<EntityRendererProvider<?>> key = ResourceKey.create(
+				ClientRegistries.ENTITY_RENDERER,
+				BuiltInRegistries.ENTITY_TYPE.getKey(EntityDataAccessorTest.TRACK_STACK_ENTITY)
+		);
+		EntityRendererProvider<TrackStackEntity> provider = TrackStackEntityRenderer::new;
+		Registry.register(BuiltInClientRegistries.ENTITY_RENDERER, key, provider);
 	}
 }

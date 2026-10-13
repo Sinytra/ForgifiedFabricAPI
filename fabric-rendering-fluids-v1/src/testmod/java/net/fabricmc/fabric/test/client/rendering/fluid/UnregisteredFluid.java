@@ -32,23 +32,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 
-public abstract class UnregisteredFluid extends FlowingFluid {
+public class UnregisteredFluid extends FlowingFluid {
 	public UnregisteredFluid() {
-	}
-
-	@Override
-	public Fluid getFlowing() {
-		return TestFluids.UNREGISTERED_FLOWING;
-	}
-
-	@Override
-	public Fluid getSource() {
-		return TestFluids.UNREGISTERED;
 	}
 
 	@Override
@@ -78,11 +66,6 @@ public abstract class UnregisteredFluid extends FlowingFluid {
 	}
 
 	@Override
-	public boolean isSame(Fluid fluid) {
-		return fluid == TestFluids.UNREGISTERED || fluid == TestFluids.UNREGISTERED_FLOWING;
-	}
-
-	@Override
 	public int getDropOff(LevelReader level) {
 		return 1;
 	}
@@ -93,8 +76,8 @@ public abstract class UnregisteredFluid extends FlowingFluid {
 	}
 
 	@Override
-	public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, Fluid fluid, Direction direction) {
-		return direction == Direction.DOWN && !fluid.isSame(TestFluids.NO_OVERLAY);
+	public boolean canBeReplacedWith(FluidState state, BlockGetter level, BlockPos pos, FluidState fluid, Direction direction) {
+		return direction == Direction.DOWN && !fluid.is(TestFluids.NO_OVERLAY);
 	}
 
 	@Override
@@ -105,41 +88,5 @@ public abstract class UnregisteredFluid extends FlowingFluid {
 	@Override
 	public Optional<SoundEvent> getPickupSound() {
 		return Optional.of(SoundEvents.BUCKET_FILL);
-	}
-
-	public static class Flowing extends UnregisteredFluid {
-		public Flowing() {
-		}
-
-		@Override
-		protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
-			super.createFluidStateDefinition(builder);
-			builder.add(LEVEL);
-		}
-
-		@Override
-		public int getAmount(FluidState state) {
-			return state.getValue(LEVEL);
-		}
-
-		@Override
-		public boolean isSource(FluidState state) {
-			return false;
-		}
-	}
-
-	public static class Still extends UnregisteredFluid {
-		public Still() {
-		}
-
-		@Override
-		public int getAmount(FluidState state) {
-			return 8;
-		}
-
-		@Override
-		public boolean isSource(FluidState state) {
-			return true;
-		}
 	}
 }

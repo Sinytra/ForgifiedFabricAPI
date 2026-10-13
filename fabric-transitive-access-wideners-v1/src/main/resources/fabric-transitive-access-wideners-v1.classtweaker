@@ -9,7 +9,7 @@ transitive-accessible	method	net/minecraft/world/inventory/MenuType	<init>	(Lnet
 
 # Registering custom screen handler type -> screen mappings
 transitive-accessible	class	net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
-transitive-accessible	method	net/minecraft/client/gui/screens/MenuScreens	register	(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+transitive-accessible	method	net/minecraft/client/gui/screens/MenuScreens	register	(Lnet/minecraft/core/Registry;Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;
 
 # Data contained in loot tables and pools
 transitive-accessible	field	net/minecraft/world/level/storage/loot/LootPool	entries	Ljava/util/List;
@@ -39,10 +39,10 @@ transitive-accessible	field	net/minecraft/client/gui/GuiGraphicsExtractor	scisso
 transitive-accessible	class	net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
 
 # Registering custom block entity renderers
-transitive-accessible	method	net/minecraft/client/renderer/blockentity/BlockEntityRenderers	register	(Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
+transitive-accessible	method	net/minecraft/client/renderer/blockentity/BlockEntityRenderers	register	(Lnet/minecraft/core/Registry;Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;
 
 # Registering custom entity renderers
-transitive-accessible	method	net/minecraft/client/renderer/entity/EntityRenderers	register	(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/client/renderer/entity/EntityRendererProvider;)V
+transitive-accessible	method	net/minecraft/client/renderer/entity/EntityRenderers	register	(Lnet/minecraft/core/Registry;Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/client/renderer/entity/EntityRendererProvider;)Lnet/minecraft/client/renderer/entity/EntityRendererProvider;
 
 # Adding custom item model types
 transitive-accessible	field	net/minecraft/client/renderer/item/ItemModels	ID_MAPPER	Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;
@@ -120,9 +120,6 @@ transitive-accessible	method	net/minecraft/world/level/block/Blocks	never	(Lnet/
 # Methods used in block registration
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	register	(Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Function;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	register	(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;
-
-# Debug HUD Entries
-transitive-accessible	method	net/minecraft/client/gui/components/debug/DebugScreenEntries	register	(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/gui/components/debug/DebugScreenEntry;)Lnet/minecraft/resources/Identifier;
 
 # Render Types
 transitive-accessible	method	net/minecraft/client/renderer/rendertype/RenderType	create	(Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;

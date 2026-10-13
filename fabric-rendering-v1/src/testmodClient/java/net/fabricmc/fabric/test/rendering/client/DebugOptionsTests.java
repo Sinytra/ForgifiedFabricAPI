@@ -16,26 +16,32 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
+import net.minecraft.client.core.registries.BuiltInClientRegistries;
+import net.minecraft.client.core.registries.ClientRegistries;
 import net.minecraft.client.gui.components.debug.DebugGroups;
-import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 
 import net.fabricmc.api.ClientModInitializer;
 
 public class DebugOptionsTests implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		DebugScreenEntries.register(Identifier.fromNamespaceAndPath("fabric-rendering", "example"), (lines, level, clientChunk, chunk) -> {
+		register("example", (lines, _, _, _) -> {
 			lines.addToGroup(DebugGroups.MISC, "Very important debug information");
 		});
 
-		DebugScreenEntry nope = (lines, level, clientChunk, chunk) -> {
-		};
-
 		// Test sorting
-		DebugScreenEntries.register(Identifier.fromNamespaceAndPath("fabric-rendering", "a"), nope);
-		DebugScreenEntries.register(Identifier.fromNamespaceAndPath("fabric-rendering", "b"), nope);
-		DebugScreenEntries.register(Identifier.fromNamespaceAndPath("fabric-rendering", "z"), nope);
+		register("a", (_, _, _, _) -> { });
+		register("b", (_, _, _, _) -> { });
+		register("z", (_, _, _, _) -> { });
+	}
+
+	private static void register(String path, DebugScreenEntry entry) {
+		Identifier id = Identifier.fromNamespaceAndPath("fabric-rendering", path);
+		ResourceKey<DebugScreenEntry> key = ResourceKey.create(ClientRegistries.DEBUG_SCREEN_ENTRY, id);
+		Registry.register(BuiltInClientRegistries.DEBUG_SCREEN_ENTRY, key, entry);
 	}
 }
