@@ -19,8 +19,6 @@ val versionForgifiedFabricLoader: String by project
 
 val curseForgeId: String by project
 val modrinthId: String by project
-val githubRepository: String by project
-val publishBranch: String by project
 
 val META_PROJECTS: List<String> = listOf(
     "deprecated",
@@ -231,8 +229,8 @@ publishMods {
 
     github {
         accessToken.set(providers.environmentVariable("GITHUB_TOKEN"))
-        repository.set(githubRepository)
-        commitish.set(publishBranch)
+        repository.set(providers.environmentVariable("GITHUB_REPOSITORY").orElse(""))
+        commitish.set(providers.environmentVariable("GITHUB_SHA").orElse(""))
     }
     curseforge {
         accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
