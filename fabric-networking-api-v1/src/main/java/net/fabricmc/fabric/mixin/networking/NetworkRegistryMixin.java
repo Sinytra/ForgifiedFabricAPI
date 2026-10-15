@@ -45,7 +45,7 @@ public class NetworkRegistryMixin {
         }
     }
 
-    @ModifyReturnValue(method = "getCodec", at = @At(value = "RETURN", ordinal = 3))
+    @ModifyReturnValue(method = "getCodec", at = @At("RETURN"))
     private static StreamCodec<? super FriendlyByteBuf, ? extends CustomPacketPayload> getFabricDynamicCodec(StreamCodec<? super FriendlyByteBuf, ? extends CustomPacketPayload> codec, ResourceLocation id, ConnectionProtocol protocol, PacketFlow flow) {
         if (codec == NeoNetworkRegistrar.DUMMY_CODEC) {
             PayloadTypeRegistryImpl<? extends FriendlyByteBuf> registry = NeoNetworkRegistrar.getPayloadRegistry(protocol, flow);
