@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.client.server.IntegratedServer;
 
 @Mixin(IntegratedServer.class)
-public class IntegratedServerMixin {
+class IntegratedServerMixin {
 	@WrapOperation(method = "halt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/server/IntegratedServer;executeBlocking(Ljava/lang/Runnable;)V"))
 	private void queueGuestRemoval(IntegratedServer server, Runnable task, Operation<Void> original) {
 		if (server.isSameThread()) {
