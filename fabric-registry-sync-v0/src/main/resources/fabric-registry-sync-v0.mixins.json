@@ -5,6 +5,7 @@
   "mixins": [
     "BaseMappedRegistryAccessor",
     "BaseMappedRegistryMixin",
+    "DataPackRegistryEventNewRegistryAccessor",
     "MappedRegistryAccessor",
     "RegistryDataLoaderMixin",
     "RegistryManagerAccessor",
