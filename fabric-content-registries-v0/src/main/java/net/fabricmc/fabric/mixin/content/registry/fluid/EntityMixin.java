@@ -29,7 +29,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
@@ -106,6 +108,20 @@ public abstract class EntityMixin implements EntityFluidExtension, InternalEntit
 		}
 
 		return hasInteracted;
+	}
+
+	@Inject(method = "getFluidHeight(Lnet/minecraft/tags/TagKey;)D", at = @At("HEAD"), cancellable = true)
+	private void getCustomFluidHeight(TagKey<Fluid> fluid, CallbackInfoReturnable<Double> cir) {
+		if (fluid != FluidTags.WATER && fluid != FluidTags.LAVA) {
+			cir.setReturnValue(this.fluidInteraction.getFluidHeight(fluid));
+		}
+	}
+
+	@Inject(method = "isEyeInFluid(Lnet/minecraft/tags/TagKey;)Z", at = @At("HEAD"), cancellable = true)
+	private void isEyeInCustomFluid(TagKey<Fluid> fluid, CallbackInfoReturnable<Boolean> cir) {
+		if (fluid != FluidTags.WATER && fluid != FluidTags.LAVA) {
+			cir.setReturnValue(this.fluidInteraction.isEyeInFluid(fluid));
+		}
 	}
 
 	@Override

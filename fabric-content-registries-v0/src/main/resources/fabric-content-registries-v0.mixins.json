@@ -28,6 +28,7 @@
     "WorkAtComposterAccessor",
     "fluid.EntityAccessor",
     "fluid.EntityFluidInteractionAccessor",
+    "fluid.EntityFluidInteractionMixin",
     "fluid.EntityFluidInteractionTrackerAccessor",
     "fluid.EntityMixin",
     "fluid.FloatGoalMixin",

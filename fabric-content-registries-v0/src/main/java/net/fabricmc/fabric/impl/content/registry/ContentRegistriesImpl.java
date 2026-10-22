@@ -1,11 +1,13 @@
 package net.fabricmc.fabric.impl.content.registry;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.sinytra.fabric.content_registries.generated.GeneratedEntryPoint;
 
@@ -23,7 +25,12 @@ import net.fabricmc.fabric.mixin.content.registry.fluid.EntityFluidInteractionTr
 
 @Mod(GeneratedEntryPoint.MOD_ID)
 public class ContentRegistriesImpl {
-	private static final Map<TagKey<Fluid>, Collection<FluidType>> FLUID_TYPE_CACHE = new HashMap<>();
+	private static final Map<TagKey<Fluid>, Collection<FluidType>> FLUID_TYPE_CACHE = new ConcurrentHashMap<>();
+
+	public ContentRegistriesImpl() {
+		NeoForge.EVENT_BUS.addListener(TagsUpdatedEvent.ServerDataLoad.class, event -> FLUID_TYPE_CACHE.clear());
+		NeoForge.EVENT_BUS.addListener(TagsUpdatedEvent.ClientPacketReceived.class, event -> FLUID_TYPE_CACHE.clear());
+	}
 
 	public static boolean isInFluid(EntityFluidInteraction interaction, TagKey<Fluid> tagKey) {
 		return getFluidTypes(tagKey).stream().anyMatch(interaction::isInFluid);
