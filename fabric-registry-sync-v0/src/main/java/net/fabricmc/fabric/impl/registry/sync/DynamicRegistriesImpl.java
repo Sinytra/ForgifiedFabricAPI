@@ -17,64 +17,77 @@
 package net.fabricmc.fabric.impl.registry.sync;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import com.mojang.serialization.Codec;
 import net.neoforged.neoforge.registries.DataPackRegistriesHooks;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryDataLoader;
-import net.minecraft.resources.RegistryValidator;
 import net.minecraft.resources.ResourceKey;
 
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.fabricmc.fabric.mixin.registry.sync.DataPackRegistryEventNewRegistryAccessor;
 
 public final class DynamicRegistriesImpl {
-	private static final List<RegistryDataLoader.RegistryData<?>> DYNAMIC_REGISTRIES = new ArrayList<>();
+	private static final List<PendingRegistry<?>> PENDING_REGISTRIES = new ArrayList<>();
 	public static final Set<ResourceKey<?>> FABRIC_DYNAMIC_REGISTRY_KEYS = new HashSet<>();
-	public static final Set<ResourceKey<? extends Registry<?>>> DYNAMIC_REGISTRY_KEYS = new HashSet<>();
-	public static final Map<ResourceKey<? extends Registry<?>>, Codec<?>> NETWORK_CODECS = new HashMap<>();
+	
+	private static boolean initialized;
 
 	private DynamicRegistriesImpl() {
 	}
 
-	public static <T> RegistryDataLoader.RegistryData<T> register(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec) {
+	public static <T> void register(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec) {
+		register(key, serverCodec, null);
+	}
+
+	public static <T> void registerSynced(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec, Codec<T> clientCodec, DynamicRegistries.SyncOption... options) {
+		Objects.requireNonNull(clientCodec, "Client codec cannot be null");
+		Objects.requireNonNull(options, "Options cannot be null");
+
+		register(key, serverCodec, clientCodec);
+	}
+
+	private static synchronized <T> void register(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec, @Nullable Codec<T> networkCodec) {
 		Objects.requireNonNull(key, "Registry key cannot be null");
 		Objects.requireNonNull(serverCodec, "Server codec cannot be null");
 
 		if (DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().anyMatch(d -> d.key().equals(key))
-				|| DYNAMIC_REGISTRY_KEYS.contains(key)
+				|| FABRIC_DYNAMIC_REGISTRY_KEYS.contains(key)
 		) {
 			throw new IllegalArgumentException("Dynamic registry " + key + " has already been registered!");
 		}
 
-		var entry = new RegistryDataLoader.RegistryData<>(key, serverCodec, RegistryValidator.none());
-		DYNAMIC_REGISTRIES.add(entry);
 		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
-		return entry;
-	}
+		PendingRegistry<T> registry = new PendingRegistry<>(key, serverCodec, networkCodec);
 
-	public static <T> void addSyncedRegistry(ResourceKey<? extends Registry<T>> key, Codec<T> clientCodec, DynamicRegistries.SyncOption... options) {
-		Objects.requireNonNull(key, "Registry key cannot be null");
-		Objects.requireNonNull(clientCodec, "Client codec cannot be null");
-		Objects.requireNonNull(options, "Options cannot be null");
-
-		NETWORK_CODECS.put(key, clientCodec);
-		FABRIC_DYNAMIC_REGISTRY_KEYS.add(key);
-	}
-
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	static void onNewDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
-		for (RegistryDataLoader.RegistryData dynamicRegistry : DYNAMIC_REGISTRIES) {
-			Codec networkCodec = NETWORK_CODECS.get(dynamicRegistry.key());
-			event.dataPackRegistry(dynamicRegistry.key(), dynamicRegistry.elementCodec(), networkCodec);
+		if (initialized) {
+			DataPackRegistryEvent.NewRegistry event = new DataPackRegistryEvent.NewRegistry();
+			registry.register(event);
+			((DataPackRegistryEventNewRegistryAccessor) (Object) event).invokeProcess();
+		} else {
+			PENDING_REGISTRIES.add(registry);
 		}
-		DYNAMIC_REGISTRIES.clear();
+	}
+
+	static synchronized void onNewDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+		for (PendingRegistry<?> registry : PENDING_REGISTRIES) {
+			registry.register(event);
+		}
+
+		PENDING_REGISTRIES.clear();
+		initialized = true;
+	}
+
+	private record PendingRegistry<T>(ResourceKey<? extends Registry<T>> key, Codec<T> serverCodec, @Nullable Codec<T> networkCodec) {
+		@SuppressWarnings("unchecked")
+		void register(DataPackRegistryEvent.NewRegistry event) {
+			event.dataPackRegistry((ResourceKey<Registry<T>>) this.key, this.serverCodec, this.networkCodec);
+		}
 	}
 }
