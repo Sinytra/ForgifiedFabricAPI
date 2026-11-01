@@ -25,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.GenerationChunkHolder;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ImposterProtoChunk;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatusTasks;
 import net.minecraft.world.level.chunk.status.WorldGenContext;
@@ -38,18 +37,10 @@ abstract class ChunkStatusTasksMixin {
 	@Unique
 	private static final FullChunkStatus[] fabric_FULL_CHUNK_STATUSES = FullChunkStatus.values(); // values() clones the internal array each call, so cache the return
 
+	// Neo: CHUNK_LOAD and CHUNK_GENERATE are fired from NeoForge's ChunkEvent.Load (see LifecycleEventsImpl), which is posted at the end of this lambda.
 	@Inject(method = "lambda$full$0", at = @At("TAIL"))
 	private static void onChunkLoad(ChunkAccess chunk, WorldGenContext worldGenContext, GenerationChunkHolder chunkHolder, CallbackInfoReturnable<ChunkAccess> callbackInfoReturnable) {
 		LevelChunk levelChunk = (LevelChunk) callbackInfoReturnable.getReturnValue();
-
-		boolean generated = !(chunk instanceof ImposterProtoChunk);
-
-		// We fire the event at TAIL since the chunk is guaranteed to be a LevelChunk then.
-		ServerChunkEvents.CHUNK_LOAD.invoker().onChunkLoad(worldGenContext.level(), levelChunk, generated);
-
-		if (generated) {
-			ServerChunkEvents.CHUNK_GENERATE.invoker().onChunkGenerate(worldGenContext.level(), levelChunk);
-		}
 
 		// Handles the case where the chunk becomes accessible from being completely unloaded, only fires if chunkHolder has been set to at least that full chunk status
 		FullChunkStatusEventTracker chunkStatusTracker = (FullChunkStatusEventTracker) chunkHolder;

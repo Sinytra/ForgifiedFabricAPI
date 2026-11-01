@@ -16,6 +16,10 @@
 
 package net.fabricmc.fabric.impl.event.lifecycle;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.ChunkEvent;
+
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -29,6 +33,24 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 public final class LifecycleEventsImpl implements ModInitializer {
 	@Override
 	public void onInitialize() {
+		// Neo: fire chunk load/unload from NeoForge's chunk events instead of vanilla injections,
+		// so they also fire when a mod replaces vanilla's chunk system and posts NeoForge's events itself.
+		NeoForge.EVENT_BUS.addListener(ChunkEvent.Load.class, event -> {
+			if (event.getLevel() instanceof ServerLevel level) {
+				ServerChunkEvents.CHUNK_LOAD.invoker().onChunkLoad(level, event.getChunk(), event.isNewChunk());
+
+				if (event.isNewChunk()) {
+					ServerChunkEvents.CHUNK_GENERATE.invoker().onChunkGenerate(level, event.getChunk());
+				}
+			}
+		});
+
+		NeoForge.EVENT_BUS.addListener(ChunkEvent.Unload.class, event -> {
+			if (event.getLevel() instanceof ServerLevel level) {
+				ServerChunkEvents.CHUNK_UNLOAD.invoker().onChunkUnload(level, event.getChunk());
+			}
+		});
+
 		// Part of impl for block entity events
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
 			((LoadedChunksCache) level).fabric_markLoaded(chunk);
